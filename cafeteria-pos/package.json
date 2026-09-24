@@ -4,12 +4,15 @@
   "private": true,
   "description": "POS integral para cafetería: stock FIFO, recetas y costeo, mostrador y mesas, boletas, comanda, pantalla cliente y dashboard.",
   "scripts": {
-    "setup": "npm ci --prefix server && npm ci --prefix web && npm run db:setup",
-    "db:setup": "[ -f server/.env ] || cp server/.env.example server/.env; npm run db:deploy --prefix server && npm run db:seed --prefix server",
+    "iniciar": "node scripts/iniciar.mjs",
+    "setup": "node scripts/iniciar.mjs --preparar",
+    "build": "node scripts/iniciar.mjs --preparar --reconstruir",
+    "start": "npm start --prefix server",
     "dev:server": "npm run dev --prefix server",
     "dev:web": "npm run dev --prefix web",
-    "build": "npm run build --prefix web && rm -rf server/public && cp -r web/dist server/public",
-    "start": "npm start --prefix server",
     "test": "npm test --prefix server"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

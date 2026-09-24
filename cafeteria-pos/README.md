@@ -11,7 +11,25 @@ segura y probada. Ver [Qué cambió respecto a v1](#qué-cambió-respecto-a-v1).
 
 ## Inicio rápido
 
-### Con Docker (recomendado)
+### Paso a paso (sin experiencia técnica)
+
+1. **Instala Node.js** (una sola vez): entra a https://nodejs.org, descarga la
+   versión **LTS** (22 o superior) e instálala con las opciones por defecto.
+2. **Descarga el proyecto** y descomprímelo:
+   https://github.com/Amras17/tienda-y-pagina-virtual/archive/refs/heads/claude/happy-pasteur-cmz75d.zip
+3. **Abre una terminal dentro de la carpeta `cafeteria-pos`**:
+   - Windows: abre la carpeta en el Explorador, escribe `cmd` en la barra de
+     direcciones y presiona Enter.
+   - Mac: clic derecho sobre la carpeta → «Nuevo Terminal en la carpeta».
+4. Escribe **`npm run iniciar`** y presiona Enter. La primera vez tarda unos
+   minutos; las siguientes, segundos.
+5. Cuando aparezca «✔ POS funcionando», abre **http://localhost:4000** en el
+   navegador. Tablets y celulares conectados al mismo wifi usan la otra
+   dirección que muestra la terminal.
+6. Para apagarlo: **Ctrl + C** en la terminal. Para volver a usarlo, repite
+   los pasos 3 y 4. Los datos se conservan.
+
+### Con Docker
 
 ```bash
 cd cafeteria-pos
@@ -22,16 +40,16 @@ Abre **http://localhost:4000**. Un solo contenedor sirve la API y el
 frontend. La primera vez aplica migraciones y carga datos demo; la base
 SQLite vive en el volumen `pos_data`.
 
-### Local (Node.js 22+)
+### Para desarrollar
 
 ```bash
-cd cafeteria-pos
-npm run setup          # instala server y web, crea la base y carga datos demo
-npm run dev:server     # API en http://localhost:4000
-npm run dev:web        # en otra terminal: app en http://localhost:5173
+npm run setup          # instala todo y prepara la base (sin arrancar)
+npm run dev:server     # API con recarga automática en http://localhost:4000
+npm run dev:web        # en otra terminal: interfaz con recarga en http://localhost:5173
 ```
 
 En desarrollo Vite redirige `/api` al backend (mismo origen, sin CORS).
+`npm run build` vuelve a compilar la interfaz que sirve `npm run iniciar`.
 
 ### Credenciales demo
 
@@ -164,7 +182,8 @@ Prisma 6 ─ SQLite (por defecto) o PostgreSQL
 
 ```
 cafeteria-pos/
-  Dockerfile, docker-compose.yml, package.json (scripts de conveniencia)
+  Dockerfile, docker-compose.yml, package.json
+  scripts/iniciar.mjs   prepara y arranca todo con un comando (Windows/Mac/Linux)
   server/
     prisma/  schema.prisma, migrations/, seed.js
     src/     app.js, index.js, config.js, db.js, auth.js, lib/, routes/, services/
