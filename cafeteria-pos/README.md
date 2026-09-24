@@ -13,21 +13,25 @@ segura y probada. Ver [Qué cambió respecto a v1](#qué-cambió-respecto-a-v1).
 
 ### Paso a paso (sin experiencia técnica)
 
+> **¿Usas Mac?** Sigue la guía detallada [GUIA-MAC.md](GUIA-MAC.md).
+
 1. **Instala Node.js** (una sola vez): entra a https://nodejs.org, descarga la
    versión **LTS** (22 o superior) e instálala con las opciones por defecto.
 2. **Descarga el proyecto** y descomprímelo:
    https://github.com/Amras17/tienda-y-pagina-virtual/archive/refs/heads/claude/happy-pasteur-cmz75d.zip
-3. **Abre una terminal dentro de la carpeta `cafeteria-pos`**:
-   - Windows: abre la carpeta en el Explorador, escribe `cmd` en la barra de
-     direcciones y presiona Enter.
-   - Mac: clic derecho sobre la carpeta → «Nuevo Terminal en la carpeta».
-4. Escribe **`npm run iniciar`** y presiona Enter. La primera vez tarda unos
-   minutos; las siguientes, segundos.
-5. Cuando aparezca «✔ POS funcionando», abre **http://localhost:4000** en el
-   navegador. Tablets y celulares conectados al mismo wifi usan la otra
-   dirección que muestra la terminal.
-6. Para apagarlo: **Ctrl + C** en la terminal. Para volver a usarlo, repite
-   los pasos 3 y 4. Los datos se conservan.
+3. Entra a la carpeta **`cafeteria-pos`** y haz **doble clic** en:
+   - Windows: **`Iniciar POS.bat`**. Si Windows avisa que el archivo viene de
+     internet, elige «Más información» → «Ejecutar de todas formas».
+   - Mac: **`Iniciar POS.command`** (el primer aviso de seguridad se explica
+     en la guía de Mac).
+4. La primera vez tarda unos minutos. Cuando aparezca «✔ POS funcionando», el
+   navegador se abre solo en **http://localhost:4000**. Tablets y celulares
+   conectados al mismo wifi usan la otra dirección que muestra la ventana.
+5. **No cierres esa ventana** mientras uses el POS. Para apagarlo presiona
+   **Control + C** en ella. Los datos se conservan.
+
+Desde una terminal abierta en `cafeteria-pos`, lo mismo se hace con
+`npm run iniciar`.
 
 ### Con Docker
 

@@ -3,6 +3,7 @@
 //   npm run iniciar                 instala lo que falte, prepara la base y arranca
 //   npm run iniciar -- --preparar   solo prepara (no arranca)
 //   npm run iniciar -- --reconstruir  vuelve a compilar la interfaz
+//   npm run iniciar -- --sin-navegador  no abre el navegador al arrancar
 //
 // Es seguro ejecutarlo todas las veces: lo que ya está listo se omite y los
 // datos de la cafetería nunca se borran.
@@ -18,6 +19,17 @@ const WEB = path.join(RAIZ, 'web');
 const PUERTO = 4000;
 const soloPreparar = process.argv.includes('--preparar');
 const reconstruir = process.argv.includes('--reconstruir');
+const abrirNavegador = !process.argv.includes('--sin-navegador');
+
+// Abre una URL en el navegador por defecto. Si no se puede, no pasa nada:
+// la dirección igual queda escrita en la terminal.
+function abrir(url) {
+  const [cmd, args] =
+    process.platform === 'darwin' ? ['open', [url]]
+    : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+    : ['xdg-open', [url]];
+  spawn(cmd, args, { stdio: 'ignore', detached: true }).on('error', () => {}).unref();
+}
 
 const paso = (n, texto) => console.log(`\n☕ [${n}/5] ${texto}`);
 const correr = (cmd, cwd) => execSync(cmd, { cwd, stdio: 'inherit' });
@@ -66,10 +78,17 @@ paso(5, 'Arrancando el POS…');
 const yaAbierto = await fetch(`http://localhost:${PUERTO}/api/health`).then((r) => r.ok, () => false);
 if (yaAbierto) {
   console.log(`\n✔ El POS ya está funcionando en otra ventana: abre http://localhost:${PUERTO}\n`);
+  if (abrirNavegador) abrir(`http://localhost:${PUERTO}`);
   process.exit(0);
 }
 const servidor = spawn(process.execPath, ['src/index.js'], { cwd: SERVER, stdio: 'inherit' });
 servidor.on('exit', (code) => process.exit(code ?? 0));
+
+// En Mac, evita que el equipo se duerma mientras el POS está encendido (las
+// tablets de comanda perderían la conexión). Se desactiva solo al apagarlo.
+if (process.platform === 'darwin') {
+  spawn('caffeinate', ['-i', '-w', String(servidor.pid)], { stdio: 'ignore' }).on('error', () => {});
+}
 for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => servidor.kill(s));
 
 // Direcciones para abrir desde otros equipos del local (tablet de comanda,
@@ -98,6 +117,8 @@ esperarServidor().then((ok) => {
   console.log(`      http://localhost:${PUERTO}`);
   if (enRed.length) console.log(`  Desde tablets o celulares en el mismo wifi:\n      ${enRed.join('\n      ')}`);
   console.log('  Usuario: cajero@cafeteria.cl   Contraseña: demo1234');
-  console.log('  Para apagarlo: Ctrl + C en esta ventana.');
+  console.log('  No cierres esta ventana mientras uses el POS.');
+  console.log('  Para apagarlo: Control + C en esta ventana.');
   console.log('────────────────────────────────────────────────\n');
+  if (abrirNavegador) abrir(`http://localhost:${PUERTO}`);
 });
