@@ -1,4 +1,10 @@
+import fs from 'node:fs';
 import { z } from 'zod';
+
+// server/.env (si existe) sin dependencias. No pisa variables ya definidas
+// en el entorno (Docker, tests).
+const ARCHIVO_ENV = new URL('../.env', import.meta.url);
+if (fs.existsSync(ARCHIVO_ENV)) process.loadEnvFile(ARCHIVO_ENV);
 
 const esProduccion = process.env.NODE_ENV === 'production';
 const SECRETO_DEMO = 'solo-para-desarrollo-cambiar-en-produccion';

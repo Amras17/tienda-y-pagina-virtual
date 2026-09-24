@@ -1,6 +1,7 @@
 import { pathToFileURL } from 'node:url';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
+import '../src/config.js'; // carga server/.env y valida DATABASE_URL
 import { calcularTotales } from '../src/services/totales.js';
 
 const DIA = 86_400_000;

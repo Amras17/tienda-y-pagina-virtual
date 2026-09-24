@@ -20,9 +20,9 @@ ENV NODE_ENV=production \
 
 WORKDIR /app/server
 COPY server/package*.json ./
-RUN npm ci --omit=dev
+# El schema va antes de `npm ci`: su postinstall ejecuta `prisma generate`.
 COPY server/prisma ./prisma
-RUN npx prisma generate
+RUN npm ci --omit=dev
 COPY server/src ./src
 COPY --from=web /app/web/dist ./public
 
