@@ -1,0 +1,200 @@
+// Sistema POS Cafeteria - esquema de datos
+//
+// Por defecto usamos SQLite para que el sistema levante sin infraestructura
+// externa. Para producción se recomienda PostgreSQL:
+//   1. Cambia `provider = "sqlite"` por `provider = "postgresql"` abajo.
+//   2. Define DATABASE_URL con una cadena de conexion postgres:// en el .env
+//      (ver docker-compose.yml, servicio "postgres" comentado, y el README).
+//   3. Corre `npx prisma migrate dev` de nuevo para generar la migracion
+//      correspondiente al nuevo motor.
+//
+// Nota: SQLite no soporta el tipo `enum` nativo de Prisma, asi que los
+// campos de "estado"/"tipo" se modelan como String con los valores validos
+// documentados en comentario junto a cada campo (y validados en las rutas).
+// Al migrar a PostgreSQL se pueden convertir a `enum` real si se desea.
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Jerarquia de permisos (de mayor a menor): ADMIN > ENCARGADO > CAJERO/GARZON.
+// ENCARGADO: acceso operativo completo del dia (dashboard, reportes, stock,
+// alertas, mesas, ventas) pero SIN gestion de usuarios ni configuracion
+// global del sistema, que queda reservada solo a ADMIN.
+// Valores validos de Usuario.rol: ADMIN | ENCARGADO | CAJERO | GARZON
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nombre       String
+  email        String   @unique
+  passwordHash String
+  rol          String
+  activo       Boolean  @default(true)
+  creadoEn     DateTime @default(now())
+  ventas       Venta[]
+}
+
+model Insumo {
+  id                      Int               @id @default(autoincrement())
+  nombre                  String
+  unidadMedida            String
+  stockMinimo             Float             @default(0)
+  costoUnitarioReferencia Float             @default(0)
+  lotes                   LoteInsumo[]
+  movimientos             MovimientoStock[]
+  recetaItems             RecetaItem[]
+  ordenCompraItems        OrdenCompraItem[]
+}
+
+model LoteInsumo {
+  id               Int               @id @default(autoincrement())
+  insumo           Insumo            @relation(fields: [insumoId], references: [id])
+  insumoId         Int
+  cantidadInicial  Float
+  cantidadRestante Float
+  costoUnitario    Float
+  fechaIngreso     DateTime          @default(now())
+  proveedor        Proveedor?        @relation(fields: [proveedorId], references: [id])
+  proveedorId      Int?
+  movimientos      MovimientoStock[]
+}
+
+// Valores validos de MovimientoStock.tipo: INGRESO | SALIDA_VENTA | SALIDA_MERMA | AJUSTE
+model MovimientoStock {
+  id         Int        @id @default(autoincrement())
+  insumo     Insumo     @relation(fields: [insumoId], references: [id])
+  insumoId   Int
+  lote       LoteInsumo? @relation(fields: [loteId], references: [id])
+  loteId     Int?
+  tipo       String
+  cantidad   Float
+  fecha      DateTime   @default(now())
+  referencia String?
+}
+
+model Proveedor {
+  id            Int           @id @default(autoincrement())
+  nombre        String
+  contacto      String?
+  telefono      String?
+  email         String?
+  lotes         LoteInsumo[]
+  ordenesCompra OrdenCompra[]
+}
+
+// Valores validos de OrdenCompra.estado: PENDIENTE | RECIBIDA
+model OrdenCompra {
+  id          Int               @id @default(autoincrement())
+  proveedor   Proveedor         @relation(fields: [proveedorId], references: [id])
+  proveedorId Int
+  fecha       DateTime          @default(now())
+  estado      String            @default("PENDIENTE")
+  items       OrdenCompraItem[]
+}
+
+model OrdenCompraItem {
+  id            Int         @id @default(autoincrement())
+  ordenCompra   OrdenCompra @relation(fields: [ordenCompraId], references: [id])
+  ordenCompraId Int
+  insumo        Insumo      @relation(fields: [insumoId], references: [id])
+  insumoId      Int
+  cantidad      Float
+  costoUnitario Float
+}
+
+model CategoriaProducto {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  productos Producto[]
+}
+
+model Producto {
+  id                  Int               @id @default(autoincrement())
+  nombre              String
+  categoria           CategoriaProducto @relation(fields: [categoriaId], references: [id])
+  categoriaId         Int
+  precioVenta         Float
+  activo              Boolean           @default(true)
+  disponibleMostrador Boolean           @default(true)
+  disponibleMesa      Boolean           @default(true)
+  receta              Receta?
+  ventaItems          VentaItem[]
+}
+
+model Receta {
+  id         Int          @id @default(autoincrement())
+  producto   Producto     @relation(fields: [productoId], references: [id])
+  productoId Int          @unique
+  items      RecetaItem[]
+}
+
+model RecetaItem {
+  id                Int    @id @default(autoincrement())
+  receta            Receta @relation(fields: [recetaId], references: [id], onDelete: Cascade)
+  recetaId          Int
+  insumo            Insumo @relation(fields: [insumoId], references: [id])
+  insumoId          Int
+  cantidadNecesaria Float
+}
+
+// Valores validos de Mesa.estado: LIBRE | OCUPADA
+model Mesa {
+  id        Int     @id @default(autoincrement())
+  numero    Int     @unique
+  capacidad Int     @default(4)
+  estado    String  @default("LIBRE")
+  ventas    Venta[]
+}
+
+// Valores validos de Venta.tipo: MOSTRADOR | MESA
+// Valores validos de Venta.estado: ABIERTA | PAGADA | ANULADA
+model Venta {
+  id            Int         @id @default(autoincrement())
+  tipo          String
+  mesa          Mesa?       @relation(fields: [mesaId], references: [id])
+  mesaId        Int?
+  usuario       Usuario     @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+  clienteNombre String?
+  fecha         DateTime    @default(now())
+  subtotal      Float       @default(0)
+  impuesto      Float       @default(0)
+  total         Float       @default(0)
+  estado        String      @default("ABIERTA")
+  items         VentaItem[]
+  boleta        Boleta?
+}
+
+model VentaItem {
+  id             Int      @id @default(autoincrement())
+  venta          Venta    @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  ventaId        Int
+  producto       Producto @relation(fields: [productoId], references: [id])
+  productoId     Int
+  cantidad       Float
+  precioUnitario Float
+  subtotal       Float
+  // Campos para la pantalla de comanda (cocina/barra): notas de preparacion
+  // (ej. "sin azucar") y marca de listo/entregado, sin exponer precios.
+  notas          String?
+  preparado      Boolean   @default(false)
+  preparadoEn    DateTime?
+}
+
+// Valores validos de Boleta.tipo: BOLETA | FACTURA
+// Valores validos de Boleta.estadoSII: NO_ENVIADA | STUB
+model Boleta {
+  id        Int      @id @default(autoincrement())
+  venta     Venta    @relation(fields: [ventaId], references: [id])
+  ventaId   Int      @unique
+  // No usa autoincrement() nativo (SQLite solo permite uno por tabla, ya
+  // usado por "id"); el folio correlativo se calcula en invoiceService.js.
+  folio     Int      @unique
+  tipo      String   @default("BOLETA")
+  pdfPath   String
+  estadoSII String   @default("NO_ENVIADA")
+  fecha     DateTime @default(now())
+}

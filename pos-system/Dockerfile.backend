@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY backend/package*.json ./
+RUN npm install --omit=dev && npm install prisma --no-save
+
+COPY backend/ ./
+
+RUN npx prisma generate
+
+EXPOSE 4000
+
+# Al iniciar el contenedor: aplica migraciones pendientes (crea la DB si no
+# existe), siembra datos demo solo si la base esta vacia, y arranca el server.
+CMD sh -c "npx prisma migrate deploy && (npx prisma db seed || true) && node src/index.js"

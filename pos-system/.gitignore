@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.db
+*.db-journal
+dist/
+backend/storage/boletas/*.pdf
+!backend/storage/boletas/.gitkeep

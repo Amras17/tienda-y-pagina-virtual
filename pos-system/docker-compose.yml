@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "4000:4000"
+    environment:
+      # Por defecto SQLite, persistido en el volumen "backend_data" (Prisma
+      # resuelve esta ruta relativa a prisma/schema.prisma).
+      DATABASE_URL: "file:./dev.db"
+      JWT_SECRET: "cambia-este-secreto-en-produccion"
+      JWT_EXPIRES_IN: "12h"
+      PORT: "4000"
+      CORS_ORIGIN: "http://localhost:5173"
+    volumes:
+      - backend_data:/app/prisma
+      - backend_storage:/app/storage
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: "http://localhost:4000/api"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  backend_data:
+  backend_storage:
+
+# ---------------------------------------------------------------------------
+# Para produccion, se recomienda reemplazar SQLite por PostgreSQL. Pasos:
+#   1. Descomenta el servicio "postgres" de abajo.
+#   2. En prisma/schema.prisma cambia `provider = "sqlite"` por
+#      `provider = "postgresql"`.
+#   3. Cambia la variable DATABASE_URL del servicio "backend" arriba por:
+#      "postgresql://cafeteria:cafeteria@postgres:5432/cafeteria_pos"
+#   4. Corre `npx prisma migrate dev` localmente una vez para generar la
+#      migracion equivalente para postgres, y luego `docker compose up --build`.
+#
+# services:
+#   postgres:
+#     image: postgres:16-alpine
+#     environment:
+#       POSTGRES_USER: cafeteria
+#       POSTGRES_PASSWORD: cafeteria
+#       POSTGRES_DB: cafeteria_pos
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#
+# volumes:
+#   postgres_data:
+# ---------------------------------------------------------------------------
