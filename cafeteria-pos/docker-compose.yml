@@ -1,0 +1,32 @@
+services:
+  pos:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      # OBLIGATORIO en producción: mínimo 24 caracteres (p. ej. `openssl rand -hex 32`).
+      JWT_SECRET: ${JWT_SECRET:-cambia-este-secreto-de-demo-por-uno-largo}
+      NOMBRE_LOCAL: ${NOMBRE_LOCAL:-Cafetería}
+    volumes:
+      - pos_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  pos_data:
+
+# --- PostgreSQL (opcional, recomendado para varias cajas en paralelo) --------
+# 1. En server/prisma/schema.prisma: provider = "postgresql".
+# 2. Regenera migraciones: borra server/prisma/migrations y corre
+#    `npx prisma migrate dev --name init` contra una base postgres local.
+# 3. Descomenta el servicio `db`, y en `pos` agrega:
+#      DATABASE_URL: postgresql://pos:pos@db:5432/pos
+#      depends_on: [db]
+#
+#  db:
+#    image: postgres:17-alpine
+#    environment:
+#      POSTGRES_USER: pos
+#      POSTGRES_PASSWORD: pos
+#      POSTGRES_DB: pos
+#    volumes:
+#      - pg_data:/var/lib/postgresql/data
