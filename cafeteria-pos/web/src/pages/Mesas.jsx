@@ -4,7 +4,7 @@ import { api, abrirPdfBoleta } from '../lib/api.js';
 import { GESTION, useAuth } from '../lib/auth.jsx';
 import { clp } from '../lib/format.js';
 import { useAccion, useDatos, usePolling } from '../lib/hooks.js';
-import { Carrito, GrillaProductos, useCarrito, useProductosDisponibles } from '../components/pos.jsx';
+import { Carrito, CodigoWifi, GrillaProductos, useCarrito, useProductosDisponibles } from '../components/pos.jsx';
 import { Alerta } from '../components/ui.jsx';
 
 export default function Mesas() {
@@ -13,7 +13,7 @@ export default function Mesas() {
   const { data: catalogo } = useDatos(() => api.get('/productos'));
   const productos = useProductosDisponibles(catalogo, 'disponibleMesa');
   const [mesaId, setMesaId] = useState(null);
-  const [ultimaBoleta, setUltimaBoleta] = useState(null);
+  const [ultimoCobro, setUltimoCobro] = useState(null); // { boleta, wifi }
   const carrito = useCarrito();
   const { ocupado, error, setError, ejecutar } = useAccion();
 
@@ -25,7 +25,7 @@ export default function Mesas() {
 
   function seleccionar(id) {
     setMesaId(id);
-    setUltimaBoleta(null);
+    setUltimoCobro(null);
     setError('');
     carrito.vaciar();
   }
@@ -45,7 +45,7 @@ export default function Mesas() {
   async function cobrar() {
     const r = await ejecutar(() => api.post(`/ventas/${venta.id}/cobrar`));
     if (r) {
-      setUltimaBoleta(r.boleta);
+      setUltimoCobro(r);
       await mesas.recargar();
     }
   }
@@ -125,12 +125,13 @@ export default function Mesas() {
               )}
             </div>
             <Alerta>{error}</Alerta>
-            {ultimaBoleta && (
+            {ultimoCobro && (
               <Alerta tipo="exito">
-                Boleta N° {ultimaBoleta.folio} emitida.{' '}
-                <button className="btn btn-sm" onClick={() => abrirPdfBoleta(ultimaBoleta.id).catch((e) => setError(e.message))}>
+                Boleta N° {ultimoCobro.boleta.folio} emitida.{' '}
+                <button className="btn btn-sm" onClick={() => abrirPdfBoleta(ultimoCobro.boleta.id).catch((e) => setError(e.message))}>
                   Ver / imprimir PDF
                 </button>
+                <CodigoWifi wifi={ultimoCobro.wifi} />
               </Alerta>
             )}
           </aside>

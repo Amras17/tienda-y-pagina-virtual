@@ -12,9 +12,11 @@ const clp = (n) => `$${Math.round(n).toLocaleString('es-CL')}`;
 // impresora térmica instalada como impresora del sistema. Para impresión
 // ESC/POS directa (corte de papel, cajón), el punto de integración es este
 // archivo, p. ej. con `node-thermal-printer`.
-export function escribirBoletaPdf(boleta, destino) {
+export function escribirBoletaPdf(boleta, destino, { wifi = {} } = {}) {
   const { venta } = boleta;
-  const alto = 230 + venta.items.length * 26 + (venta.clienteNombre ? 12 : 0);
+  const acceso = venta.accesoWifi;
+  const altoWifi = acceso ? 92 + (wifi.redNombre ? 12 : 0) + (wifi.portalUrl ? 12 : 0) : 0;
+  const alto = 230 + venta.items.length * 26 + (venta.clienteNombre ? 12 : 0) + altoWifi;
   const doc = new PDFDocument({ size: [227, alto], margin: 12, info: { Title: `Boleta ${boleta.folio}` } });
   doc.pipe(destino);
 
@@ -38,6 +40,22 @@ export function escribirBoletaPdf(boleta, destino) {
   doc.text(`Neto: ${clp(venta.subtotal)}`, { align: 'right' });
   doc.text(`IVA (19%): ${clp(venta.impuesto)}`, { align: 'right' });
   doc.font('Helvetica-Bold').fontSize(12).text(`TOTAL: ${clp(venta.total)}`, { align: 'right' });
+
+  if (acceso) {
+    doc.moveDown(0.4).font('Helvetica').fontSize(9);
+    linea();
+    doc.font('Helvetica-Bold').fontSize(10).text('WiFi de cortesía', { align: 'center' });
+    doc.font('Helvetica').fontSize(8);
+    if (wifi.redNombre) doc.text(`Red: ${wifi.redNombre}`, { align: 'center' });
+    doc.font('Courier-Bold').fontSize(16).text(acceso.codigo, { align: 'center' });
+    doc.font('Helvetica').fontSize(8).text(`${acceso.minutos} minutos de navegación`, { align: 'center' });
+    if (wifi.portalUrl) doc.text(wifi.portalUrl, { align: 'center' });
+    doc.fontSize(7).text(
+      `El tiempo corre desde el primer ingreso. Úsalo antes del ${new Date(acceso.activableHasta).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}.`,
+      { align: 'center' },
+    );
+  }
+
   doc.moveDown().font('Helvetica').fontSize(8).text('¡Gracias por su visita!', { align: 'center' });
   doc.end();
 }

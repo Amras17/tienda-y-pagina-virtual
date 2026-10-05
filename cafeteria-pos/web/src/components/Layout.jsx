@@ -11,6 +11,7 @@ export const SECCIONES = [
   { ruta: '/carta', titulo: 'Carta y recetas', roles: GESTION },
   { ruta: '/proveedores', titulo: 'Proveedores', roles: GESTION },
   { ruta: '/dashboard', titulo: 'Dashboard', roles: GESTION },
+  { ruta: '/wifi', titulo: 'WiFi', roles: GESTION },
 ];
 
 export default function Layout() {

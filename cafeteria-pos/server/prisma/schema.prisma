@@ -197,6 +197,7 @@ model Venta {
   estado        EstadoVenta @default(ABIERTA)
   items         VentaItem[]
   boleta        Boleta?
+  accesoWifi    AccesoWifi?
 
   @@index([estado, fecha])
   @@index([mesaId, estado])
@@ -230,4 +231,43 @@ model Boleta {
   tipo      TipoDocumento @default(BOLETA)
   estadoSII EstadoSII     @default(NO_ENVIADA)
   fecha     DateTime      @default(now())
+}
+
+// ---------- WiFi por consumo ----------
+//
+// Regla única (fila id = 1): los minutos de WiFi son proporcionales al total
+// pagado, redondeados hacia abajo a múltiplos de 5 y acotados entre un mínimo
+// y un tope. Bajo `montoMinimo` la venta no genera código.
+model ConfigWifi {
+  id               Int      @id @default(1)
+  activo           Boolean  @default(true)
+  minutosPorMil    Int      @default(10) // minutos por cada $1.000 pagados
+  minutosMinimo    Int      @default(30)
+  minutosMaximo    Int      @default(180)
+  montoMinimo      Int      @default(2000) // CLP, IVA incluido
+  dispositivos     Int      @default(1) // equipos que pueden usar un mismo código
+  horasParaActivar Int      @default(12) // plazo para usar el código tras el cobro
+  redNombre        String   @default("") // nombre de la red (SSID) para la boleta
+  portalUrl        String   @default("") // dirección del portal, si se imprime
+  actualizadoEn    DateTime @updatedAt
+}
+
+// Un código por venta cobrada. El tiempo corre desde la primera activación,
+// no desde el cobro: quien paga y se sienta a conversar no pierde minutos.
+model AccesoWifi {
+  id             Int       @id @default(autoincrement())
+  codigo         String    @unique
+  venta          Venta     @relation(fields: [ventaId], references: [id], onDelete: Cascade)
+  ventaId        Int       @unique
+  montoBase      Int // total de la venta usado para el cálculo
+  minutos        Int
+  dispositivos   Int       @default(1)
+  creadoEn       DateTime  @default(now())
+  activableHasta DateTime
+  activadoEn     DateTime?
+  expiraEn       DateTime?
+  macs           String    @default("") // MAC de los equipos, separadas por coma
+  revocado       Boolean   @default(false)
+
+  @@index([creadoEn])
 }

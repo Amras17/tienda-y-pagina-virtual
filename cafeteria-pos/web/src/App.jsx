@@ -14,8 +14,10 @@ const PAGINAS = {
   '/carta': lazy(() => import('./pages/Carta.jsx')),
   '/proveedores': lazy(() => import('./pages/Proveedores.jsx')),
   '/dashboard': lazy(() => import('./pages/Dashboard.jsx')),
+  '/wifi': lazy(() => import('./pages/Wifi.jsx')),
 };
 const PantallaCliente = lazy(() => import('./pages/PantallaCliente.jsx'));
+const PortalWifi = lazy(() => import('./pages/PortalWifi.jsx'));
 
 function Inicio() {
   const { usuario } = useAuth();
@@ -29,6 +31,8 @@ export default function App() {
         {/* Pantalla pública orientada al cliente: sin login ni menú. */}
         <Route path="/pantalla-cliente/mesa/:mesaId" element={<PantallaCliente />} />
         <Route path="/pantalla-cliente/orden/:codigo" element={<PantallaCliente />} />
+        {/* Portal WiFi: el cliente canjea el código de su boleta desde el celular. */}
+        <Route path="/portal-wifi" element={<PortalWifi />} />
         <Route path="/login" element={<Login />} />
 
         <Route element={<Layout />}>

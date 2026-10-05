@@ -7,13 +7,14 @@ import { notFound } from '../lib/errors.js';
 import { paramId } from '../lib/validation.js';
 import { escribirBoletaPdf } from '../services/boletaPdf.js';
 import { emitirDTE } from '../services/sii.js';
+import { obtenerConfig } from '../services/wifi.js';
 
 const router = Router();
 router.use(requireRole(INTERNOS));
 
 const detalle = {
   venta: {
-    include: { mesa: true, items: { include: { producto: { select: { nombre: true } } }, orderBy: { id: 'asc' } } },
+    include: { mesa: true, accesoWifi: true, items: { include: { producto: { select: { nombre: true } } }, orderBy: { id: 'asc' } } },
   },
 };
 
@@ -36,10 +37,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => res.json(await buscar(paramId(req))));
 
 router.get('/:id/pdf', async (req, res) => {
-  const boleta = await buscar(paramId(req));
+  const [boleta, wifi] = await Promise.all([buscar(paramId(req)), obtenerConfig()]);
   res.type('application/pdf');
   res.setHeader('Content-Disposition', `inline; filename="boleta-${boleta.folio}.pdf"`);
-  escribirBoletaPdf(boleta, res);
+  escribirBoletaPdf(boleta, res, { wifi });
 });
 
 // Intenta emitir el DTE ante el SII (stub, ver services/sii.js).

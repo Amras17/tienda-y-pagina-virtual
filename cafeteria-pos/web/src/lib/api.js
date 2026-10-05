@@ -51,6 +51,7 @@ export const api = {
   login: (email, password) => request('/auth/login', { method: 'POST', body: { email, password }, auth: false }),
   // Sin token: pantalla pública del cliente.
   publico: (path) => request(`/publico${path}`, { auth: false }),
+  publicoPost: (path, body = {}) => request(`/publico${path}`, { method: 'POST', body, auth: false }),
 };
 
 // El PDF requiere el token, así que no basta un <a href>: se descarga con

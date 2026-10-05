@@ -93,6 +93,8 @@ label.crece { flex: 1; }
   font-weight: 600;
 }
 .insignia-alerta { background: #fff3cd; color: #7a5b00; }
+.insignia-exito { background: var(--exito-fondo); color: var(--exito); }
+.insignia-apagada { color: var(--suave); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
 .chip {
@@ -313,11 +315,58 @@ label.crece { flex: 1; }
 .pantalla-cliente-estado.listo { background: var(--exito-fondo); color: var(--exito); }
 .pantalla-cliente-total { font-size: 2rem; font-weight: 700; text-align: right; margin-top: 20px; }
 
+/* ---------- WiFi por consumo ---------- */
+.codigo-wifi {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px dashed var(--exito);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--texto);
+}
+.codigo-wifi strong { font-family: ui-monospace, Menlo, monospace; font-size: 1.25rem; letter-spacing: 0.08em; }
+.codigo-wifi span { color: var(--suave); font-size: 0.85rem; }
+.grilla-campos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.grilla-campos small { font-size: 0.75rem; }
+
+.pantalla-cliente-wifi {
+  margin-top: 20px;
+  padding: 16px;
+  border: 2px dashed var(--caramelo);
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pantalla-cliente-wifi span { font-size: 1.2rem; color: var(--suave); }
+.pantalla-cliente-wifi strong { font-family: ui-monospace, Menlo, monospace; font-size: 2.4rem; letter-spacing: 0.1em; color: var(--cafe); }
+
+.portal-wifi { min-height: 100vh; background: var(--cafe-oscuro); display: grid; grid-template-columns: minmax(0, 400px); place-content: center; padding: 16px; }
+.portal-wifi-tarjeta { background: var(--tarjeta); border-radius: 18px; padding: 28px 22px; width: 100%; max-width: 400px; text-align: center; box-shadow: var(--sombra); }
+.portal-wifi-tarjeta h1 { margin: 0 0 8px; font-size: 1.6rem; }
+.portal-wifi-icono { font-size: 2.6rem; margin: 0; }
+.portal-wifi-tarjeta form { display: flex; flex-direction: column; gap: 12px; }
+.portal-wifi-codigo {
+  text-align: center;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 1.8rem;
+  letter-spacing: 0.12em;
+  padding: 12px;
+  text-transform: uppercase;
+  width: 100%;
+}
+.portal-wifi-error { color: var(--error); margin: 0; }
+.portal-wifi-reloj { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--cafe); margin: 8px 0; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
   .pos, .carta, .graficos, .dos-columnas { grid-template-columns: 1fr; }
   .panel-carrito { position: static; }
-  .costeo { grid-template-columns: 1fr; }
+  .costeo, .grilla-campos { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   .navbar { padding: 8px 12px; gap: 8px; }

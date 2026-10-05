@@ -17,6 +17,7 @@ import dashboard from './routes/dashboard.js';
 import reportes from './routes/reportes.js';
 import comanda from './routes/comanda.js';
 import publico from './routes/publico.js';
+import wifi from './routes/wifi.js';
 
 // Frontend compilado (web/dist copiado a server/public en la imagen Docker).
 const PUBLIC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'public');
@@ -58,6 +59,7 @@ export function createApp() {
   api.use('/dashboard', dashboard);
   api.use('/reportes', reportes);
   api.use('/comanda', comanda);
+  api.use('/wifi', wifi);
   api.use('/publico', publico); // sin JWT: pantalla del cliente
   api.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
   app.use('/api', api);

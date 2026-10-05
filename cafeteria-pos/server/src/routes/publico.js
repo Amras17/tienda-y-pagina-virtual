@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { prisma } from '../db.js';
 import { notFound } from '../lib/errors.js';
 import { paramId } from '../lib/validation.js';
+import { limitarIntentos } from '../auth.js';
+import { activarAcceso, consultarAcceso } from '../services/wifi.js';
 
 const router = Router();
 
@@ -12,6 +14,7 @@ const router = Router();
 const seleccion = {
   estado: true,
   total: true,
+  accesoWifi: { select: { codigo: true, minutos: true } },
   mesa: { select: { numero: true } },
   items: {
     orderBy: { id: 'asc' },
@@ -27,6 +30,9 @@ function proyeccionCliente(venta) {
     estado: venta.estado === 'ANULADA' ? 'Anulado' : listo ? 'Listo para retirar' : 'Preparando',
     items: venta.items.map((i) => ({ nombreProducto: i.producto.nombre, cantidad: i.cantidad })),
     total: venta.total, // IVA incluido
+    // Código WiFi de la compra: solo una vez pagada y si el monto lo generó.
+    ...(venta.estado === 'PAGADA' &&
+      venta.accesoWifi && { wifi: { clave: venta.accesoWifi.codigo, minutos: venta.accesoWifi.minutos } }),
   };
 }
 
@@ -46,6 +52,22 @@ router.get('/mesa/:mesaId', async (req, res) => {
   });
   if (!venta) throw notFound('No hay un pedido vigente para esta mesa');
   res.json(proyeccionCliente(venta));
+});
+
+// ---------- Portal WiFi (lo usa el cliente desde su celular) ----------
+// Con límite de intentos por IP: el código no se puede adivinar a fuerza bruta.
+const limiteWifi = limitarIntentos({ max: 15, ventanaMs: 60_000 });
+
+router.get('/wifi/:codigo', limiteWifi, async (req, res) => {
+  res.json(await consultarAcceso(req.params.codigo));
+});
+
+// `mac` la agrega el router en la URL del portal cautivo (si la envía).
+router.post('/wifi/activar', limiteWifi, async (req, res) => {
+  const { codigo, mac } = z
+    .object({ codigo: z.string().max(20), mac: z.string().max(30).optional().nullable() })
+    .parse(req.body);
+  res.json(await activarAcceso(codigo, mac));
 });
 
 export default router;

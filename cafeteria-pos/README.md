@@ -3,7 +3,7 @@
 Sistema interno para una cafetería de especialidad: **stock de insumos con
 FIFO**, **recetas y costeo**, **punto de venta** (mostrador y mesas),
 **boletas en PDF**, **comanda** para barra/cocina, **pantalla pública** para
-el cliente y **dashboard** con reportes.
+el cliente, **WiFi por consumo** y **dashboard** con reportes.
 
 Es la reconstrucción desde cero de `pos-system/` (v1): mismas pantallas,
 mismos roles, mismas reglas de negocio, pero con una base más simple, más
@@ -69,13 +69,14 @@ Contraseña para todos: `demo1234` (en el login hay botones para rellenarlas).
 ### Tests
 
 ```bash
-npm test               # 10 tests de integración de la API (base SQLite desechable)
+npm test               # 16 tests de la API y de la regla WiFi (base SQLite desechable)
 ```
 
 Cubren: cobro con IVA incluido, descuento FIFO entre lotes, venta sin stock
 suficiente, doble cobro, mesas (pedido compartido, cobro, anulación),
 permisos por rol, que la comanda y la pantalla pública nunca expongan
-precios/costos, órdenes de compra y costeo de recetas.
+precios/costos, órdenes de compra, costeo de recetas y WiFi por consumo
+(minutos proporcionales, portal, límite de equipos, revocación).
 
 ## Módulos y roles
 
@@ -89,6 +90,7 @@ precios/costos, órdenes de compra y costeo de recetas.
 | Carta y recetas    |  ✔    |    ✔      |        |        |
 | Proveedores / OC   |  ✔    |    ✔      |        |        |
 | Dashboard          |  ✔    |    ✔      |        |        |
+| WiFi (regla y códigos) | ✔ |    ✔      |        |        |
 | Anular pedido      |  ✔    |    ✔      |        |        |
 | Eliminar registros |  ✔    |           |        |        |
 
@@ -121,14 +123,55 @@ Muestra ítems, total con IVA y estado: **«Preparando»** hasta que barra marca
 todo como listo en la comanda, luego **«Listo para retirar»**. Nunca muestra
 costos, márgenes, recetas, stock, folio ni datos de otros clientes.
 
+## WiFi por consumo
+
+Cada cobro entrega un **código WiFi** con minutos de navegación
+**proporcionales al total pagado**. Se imprime en la boleta, aparece junto a
+la boleta en Mostrador y Mesas, y en la pantalla del cliente del pedido.
+
+**Regla** (pantalla *WiFi*, encargado y admin; se aplica desde el próximo
+cobro):
+
+| Parámetro | Por defecto | Qué hace |
+|---|---|---|
+| Minutos por cada $1.000 | 10 | La proporción entre gasto y tiempo |
+| Monto mínimo | $2.000 | Bajo este total no se entrega código |
+| Mínimo / tope de minutos | 30 / 180 | Límites de lo que entrega un código |
+| Equipos por código | 1 | Celulares o notebooks que pueden usar el mismo código |
+| Horas para usar el código | 12 | Plazo para el primer uso; después caduca |
+| Nombre de la red / dirección del portal | — | Se imprimen en la boleta |
+
+Con la regla por defecto: $3.000 → 30 min, $5.000 → 50 min, $8.000 → 1 h
+20 min, $12.000 → 2 h, desde $18.000 → 3 h. Los minutos se redondean hacia
+abajo a múltiplos de 5. La pantalla muestra la tabla al editar la regla.
+
+**El reloj corre desde el primer uso**, no desde el cobro. Si el cliente se
+desconecta, vuelve a ingresar el mismo código y sigue con el tiempo que le
+quedaba (no se regalan minutos). El encargado ve los códigos del día, su
+estado y tiempo restante, y puede **desactivar** uno.
+
+**Portal del cliente** — `/portal-wifi`, público y pensado para el celular:
+el cliente escribe el código y ve la cuenta regresiva. El router lo puede
+abrir como **portal cautivo** y pasar la MAC del equipo en la URL
+(`?mac=…`, `?clientMac=…` o `?id=…`); con la MAC se respeta el límite de
+equipos por código. Tiene límite de intentos por IP contra adivinanzas.
+
+**Corte de la conexión: depende del router (STUB).** El POS decide quién
+navega y por cuánto tiempo; quien abre y cierra la red es el equipo WiFi.
+`server/src/services/routerWifi.js` es el punto de integración (UniFi,
+Omada, MikroTik Hotspot u OpenWrt/openNDS, ver comentarios del archivo).
+Mientras no se conecte, el portal valida y cronometra, pero no corta la red.
+Para que los clientes lleguen al portal, la red de invitados debe permitir
+el acceso al computador del POS (puerto 4000).
+
 ## Reglas de negocio
 
 - **IVA incluido**: `precioVenta` incluye IVA 19 %. La venta guarda total,
   neto e IVA en **pesos enteros** (neto + IVA = total, siempre).
 - **Precio congelado**: cada ítem guarda el precio del momento; cambiar la
   carta no altera pedidos ya tomados.
-- **Cobro atómico**: marcar pagada, descontar stock y emitir boleta ocurren en
-  **una sola transacción**. Si algo falla no queda nada a medias. Un doble
+- **Cobro atómico**: marcar pagada, descontar stock, emitir boleta y generar el
+  código WiFi ocurren en **una sola transacción**. Si algo falla no queda nada a medias. Un doble
   clic en «Cobrar» se rechaza (409) sin descontar stock dos veces.
 - **FIFO**: el stock se consume del lote más antiguo. El costo de receta usa el
   costo del lote más reciente (costo de reposición) o el de referencia.
@@ -178,6 +221,8 @@ Express 5 ─ server/src/app.js
    │     costeo.js     costo de receta y margen (sin N+1)
    │     reportes.js   agrupación por día / semana ISO / mes en hora local
    │     boletaPdf.js  ticket 80 mm al vuelo (pdfkit)
+   │     wifi*.js      WiFi por consumo: regla, códigos, portal
+   │     routerWifi.js STUB de integración con el router
    │     sii.js        STUB de facturación electrónica
    ├─ public/     frontend compilado (solo en la imagen Docker)
    ▼
@@ -240,7 +285,8 @@ Variables del backend (`server/.env`, ver `.env.example`):
 **Cajero** — *Mostrador*: toca productos, ajusta cantidades con − / +,
 agrega una nota para barra si hace falta, opcionalmente el nombre del
 cliente, y **Cobrar**. Se emite la boleta y aparecen «Ver / imprimir PDF» y
-«Pantalla cliente».
+«Pantalla cliente». Si el total alcanza el monto mínimo, junto a la boleta
+aparece el **código WiFi** del cliente (también va impreso).
 
 **Garzón** — *Mesas*: toca una mesa (verde = libre, amarilla = ocupada con su
 total). Agrega productos y pulsa **Abrir pedido** o **Agregar al pedido**.
@@ -264,3 +310,5 @@ para retirar».
   mostrador vs mesa, ventas por día / semana / mes, alertas y rentabilidad
   por producto.
 - *Mesas*: además puede **Anular** un pedido abierto.
+- *WiFi*: ajusta la regla de minutos por consumo, revisa los códigos del día
+  y **Desactiva** uno si hace falta.

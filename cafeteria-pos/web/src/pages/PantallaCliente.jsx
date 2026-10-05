@@ -29,6 +29,13 @@ export default function PantallaCliente() {
           </ul>
           <div className={`pantalla-cliente-estado ${listo ? 'listo' : ''}`}>{pedido.estado}</div>
           <div className="pantalla-cliente-total">Total {clp(pedido.total)}</div>
+          {pedido.wifi && (
+            <div className="pantalla-cliente-wifi">
+              <span>WiFi de cortesía · {pedido.wifi.minutos} minutos</span>
+              <strong>{pedido.wifi.clave}</strong>
+              <small>Conéctate a la red y escribe esta clave en la página que se abre.</small>
+            </div>
+          )}
         </div>
       )}
     </div>

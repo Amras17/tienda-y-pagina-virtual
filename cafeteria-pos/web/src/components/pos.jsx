@@ -79,6 +79,18 @@ export function Carrito({ carrito }) {
   );
 }
 
+// Código WiFi que entrega el cobro (también va impreso en la boleta).
+export function CodigoWifi({ wifi }) {
+  if (!wifi) return null;
+  return (
+    <div className="codigo-wifi">
+      <span>WiFi</span>
+      <strong>{wifi.codigo}</strong>
+      <span>{wifi.minutos} min</span>
+    </div>
+  );
+}
+
 export function useProductosDisponibles(productos, campo) {
   return useMemo(() => (productos || []).filter((p) => p.activo && p[campo]), [productos, campo]);
 }

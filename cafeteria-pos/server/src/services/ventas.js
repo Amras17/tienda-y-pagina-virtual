@@ -3,6 +3,7 @@ import { prisma } from '../db.js';
 import { badRequest, conflict, notFound } from '../lib/errors.js';
 import { calcularTotales } from './totales.js';
 import { descontarPorVenta } from './stock.js';
+import { emitirAccesoWifi } from './wifi.js';
 
 // Ítems con precio congelado al momento de la venta (un cambio de precio
 // posterior no altera pedidos ya tomados).
@@ -75,9 +76,10 @@ export async function agregarItems(ventaId, items) {
   });
 }
 
-// Cobra una venta en UNA sola transacción: marca PAGADA, descuenta stock FIFO
-// y emite la boleta con folio correlativo. Si algo falla, no queda nada a
-// medias (ni stock descontado sin boleta, ni boleta sin venta pagada).
+// Cobra una venta en UNA sola transacción: marca PAGADA, descuenta stock FIFO,
+// emite la boleta con folio correlativo y el código WiFi proporcional al
+// total. Si algo falla, no queda nada a medias (ni stock descontado sin
+// boleta, ni boleta sin venta pagada, ni WiFi sin cobro).
 export async function cobrarVenta(ventaId, intentos = 3) {
   try {
     return await prisma.$transaction(async (tx) => {
@@ -99,7 +101,9 @@ export async function cobrarVenta(ventaId, intentos = 3) {
         data: { ventaId, folio: (ultima._max.folio || 0) + 1 },
       });
       const venta = await tx.venta.findUnique({ where: { id: ventaId }, include: { items: true } });
-      return { venta, boleta };
+      const acceso = await emitirAccesoWifi(tx, venta);
+      const wifi = acceso && { codigo: acceso.codigo, minutos: acceso.minutos, activableHasta: acceso.activableHasta };
+      return { venta, boleta, wifi };
     });
   } catch (err) {
     // Dos cobros simultáneos de ventas distintas pueden calcular el mismo

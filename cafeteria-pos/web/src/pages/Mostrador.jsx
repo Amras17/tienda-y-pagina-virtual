@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { api, abrirPdfBoleta } from '../lib/api.js';
 import { clp } from '../lib/format.js';
 import { useAccion, useDatos } from '../lib/hooks.js';
-import { Carrito, GrillaProductos, useCarrito, useProductosDisponibles } from '../components/pos.jsx';
+import { Carrito, CodigoWifi, GrillaProductos, useCarrito, useProductosDisponibles } from '../components/pos.jsx';
 import { Alerta } from '../components/ui.jsx';
 
 export default function Mostrador() {
@@ -47,6 +47,7 @@ export default function Mostrador() {
         {ultima && (
           <Alerta tipo="exito">
             Boleta N° {ultima.boleta.folio} emitida por {clp(ultima.venta.total)}.
+            <CodigoWifi wifi={ultima.wifi} />
             <div className="acciones">
               <button className="btn btn-sm" onClick={() => abrirPdfBoleta(ultima.boleta.id).catch((e) => setError(e.message))}>
                 Ver / imprimir PDF
