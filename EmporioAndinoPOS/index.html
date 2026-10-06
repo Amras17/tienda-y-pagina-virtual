@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.1</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.2</span></div><span class="chip num" id="loginClock">--:--</span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.1</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.2</span><small>Emporio Andino · San Pedro</small></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -188,8 +188,16 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 2.1</h2><p>Emporio System 1.1 como base de todas las capas</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 2.2</h2><p>Contextos de simulación y pedidos a mano en la Prueba, sobre la base de Emporio System 1.1</p></div></div>
           <div class="notas">
+            <div><h3>Día, semana y mes</h3><ul>
+              <li>La Prueba simula un día en vivo, una semana o el mes completo desde una fecha, con temporada, afluencia y eventos marcados día por día.</li>
+              <li>La demanda cambia según el día de la semana; desde el período se abre cualquier día en vivo.</li>
+            </ul></div>
+            <div><h3>Pedidos a mano y fila</h3><ul>
+              <li>En el día se ingresan ventas para mesas y para llevar con la carta de la prueba.</li>
+              <li>Quien espera mesa o la salida de empanadas puede comprar en la fila, y aparece como canal propio.</li>
+            </ul></div>
             <div><h3>Un mismo diseño</h3><ul>
               <li>El diseño y los comportamientos de Emporio System 1.1 son ahora la base de todo: noche volcánica con vidrio, Sora y Plus Jakarta Sans, resortes, indicadores que se deslizan y mosaicos con brillo.</li>
               <li>Viven en <span class="num">nucleo/emporio.css</span> y <span class="num">nucleo/emporio.js</span>; cada módulo los carga.</li>
@@ -250,7 +258,7 @@ var VIEWS={
   salon:{t:"Control de Salón",g:"Operación",c:"#9A80D6",d:"Disponibilidad de la carta, horno y estudio de la carta"},
   cocina:{t:"Comandas",g:"Operación",c:"#FF7F50",d:"Lo cobrado en la Caja, por estación: cocina, barra y horno"},
   carta:{t:"Carta Interactiva",g:"Operación",c:"#1AA89B",d:"La carta que usa el cliente en la mesa"},
-  prueba:{t:"Prueba y simulación",g:"Gestión",c:"#FFB547",d:"Cambios de precios, carta y metas, con un día simulado antes de aplicarlos"},
+  prueba:{t:"Prueba y simulación",g:"Gestión",c:"#FFB547",d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos"},
   verificacion:{t:"Verificación",g:"Sistema",c:"#3DDC84",d:"Que cada módulo abra y funcione en este equipo"},
   versiones:{t:"Versiones y accesos",g:"Sistema",c:"#40E0D0",d:"Historial de configuración y PIN del equipo"},
   retro:{t:"Retroalimentación",g:"Sistema",c:"#D9A93A",d:"Lo que falla y lo que se puede mejorar"}

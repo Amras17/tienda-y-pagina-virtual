@@ -1,7 +1,7 @@
 {
-  "version": "2.1",
-  "fecha": "2026-10-06T11:06:39.688Z",
-  "total": 126,
+  "version": "2.2",
+  "fecha": "2026-10-06T11:46:45.736Z",
+  "total": 146,
   "fallas": 0,
   "resultados": [
     {
@@ -222,9 +222,9 @@
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
-      "prueba": "doce vistas",
+      "prueba": "catorce vistas",
       "ok": true,
-      "detalle": "inicio,salon,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
+      "detalle": "inicio,contexto,salon,pedido,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
@@ -264,12 +264,6 @@
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
-      "prueba": "proyección de 30 días",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Prueba y aplicación · escritorio",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
@@ -282,6 +276,72 @@
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "semana: siete días simulados",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "mes: el mes calendario completo",
+      "ok": true,
+      "detalle": "{\"barras\":31,\"stats\":6}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "un evento en un día sube su demanda",
+      "ok": true,
+      "detalle": "{\"antes\":1262500,\"ev\":\"evento\",\"rev\":1620100}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "abre ese día en vivo en el Dashboard",
+      "ok": true,
+      "detalle": "{\"h\":\"dia\",\"fecha\":\"2026-10-16\",\"cur\":\"inicio\",\"sub\":\"Viernes, 16 de octubre de 2026 · Brunch y carta completa · temporada baja\"}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "pedido a mano en una mesa",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "para llevar sin vitrina: cobra y espera la tanda",
+      "ok": true,
+      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":18}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "venta en la fila a quien espera mesa",
+      "ok": true,
+      "detalle": "{\"n\":1,\"manual\":3,\"cola\":1}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "la fila aparece como canal en Clientes",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -600,9 +660,9 @@
     },
     {
       "modulo": "Prueba y aplicación · telefono",
-      "prueba": "doce vistas",
+      "prueba": "catorce vistas",
       "ok": true,
-      "detalle": "inicio,salon,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
+      "detalle": "inicio,contexto,salon,pedido,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
     },
     {
       "modulo": "Prueba y aplicación · telefono",
@@ -642,12 +702,6 @@
     },
     {
       "modulo": "Prueba y aplicación · telefono",
-      "prueba": "proyección de 30 días",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Prueba y aplicación · telefono",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
@@ -660,6 +714,72 @@
     },
     {
       "modulo": "Prueba y aplicación · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "semana: siete días simulados",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "mes: el mes calendario completo",
+      "ok": true,
+      "detalle": "{\"barras\":31,\"stats\":6}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "un evento en un día sube su demanda",
+      "ok": true,
+      "detalle": "{\"antes\":1262500,\"ev\":\"evento\",\"rev\":1620100}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "abre ese día en vivo en el Dashboard",
+      "ok": true,
+      "detalle": "{\"h\":\"dia\",\"fecha\":\"2026-10-16\",\"cur\":\"inicio\",\"sub\":\"Viernes, 16 de octubre de 2026 · Brunch y carta completa · temporada baja\"}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "pedido a mano en una mesa",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "para llevar sin vitrina: cobra y espera la tanda",
+      "ok": true,
+      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":18}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "venta en la fila a quien espera mesa",
+      "ok": true,
+      "detalle": "{\"n\":1,\"manual\":3,\"cola\":1}"
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "la fila aparece como canal en Clientes",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""

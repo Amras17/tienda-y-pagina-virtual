@@ -458,6 +458,52 @@ html.incrustado .franja{position:relative}
   .login-card{padding:20px}
   .pad{grid-template-columns:repeat(3,56px)}
 }
+/* Contexto y período */
+.cxform{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;align-items:end}
+.cxform .campo{display:flex;flex-direction:column;gap:6px;font-size:11.5px;font-weight:700;color:var(--fg-2);min-width:0}
+.cxform .seg{align-self:flex-start}
+.cxform input[type=range]{accent-color:var(--accent);width:100%}
+.cxform .fin{width:100%}
+.cxformula{margin-top:14px;font-size:12.5px;color:var(--fg-2);padding:9px 12px;border-radius:12px;background:var(--glass-2);border:1px solid var(--stroke)}
+.cxformula b{color:var(--fg)}
+.pbar{cursor:pointer;outline:none}
+.pbar:focus-visible rect.b,.pbar.sel rect.b{stroke:var(--fg);stroke-width:2}
+.perdia{margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--glass-2);border:1px solid var(--stroke);display:grid;gap:10px}
+.perdia h3{margin:0;font-family:var(--f-num);font-size:15px}
+.perdia .r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.evchips{display:flex;flex-wrap:wrap;gap:6px}
+/* Tomar pedido */
+.pdgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:560px;overflow:auto;padding:2px;margin-top:10px}
+.pprod{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--stroke);background:var(--glass-2);min-height:74px;transition:transform var(--spring-dur) var(--spring),border-color .2s,background .2s}
+.pprod:hover:not(:disabled){border-color:rgba(64,224,208,.5);transform:translateY(-1px)}
+.pprod:active:not(:disabled){transform:scale(.96);transition-duration:.08s}
+.pprod.on{border-color:var(--accent);background:rgba(64,224,208,.10)}
+.pprod .nm{font-weight:700;font-size:13px;line-height:1.25;padding-right:22px}
+.pprod .pr{color:var(--accent);font-family:var(--f-num);font-weight:800;font-size:13px}
+.pprod .why{font-size:10.5px;font-weight:700;color:var(--warn)}
+.pprod .qn{position:absolute;top:7px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:800;display:grid;place-items:center;padding:0 6px}
+.pddest{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.pdlineas{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+.pdlineas li{display:grid;grid-template-columns:minmax(0,1fr) auto 78px;gap:8px;align-items:center;font-size:13px}
+.pdlineas li.empty-s{display:block}
+.pdlineas .qty{display:inline-flex;align-items:center;gap:6px}
+.pdlineas .qty .btn{padding:2px 9px;min-width:30px;justify-content:center}
+.pdlineas li>b{text-align:right}
+.pdtot{display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 10px;padding-top:10px;border-top:1px solid var(--stroke);font-weight:700;color:var(--fg-2)}
+.pdtot b{font-family:var(--f-num);font-size:24px;font-weight:800;color:var(--accent)}
+.pdacc{display:grid;gap:8px}
+.pdacc .btn{justify-content:center}
+.pdmesas{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.pdfila{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
+.pfila{display:flex;justify-content:space-between;gap:10px;width:100%;padding:8px 10px;border-radius:12px;border:1px solid var(--stroke);background:var(--glass-2);font-size:12.5px;text-align:left}
+.pfila[aria-pressed="true"]{border-color:var(--accent);background:rgba(64,224,208,.10)}
+.pfila .num{color:var(--muted);white-space:nowrap}
+.pdpax{display:flex;align-items:center;gap:8px;margin:4px 0 10px}
+.pdpax b{min-width:22px;text-align:center;font-size:16px}
+.queues{grid-template-columns:repeat(4,minmax(0,1fr))}
+.pdbarra{display:none;position:sticky;bottom:12px;z-index:6;margin-top:12px;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 10px 16px;border-radius:16px;border:1px solid rgba(64,224,208,.45);font-weight:700;background:rgba(14,22,25,.94)}
+@media (max-width:1280px){.pdbarra{display:flex}}
+@media (max-width:640px){.queues{grid-template-columns:repeat(2,minmax(0,1fr))}.pdgrid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:none}}
 @media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
 </style>
 
@@ -498,8 +544,8 @@ html.incrustado .franja{position:relative}
         <span class="clock num" id="clock">--:--</span>
         <span class="chip"><span class="dot live" id="liveDot"></span><span id="modeTxt">Simulación en vivo</span></span>
         <span class="chip" id="hdrSync"><span class="dot" id="hdrSyncDot"></span><span id="hdrSyncTxt">Online</span></span>
-        <div class="seg" role="group" aria-label="Temporada simulada" id="seasonSeg"><span class="ind"></span>
-          <button type="button" data-season="alta" aria-pressed="false">Alta</button><button type="button" data-season="baja" aria-pressed="true">Baja</button></div>
+        <div class="seg" role="group" aria-label="Horizonte de la simulación" id="horSeg"><span class="ind"></span>
+          <button type="button" data-hor="dia" aria-pressed="true">Día</button><button type="button" data-hor="semana" aria-pressed="false">Semana</button><button type="button" data-hor="mes" aria-pressed="false">Mes</button></div>
         <div class="seg" role="group" aria-label="Velocidad de simulación" id="speedSeg"><span class="ind"></span>
           <button type="button" data-speed="1" aria-pressed="false">1×</button><button type="button" data-speed="60" aria-pressed="true">60×</button><button type="button" data-speed="300" aria-pressed="false">300×</button></div>
         <button class="btn pri" id="play" type="button"><svg viewBox="0 0 24 24" fill="currentColor"></svg><span>Pausar</span></button>
@@ -543,18 +589,56 @@ html.incrustado .franja{position:relative}
       <div class="hub" id="hub"></div>
     </section>
 
+    <!-- ===== CONTEXTO Y PERÍODO ===== -->
+    <section class="view" data-view="contexto" hidden>
+      <div class="grid">
+        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Contexto de la simulación</h2><p>Qué se simula y con qué demanda. El día en vivo del Dashboard usa la fecha elegida.</p></div></div>
+            <div class="cxform">
+              <div class="campo">Horizonte<div class="seg" role="group" aria-label="Horizonte" id="cxHor"><span class="ind"></span><button type="button" data-hor="dia" aria-pressed="true">Día</button><button type="button" data-hor="semana" aria-pressed="false">Semana</button><button type="button" data-hor="mes" aria-pressed="false">Mes</button></div></div>
+              <label class="campo">Fecha<input class="fin num" type="date" id="cxFecha"></label>
+              <div class="campo">Temporada<div class="seg" role="group" aria-label="Temporada" id="cxTemp"><span class="ind"></span><button type="button" data-temp="alta" aria-pressed="false">Alta</button><button type="button" data-temp="baja" aria-pressed="true">Baja</button></div></div>
+              <label class="campo">Evento de ese día<select class="fin" id="cxEvento"></select></label>
+              <label class="campo">Afluencia <span class="num" id="cxAflV">100%</span><input type="range" id="cxAfl" min="50" max="150" step="5" value="100"></label>
+            </div>
+            <div class="cxformula" id="cxFormula"></div></div></article>
+        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc" id="perOut"></div></article>
+      </div>
+    </section>
+
     <!-- ===== SALÓN ===== -->
     <section class="view" data-view="salon" hidden>
       <div class="grid">
         <article class="tile glass s8"><div class="sk"><i class="t"></i><i class="blk"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Mesas</h2><p>Toca una mesa para ver el pedido o cobrarla</p></div>
             <div class="legend"><span><i class="sw" style="background:#3DDC84"></i>Libre</span><span><i class="sw" style="background:#FF6161"></i>Ocupada</span><span><i class="sw" style="background:#FFB547"></i>Esperando cuenta</span><span><i class="sw" style="background:#9AAAA7"></i>Colación</span></div></div>
-            <div class="queues"><div class="q"><b id="qLlevar">0</b><span>Fila para llevar</span></div><div class="q"><b id="qMesa">0</b><span>Espera de mesa</span></div><div class="q"><b id="qCafe">0</b><span>Espera de café</span></div></div>
+            <div class="queues"><div class="q"><b id="qLlevar">0</b><span>Fila para llevar</span></div><div class="q"><b id="qMesa">0</b><span>Espera de mesa</span></div><div class="q"><b id="qEmp">0</b><span>Espera de empanadas</span></div><div class="q"><b id="qCafe">0</b><span>Espera de café</span></div></div>
+            <div class="row-end" style="margin:4px 0 8px"><small id="qNota"></small><button class="btn sm" type="button" id="qFila">Vender en la fila</button></div>
             <div id="tables"></div></div></article>
         <article class="tile glass s4"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Pedido de la mesa</h2><p>Se ordena y se paga en la mesa</p></div></div><div class="detail" id="detail"></div>
-            <h2 class="sec-t" style="margin-top:18px">Mostrador · para llevar</h2><ul class="log" id="salonLlevar" style="margin-top:10px"></ul></div></article>
+            <h2 class="sec-t" style="margin-top:18px">Mostrador y fila</h2><ul class="log" id="salonLlevar" style="margin-top:10px"></ul></div></article>
       </div>
+    </section>
+
+    <!-- ===== TOMAR PEDIDO ===== -->
+    <section class="view" data-view="pedido" hidden>
+      <div class="grid">
+        <article class="tile glass s8"><div class="sk"><i class="t"></i><i class="blk"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd pddest"><div><h2>Carta</h2><p id="pdSub">Precios de la prueba · lo que no se puede vender ahora aparece apagado</p></div>
+              <div class="seg" role="group" aria-label="Destino del pedido" id="pdDest"><span class="ind"></span><button type="button" data-dest="mesa" aria-pressed="true">Mesa</button><button type="button" data-dest="llevar" aria-pressed="false">Para llevar</button><button type="button" data-dest="fila" aria-pressed="false">Fila</button></div></div>
+            <div class="filters"><input id="pdQ" class="search" type="search" placeholder="Buscar en la carta…" aria-label="Buscar en la carta"><div class="fchips" id="pdCats"></div></div>
+            <div class="pdgrid" id="pdCarta"></div></div></article>
+        <article class="tile glass s4"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2 id="pdTit">Pedido de mesa</h2><p id="pdTxt"></p></div></div>
+            <div id="pdDestino"></div>
+            <ul class="pdlineas" id="pdLineas"></ul>
+            <div class="pdtot"><span>Total</span><b id="pdTotal">$0</b></div>
+            <div class="pdacc"><button class="btn pri" type="button" id="pdEnviar" disabled>Enviar</button><button class="btn" type="button" id="pdVaciar">Vaciar pedido</button></div>
+            <h2 class="sec-t" style="margin-top:18px">Ingresados a mano</h2><ul class="log" id="pdLog" style="margin-top:10px"></ul></div></article>
+      </div>
+      <div class="pdbarra glass" id="pdBarra" hidden><span id="pdBarTxt"></span><button class="btn pri sm" type="button" id="pdBarBtn">Ver pedido</button></div>
     </section>
 
     <!-- ===== COCINA ===== -->
@@ -640,7 +724,7 @@ html.incrustado .franja{position:relative}
             <div class="tbl-wrap"><table><thead><tr><th>Canal</th><th class="r">Tickets</th><th class="r">Ventas</th><th class="r">Ticket prom.</th><th class="r">Participación</th></tr></thead><tbody id="clCanales"></tbody></table></div></div></article>
         <article class="tile glass s5"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Filas y espera</h2><p>Las tres filas del local</p></div></div>
-            <div class="kv"><div class="stat"><b class="num" id="clLlevar">0</b><span>Para llevar</span></div><div class="stat"><b class="num" id="clMesa">0</b><span>Espera de mesa</span></div><div class="stat"><b class="num" id="clCafe">0</b><span>Espera de café</span></div><div class="stat"><b class="num" id="clAband">0</b><span>Grupos que se fueron sin mesa</span></div></div></div></article>
+            <div class="kv"><div class="stat"><b class="num" id="clLlevar">0</b><span>Para llevar</span></div><div class="stat"><b class="num" id="clMesa">0</b><span>Espera de mesa</span></div><div class="stat"><b class="num" id="clEmp">0</b><span>Espera de empanadas</span></div><div class="stat"><b class="num" id="clCafe">0</b><span>Espera de café</span></div><div class="stat"><b class="num" id="clAband">0</b><span>Se fueron sin ser atendidos</span></div></div></div></article>
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Delivery DesertGo en curso</h2><p id="clDelSub"></p></div></div><div class="tbl-wrap"><table><thead><tr><th>Pedido</th><th>Entró</th><th class="r">Minutos</th><th>Estado</th><th class="r">Monto</th></tr></thead><tbody id="clDeliv"></tbody></table></div></div></article>
       </div>
@@ -656,7 +740,7 @@ html.incrustado .franja{position:relative}
           <div class="tc"><div class="hd"><div><h2>Ruteo por área</h2><p>Ventas según dónde sale el pedido</p></div></div><div class="stack" id="stack" role="img" aria-label="Ventas por área"></div><div id="arows"></div>
             <h2 class="sec-t" style="margin-top:14px">Más vendidos</h2><ul class="rank" id="top10" style="margin-top:8px"></ul></div></article>
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc" id="proj"></div></article>
+          <div class="tc"><div class="hd"><div><h2>Semana y mes</h2><p>La proyección de varios días se arma en Contexto y período, con la fecha, la temporada y los eventos de cada día.</p></div><button class="btn sm" type="button" id="repCtx">Abrir Contexto y período</button></div></div></article>
       </div>
     </section>
 
@@ -666,7 +750,7 @@ html.incrustado .franja{position:relative}
         <article class="tile glass s12" id="dbTile"><div class="sk"><i class="t"></i><i class="l"></i><i class="l"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Catálogo de la prueba</h2><p id="dbSub"></p></div></div>
             <div class="filters"><input id="q" class="search" type="search" placeholder="Buscar producto, ingrediente o código…" aria-label="Buscar producto"><div class="fchips" id="fchips"></div></div>
-            <div class="scroll db" style="max-height:560px"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Área</th><th class="r">Precio prueba</th><th class="r">Costo (Caja)</th><th class="r">Food cost</th><th class="r">Vendidos</th><th class="r">Simular</th></tr></thead><tbody id="dbBody"></tbody></table></div></div></article>
+            <div class="scroll db" style="max-height:560px"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Área</th><th class="r">Precio prueba</th><th class="r">Costo (Caja)</th><th class="r">Food cost</th><th class="r">Vendidos</th></tr></thead><tbody id="dbBody"></tbody></table></div></div></article>
       </div>
     </section>
 
@@ -683,7 +767,7 @@ html.incrustado .franja{position:relative}
               <button class="btn" type="button" id="cbDescartar">Descartar borrador</button>
             </div></div></article>
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="hd"><div><h2>Un día completo, general contra prueba</h2><p>Misma demanda y misma temporada; cambia solo la configuración</p></div><button class="btn sm" type="button" id="cbComparar">Comparar</button></div>
+          <div class="tc"><div class="hd"><div><h2>General contra prueba en el período</h2><p id="cbVsSub">Mismos días y misma demanda; cambia solo la configuración</p></div><button class="btn sm" type="button" id="cbComparar">Comparar</button></div>
             <div id="cbVs"></div></div></article>
         <article class="tile glass s8"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Precios y carta</h2><p>Precio con IVA. Lo marcado como fuera deja de venderse en la Caja y la Carta lo muestra como no disponible.</p></div></div>
@@ -847,7 +931,7 @@ function construirMenu(cfg){
     v:x.pf?x.pf.v:/vegan/i.test(x.p.n),local:!!(x.p.loc||CATS[x.c].local),d:x.d}));
 }
 let MENU=[],SINPRECIO=0;
-function armarMenu(){const cfg=EAPOS.prueba();MENU=construirMenu(cfg);SINPRECIO=EAPOS.catalogo(cfg).filter(p=>p.p==null).length}
+function armarMenu(){const cfg=EAPOS.prueba();MENU=construirMenu(cfg);SINPRECIO=EAPOS.catalogo(cfg).filter(p=>p.p==null).length;if(typeof menuV==="number")menuV++}
 armarMenu();
 const AREAS={barra:{n:"Barra",col:"#1AA89B"},horno:{n:"Horno · empanadas",col:"#E8674A"},cocina:{n:"Cocina",col:"#9A80D6"}};
 const PROFILE={7:.35,8:.6,9:.85,10:.95,11:.9,12:1.15,13:1.35,14:1.15,15:.85,16:.95,17:1.05,18:.95,19:.75,20:.6,21:.4};
@@ -855,6 +939,35 @@ let GOAL=EAPOS.prueba().metas.dia||1800000;const OPEN=420,CLOSE=1320,START=790;
 const PROF_SUM=Object.values(PROFILE).reduce((a,b)=>a+b,0);
 const SEASONS={alta:1,baja:.6};
 let DEMAND=SEASONS.baja;
+/* Contexto: qué se simula (un día, una semana o un mes desde una fecha) y con
+   qué demanda. La demanda de un día es temporada × día de la semana × evento
+   × afluencia. Los eventos se marcan día por día; sin marca, el día es normal. */
+const DOW_F=[1.2,.85,.8,.85,.9,1.05,1.3];
+const DOW_N=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const EVENTOS={normal:{n:"Día normal",f:1},feriado:{n:"Feriado o fin de semana largo",f:1.3},evento:{n:"Evento en el pueblo",f:1.45},lento:{n:"Día lento · viento o ruta cortada",f:.65}};
+const HORIZ={dia:"Día",semana:"Semana",mes:"Mes"};
+const CTX_KEY="eapos_prueba_ctx";
+const pad2=n=>String(n).padStart(2,"0");
+const isoDe=d=>d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+const fechaDe=iso=>{const p=String(iso).split("-").map(Number);return new Date(p[0],p[1]-1,p[2])};
+function leerCtx(){let c=null;try{c=JSON.parse(localStorage.getItem(CTX_KEY))}catch(e){}
+  c=Object.assign({h:"dia",fecha:isoDe(new Date()),temporada:"baja",afl:100,dias:{}},c&&typeof c==="object"?c:{});
+  if(!HORIZ[c.h])c.h="dia";if(!SEASONS[c.temporada])c.temporada="baja";
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(c.fecha)||isNaN(fechaDe(c.fecha)))c.fecha=isoDe(new Date());
+  c.afl=Math.min(150,Math.max(50,+c.afl||100));if(!c.dias||typeof c.dias!=="object")c.dias={};
+  for(const k in c.dias)if(!EVENTOS[c.dias[k]]||c.dias[k]==="normal")delete c.dias[k];
+  return c}
+let CTX=leerCtx();
+function guardarCtx(){try{localStorage.setItem(CTX_KEY,JSON.stringify(CTX))}catch(e){}}
+const eventoDe=iso=>CTX.dias[iso]||"normal";
+function demandaDe(iso){return SEASONS[CTX.temporada]*DOW_F[fechaDe(iso).getDay()]*EVENTOS[eventoDe(iso)].f*CTX.afl/100}
+/* Cada fecha tiene su propia semilla: el mismo día da siempre el mismo resultado. */
+function semillaDe(iso){let h=2166136261;for(const ch of iso){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+/* Los días del período: el día elegido, siete desde ese día o el mes calendario completo. */
+function diasDelPeriodo(h){h=h||CTX.h;const d0=fechaDe(CTX.fecha),out=[];
+  if(h==="mes"){const d=new Date(d0.getFullYear(),d0.getMonth(),1);while(d.getMonth()===d0.getMonth()){out.push(isoDe(d));d.setDate(d.getDate()+1)}}
+  else{const n=h==="semana"?7:1;for(let i=0;i<n;i++){const d=new Date(d0);d.setDate(d0.getDate()+i);out.push(isoDe(d))}}
+  return out}
 let seed=20260930;
 function rnd(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
 const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1));
@@ -866,7 +979,7 @@ let S;
 function newState(stock){
   const st={t:OPEN,sales:Array(24).fill(0),cum:[],area:{barra:0,horno:0,cocina:0},tickets:0,revenue:0,tx:[],sold:{},log:[],queue:[],deliv:[],llevar:[],stock:{},
     oven:null,ovenDone:null,seq:101,pulses:[],methods:{},records:0,used:{},orders:[],batches:[],abandon:0,lostFull:0,outMin:{},
-    kinds:{mesa:{n:0,v:0},llevar:{n:0,v:0},deliv:{n:0,v:0}}};
+    kinds:{mesa:{n:0,v:0},llevar:{n:0,v:0},fila:{n:0,v:0},deliv:{n:0,v:0}},espEmp:[],eseq:0,abandonEmp:0,manual:[]};
   for(const k in INS0)st.stock[k]=stock&&stock[k]!==undefined?stock[k]:INS0[k].s;
   st.tables=Array.from({length:15},(_,i)=>({n:i+1,salon:i<7?1:i<14?2:15,state:"libre",since:0,dur:0,items:[],pax:0,total:0}));
   return st;
@@ -875,13 +988,17 @@ const hourOf=t=>Math.floor(t/60);
 const avail=it=>it.r.every(c=>S.stock[REC[c][0]]>=REC[c][1]-1e-9);
 function hourMult(it,h){const c=it.c;if(c==="cf"||c==="bf")return h<11?.5:h<18?1.5:.8;if(c==="cc"||c==="tc")return h<11?1.5:h<17?.75:1.25;if(c==="emp")return h<11?.4:1.3;return 1}
 function okTime(it,t){const c=CATS[it.c];if(c.to&&t>=c.to)return false;if(c.from&&t<c.from)return false;return true}
-function pick(kind,opt){const h=hourOf(S.t);const pool=MENU.filter(it=>CATS[it.c].k===kind&&it.w>0&&okTime(it,S.t)&&!(opt.away&&it.local)&&avail(it));
+function pick(kind,opt){const h=hourOf(S.t);const pool=MENU.filter(it=>CATS[it.c].k===kind&&it.w>0&&okTime(it,S.t)&&!(opt.away&&it.local)&&(!opt.cats||opt.cats.includes(it.c))&&avail(it));
   return wpick(pool,it=>it.w*hourMult(it,h)*(opt.deliv&&it.c==="emp"?2.2:1)*(opt.deliv&&it.c==="san"?1.6:1)*(opt.away&&it.c==="emp"?1.8:1))}
 function consume(it){for(const c of it.r){const[k,q]=REC[c];S.stock[k]=Math.max(0,+(S.stock[k]-q).toFixed(4));S.used[k]=(S.used[k]||0)+q}}
-function addItem(list,it,extra){consume(it);S.sold[it.id]=(S.sold[it.id]||0)+1;const a=CATS[it.c].a;list.push({id:it.id,n:it.n,p:it.p,a});S.log.push({t:S.t,a,p:it.p,id:it.id});S.pulses.push(a);if(extra)addItem(list,extra)}
+function anotar(list,it){S.sold[it.id]=(S.sold[it.id]||0)+1;const a=CATS[it.c].a;list.push({id:it.id,n:it.n,p:it.p,a});S.log.push({t:S.t,a,p:it.p,id:it.id});S.pulses.push(a)}
+function addItem(list,it,extra){consume(it);anotar(list,it);if(extra)addItem(list,extra)}
 /* Leche vegetal: cambia el insumo; el extra se cobra en la Caja real, aquí no se suma */
 function veg(it){if(it.r.includes("m")&&rnd()<.15&&S.stock.lveg>=.2){S.stock.leche+=.2;S.used.leche=(S.used.leche||0)-.2;S.stock.lveg-=.2;S.used.lveg=(S.used.lveg||0)+.2}return null}
-function buildOrder(kind,pax){const items=[];const opt={away:kind!=="mesa",deliv:kind==="deliv"};const n=kind==="mesa"?pax:kind==="llevar"?ri(1,2):ri(2,4);
+/* Carta de la fila: lo que se puede pedir de pie mientras se espera mesa o la tanda de empanadas. */
+const FILA_CATS=["cc","tc","cf","bf","pas","emp"];
+function buildOrder(kind,pax){const items=[];
+  if(kind==="fila"){const n=ri(1,Math.max(1,pax||1));for(let i=0;i<n;i++){const d=pick("drink",{away:true,cats:FILA_CATS});if(d)addItem(items,d,veg(d));if(rnd()<.3){const f=pick("food",{away:true,cats:["pas"]});if(f)addItem(items,f)}}return items}const opt={away:kind!=="mesa",deliv:kind==="deliv"};const n=kind==="mesa"?pax:kind==="llevar"?ri(1,2):ri(2,4);
   for(let i=0;i<n;i++){let food=null;const wantFood=kind==="mesa"?rnd()<.82:kind==="deliv"?rnd()<.8:rnd()<.45;
     if(wantFood){food=pick("food",opt);if(food)addItem(items,food)}
     const included=food&&(food.c==="des"||food.c==="bru");const wantDrink=!included&&(kind==="deliv"?rnd()<.45:rnd()<.85);
@@ -896,6 +1013,18 @@ function pay(label,kind,items,by){if(!items.length)return;const amt=sum(items);S
 function seat(tb,pax){tb.state="ocupada";tb.since=S.t;tb.pax=pax;tb.items=buildOrder("mesa",pax);tb.total=sum(tb.items);tb.dur=ri(22,38)+pax*ri(5,9);tb.flash=true;
   if(!tb.items.length)tb.state="libre";else order("Mesa "+tb.n,"mesa",tb.items)}
 function closeTable(tb,by){pay("Mesa "+tb.n,"mesa",tb.items,by);tb.state="libre";tb.items=[];tb.total=0;tb.pax=0;tb.since=S.t;tb.flash=true}
+/* Venta en la fila: a quien espera mesa o empanadas se le cobra ahí mismo. */
+function ventaFila(g,tipo,items,by){g.compro=true;items=items||buildOrder("fila",g.pax);if(!items.length)return 0;
+  const lb=tipo==="mesa"?`Fila · espera de mesa (${g.pax} pers.)`:"Fila · espera de empanadas";order(lb,"fila",items);pay(lb,"fila",items,by||"Simulación");return sum(items)}
+/* Al salir una tanda se atiende a quien esperaba empanadas, en orden de llegada.
+   El que ya pagó solo las retira; el que no, paga al recibirlas. Pasados 18 minutos
+   sin tanda, quien no pagó se va. */
+function servirEspera(){const t=S.t;
+  while(S.espEmp.length&&S.stock.emp>=S.espEmp[0].n&&(!S.espEmp[0].tanda||(S.ovenDone!=null&&S.ovenDone>S.espEmp[0].t))){const e=S.espEmp.shift();
+    if(e.pagado){S.stock.emp-=e.n;S.used.emp=(S.used.emp||0)+e.n}
+    else{const items=[];for(let i=0;i<e.n;i++){const f=pick("food",{away:true,cats:["emp"]});if(f)addItem(items,f)}
+      if(items.length){order("Mostrador · esperó la tanda","llevar",items);pay("Mostrador · esperó la tanda","llevar",items,"Simulación")}}}
+  const n0=S.espEmp.length;S.espEmp=S.espEmp.filter(e=>e.pagado||e.tanda||t-e.t<18);S.abandonEmp+=n0-S.espEmp.length}
 function bake(by){if(S.oven)return false;S.oven={start:S.t,end:S.t+5};S.batches.push({start:S.t,end:S.t+5,by:by||ACTOR.name});return true}
 const inColacion=t=>(t>=690&&t<735)||(t>=960&&t<1000);
 function step(){
@@ -904,16 +1033,22 @@ function step(){
   if(!inColacion(t)&&m15.state==="colacion"){m15.state="libre";m15.since=t;m15.flash=true}
   for(const tb of S.tables){if(tb.state==="ocupada"&&t>=tb.since+tb.dur){tb.state="cuenta";tb.since=t;tb.dur=ri(3,8);tb.flash=true}else if(tb.state==="cuenta"&&t>=tb.since+tb.dur)closeTable(tb,"Simulación")}
   const qb=S.queue.length;S.queue=S.queue.filter(g=>t-g.t<16);S.abandon+=qb-S.queue.length;
-  for(const tb of S.tables){if(tb.state==="libre"&&S.queue.length)seat(tb,S.queue.shift().pax)}
+  /* Quien espera mira la carta de la fila y a veces pide algo. */
+  for(const g of S.queue)if(!g.compro&&t-g.t>=2&&rnd()<.07)ventaFila(g,"mesa");
+  for(const e of S.espEmp)if(!e.compro&&t-e.t>=1&&rnd()<.06)ventaFila(e,"emp");
+  /* Se sienta al primero de la fila que ya puede pasar (los ingresados a mano esperan que se prepare su mesa). */
+  for(const tb of S.tables){if(tb.state!=="libre")continue;const i=S.queue.findIndex(g=>!(g.hasta>t));if(i<0)break;seat(tb,S.queue.splice(i,1)[0].pax)}
   S.deliv=S.deliv.filter(d=>t<d.t+d.eta);S.llevar=S.llevar.filter(x=>t-x<6);
   if(S.oven&&t>=S.oven.end){S.stock.emp+=15;S.oven=null;S.ovenDone=t}
-  if(!S.oven&&S.stock.emp<INS0.emp.min&&t<CLOSE-30)bake("Automático");
+  servirEspera();
+  if(!S.oven&&((S.stock.emp<INS0.emp.min&&t<CLOSE-30)||S.espEmp.length))bake("Automático");
   for(const k in MINQ){if(S.stock[k]<MINQ[k]-1e-9)S.outMin[k]=(S.outMin[k]||0)+1}
   if(t<CLOSE-15){const k=poisson(.2*DEMAND*(PROFILE[hourOf(t)]||0));
     for(let i=0;i<k;i++){const r=rnd();
       if(r<.55){const pax=wpick([1,2,3,4],p=>[.25,.4,.2,.15][p-1]);const free=S.tables.filter(x=>x.state==="libre");
-        if(free.length)seat(free[Math.floor(rnd()*free.length)],pax);else if(S.queue.length<5)S.queue.push({t,pax});else S.lostFull++}
-      else if(r<.82){const items=buildOrder("llevar");S.llevar.push(t);order("Mostrador","llevar",items);pay("Mostrador","llevar",items,"Simulación")}
+        if(free.length)seat(free[Math.floor(rnd()*free.length)],pax);else if(S.queue.length<5)S.queue.push({t,pax,id:++S.eseq});else S.lostFull++}
+      else if(r<.82){if(S.stock.emp<3&&rnd()<.6){S.espEmp.push({t,n:ri(1,3),pax:1,id:++S.eseq});if(!S.oven)bake("Automático")}
+        else{const items=buildOrder("llevar");S.llevar.push(t);order("Mostrador","llevar",items);pay("Mostrador","llevar",items,"Simulación")}}
       else{const items=buildOrder("deliv");if(items.length){const lb="DesertGo #"+(4100+S.seq);order(lb,"deliv",items);pay(lb,"deliv",items,"Simulación");S.deliv.push({t,eta:ri(22,40),label:lb,amt:sum(items)})}}}}
   S.t++;S.cum[S.t]=S.revenue;
   if(S.log.length>1500)S.log=S.log.filter(x=>S.t-x.t<=60);
@@ -967,11 +1102,15 @@ const ICONS={
  reportes:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',
  cambios:'<path d="M4 7h10M18 7h2M4 12h3M11 12h9M4 17h8M16 17h4"/><circle cx="16" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="17" r="2"/>',
  carta:'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>',
+ contexto:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7.5 13.5h2M11 13.5h2M14.5 13.5h2M7.5 17h2M11 17h2"/>',
+ pedido:'<path d="M8 3h8l1 2h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2z"/><path d="M8 10h8M8 14h8M8 18h5"/>',
  datos:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>'
 };
 const VIEWS={
  inicio:{t:"Dashboard",g:"Simulación",c:"#40E0D0"},
+ contexto:{t:"Contexto y período",g:"Simulación",c:"#D9A93A",d:"Día, semana o mes con fecha, temporada y eventos"},
  salon:{t:"Salón simulado",g:"Simulación",c:"#3DDC84",d:"Mesas, filas y cobro en la mesa"},
+ pedido:{t:"Tomar pedido",g:"Simulación",c:"#FF7F50",d:"Ingreso a mano: mesas, para llevar y fila"},
  cocina:{t:"Cocina",g:"Simulación",c:"#9A80D6",d:"Comandas y pronóstico de carga"},
  horno:{t:"Horno · Empanadas",g:"Simulación",c:"#E8674A",d:"Vitrina, tandas y ventas por tipo"},
  barra:{t:"Barra",g:"Simulación",c:"#1AA89B",d:"Bebidas e insumos de barra"},
@@ -1012,7 +1151,7 @@ function show(v,silent){
   $("vTitle").textContent=VIEWS[v].t;$("backBtn").hidden=v==="inicio";
   document.querySelectorAll("#nav a").forEach(a=>{const on=a.dataset.v===v;a.classList.toggle("on",on);a.toggleAttribute("aria-current",on)});
   navSl&&navSl.to(document.querySelector("#nav a.on"),silent);
-  if(booted){renderView();document.querySelectorAll(`.view[data-view="${v}"] .tc`).forEach((el,i)=>{el.style.setProperty("--d",(i*50)+"ms");el.style.animation="none";void el.offsetWidth;el.style.animation=""})}
+  if(booted){renderView();segs(true);document.querySelectorAll(`.view[data-view="${v}"] .tc`).forEach((el,i)=>{el.style.setProperty("--d",(i*50)+"ms");el.style.animation="none";void el.offsetWidth;el.style.animation=""})}
   if(!silent){window.scrollTo(0,0);$("vTitle").focus({preventScroll:true})}
   renderClock();
 }
@@ -1048,6 +1187,8 @@ function renderHub(){
   const set=(v,st,ss,badge)=>{const el=$("ac-"+v);if(!el)return;el.querySelector("[data-st]").innerHTML=st;if(ss!=null)el.querySelector("[data-ss]").innerHTML=ss+(badge||"")};
   const occ=S.tables.filter(x=>x.state==="ocupada"||x.state==="cuenta").length;
   set("salon",`${occ} / 15 mesas`,`${S.queue.length} en espera · ${S.llevar.length} en fila para llevar `);
+  set("contexto",`${HORIZ[CTX.h]} · ${fechaCorta(CTX.fecha)}`,`Temporada ${CTX.temporada} · ${EVENTOS[eventoDe(CTX.fecha)].n.toLowerCase()}`);
+  set("pedido",`${S.manual.length} a mano`,`${S.queue.length+S.espEmp.length} esperando en fila · ${S.kinds.fila.n} ventas en fila`);
   const act=cocinaActivas().length;set("cocina",`${act} comandas`,`≈ ${Math.round(NN.pred[2])} platos la próxima hora`);
   set("horno",`${S.stock.emp} en vitrina`,S.oven?`Tanda sale en ${Math.max(0,S.oven.end-S.t)} min`:`${S.batches.length} tandas hoy`);
   const beb=MENU.filter(it=>CATS[it.c].a==="barra"&&it.c!=="ext").reduce((a,it)=>a+(S.sold[it.id]||0),0);
@@ -1055,7 +1196,7 @@ function renderHub(){
   const crit=Object.keys(INS0).filter(k=>sev(k)==="crit").length,warn=Object.keys(INS0).filter(k=>sev(k)==="warn").length;
   set("inventario",`${crit} críticos`,`${warn} en advertencia `,crit?`<span class="badge crit">Revisar</span>`:`<span class="badge ok">OK</span>`);
   set("caja",clp(S.revenue),`${S.tx.length} movimientos${NET.queue?` · ${NET.queue} en cola`:""}`);
-  set("clientes",`${S.kinds.mesa.n+S.kinds.llevar.n+S.kinds.deliv.n} tickets`,`Mesa ${S.kinds.mesa.n} · Llevar ${S.kinds.llevar.n} · Delivery ${S.kinds.deliv.n}`);
+  set("clientes",`${S.kinds.mesa.n+S.kinds.llevar.n+S.kinds.fila.n+S.kinds.deliv.n} tickets`,`Mesa ${S.kinds.mesa.n} · Llevar ${S.kinds.llevar.n} · Fila ${S.kinds.fila.n} · Delivery ${S.kinds.deliv.n}`);
   const top=Object.entries(S.sold).map(([id,u])=>({it:MENU[id],u})).filter(x=>x.it.c!=="ext").sort((a,b)=>b.u-a.u)[0];
   set("reportes",top?esc(top.it.n):"—",top?`Más vendido hoy · ${top.u} u.`:"Sin ventas aún");
 
@@ -1101,13 +1242,14 @@ function showTip(i){const box=$("chart"),geo=box._geo,tip=$("tip");if(!geo||!tip
 let selTable=null;
 const stLabel=s=>({libre:"Libre",ocupada:"Ocupada",cuenta:"Esperando cuenta",colacion:"Colación"})[s];
 function renderSalon(){
-  const t=S.t;$("qLlevar").textContent=S.llevar.length;$("qMesa").textContent=S.queue.length;$("qCafe").textContent=S.log.filter(x=>x.a==="barra"&&t-x.t<4).length;
+  const t=S.t;$("qLlevar").textContent=S.llevar.length;$("qMesa").textContent=S.queue.length;$("qEmp").textContent=S.espEmp.length;
+  $("qNota").textContent=S.queue.length+S.espEmp.length?`${S.kinds.fila.n} ventas en la fila hoy · ${clp(S.kinds.fila.v)}`:`Nadie esperando · ${S.kinds.fila.n} ventas en la fila hoy`;$("qCafe").textContent=S.log.filter(x=>x.a==="barra"&&t-x.t<4).length;
   const tile=tb=>`<button type="button" class="mesa ${tb.state}${tb.flash&&!REDUCE?" pop":""}" data-t="${tb.n}" aria-pressed="${selTable===tb.n}" aria-label="Mesa ${tb.n}, ${stLabel(tb.state)}"><span class="n">${tb.n}</span><span class="st">${stLabel(tb.state)}</span><span class="mt num">${tb.state==="ocupada"||tb.state==="cuenta"?`${t-tb.since} min · ${clp(tb.total)}`:tb.state==="colacion"?"Equipo":"—"}</span></button>`;
   const g=s=>S.tables.filter(x=>x.salon===s).map(tile).join("");
   $("tables").hx=`<div class="room">Salón 1</div><div class="tiles">${g(1)}</div><div class="room">Salón 2</div><div class="tiles">${g(2)}</div><div class="room">Mesa 15 · colación del equipo, libre para clientes cuando se desocupa</div><div class="tiles">${g(15)}</div>`;
   S.tables.forEach(x=>x.flash=false);renderDetail();
-  const ll=S.orders.filter(o=>o.kind==="llevar").slice(-6).reverse();
-  $("salonLlevar").hx=ll.map(o=>`<li><b>${hhmm(o.t)}</b>${esc(o.items.map(i=>i.n).join(", "))}</li>`).join("")||`<li>Sin pedidos para llevar aún</li>`;
+  const ll=S.orders.filter(o=>o.kind==="llevar"||o.kind==="fila").slice(-6).reverse();
+  $("salonLlevar").hx=ll.map(o=>`<li><b>${hhmm(o.t)}</b>${o.kind==="fila"?"Fila · ":""}${esc(o.items.map(i=>i.n).join(", "))}</li>`).join("")||`<li>Sin pedidos de mostrador ni de fila aún</li>`;
 }
 function renderDetail(){
   const d=$("detail");const tb=S.tables.find(x=>x.n===selTable);
@@ -1115,7 +1257,7 @@ function renderDetail(){
   const busy=tb.state==="ocupada"||tb.state==="cuenta";
   d.innerHTML=`<div class="row"><b>Mesa ${tb.n} · ${stLabel(tb.state)}</b>${busy?`<span class="num">${tb.pax} pers. · ${clp(tb.total)}</span>`:""}</div>`+
    (busy?`<ul>${tb.items.map(i=>`<li>${esc(i.n)} <span class="num" style="color:var(--muted)">${clp(i.p)}</span></li>`).join("")}</ul><div class="row" style="justify-content:flex-end">${tb.state==="ocupada"?`<button class="btn sm" type="button" data-act="cuenta">Pedir cuenta</button>`:""}<button class="btn sm pri" type="button" data-act="cobrar">Cobrar ${clp(tb.total)}</button></div>`
-   :`<div class="row"><span class="empty-s">${tb.state==="colacion"?"Espacio de colación del personal":"Mesa disponible"}</span>${tb.state==="libre"?`<button class="btn sm" type="button" data-act="sentar">Sentar grupo de 2</button>`:""}</div>`);
+   :`<div class="row"><span class="empty-s">${tb.state==="colacion"?"Espacio de colación del personal":"Mesa disponible"}</span>${tb.state==="libre"?`<button class="btn sm pri" type="button" data-act="pedido">Tomar pedido</button>`:""}</div>`);
 }
 function cocinaActivas(){return S.orders.filter(o=>S.t-o.t<20&&o.items.some(i=>i.a==="cocina"))}
 function renderCocina(){
@@ -1176,9 +1318,9 @@ function renderCaja(){
   if(S.tx.length)lastTxId=S.tx[S.tx.length-1].id;
 }
 function renderClientes(){
-  const K=[["Mesa","mesa"],["Para llevar","llevar"],["Delivery DesertGo","deliv"]],tot=S.revenue||1;
+  const K=[["Mesa","mesa"],["Para llevar","llevar"],["Fila (mientras espera)","fila"],["Delivery DesertGo","deliv"]],tot=S.revenue||1;
   $("clCanales").hx=K.map(([n,k])=>{const x=S.kinds[k];return `<tr><td>${n}</td><td class="r num">${x.n}</td><td class="r num">${clp(x.v)}</td><td class="r num">${clp(x.n?x.v/x.n:0)}</td><td class="r num">${Math.round(x.v/tot*100)}%</td></tr>`}).join("");
-  $("clLlevar").textContent=S.llevar.length;$("clMesa").textContent=S.queue.length;$("clCafe").textContent=S.log.filter(x=>x.a==="barra"&&S.t-x.t<4).length;$("clAband").textContent=S.abandon+S.lostFull;
+  $("clLlevar").textContent=S.llevar.length;$("clMesa").textContent=S.queue.length;$("clEmp").textContent=S.espEmp.length;$("clCafe").textContent=S.log.filter(x=>x.a==="barra"&&S.t-x.t<4).length;$("clAband").textContent=S.abandon+S.lostFull+S.abandonEmp;
   $("clDelSub").textContent=`${S.deliv.length} en curso · ${S.kinds.deliv.n} pedidos hoy`;
   $("clDeliv").hx=S.deliv.map(d=>{const el=S.t-d.t,st=el<12?"En preparación":el<d.eta-8?"Esperando repartidor":"En camino";return `<tr><td>${esc(d.label)}</td><td class="num">${hhmm(d.t)}</td><td class="r num">${el}</td><td>${st}</td><td class="r num">${clp(d.amt)}</td></tr>`}).join("")||`<tr><td colspan="5" class="empty-s">Sin pedidos en curso</td></tr>`;
 }
@@ -1189,7 +1331,6 @@ function renderReportes(){
   $("arows").hx=Object.keys(AREAS).map(k=>`<div class="arow"><i class="sw" style="background:${AREAS[k].col}"></i><span>${AREAS[k].n}</span><b class="num">${clp(S.area[k])}</b><span class="pct num">${Math.round(S.area[k]/tot*100)}%</span></div>`).join("");
   const top=Object.entries(S.sold).map(([id,u])=>({it:MENU[id],u})).filter(x=>x.it.c!=="ext").sort((a,b)=>b.u-a.u).slice(0,10);
   $("top10").hx=top.map((x,i)=>`<li><span class="rk">${i+1}</span><span class="nm"><i class="adot" style="background:${AREAS[CATS[x.it.c].a].col}"></i>${esc(x.it.n)}</span><b class="num">${x.u} u.</b></li>`).join("");
-  if(!renderReportes.proj)renderProj();
 }
 /* Un día completo de simulación, de la apertura al cierre, sin tocar el día
    que se está mirando: guarda el estado del motor, corre y lo devuelve. */
@@ -1197,35 +1338,13 @@ function correrDia(menu,dem,semilla){
   const g={MENU,DEMAND,seed,S,on:NET.online,q:NET.queue};
   MENU=menu;DEMAND=dem;seed=semilla;NET.online=true;S=newState();
   while(S.t<CLOSE)step();
-  const r={rev:S.revenue,tk:S.tickets,sold:Object.assign({},S.sold),emp:S.stock.emp,cafe:S.used.cafe||0,abandon:S.abandon+S.lostFull,menu};
+  const r={rev:S.revenue,tk:S.tickets,sold:Object.assign({},S.sold),emp:S.stock.emp,cafe:S.used.cafe||0,abandon:S.abandon+S.lostFull+S.abandonEmp,
+    kinds:JSON.parse(JSON.stringify(S.kinds)),tandas:S.batches.length,menu};
   MENU=g.MENU;DEMAND=g.DEMAND;seed=g.seed;S=g.S;NET.online=g.on;NET.queue=g.q;
   return r;
 }
-function correrDias(menu,dem,n){const out=[];for(let d=0;d<n;d++)out.push(correrDia(menu,dem,20261001+d*7919));return out}
-function renderProj(){
-  renderReportes.proj=1;const el=$("proj");
-  el.innerHTML=`<div class="hd"><div><h2>Proyección de 30 días · temporada ${season}</h2><p>Treinta días con el motor y la configuración de la prueba. Datos simulados, no ventas reales.</p></div><button class="btn sm" type="button" id="projBtn">Calcular</button></div><div id="projOut"><p class="note">Toca Calcular. Corre treinta días completos en este equipo y tarda un par de segundos.</p></div>`;
-  $("projBtn").onclick=()=>{
-    $("projOut").innerHTML=`<p class="note">Calculando…</p>`;
-    setTimeout(()=>{
-      const dias=correrDias(MENU,DEMAND,30),tot=dias.reduce((a,d)=>a+d.rev,0),tk=dias.reduce((a,d)=>a+d.tk,0);
-      const meta=GOAL,ok=dias.filter(d=>d.rev>=meta).length,sobra=dias.reduce((a,d)=>a+d.emp,0),cafe=dias.reduce((a,d)=>a+d.cafe,0);
-      const W=860,H=200,pad={l:52,r:8,t:14,b:24},bw=(W-pad.l-pad.r)/dias.length,mx=niceMax(Math.max(meta,...dias.map(d=>d.rev))*1.05),y=v=>pad.t+(H-pad.t-pad.b)*(1-v/mx);
-      let g="";for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(255,255,255,${i?0.06:0.18})"/><text x="${pad.l-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#98ABA8">${(v/1e6).toLocaleString("es-CL",{maximumFractionDigits:1})}M</text>`}
-      dias.forEach((d,i)=>{const cx=pad.l+i*bw+bw/2,w=bw*.66,yy=y(d.rev);g+=`<rect x="${cx-w/2}" y="${yy}" width="${w}" height="${H-pad.b-yy}" rx="3" fill="${d.rev>=meta?"#1AA89B":"#5C6F6C"}"><title>Día ${i+1}: ${clp(d.rev)}</title></rect>`;if(i%5===0)g+=`<text x="${cx}" y="${H-7}" text-anchor="middle" font-size="11" fill="#98ABA8">${i+1}</text>`});
-      g+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(meta)}" y2="${y(meta)}" stroke="#FF7F50" stroke-dasharray="5 4"/><text x="${W-pad.r}" y="${y(meta)-5}" text-anchor="end" font-size="11" fill="#FFB499">objetivo ${clp(meta)}</text>`;
-      $("projOut").innerHTML=`<div class="kv" style="margin-bottom:14px">
-        <div class="stat"><b class="num">${clp(tot)}</b><span>Venta simulada en 30 días</span></div>
-        <div class="stat"><b class="num">${clp(tot/30)}</b><span>Promedio por día</span></div>
-        <div class="stat"><b class="num">${clp(tk?tot/tk:0)}</b><span>Ticket promedio</span></div>
-        <div class="stat"><b class="num">${ok} de 30</b><span>Días que alcanzan el objetivo</span></div>
-        <div class="stat"><b class="num">${sobra.toLocaleString("es-CL")}</b><span>Empanadas sobrantes al cierre</span></div>
-        <div class="stat"><b class="num">${fmtQ(cafe,"kg")} kg</b><span>Café usado</span></div></div>
-        <div class="tbl-wrap"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:520px;height:auto;display:block" role="img" aria-label="Venta simulada por día, 30 días">${g}</svg></div>
-        <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:#1AA89B"></i>Alcanza el objetivo</span><span><i class="sw" style="background:#5C6F6C"></i>Bajo el objetivo</span><span><i class="sw dash" style="border-color:#FF7F50"></i>Objetivo diario</span></div>`;
-    },30);
-  };
-}
+/* Un período completo: cada fecha con su demanda (temporada, día de la semana, evento) y su semilla. */
+function correrPeriodo(menu,dias){return dias.map(iso=>Object.assign(correrDia(menu,demandaDe(iso),semillaDe(iso)),{iso,ev:eventoDe(iso),dem:demandaDe(iso)}))}
 function renderDatos(){
   const on=NET.online;
   $("syncMode").textContent=on?(NET.syncing?"Sincronizando":"Online"):"Offline";$("syncDot").className="dot"+(on&&!NET.syncing?"":" off");
@@ -1262,9 +1381,9 @@ function renderPhotos(){
 function renderDB(){
   const q=fQ.trim().toLowerCase();
   const rows=MENU.filter(it=>(fCat==="all"||it.c===fCat)&&(!q||(it.n+" "+it.d+" "+CATS[it.c].n+" "+it.code).toLowerCase().includes(q)));
-  $("dbBody").hx=rows.map(it=>{const C=CATS[it.c],out=!avail(it),tw=!okTime(it,S.t),c=costoCaja(it.key);
-    return `<tr><td class="num" style="color:var(--muted);font-size:12px">${it.code}</td><td><b>${esc(it.n)}</b>${it.v?LEAF:""}${it.local?`<span class="flag">Solo local</span>`:""}${C.note?`<span class="flag">${C.note}</span>`:""}${out?`<span class="flag out">Sin insumo</span>`:""}${it.d?`<div class="desc">${esc(it.d)}</div>`:""}</td><td>${C.n}</td><td><i class="adot" style="background:${AREAS[C.a].col}"></i>${AREAS[C.a].n}</td><td class="r"><span class="price">${clp(it.p)}</span></td><td class="r num">${c!=null?clp(c):"—"}</td><td class="r">${fcPill(it)}</td><td class="r num">${S.sold[it.id]||0}</td><td class="r"><button class="btn sm" type="button" data-sell="${it.id}" ${tw||out?"disabled":""} aria-label="Vender ${esc(it.n)}">+ Vender</button></td></tr>`}).join("")
-   ||`<tr><td colspan="9" class="empty-s">Sin resultados para “${esc(fQ)}”</td></tr>`;
+  $("dbBody").hx=rows.map(it=>{const C=CATS[it.c],out=!avail(it),c=costoCaja(it.key);
+    return `<tr><td class="num" style="color:var(--muted);font-size:12px">${it.code}</td><td><b>${esc(it.n)}</b>${it.v?LEAF:""}${it.local?`<span class="flag">Solo local</span>`:""}${C.note?`<span class="flag">${C.note}</span>`:""}${out?`<span class="flag out">Sin insumo</span>`:""}${it.d?`<div class="desc">${esc(it.d)}</div>`:""}</td><td>${C.n}</td><td><i class="adot" style="background:${AREAS[C.a].col}"></i>${AREAS[C.a].n}</td><td class="r"><span class="price">${clp(it.p)}</span></td><td class="r num">${c!=null?clp(c):"—"}</td><td class="r">${fcPill(it)}</td><td class="r num">${S.sold[it.id]||0}</td></tr>`}).join("")
+   ||`<tr><td colspan="8" class="empty-s">Sin resultados para “${esc(fQ)}”</td></tr>`;
 }
 
 /* =============== RED NEURAL =============== */
@@ -1317,18 +1436,20 @@ function slider(ind){if(!ind)return null;const sp={x:new Spring(0,260,24),y:new 
   const apply=()=>{ind.style.transform=`translate(${sp.x.x}px,${sp.y.x}px)`;ind.style.width=Math.max(0,sp.w.x)+"px";ind.style.height=Math.max(0,sp.h.x)+"px"};
   Object.values(sp).forEach(s=>s.on=apply);
   return{to(el,jump){if(!el)return;const v={x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight};for(const k in v){jump?sp[k].jump(v[k]):sp[k].set(v[k])}}}}
-let navSl=null;const spdSl=slider(document.querySelector("#speedSeg .ind")),seaSl=slider(document.querySelector("#seasonSeg .ind"));
-function setSliders(jump){navSl&&navSl.to(document.querySelector("#nav a.on"),jump);spdSl.to(document.querySelector("#speedSeg [aria-pressed=true]"),jump);seaSl.to(document.querySelector("#seasonSeg [aria-pressed=true]"),jump)}
+let navSl=null;const spdSl=slider(document.querySelector("#speedSeg .ind"));
+const SEGS=["horSeg","cxHor","cxTemp","pdDest"].map(id=>({id,sl:slider(document.querySelector("#"+id+" .ind"))}));
+function segs(jump){SEGS.forEach(x=>{const b=document.querySelector("#"+x.id+" [aria-pressed=true]");if(b&&b.offsetWidth)x.sl.to(b,jump)})}
+function setSliders(jump){navSl&&navSl.to(document.querySelector("#nav a.on"),jump);spdSl.to(document.querySelector("#speedSeg [aria-pressed=true]"),jump);segs(jump)}
 
 /* =============== CICLO =============== */
-let speed=60,playing=true,acc=0,lastTick=performance.now(),secs=0,booted=false,season="baja";
+let speed=60,playing=true,acc=0,lastTick=performance.now(),secs=0,booted=false;
 function renderClock(){if(!S)return;const t=S.t,closed=t>=CLOSE;
   $("clock").textContent=speed===1?hhmm(t)+":"+String(Math.floor(secs)).padStart(2,"0"):hhmm(t);
   const fr=closed?"Local cerrado · 22:00":(t<720?"Desayunos hasta las 12:00":"Brunch y carta completa");
-  $("vSub").textContent=cur==="inicio"?`${fr} · temporada ${season} · configuración de prueba`:VIEWS[cur].d+" · "+fr;
+  $("vSub").textContent=cur==="inicio"?`${cap(fechaLarga(CTX.fecha))} · ${fr} · temporada ${CTX.temporada}`:VIEWS[cur].d+" · "+fechaCorta(CTX.fecha)+" · "+fr;
   $("modeTxt").textContent=closed?"Día terminado":playing?"Simulación en vivo":"En pausa";$("liveDot").className="dot"+(playing&&!closed?" live":" idle")}
 function renderView(){if(!USER||!S)return;
-  ({inicio:renderDash,salon:renderSalon,cocina:renderCocina,horno:renderHorno,barra:renderBarra,inventario:renderInv,caja:renderCaja,clientes:renderClientes,reportes:renderReportes,carta:renderDB,cambios:renderCambios,datos:renderDatos})[cur]()}
+  ({inicio:renderDash,contexto:renderContexto,pedido:renderPedido,salon:renderSalon,cocina:renderCocina,horno:renderHorno,barra:renderBarra,inventario:renderInv,caja:renderCaja,clientes:renderClientes,reportes:renderReportes,carta:renderDB,cambios:renderCambios,datos:renderDatos})[cur]()}
 function renderAll(){computeNN();if(NET.online&&!NET.syncing)NET.last=S.t;renderView();renderHdrSync();renderClock();spawnPulses()}
 function tick(){const now=performance.now(),dt=(now-lastTick)/1000;lastTick=now;if(!booted)return;
   if(playing&&S.t<CLOSE){acc+=dt*speed/60;secs=(secs+dt*speed)%60;let n=0;while(acc>=1&&n<30){step();acc-=1;n++}
@@ -1339,7 +1460,7 @@ function setPlay(){const b=$("play");b.querySelector("span").textContent=playing
   b.querySelector("svg").innerHTML=playing?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 5l12 7-12 7z"/>'}
 function boot(first){
   armarMenu();GOAL=EAPOS.prueba().metas.dia||1800000;renderPhotos();
-  seed=20260930;DEMAND=SEASONS[season];S=newState();while(S.t<START)step();S.pulses=[];NET.queue=0;NET.log=[];NET.last=S.t;selTable=null;lastTxId=S.tx.length?S.tx[S.tx.length-1].id:0;renderReportes.proj=0;
+  seed=semillaDe(CTX.fecha);DEMAND=demandaDe(CTX.fecha);S=newState();PD.lineas={};PD.mesa=null;PD.fila=null;while(S.t<START)step();S.pulses=[];NET.queue=0;NET.log=[];NET.last=S.t;selTable=null;lastTxId=S.tx.length?S.tx[S.tx.length-1].id:0;
   const app=$("app");app.classList.add("loading");booted=false;
   setTimeout(()=>{app.classList.remove("loading");booted=true;lastTick=performance.now();renderAll();setSliders(true);
     document.querySelectorAll(`.view[data-view="${cur}"] .tc`).forEach((el,i)=>{el.style.setProperty("--d",(i*50)+"ms");el.style.animation="none";void el.offsetWidth;el.style.animation=""})},REDUCE?0:(first?900:600));
@@ -1360,7 +1481,6 @@ function bindTiles(root){root.querySelectorAll(".tile").forEach(t=>{
 bindTiles(document);
 $("play").addEventListener("click",()=>{if(S.t>=CLOSE)return;playing=!playing;setPlay();lastTick=performance.now();renderClock()});
 document.querySelectorAll("[data-speed]").forEach(b=>b.addEventListener("click",()=>{speed=+b.dataset.speed;document.querySelectorAll("[data-speed]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));spdSl.to(b);renderClock()}));
-document.querySelectorAll("[data-season]").forEach(b=>b.addEventListener("click",()=>{if(season===b.dataset.season)return;season=b.dataset.season;document.querySelectorAll("[data-season]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));seaSl.to(b);boot(false);playing=true;setPlay();toast(`Temporada ${season}: el día se reinicia con demanda ${season==="baja"?"de temporada baja":"de temporada alta"}`)}));
 $("reset").addEventListener("click",()=>{boot(false);playing=true;setPlay();toast("Día reiniciado desde las "+hhmm(START))});
 $("netBtn").addEventListener("click",()=>{if(NET.syncing)return;NET.forced=NET.online;setOnline(!NET.online)});
 $("ovBtn").addEventListener("click",()=>{if(bake(ACTOR.name)){S.records++;if(!NET.online)NET.queue++;toast("Lata al horno · sale en 5 min");renderView()}});
@@ -1368,7 +1488,7 @@ $("tables").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if
 $("detail").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const tb=S.tables.find(x=>x.n===selTable);if(!tb)return;
   if(b.dataset.act==="cobrar"){const amt=tb.total;closeTable(tb,ACTOR.name);toast(`Mesa ${tb.n} cobrada · ${clp(amt)}`)}
   if(b.dataset.act==="cuenta"){tb.state="cuenta";tb.since=S.t;tb.dur=ri(3,8);tb.flash=true}
-  if(b.dataset.act==="sentar"){seat(tb,2);toast(`Mesa ${tb.n}: pedido tomado · ${clp(tb.total)}`)}
+  if(b.dataset.act==="pedido"){PD.dest="mesa";PD.mesa=tb.n;go("pedido");return}
   renderAll()});
 $("inv").addEventListener("click",e=>{const b=e.target.closest("[data-rep]");if(!b)return;const k=b.dataset.rep;
   if(k==="emp"){if(bake(ACTOR.name))toast("Lata al horno · sale en 5 min");else toast("Ya hay una tanda en el horno")}
@@ -1378,14 +1498,175 @@ $("invAll").addEventListener("click",()=>{invAll=!invAll;$("invAll").textContent
 $("txFilter").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;txF=b.dataset.f;$("txFilter").querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderCaja()});
 $("q").addEventListener("input",e=>{fQ=e.target.value;renderDB()});
 $("fchips").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;fCat=b.dataset.c;$("fchips").querySelectorAll("[data-c]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderDB()});
-$("dbBody").addEventListener("click",e=>{const b=e.target.closest("[data-sell]");if(!b)return;const it=MENU[b.dataset.sell];if(!avail(it))return;
-  const items=[];addItem(items,it);const lb=it.local?"Venta en local":"Mostrador";order(lb,"llevar",items);pay(lb,"llevar",items,ACTOR.name);if(!it.local)S.llevar.push(S.t);toast(`Venta simulada: ${it.n} · ${clp(it.p)}`);renderAll()});
 
 
 const chartBox=$("chart");
 chartBox.addEventListener("mousemove",e=>{const geo=chartBox._geo;if(!geo)return;const r=chartBox.getBoundingClientRect(),i=Math.floor((e.clientX-r.left-geo.pad.l)/geo.bw);const ni=(i>=0&&i<geo.hours.length)?i:null;if(ni!==chartHover){chartHover=ni;renderChart("chart",false)}});
 chartBox.addEventListener("mouseleave",()=>{chartHover=null;renderChart("chart",false)});
 new ResizeObserver(()=>{if(booted&&USER){if(cur==="inicio"&&ROLES[USER.r].ventas){renderSpark();renderChart("chartMini",true)}if(cur==="reportes")renderChart("chart",false);setSliders(true)}}).observe(document.body);
+
+/* =============== CONTEXTO Y PERÍODO =============== */
+const cap=x=>x.charAt(0).toUpperCase()+x.slice(1);
+const fechaLarga=iso=>fechaDe(iso).toLocaleDateString("es-CL",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+const fechaCorta=iso=>fechaDe(iso).toLocaleDateString("es-CL",{weekday:"short",day:"numeric",month:"short"}).replace(/\./g,"");
+const f2=x=>x.toLocaleString("es-CL",{maximumFractionDigits:2});
+let PER=null,perPend=false,perSel=null;var menuV=0;
+const perKey=()=>JSON.stringify([CTX.h,CTX.fecha,CTX.temporada,CTX.afl,CTX.dias,menuV]);
+function simularPeriodo(){PER={key:perKey(),h:CTX.h,dias:correrPeriodo(MENU,diasDelPeriodo())};if(perSel&&!PER.dias.some(d=>d.iso===perSel))perSel=null}
+function asegurarPeriodo(){if(CTX.h==="dia"||(PER&&PER.key===perKey())||perPend)return;perPend=true;
+  setTimeout(()=>{perPend=false;simularPeriodo();if(cur==="contexto")renderContexto();renderHub()},30)}
+function marcarSegs(){
+  document.querySelectorAll("[data-hor]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.hor===CTX.h)));
+  document.querySelectorAll("[data-temp]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.temp===CTX.temporada)));segs()}
+/* Cambia el contexto. Si cambia algo del día en vivo, ese día se reinicia. */
+function cambiarCtx(fn,motivo){const antes=JSON.stringify([CTX.fecha,CTX.temporada,CTX.afl,eventoDe(CTX.fecha)]);fn(CTX);
+  for(const k in CTX.dias)if(CTX.dias[k]==="normal")delete CTX.dias[k];guardarCtx();marcarSegs();
+  if(JSON.stringify([CTX.fecha,CTX.temporada,CTX.afl,eventoDe(CTX.fecha)])!==antes){boot(false);playing=true;setPlay();if(motivo)toast(motivo)}
+  renderView();renderHub();renderClock()}
+function renderContexto(){
+  marcarSegs();const fe=$("cxFecha");if(document.activeElement!==fe)fe.value=CTX.fecha;
+  if(!$("cxEvento").options.length)$("cxEvento").innerHTML=Object.keys(EVENTOS).map(k=>`<option value="${k}">${EVENTOS[k].n}</option>`).join("");
+  $("cxEvento").value=eventoDe(CTX.fecha);$("cxAfl").value=CTX.afl;$("cxAflV").textContent=CTX.afl+"%";
+  const d=fechaDe(CTX.fecha),ev=eventoDe(CTX.fecha);
+  $("cxFormula").innerHTML=`<b>${cap(fechaLarga(CTX.fecha))}</b> · demanda <b class="num">${f2(demandaDe(CTX.fecha))}</b> = temporada ${CTX.temporada} ${f2(SEASONS[CTX.temporada])} × ${DOW_N[d.getDay()]} ${f2(DOW_F[d.getDay()])} × ${EVENTOS[ev].n.toLowerCase()} ${f2(EVENTOS[ev].f)} × afluencia ${CTX.afl}%`;
+  renderPeriodo()}
+function renderPeriodo(){
+  const el=$("perOut");
+  if(CTX.h==="dia"){el.hx=`<div class="hd"><div><h2>Día en vivo</h2><p>${cap(fechaLarga(CTX.fecha))}. El día corre en el Dashboard y en cada área; puedes tomar pedidos a mano en Tomar pedido.</p></div><button class="btn sm pri" type="button" data-per="dash">Ir al Dashboard</button></div>
+    <p class="note">Elige Semana o Mes para simular varios días seguidos con este contexto. Desde el período puedes marcar eventos en cada día y abrir cualquiera en vivo.</p>`;return}
+  if(!PER||PER.key!==perKey()){el.hx=`<p class="note">Simulando ${diasDelPeriodo().length} días…</p>`;asegurarPeriodo();return}
+  const D=PER.dias,n=D.length,tot=D.reduce((a,x)=>a+x.rev,0),tk=D.reduce((a,x)=>a+x.tk,0),cfg=EAPOS.prueba(),mDia=GOAL;
+  const mPer=CTX.h==="mes"?(cfg.metas.mes||mDia*n):mDia*n,ok=D.filter(x=>x.rev>=mDia).length;
+  const mejor=D.reduce((a,x)=>x.rev>a.rev?x:a),peor=D.reduce((a,x)=>x.rev<a.rev?x:a);
+  const canal=k=>D.reduce((a,x)=>({n:a.n+x.kinds[k].n,v:a.v+x.kinds[k].v}),{n:0,v:0});
+  const titulo=CTX.h==="mes"?cap(fechaDe(D[0].iso).toLocaleDateString("es-CL",{month:"long",year:"numeric"})):`Semana desde el ${fechaLarga(D[0].iso)}`;
+  /* barras por día */
+  const W=860,H=210,pad={l:52,r:8,t:16,b:30},bw=(W-pad.l-pad.r)/n,mx=niceMax(Math.max(mDia,...D.map(x=>x.rev))*1.08),y=v=>pad.t+(H-pad.t-pad.b)*(1-v/mx);
+  let g="";for(let i=0;i<=4;i++){const v=mx*i/4;g+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(255,255,255,${i?0.06:0.18})"/><text x="${pad.l-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#98ABA8">${v>=1e6?(v/1e6).toLocaleString("es-CL",{maximumFractionDigits:1})+"M":Math.round(v/1000)+"k"}</text>`}
+  D.forEach((x,i)=>{const cx=pad.l+i*bw+bw/2,w=Math.max(6,bw*.66),yy=y(x.rev),dd=fechaDe(x.iso),fin=dd.getDay()===0||dd.getDay()===6;
+    g+=`<g class="pbar${perSel===x.iso?" sel":""}" data-dia="${x.iso}" tabindex="0" role="button" aria-label="${esc(fechaLarga(x.iso))}: ${clp(x.rev)}"><rect x="${cx-bw/2}" y="${pad.t}" width="${bw}" height="${H-pad.t-pad.b}" fill="transparent"/><rect class="b" x="${cx-w/2}" y="${yy}" width="${w}" height="${H-pad.b-yy}" rx="3" fill="${x.rev>=mDia?"#1AA89B":"#5C6F6C"}"><title>${esc(fechaLarga(x.iso))}: ${clp(x.rev)}</title></rect>${x.ev!=="normal"?`<circle cx="${cx}" cy="${yy-7}" r="3.5" fill="#FF7F50"/>`:""}
+      <text x="${cx}" y="${H-15}" text-anchor="middle" font-size="10.5" fill="${fin?"#F2F7F6":"#98ABA8"}" font-weight="${fin?800:500}">${n<=7?cap(DOW_N[dd.getDay()].slice(0,3)):"lmmjvsd"[(dd.getDay()+6)%7]}</text><text x="${cx}" y="${H-3}" text-anchor="middle" font-size="10.5" fill="#98ABA8">${dd.getDate()}</text></g>`});
+  g+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(mDia)}" y2="${y(mDia)}" stroke="#FF7F50" stroke-dasharray="5 4"/><text x="${W-pad.r}" y="${y(mDia)-5}" text-anchor="end" font-size="11" fill="#FFB499">meta diaria ${clp(mDia)}</text>`;
+  /* semanas del mes */
+  let semanas="";
+  if(CTX.h==="mes"){const grupos=[];D.forEach(x=>{const dd=fechaDe(x.iso);if(!grupos.length||dd.getDay()===1)grupos.push([]);grupos[grupos.length-1].push(x)});
+    semanas=`<h2 class="sec-t" style="margin-top:16px">Por semana</h2><div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Semana</th><th class="r">Días</th><th class="r">Venta</th><th class="r">Promedio por día</th><th class="r">Días sobre la meta</th></tr></thead><tbody>${grupos.map((s,i)=>{const v=s.reduce((a,x)=>a+x.rev,0);return `<tr><td>${i+1} · ${fechaCorta(s[0].iso)} – ${fechaCorta(s[s.length-1].iso)}</td><td class="r num">${s.length}</td><td class="r num">${clp(v)}</td><td class="r num">${clp(v/s.length)}</td><td class="r num">${s.filter(x=>x.rev>=mDia).length}</td></tr>`}).join("")}</tbody></table></div>`}
+  /* productos más vendidos */
+  const u={};D.forEach(x=>{for(const id in x.sold){const it=x.menu[id];if(it)u[it.n]=(u[it.n]||0)+x.sold[id]}});
+  const top=Object.entries(u).sort((a,b)=>b[1]-a[1]).slice(0,8),mt=Math.max(1,...top.map(x=>x[1]));
+  const C=[["Mesa","mesa"],["Para llevar","llevar"],["Fila (mientras espera)","fila"],["Delivery DesertGo","deliv"]];
+  /* detalle del día elegido */
+  let det="";const s=perSel&&D.find(x=>x.iso===perSel);
+  if(s){det=`<div class="perdia" id="perDia"><h3>${cap(fechaLarga(s.iso))}</h3>
+    <div class="kv"><div class="stat"><b class="num">${clp(s.rev)}</b><span>Venta del día</span></div><div class="stat"><b class="num">${s.tk}</b><span>Tickets</span></div><div class="stat"><b class="num">${clp(s.tk?s.rev/s.tk:0)}</b><span>Ticket promedio</span></div><div class="stat"><b class="num">${f2(s.dem)}</b><span>Demanda del día</span></div><div class="stat"><b class="num">${s.kinds.fila.n}</b><span>Ventas en la fila</span></div></div>
+    <div class="r"><span class="lbl">Evento</span><div class="evchips">${Object.keys(EVENTOS).map(k=>`<button type="button" class="fchip" data-ev="${k}" aria-pressed="${s.ev===k}">${EVENTOS[k].n}</button>`).join("")}</div></div>
+    <div class="r"><button class="btn sm pri" type="button" data-per="abrir">Abrir este día en vivo</button><span class="note" style="margin:0">El Dashboard pasa a este día y puedes tomar pedidos a mano.</span></div></div>`}
+  el.hx=`<div class="hd"><div><h2>${esc(titulo)}</h2><p>${n} días simulados con la configuración de la prueba · temporada ${CTX.temporada} · afluencia ${CTX.afl}%. Toca un día para ver el detalle, marcar un evento o abrirlo en vivo.</p></div><button class="btn sm" type="button" data-per="recalc">Volver a simular</button></div>
+    <div class="kv" style="margin-bottom:14px">
+      <div class="stat"><b class="num">${clp(tot)}</b><span>Venta del período</span></div>
+      <div class="stat"><b class="num">${clp(tot/n)}</b><span>Promedio por día</span></div>
+      <div class="stat"><b class="num">${Math.round(tot/mPer*100)}%</b><span>De la meta ${CTX.h==="mes"&&cfg.metas.mes?"del mes":"del período"} (${clp(mPer)})</span></div>
+      <div class="stat"><b class="num">${ok} de ${n}</b><span>Días sobre la meta diaria</span></div>
+      <div class="stat"><b class="num">${clp(tk?tot/tk:0)}</b><span>Ticket promedio</span></div>
+      <div class="stat"><b class="num">${D.reduce((a,x)=>a+x.abandon,0)}</b><span>Se fueron sin ser atendidos</span></div></div>
+    <div class="tbl-wrap"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:520px;height:auto;display:block" role="img" aria-label="Venta simulada por día">${g}</svg></div>
+    <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:#1AA89B"></i>Sobre la meta diaria</span><span><i class="sw" style="background:#5C6F6C"></i>Bajo la meta</span><span><i class="sw" style="background:#FF7F50;border-radius:50%"></i>Día con evento</span><span>Mejor: ${esc(fechaCorta(mejor.iso))} ${clp(mejor.rev)} · Más bajo: ${esc(fechaCorta(peor.iso))} ${clp(peor.rev)}</span></div>
+    ${det}${semanas}
+    <div class="grid" style="margin-top:14px;gap:14px">
+      <div class="s7"><h2 class="sec-t">Canales</h2><div class="tbl-wrap" style="margin-top:8px"><table><thead><tr><th>Canal</th><th class="r">Tickets</th><th class="r">Venta</th><th class="r">Participación</th></tr></thead><tbody>${C.map(([nm,k])=>{const c=canal(k);return `<tr><td>${nm}</td><td class="r num">${c.n}</td><td class="r num">${clp(c.v)}</td><td class="r num">${tot?Math.round(c.v/tot*100):0}%</td></tr>`}).join("")}</tbody></table></div>
+        <p class="note">Empanadas sobrantes al cierre: ${D.reduce((a,x)=>a+x.emp,0).toLocaleString("es-CL")} · tandas: ${D.reduce((a,x)=>a+x.tandas,0)} · café usado: ${fmtQ(D.reduce((a,x)=>a+x.cafe,0),"kg")} kg</p></div>
+      <div class="s5"><h2 class="sec-t">Más vendidos</h2><ul class="rank" style="margin-top:8px">${top.map(([nm,q],i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(nm)}</span><span class="hbar"><i style="width:${q/mt*100}%;background:#40E0D0"></i></span></span><b class="num">${q.toLocaleString("es-CL")}</b></li>`).join("")}</ul></div>
+    </div>`}
+function abrirDia(iso){cambiarCtx(c=>{c.fecha=iso;c.h="dia"});go("inicio");toast("Día en vivo: "+fechaLarga(iso))}
+document.querySelectorAll("[data-hor]").forEach(b=>b.addEventListener("click",()=>{const h=b.dataset.hor,enc=!!b.closest("#horSeg");
+  if(h!==CTX.h)cambiarCtx(c=>{c.h=h});if(enc)go(h==="dia"?"inicio":"contexto")}));
+document.querySelectorAll("[data-temp]").forEach(b=>b.addEventListener("click",()=>{const t=b.dataset.temp;if(t===CTX.temporada)return;
+  cambiarCtx(c=>{c.temporada=t},`Temporada ${t}: el día en vivo se reinicia con esa demanda`)}));
+$("cxFecha").addEventListener("change",e=>{const v=e.target.value;if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return;cambiarCtx(c=>{c.fecha=v},"Día en vivo: "+fechaLarga(v))});
+$("cxEvento").addEventListener("change",e=>{const v=e.target.value;cambiarCtx(c=>{c.dias[c.fecha]=v},`${EVENTOS[v].n}: el día en vivo se reinicia`)});
+$("cxAfl").addEventListener("input",e=>{$("cxAflV").textContent=e.target.value+"%"});
+$("cxAfl").addEventListener("change",e=>{const v=+e.target.value;cambiarCtx(c=>{c.afl=v},`Afluencia ${v}%: el día en vivo se reinicia`)});
+$("perOut").addEventListener("click",e=>{
+  const p=e.target.closest("[data-per]");if(p){const a=p.dataset.per;if(a==="dash")go("inicio");if(a==="abrir"&&perSel)abrirDia(perSel);if(a==="recalc"){PER=null;renderPeriodo()}return}
+  const ev=e.target.closest("[data-ev]");if(ev&&perSel){const iso=perSel,k=ev.dataset.ev;cambiarCtx(c=>{c.dias[iso]=k},iso===CTX.fecha?`${EVENTOS[k].n}: el día en vivo se reinicia`:"");return}
+  const d=e.target.closest("[data-dia]");if(d){perSel=perSel===d.dataset.dia?null:d.dataset.dia;renderPeriodo()}});
+$("perOut").addEventListener("keydown",e=>{const d=e.target.closest("[data-dia]");if(d&&(e.key==="Enter"||e.key===" ")){e.preventDefault();d.click()}});
+$("repCtx").addEventListener("click",()=>go("contexto"));
+
+/* =============== TOMAR PEDIDO =============== */
+const PD={dest:"mesa",mesa:null,pax:2,fila:null,lineas:{},cat:"all",q:""};
+const pdItems=()=>Object.entries(PD.lineas).filter(([id,q])=>q>0&&MENU[id]).flatMap(([id,q])=>Array(q).fill(MENU[id]));
+/* ¿Alcanzan los insumos? Para llevar, las empanadas que falten se esperan del horno. */
+function revisarInsumos(its,esperaEmp){const st=Object.assign({},S.stock);let falta=0;
+  for(const it of its)for(const c of it.r){const[k,q]=REC[c];
+    if(k==="emp"&&esperaEmp&&st.emp<q){falta+=q;continue}
+    if(st[k]<q-1e-9)return{ins:k};st[k]-=q}
+  return{falta}}
+function filaEsperando(){return[...S.queue.map(g=>({k:"m:"+g.id,g,tipo:"mesa",txt:`Espera de mesa · ${g.pax} pers.`,min:S.t-g.t})),
+  ...S.espEmp.map(e=>({k:"e:"+e.id,g:e,tipo:"emp",txt:`Espera de empanadas · ${e.n} u.${e.pagado?" pagadas":""}`,min:S.t-e.t}))]}
+function renderPedido(){
+  document.querySelectorAll("#pdDest [data-dest]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.dest===PD.dest)));segs();
+  const cats=Object.keys(CATS).filter(c=>PD.dest!=="fila"||FILA_CATS.includes(c));if(PD.cat!=="all"&&!cats.includes(PD.cat))PD.cat="all";
+  $("pdCats").hx=`<button class="fchip" type="button" data-pc="all" aria-pressed="${PD.cat==="all"}">Todo</button>`+cats.map(c=>`<button class="fchip" type="button" data-pc="${c}" aria-pressed="${PD.cat===c}">${CATS[c].n}</button>`).join("");
+  const q=norm(PD.q),cerrado=S.t>=CLOSE;
+  const rows=MENU.filter(it=>cats.includes(it.c)&&(PD.cat==="all"||it.c===PD.cat)&&(!q||norm(it.n+" "+it.d).includes(q)));
+  $("pdCarta").hx=rows.map(it=>{const tw=!okTime(it,S.t),loc=PD.dest!=="mesa"&&it.local,espera=it.c==="emp"&&S.stock.emp<1,out=!avail(it)&&!(espera&&PD.dest==="llevar");
+    const dis=cerrado||tw||loc||out,why=tw?CATS[it.c].note:loc?"Solo en el local":out?"Sin insumo":espera?"Espera la tanda":"",qn=PD.lineas[it.id]||0;
+    return `<button type="button" class="pprod${qn?" on":""}" data-add="${it.id}" ${dis?"disabled":""}><span class="nm">${esc(it.n)}${it.v?LEAF:""}</span><span class="pr">${clp(it.p)}</span>${why?`<span class="why">${esc(why)}</span>`:""}${qn?`<span class="qn">${qn}</span>`:""}</button>`}).join("")||`<p class="empty-s">Sin productos para este filtro.</p>`;
+  let dh="";const pax=`<div class="pdpax"><span class="lbl">Personas</span><button type="button" class="btn sm" data-pax="-1" aria-label="Una persona menos">−</button><b class="num" id="pdPax">${PD.pax}</b><button type="button" class="btn sm" data-pax="1" aria-label="Una persona más">+</button></div>`;
+  if(PD.dest==="mesa"){const libres=S.tables.filter(x=>x.state==="libre");if(PD.mesa&&!libres.some(x=>x.n===PD.mesa))PD.mesa=null;
+    $("pdTit").textContent="Pedido de mesa";$("pdTxt").textContent="Se sienta el grupo, el pedido sale a cocina, barra y horno, y la mesa se cobra en el Salón.";
+    dh=`<span class="lbl">Mesa libre</span><div class="pdmesas">${libres.map(x=>`<button type="button" class="fchip" data-mesa="${x.n}" aria-pressed="${PD.mesa===x.n}">Mesa ${x.n}</button>`).join("")||`<span class="empty-s">No hay mesas libres. El grupo puede esperar en la fila y pedir desde ahí.</span>`}</div>${pax}
+      ${libres.length?"":`<button type="button" class="btn sm" data-afila="mesa">Grupo de ${PD.pax} espera mesa en la fila</button>`}`}
+  else if(PD.dest==="llevar"){$("pdTit").textContent="Para llevar";$("pdTxt").textContent="Se cobra en el mostrador.";
+    dh=`<p class="note" style="margin-top:0">Vitrina: <b class="num">${S.stock.emp}</b> empanadas${S.oven?` · tanda sale en ${Math.max(0,S.oven.end-S.t)} min`:""}. Si no alcanza, el cliente paga y espera la tanda en la fila.</p>`}
+  else{const L=filaEsperando();if(PD.fila&&!L.some(x=>x.k===PD.fila))PD.fila=null;if(!PD.fila&&L.length)PD.fila=L[0].k;
+    $("pdTit").textContent="Venta en la fila";$("pdTxt").textContent="Para quien espera mesa o la salida de empanadas: se cobra ahí mismo.";
+    dh=`<span class="lbl">Quién pide</span><div class="pdfila">${L.map(x=>`<button type="button" class="pfila" data-fila="${x.k}" aria-pressed="${PD.fila===x.k}"><span>${x.txt}</span><span class="num">${x.min} min${x.g.compro?" · ya pidió":""}</span></button>`).join("")||`<span class="empty-s">Nadie espera ahora. Forma la fila con los botones de abajo.</span>`}</div>${pax}
+      <div class="pdacc"><button type="button" class="btn sm" data-afila="mesa">Grupo de ${PD.pax} espera mesa</button><button type="button" class="btn sm" data-afila="emp">Cliente espera la próxima tanda (${PD.pax} empanadas)</button></div>
+      <p class="note">El grupo pasa a su mesa en unos 5 minutos, cuando haya una libre; quien espera empanadas las recibe al salir la tanda.</p>`}
+  $("pdDestino").hx=dh;
+  const its=Object.entries(PD.lineas).filter(([id,qq])=>qq>0&&MENU[id]);
+  $("pdLineas").hx=its.map(([id,qq])=>{const it=MENU[id];return `<li><span class="nm">${esc(it.n)}</span><span class="qty"><button type="button" class="btn sm" data-q="${id}" data-d="-1" aria-label="Quitar uno">−</button><b class="num">${qq}</b><button type="button" class="btn sm" data-q="${id}" data-d="1" aria-label="Agregar uno">+</button></span><b class="num">${clp(it.p*qq)}</b></li>`}).join("")||`<li class="empty-s">Toca productos de la carta para armar el pedido.</li>`;
+  const tot=its.reduce((a,[id,qq])=>a+MENU[id].p*qq,0),nIt=its.reduce((a,[,qq])=>a+qq,0);$("pdTotal").textContent=clp(tot);
+  $("pdBarra").hidden=!nIt;$("pdBarTxt").textContent=`${nIt} ${nIt===1?"producto":"productos"} · ${clp(tot)}`;
+  const b=$("pdEnviar");b.disabled=cerrado||!its.length||(PD.dest==="mesa"&&!PD.mesa)||(PD.dest==="fila"&&!PD.fila);
+  b.textContent=cerrado?"Local cerrado":PD.dest==="mesa"?(PD.mesa?`Sentar en mesa ${PD.mesa} y enviar · ${clp(tot)}`:"Elige una mesa libre"):PD.dest==="llevar"?`Cobrar para llevar · ${clp(tot)}`:(PD.fila?`Cobrar en la fila · ${clp(tot)}`:"Elige quién pide");
+  $("pdLog").hx=S.manual.slice(-8).reverse().map(m=>`<li><b>${hhmm(m.t)}</b>${esc(m.txt)} · ${clp(m.amt)}</li>`).join("")||`<li>Sin pedidos ingresados a mano todavía</li>`;
+}
+function enviarPedido(){
+  const its=pdItems();if(!its.length||S.t>=CLOSE)return;
+  const r=revisarInsumos(its,PD.dest==="llevar");if(r.ins){toast(`No alcanza ${INS0[r.ins].n.toLowerCase()} para todo el pedido`);return}
+  let txt="",amt=0;
+  if(PD.dest==="mesa"){const tb=S.tables.find(x=>x.n===PD.mesa&&x.state==="libre");if(!tb){toast("Esa mesa ya no está libre");return}
+    tb.state="ocupada";tb.since=S.t;tb.pax=PD.pax;tb.items=[];its.forEach(it=>addItem(tb.items,it));tb.total=amt=sum(tb.items);tb.dur=ri(22,38)+PD.pax*ri(5,9);tb.flash=true;
+    order("Mesa "+tb.n,"mesa",tb.items);txt=`Mesa ${tb.n} · ${PD.pax} pers. · ${its.length} productos`;PD.mesa=null;toast(`Mesa ${tb.n}: pedido enviado · ${clp(amt)}`)}
+  else if(PD.dest==="llevar"){const items=[];let falta=0;
+    for(const it of its){if(it.c==="emp"&&S.stock.emp<1){anotar(items,it);falta++}else addItem(items,it)}
+    order("Mostrador","llevar",items);pay("Mostrador","llevar",items,ACTOR.name);amt=sum(items);
+    if(falta){S.espEmp.push({t:S.t,n:falta,pax:1,id:++S.eseq,pagado:true});if(!S.oven)bake(ACTOR.name);txt=`Para llevar · ${falta} empanadas esperan la tanda`;toast(`Cobrado ${clp(amt)} · espera ${falta} empanadas de la próxima tanda`)}
+    else{S.llevar.push(S.t);txt=`Para llevar · ${its.length} productos`;toast(`Para llevar cobrado · ${clp(amt)}`)}}
+  else{const x=filaEsperando().find(y=>y.k===PD.fila);if(!x){toast("Esa persona ya no está en la fila");return}
+    const items=[];its.forEach(it=>addItem(items,it));amt=ventaFila(x.g,x.tipo,items,ACTOR.name);txt=`Fila · ${x.tipo==="mesa"?"espera de mesa":"espera de empanadas"}`;toast(`Venta en la fila · ${clp(amt)}`)}
+  S.manual.push({t:S.t,txt,amt});S.records+=1+its.length;if(!NET.online)NET.queue+=1+its.length;
+  PD.lineas={};renderAll()}
+$("pdDest").addEventListener("click",e=>{const b=e.target.closest("[data-dest]");if(!b)return;PD.dest=b.dataset.dest;renderPedido()});
+$("pdCats").addEventListener("click",e=>{const b=e.target.closest("[data-pc]");if(!b)return;PD.cat=b.dataset.pc;renderPedido()});
+$("pdQ").addEventListener("input",e=>{PD.q=e.target.value;renderPedido()});
+$("pdCarta").addEventListener("click",e=>{const b=e.target.closest("[data-add]");if(!b||b.disabled)return;const id=b.dataset.add;PD.lineas[id]=(PD.lineas[id]||0)+1;renderPedido()});
+$("pdLineas").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(!b)return;const id=b.dataset.q;PD.lineas[id]=Math.max(0,(PD.lineas[id]||0)+ +b.dataset.d);if(!PD.lineas[id])delete PD.lineas[id];renderPedido()});
+$("pdDestino").addEventListener("click",e=>{const t=e.target;
+  const m=t.closest("[data-mesa]");if(m){PD.mesa=+m.dataset.mesa;renderPedido();return}
+  const p=t.closest("[data-pax]");if(p){PD.pax=Math.min(8,Math.max(1,PD.pax+ +p.dataset.pax));renderPedido();return}
+  const f=t.closest("[data-fila]");if(f){PD.fila=f.dataset.fila;renderPedido();return}
+  const af=t.closest("[data-afila]");if(af){if(S.t>=CLOSE)return;
+    if(af.dataset.afila==="mesa"){const g={t:S.t,pax:PD.pax,id:++S.eseq,hasta:S.t+5};S.queue.push(g);PD.fila="m:"+g.id;toast(`Grupo de ${g.pax} en la fila: puede pedir mientras se prepara su mesa`)}
+    else{const e={t:S.t,n:PD.pax,pax:1,id:++S.eseq,tanda:true};S.espEmp.push(e);if(!S.oven)bake(ACTOR.name);PD.fila="e:"+e.id;toast(`Cliente espera ${e.n} empanadas de la próxima tanda`)}
+    PD.dest="fila";renderAll()}});
+$("pdEnviar").addEventListener("click",enviarPedido);
+$("pdVaciar").addEventListener("click",()=>{PD.lineas={};renderPedido()});
+$("pdBarBtn").addEventListener("click",()=>{document.querySelector('.view[data-view="pedido"] .s4').scrollIntoView({behavior:REDUCE?"auto":"smooth",block:"start"})});
+$("qFila").addEventListener("click",()=>{PD.dest="fila";go("pedido")});
 
 /* =============== CAMBIOS: borrador, comparación y aplicación =============== */
 let cbGrupo="all",cbQ="",descArm=0,simVieja=false;
@@ -1432,10 +1713,11 @@ $("cbDescartar").addEventListener("click",()=>{const now=Date.now();
   if(now-descArm<2500){descArm=0;EAPOS.descartarPrueba();simVieja=true;renderCambios();renderHub();toast("Borrador descartado: la prueba vuelve a la configuración general")}
   else{descArm=now;toast("Toca otra vez para descartar el borrador")}});
 $("cbComparar").addEventListener("click",()=>{
-  $("cbVs").innerHTML=`<p class="note">Simulando siete días con cada configuración…</p>`;
+  const dias=diasDelPeriodo(CTX.h==="dia"?"semana":CTX.h),n=dias.length;
+  $("cbVs").innerHTML=`<p class="note">Simulando ${n} días con cada configuración…</p>`;
   setTimeout(()=>{
     const gC=EAPOS.general(),pC=EAPOS.prueba(),mG=construirMenu(gC),mP=construirMenu(pC);
-    const dG=correrDias(mG,DEMAND,7),dP=correrDias(mP,DEMAND,7);
+    const dG=correrPeriodo(mG,dias),dP=correrPeriodo(mP,dias);
     const res=(d,cfg)=>{const rev=d.reduce((a,x)=>a+x.rev,0)/d.length,tk=d.reduce((a,x)=>a+x.tk,0)/d.length,meta=cfg.metas.dia||1800000;
       return{rev,tk,tic:tk?rev/tk:0,ok:d.filter(x=>x.rev>=meta).length,meta,ref:!cfg.metas.dia,abandon:d.reduce((a,x)=>a+x.abandon,0)/d.length}};
     const a=res(dG,gC),b=res(dP,pC);
@@ -1443,9 +1725,9 @@ $("cbComparar").addEventListener("click",()=>{
     const dif=(x,y)=>{if(!x)return`<span class="dif eq">—</span>`;const d=(y/x-1)*100;return`<span class="dif ${Math.abs(d)<.5?"eq":d>0?"up":"dn"}">${d>0?"+":""}${d.toFixed(1)}%</span>`};
     const lado=(t,r,ref)=>`<div class="lado"><h3>${t}</h3><span class="big2">${clp(r.rev)}</span><span class="desc">venta promedio por día ${ref?dif(ref.rev,r.rev):""}</span>
       <div class="r"><span>Tickets por día</span><b>${r.tk.toFixed(0)}</b></div><div class="r"><span>Ticket promedio</span><b>${clp(r.tic)} ${ref?dif(ref.tic,r.tic):""}</b></div>
-      <div class="r"><span>Días sobre ${r.ref?"el objetivo de referencia":"la meta"} (${clp(r.meta)})</span><b>${r.ok} de 7</b></div></div>`;
+      <div class="r"><span>Días sobre ${r.ref?"el objetivo de referencia":"la meta"} (${clp(r.meta)})</span><b>${r.ok} de ${n}</b></div></div>`;
     $("cbVs").innerHTML=`<div class="vs">${lado("Sistema general · v"+gC.v,a)}${lado("Prueba (borrador)",b,a)}</div>
-      <p class="note">Más pedidos en la prueba: ${top.map(([n,u])=>esc(n)+" ("+u+")").join(" · ")||"—"}. Siete días con la temporada ${season} y la misma semilla para los dos lados. El motor no cambia la demanda según el precio: muestra el efecto directo del precio, de la carta y de las metas.</p>`;
+      <p class="note">Más pedidos en la prueba: ${top.map(([n,u])=>esc(n)+" ("+u+")").join(" · ")||"—"}. ${n} días desde el ${fechaLarga(dias[0])} (${CTX.h==="mes"?"el mes del contexto":"una semana"}), temporada ${CTX.temporada}, con los eventos marcados y la misma semilla por día para los dos lados. El motor no cambia la demanda según el precio: muestra el efecto directo del precio, de la carta y de las metas.</p>`;
   },30);
 });
 addEventListener("storage",ev=>{if(ev.key==="eapos_cfg"||ev.key==="eapos_prueba_cfg"){if(booted){if(cur==="cambios")renderCambios();renderHub()}}});
@@ -1453,7 +1735,7 @@ addEventListener("storage",ev=>{if(ev.key==="eapos_cfg"||ev.key==="eapos_prueba_
 /* =============== INICIO =============== */
 $("meAv").textContent=initials(USER.n);$("meAv").style.background=SES?EAPOS.COLOR_ROL[SES.r]:"#FFB547";$("meName").textContent=USER.n;$("meRole").textContent=USER.c;
 if(window.parent!==window)$("logoutBtn").hidden=true;
-S=newState();while(S.t<START)step();
+seed=semillaDe(CTX.fecha);DEMAND=demandaDe(CTX.fecha);S=newState();while(S.t<START)step();
 const H0=(location.hash||"").slice(1);   /* se lee antes de que el historial lo reescriba */
 buildNav();buildHub();renderPhotos();setPlay();initHistory();
 cur=VIEWS[H0]?H0:"inicio";show(cur,true);if(cur!=="inicio")hist("pushState",{es:"view",v:cur},"#"+cur);

@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "2.1";
+  var VERSION = "2.2";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -128,7 +128,7 @@
     salon:  {n:"Control de Salón", d:"Disponibilidad de la carta, horno y estudio de la carta", ruta:"carta/salon.html"},
     cocina: {n:"Comandas", d:"Lo que se vendió en la caja, por estación: cocina, barra y horno", ruta:"cocina/index.html"},
     carta:  {n:"Carta Interactiva", d:"La carta que usa el cliente en la mesa", ruta:"carta/index.html"},
-    prueba: {n:"Prueba y simulación", d:"Cambios de precios, carta y metas, con un día simulado antes de aplicarlos", ruta:"prueba/index.html"}
+    prueba: {n:"Prueba y simulación", d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos", ruta:"prueba/index.html"}
   };
   var ROLES = {
     dueno:      {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"todo", sistema:1},

@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.1
+# EmporioAndinoPOS v2.2
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -12,8 +12,9 @@ Sistema general (index.html) ── capa superior: ingreso con PIN, cargos, vers
 ├── Control de Salón carta/salon.html    disponibilidad de la carta, horno y estudio de la carta
 ├── Comandas        cocina/index.html    ventas de la Caja repartidas por estación (cocina, barra, horno)
 ├── Carta Interactiva carta/index.html   la carta que usa el cliente en la mesa
-└── Prueba          prueba/index.html    simulación del día y borrador de cambios; "Aplicar al sistema
-                                          general" es el único camino para cambiar precios, carta y metas
+└── Prueba          prueba/index.html    simulación por día, semana o mes, pedidos a mano y borrador de
+                                          cambios; "Aplicar al sistema general" es el único camino para
+                                          cambiar precios, carta y metas
 nucleo/datos.js   la carta única (130 productos, 10 idiomas)
 nucleo/nucleo.js  catálogo, configuración general y de prueba, versiones, equipo, cargos, PIN y sesión
 nucleo/emporio.css  sistema de diseño de Emporio System 1.1, común a todas las capas
@@ -23,11 +24,39 @@ nucleo/emporio.js   comportamientos de Emporio System 1.1 (resortes, indicador, 
 Cómo fluye el dato:
 
 1. En la **Prueba** se cambian precios, se sacan productos de la carta o se ajustan metas. El borrador
-   se compara con el sistema general en siete días simulados y se proyecta a 30 días.
+   se compara con el sistema general en los días del contexto (la semana o el mes elegido).
 2. **Aplicar al sistema general** guarda una versión nueva (quién, cuándo, qué cambió).
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Prueba: contextos y pedidos a mano (v2.2)
+
+**Contexto y período.** Se elige un horizonte (día, semana o mes), una fecha, la temporada, la afluencia
+(50 a 150 %) y el evento de cada día (normal, feriado, evento en el pueblo, día lento). La demanda de un día
+es temporada × día de la semana × evento × afluencia; el sábado y el domingo venden más que el martes. Cada
+fecha tiene su propia semilla, así que el mismo día da siempre el mismo resultado.
+
+- **Día:** corre en vivo en el Dashboard y en cada área, con la fecha elegida.
+- **Semana y mes:** simula los siete días desde la fecha o el mes calendario completo. Muestra venta,
+  promedio, avance contra la meta, días sobre la meta diaria, ventas por semana, canales y más vendidos.
+  Al tocar un día se ve su detalle, se le marca un evento o se abre en vivo.
+- **Comparar** en Cambios usa los mismos días del contexto para el sistema general y la prueba.
+- La proyección fija de 30 días de Reportes salió: la reemplaza el mes del contexto.
+
+**Tomar pedido.** Con la carta de la prueba se ingresan ventas a mano en el día en vivo:
+
+- **Mesa:** se elige una mesa libre y las personas; el pedido sale a cocina, barra y horno y la mesa se
+  cobra en el Salón.
+- **Para llevar:** se cobra en el mostrador. Si la vitrina no alcanza, el cliente paga y espera la
+  próxima tanda.
+- **Fila:** a quien espera mesa o la salida de empanadas se le vende desde una carta de fila (cafés,
+  bebidas, pastelería y empanadas). Se puede formar la fila a mano: un grupo que espera mesa (pasa en unos
+  5 minutos) o un cliente que espera la próxima tanda.
+
+El motor también forma filas solo: en días de alta demanda los grupos esperan mesa, algunos compran en la
+fila y otros se van. La fila es un canal propio en Clientes y en el período. El catálogo dejó de tener su
+botón de venta suelta: ahora se vende desde Tomar pedido.
 
 ## Diseño base: Emporio System 1.1
 
@@ -93,7 +122,8 @@ Prueba cada módulo a 1366 px y a 390 px, y los flujos que cruzan módulos: ingr
 Caja → comanda en Comandas; borrador en la Prueba → aplicar → precio nuevo en la Caja y producto fuera
 en la Carta; garzón → Caja con solo cobro y stock; la Carta en cada idioma directo sin textos
 indefinidos; y en cada capa, que cargue el diseño de Emporio System 1.1. Resultado en
-`verificacion/informe.json` (124 de 124 en la v2.1).
+`verificacion/informe.json`. En la Prueba revisa además la semana y el mes del contexto, un evento que
+sube la demanda de un día, abrir ese día en vivo y los pedidos a mano en mesa, para llevar y en la fila.
 
 El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
 para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre

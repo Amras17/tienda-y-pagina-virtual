@@ -1,9 +1,11 @@
-// Agente de verificación de EmporioAndinoPOS 2.1.
+// Agente de verificación de EmporioAndinoPOS 2.2.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
 //   ingreso con PIN → venta en la Caja → comanda en Comandas,
 //   borrador en la Prueba → aplicar → precio nuevo en la Caja,
+//   contexto de la Prueba por día, semana y mes; pedidos a mano en mesa,
+//   para llevar y en la fila,
 //   cargo de garzón → la Caja muestra solo cobro y stock.
 // Falla si aparece un error de JavaScript, un recurso propio que no carga o
 // desborde horizontal. Uso, desde EmporioAndinoPOS/:
@@ -164,7 +166,7 @@ async function probarPruebaAplicar(vista) {
   anota(M, "franja de prueba visible", await pr.locator(".franja").isVisible());
   anota(M, "diseño Emporio System 1.1", await disenoEmporio(pr));
   const nav = await pr.locator("#nav a").evaluateAll(a => a.map(x => x.dataset.v));
-  anota(M, "doce vistas", nav.length === 12, nav.join(","));
+  anota(M, "catorce vistas", nav.length === 14, nav.join(","));
   for (const v of nav) { const a = pr.locator(`#nav a[data-v="${v}"]`); if (await a.isVisible()) await a.click(); else await a.evaluate(el => el.click()); await pr.waitForTimeout(250); }
   await pr.evaluate(() => go("cambios")); await pr.waitForTimeout(300);
   await pr.locator('#cbGrupos [data-cg="emp"]').click();
@@ -186,8 +188,57 @@ async function probarPruebaAplicar(vista) {
   anota(M, "la Carta marca lo que salió de la carta", await carta.evaluate(() => gone("emp", "e-napolitana") && !gone("emp", "e-pino")));
   await page.reload(); await page.waitForTimeout(300);
   anota(M, "el sistema general muestra la versión vigente", (await page.locator("#cfgTxt").innerText()) === "Configuración v" + g.v);
-  await pr.evaluate(() => go("reportes")); await pr.locator("#projBtn").click(); await pr.waitForTimeout(7000);
-  anota(M, "proyección de 30 días", (await pr.locator("#projOut .stat").count()) === 6);
+  await cierre(M, pr, errores, caidos);
+  await ctx.close();
+}
+
+// ---------- Prueba: contextos de día, semana y mes; pedidos a mano ----------
+async function probarPruebaContexto(vista) {
+  const M = `Prueba · contexto y pedidos · ${vista}`;
+  const { ctx, errores, caidos } = await contexto(vista);
+  const pr = await ctx.newPage();
+  await pr.goto(BASE + "prueba/index.html#contexto"); await pr.waitForTimeout(1500);
+  await pr.evaluate(() => { const i = document.getElementById("cxFecha"); i.value = "2026-10-06"; i.dispatchEvent(new Event("change")); });
+  await pr.waitForTimeout(900);
+  await pr.locator('#cxHor [data-hor="semana"]').click(); await pr.waitForTimeout(700);
+  anota(M, "semana: siete días simulados", (await pr.locator("#perOut .pbar").count()) === 7);
+  await pr.locator('#cxHor [data-hor="mes"]').click(); await pr.waitForTimeout(900);
+  const mes = await pr.evaluate(() => ({ barras: document.querySelectorAll("#perOut .pbar").length, stats: document.querySelectorAll("#perOut > .kv .stat").length }));
+  anota(M, "mes: el mes calendario completo", mes.barras === 31 && mes.stats === 6, JSON.stringify(mes));
+  const antes = await pr.evaluate(() => PER.dias.find(d => d.iso === "2026-10-16").rev);
+  await pr.locator('#perOut .pbar[data-dia="2026-10-16"]').dispatchEvent("click"); await pr.waitForTimeout(150);
+  await pr.locator('#perDia [data-ev="evento"]').click(); await pr.waitForTimeout(900);
+  const ev = await pr.evaluate(() => ({ ev: CTX.dias["2026-10-16"], rev: PER.dias.find(d => d.iso === "2026-10-16").rev }));
+  anota(M, "un evento en un día sube su demanda", ev.ev === "evento" && ev.rev > antes, JSON.stringify({ antes, ...ev }));
+  await pr.locator('#perDia [data-per="abrir"]').click(); await pr.waitForTimeout(1500);
+  const dia = await pr.evaluate(() => ({ h: CTX.h, fecha: CTX.fecha, cur, sub: document.getElementById("vSub").textContent }));
+  anota(M, "abre ese día en vivo en el Dashboard", dia.h === "dia" && dia.fecha === "2026-10-16" && dia.cur === "inicio" && /16 de octubre/.test(dia.sub), JSON.stringify(dia));
+  // Tomar pedido: mesa
+  await pr.evaluate(() => go("pedido")); await pr.waitForTimeout(400);
+  const mesa = await pr.locator("#pdDestino [data-mesa]").first().getAttribute("data-mesa");
+  await pr.locator(`#pdDestino [data-mesa="${mesa}"]`).click();
+  await pr.locator("#pdCarta [data-add]:not([disabled])").nth(0).click(); await pr.locator("#pdCarta [data-add]:not([disabled])").nth(2).click();
+  await pr.locator("#pdEnviar").click(); await pr.waitForTimeout(200);
+  anota(M, "pedido a mano en una mesa", await pr.evaluate(n => { const t = S.tables.find(x => x.n === +n); return t.state === "ocupada" && t.items.length === 2; }, mesa));
+  // Para llevar con la vitrina vacía: paga y espera la tanda
+  await pr.locator('#pdDest [data-dest="llevar"]').click();
+  await pr.evaluate(() => { S.stock.emp = 0; S.oven = null; renderPedido(); });
+  await pr.locator('#pdCats [data-pc="emp"]').click();
+  await pr.locator("#pdCarta [data-add]:not([disabled])").first().click(); await pr.locator("#pdCarta [data-add]:not([disabled])").first().click();
+  const kAntes = await pr.evaluate(() => S.kinds.llevar.n);
+  await pr.locator("#pdEnviar").click(); await pr.waitForTimeout(200);
+  const ll = await pr.evaluate(() => ({ esp: S.espEmp.filter(e => e.pagado).map(e => e.n), horno: !!S.oven, n: S.kinds.llevar.n }));
+  anota(M, "para llevar sin vitrina: cobra y espera la tanda", ll.esp.includes(2) && ll.horno && ll.n === kAntes + 1, JSON.stringify(ll));
+  // Fila: un grupo espera mesa y compra mientras espera
+  await pr.locator('#pdDest [data-dest="fila"]').click(); await pr.waitForTimeout(100);
+  await pr.locator('#pdDestino [data-afila="mesa"]').click(); await pr.waitForTimeout(100);
+  await pr.locator('#pdCats [data-pc="cc"]').click();
+  await pr.locator("#pdCarta [data-add]:not([disabled])").first().click();
+  await pr.locator("#pdEnviar").click(); await pr.waitForTimeout(200);
+  const fila = await pr.evaluate(() => ({ n: S.kinds.fila.n, manual: S.manual.length, cola: S.queue.length }));
+  anota(M, "venta en la fila a quien espera mesa", fila.n >= 1 && fila.manual === 3, JSON.stringify(fila));
+  await pr.evaluate(() => go("clientes")); await pr.waitForTimeout(300);
+  anota(M, "la fila aparece como canal en Clientes", /Fila \(mientras espera\)/.test(await pr.locator("#clCanales").innerText()));
   await cierre(M, pr, errores, caidos);
   await ctx.close();
 }
@@ -238,13 +289,14 @@ for (const v of Object.keys(VISTAS)) {
   await probarGeneral(v);
   await probarCajaYComandas(v);
   await probarPruebaAplicar(v);
+  await probarPruebaContexto(v);
   await probarCarta(v);
   await probarSalon(v);
 }
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.1", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.2", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);
