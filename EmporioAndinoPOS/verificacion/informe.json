@@ -1,0 +1,464 @@
+{
+  "version": "1.0",
+  "fecha": "2026-10-06T05:07:53.681Z",
+  "total": 76,
+  "fallas": 0,
+  "resultados": [
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "carga la pantalla de ingreso",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "lista de personas",
+      "ok": true,
+      "detalle": "16 personas"
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "ingreso con PIN nuevo (crear y confirmar)",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "menú de áreas",
+      "ok": true,
+      "detalle": "Dashboard, Punto de venta, Cocina, Horno, Barra, Inventario, Caja y finanzas, Clientes, Reportes, Escandallo, Carta, Base de datos"
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Dashboard",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Punto de venta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Cocina",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Horno",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Barra",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Inventario",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Caja y finanzas",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Clientes",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Reportes",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Escandallo",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Carta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "abre Base de datos",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "termina la bienvenida",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "selector de idioma",
+      "ok": true,
+      "detalle": "7 idiomas directos"
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "navega capas de la carta",
+      "ok": true,
+      "detalle": "4 toques"
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "imágenes visibles cargadas",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
+      "prueba": "título",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
+      "prueba": "dibuja contenido",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "tres módulos",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "autodiagnóstico interno",
+      "ok": true,
+      "detalle": "8/8 pruebas"
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "abre el Sistema dentro del lanzador",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "vuelve al lanzador",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "carga la pantalla de ingreso",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "lista de personas",
+      "ok": true,
+      "detalle": "16 personas"
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "ingreso con PIN nuevo (crear y confirmar)",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "menú de áreas",
+      "ok": true,
+      "detalle": "Dashboard, Punto de venta, Cocina, Horno, Barra, Inventario, Caja y finanzas, Clientes, Reportes, Escandallo, Carta, Base de datos"
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Dashboard",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Punto de venta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Cocina",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Horno",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Barra",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Inventario",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Caja y finanzas",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Clientes",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Reportes",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Escandallo",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Carta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "abre Base de datos",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema 1.1 · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "termina la bienvenida",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "selector de idioma",
+      "ok": true,
+      "detalle": "7 idiomas directos"
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "navega capas de la carta",
+      "ok": true,
+      "detalle": "4 toques"
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "imágenes visibles cargadas",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
+      "prueba": "título",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
+      "prueba": "dibuja contenido",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "tres módulos",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "autodiagnóstico interno",
+      "ok": true,
+      "detalle": "8/8 pruebas"
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "abre el Sistema dentro del lanzador",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "vuelve al lanzador",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Lanzador · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    }
+  ]
+}
