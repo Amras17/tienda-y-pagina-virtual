@@ -1948,8 +1948,8 @@ arrancarReloj();
 
 <!-- ===================================================================
      Añadido en otra sesión de trabajo y recuperado aquí para que no se
-     pierda al recompilar: reglas para tablet y pantalla horizontal, y la
-     entrada a la caja. Va al final, después del script principal, para no
+     pierda al recompilar: reglas para tablet y pantalla horizontal. Va al
+     final, después del script principal, para no
      tocar nada de lo anterior.
      =================================================================== -->
 
@@ -2010,39 +2010,6 @@ arrancarReloj();
   .langgrid{grid-template-columns:repeat(5,minmax(0,1fr))}
 }
 </style>
-
-<style>
-/* ---------- entrada a la caja ----------
-   El equipo de salón ya está adentro de la herramienta: la caja queda a un
-   toque, no en otro enlace que haya que buscar en el teléfono. */
-.acaja{display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
-  text-decoration:none; color:var(--ink); border:1.5px solid var(--dorado);
-  background:var(--dorado-soft); border-radius:15px; padding:13px 14px; margin-top:4px}
-.acaja svg{width:22px; height:22px; color:var(--dorado); flex:none}
-.acaja b{display:block; font-family:"Sora",system-ui,sans-serif; font-size:15px;
-  font-weight:800; letter-spacing:-.01em}
-.acaja em{display:block; font-style:normal; font-size:11.5px; color:var(--ink-soft); margin-top:2px; line-height:1.35}
-.acaja .fl{width:17px; height:17px; color:var(--ink-soft)}
-</style>
-<script>
-/* Se inserta sobre el pie para no tocar el armado de las pestañas. */
-(function(){
-  var pie=document.querySelector(".wrap > footer");
-  if(!pie) return;
-  var a=document.createElement("a");
-  a.className="acaja";
-  /* La Caja vive en el mismo paquete. Dentro del sistema general se abre
-     desde ahí, que revisa si el cargo de quien está en sesión la puede usar. */
-  a.href="../caja/index.html";
-  a.onclick=function(ev){ if(EAPOS.abrirEnSistema("caja")) ev.preventDefault(); };
-  a.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+
-    '<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6.5A2.5 2.5 0 0 1 8.5 4h7A2.5 2.5 0 0 1 18 6.5V9"/>'+
-    '<path d="M8 13h3M14 13h2M8 16.5h8"/></svg>'+
-    '<span><b>Abrir la caja</b><em>Cobro, folio de la boleta, stock, costos, compras, mermas e informes.</em></span>'+
-    '<svg class="fl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
-  pie.parentNode.insertBefore(a, pie);
-})();
-</script>
 
 <style>
 /* En una pantalla ancha, un párrafo que cruza los 1020 px se lee mal: los

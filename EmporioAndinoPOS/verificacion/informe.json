@@ -1,7 +1,7 @@
 {
   "version": "2.1",
-  "fecha": "2026-10-06T10:33:26.540Z",
-  "total": 124,
+  "fecha": "2026-10-06T11:06:39.688Z",
+  "total": 126,
   "fallas": 0,
   "resultados": [
     {
@@ -54,6 +54,12 @@
     },
     {
       "modulo": "Sistema general · escritorio",
+      "prueba": "menú de la Caja visible y usable dentro del sistema",
+      "ok": true,
+      "detalle": "6 secciones"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
       "prueba": "abre salon como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
@@ -354,7 +360,7 @@
     },
     {
       "modulo": "Salón · escritorio",
-      "prueba": "enlace a la Caja del paquete",
+      "prueba": "sin acceso a la Caja desde el Salón",
       "ok": true,
       "detalle": ""
     },
@@ -426,6 +432,12 @@
     },
     {
       "modulo": "Sistema general · telefono",
+      "prueba": "menú de la Caja visible y usable dentro del sistema",
+      "ok": true,
+      "detalle": "5 secciones"
+    },
+    {
+      "modulo": "Sistema general · telefono",
       "prueba": "abre salon como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
@@ -726,7 +738,7 @@
     },
     {
       "modulo": "Salón · telefono",
-      "prueba": "enlace a la Caja del paquete",
+      "prueba": "sin acceso a la Caja desde el Salón",
       "ok": true,
       "detalle": ""
     },

@@ -96,6 +96,15 @@ async function probarGeneral(vista) {
     const fr = page.frameLocator(`section[data-view="${m}"] iframe`);
     const inc = await fr.locator("html").evaluate(h => h.classList.contains("incrustado") && !!window.EA_UI).catch(() => false);
     anota(M, `abre ${m} como subcapa con el diseño Emporio`, ok && inc);
+    if (m === "caja") {
+      // El menú de secciones de la Caja (riel o pestañas) debe quedar entero y a la vista dentro del sistema.
+      const menu = await fr.locator("html").evaluate(() => {
+        const n = [...document.querySelectorAll("#riel button, #pestanas button")].filter(b => b.offsetParent);
+        const ok = n.length >= 2 && n.every(b => { const r = b.getBoundingClientRect(); return r.width >= 40 && r.height >= 40 && r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth; });
+        return { ok, n: n.length };
+      }).catch(() => ({ ok: false, n: 0 }));
+      anota(M, "menú de la Caja visible y usable dentro del sistema", menu.ok, menu.n + " secciones");
+    }
   }
   await navA(page, "versiones");
   anota(M, "versiones y accesos", await page.locator("#acc tr").count() === 16);
@@ -220,7 +229,7 @@ async function probarSalon(vista) {
   anota(M, "título", (await page.title()) === "Control de Salón");
   anota(M, "dibuja contenido", await page.evaluate(() => document.body.innerText.trim().length > 50));
   anota(M, "diseño Emporio System 1.1", await disenoEmporio(page));
-  anota(M, "enlace a la Caja del paquete", (await page.locator("a.acaja").getAttribute("href")) === "../caja/index.html");
+  anota(M, "sin acceso a la Caja desde el Salón", await page.evaluate(() => !document.querySelector('a[href*="caja"], .acaja') && !/Abrir la caja/i.test(document.body.innerText)));
   await cierre(M, page, errores, caidos);
   await ctx.close();
 }

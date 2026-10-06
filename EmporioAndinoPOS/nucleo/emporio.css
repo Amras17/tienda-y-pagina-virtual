@@ -362,7 +362,7 @@ html.incrustado .atmo{display:none}
 .franja-prueba{background:repeating-linear-gradient(135deg,#FFB547 0 14px,#FF9F45 14px 28px);color:#1B0E06}
 /* Un módulo con menú propio (la Prueba) dentro del sistema general usa el menú
    compacto horizontal, para no apilar dos barras laterales. */
-html.incrustado .app{grid-template-columns:minmax(0,1fr)}
+html.incrustado .app:has(>.side){grid-template-columns:minmax(0,1fr)}
 html.incrustado .side{position:relative;top:auto;height:auto;padding:4px 0 0}
 html.incrustado .side-in{flex-direction:row;align-items:center;flex-wrap:wrap;overflow:hidden}
 html.incrustado .band,html.incrustado .side-foot,html.incrustado .nav .grp,html.incrustado .brand,html.incrustado .me{display:none}

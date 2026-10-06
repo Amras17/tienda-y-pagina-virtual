@@ -47,7 +47,9 @@ movimientos con resorte calculados desde un resorte físico.
 
 Correcciones de la v2.1: la Carta y el Salón incrustados ya no muestran fondo blanco (esquema de color
 oscuro declarado), la Caja en celular ya no se sale por la derecha y las iniciales del usuario se leen en
-el menú.
+el menú. En pantalla ancha, el menú de secciones de la Caja (Caja, Panel, Stock, Gestión, Informes,
+Ajustes) quedaba aplastado en una franja turquesa dentro del sistema general: una regla pensada para el
+menú de la Prueba también tocaba la Caja. Ahora esa regla solo aplica a la Prueba.
 
 ## Cargos
 
@@ -71,8 +73,9 @@ el menú.
 - **Carta:** salieron servicios del pueblo, números de emergencia, reseñas de Google y TripAdvisor,
   Instagram, galería, banda de fotos y avisos de altura, junto con sus 49 textos en 10 idiomas y 11 fotos.
   Queda el enlace a DesertGo, que es un canal de venta.
-- **Control de Salón:** los enlaces a la Caja y a la Pizarra de Empanadas, que eran artefactos aparte,
-  se reemplazaron por la Caja del paquete.
+- **Control de Salón:** salieron los enlaces a la Caja y a la Pizarra de Empanadas. Desde la v2.1 el
+  Salón no tiene acceso a la Caja: la Caja se abre solo desde el menú del sistema general, que revisa el
+  cargo de quien está en sesión.
 - **Nuevo:** Comandas por estación, alimentadas por las ventas reales de la Caja.
 
 Correcciones encontradas al probar: los dígitos del PIN tecleados mientras se valida ya no se pierden;
