@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 2.3.
+// Agente de verificación de EmporioAndinoPOS 2.4.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -109,6 +109,17 @@ async function probarGeneral(vista) {
       anota(M, "menú de la Caja visible y usable dentro del sistema", menu.ok, menu.n + " secciones");
     }
   }
+  for (const v of ["caja", "salon", "cocina", "carta", "prueba", "verificacion", "versiones", "retro"]) {
+    await navA(page, v); await page.waitForTimeout(150);
+    const pn = await page.evaluate(v => { const e = document.querySelector(`[data-pn="${v}"]`); return e ? { tono: e.dataset.tono, tit: (e.querySelector(".pn-tit") || {}).textContent || "", k: e.querySelectorAll(".pn-k").length } : null; }, v);
+    anota(M, `resumen arriba de ${v}`, !!pn && !!pn.tit && pn.k >= 3 && ["ok", "warn", "crit", "info"].includes(pn.tono), JSON.stringify(pn));
+  }
+  await page.evaluate(() => { localStorage.setItem("ea_control", JSON.stringify({ fecha: new Date().toISOString().slice(0, 10), st: { latte: "off" }, uni: {} })); window.dispatchEvent(new StorageEvent("storage", { key: "ea_control" })); });
+  await page.waitForTimeout(200);
+  await page.locator("#avisosBtn").click(); await page.waitForTimeout(150);
+  const av = await page.evaluate(() => ({ badge: (document.querySelector("#avisosBtn .badge-n") || {}).textContent, items: [...document.querySelectorAll(".avisos .av-item")].map(a => a.innerText.split("\n")[0]) }));
+  anota(M, "avisos importantes: se acabó", av.items.some(t => /Se acabó: Latte/.test(t)) && +av.badge >= 1, JSON.stringify(av));
+  await page.keyboard.press("Escape");
   await navA(page, "versiones");
   anota(M, "versiones y accesos", await page.locator("#acc tr").count() === 16);
   await navA(page, "inicio");
@@ -143,6 +154,13 @@ async function probarCajaYComandas(vista) {
   await com.locator("#tablero [data-listo]").first().click();
   anota(M, "marcar lista la comanda", await com.locator("#tablero .comanda").count() === 0);
   await cierre(M + " (comandas)", com, [], []);
+  const enc = await caja.evaluate(() => ({ secc: SECC.map(s => s.id).join(","), gest: SUBGEST.map(s => s.id).join(","), inf: SUBINF.map(s => s.id).join(",") }));
+  anota(M, "encargado: sin panel, costos, metas ni estadísticas", enc.secc === "caja,stock,gest,inf,ajustes" && enc.gest === "compras,mermas" && enc.inf === "rep,hist", JSON.stringify(enc));
+  await page.reload(); await page.waitForTimeout(400);
+  anota(M, "encargado: el dashboard no muestra ventas en pesos", await page.evaluate(() => document.getElementById("dash").classList.contains("nov")));
+  await sesion(page, "Constanza Veliz");
+  await caja.reload(); await caja.waitForTimeout(500);
+  anota(M, "dueña: la Caja completa", await caja.evaluate(() => SECC.map(s => s.id).join(",") === "caja,panel,stock,gest,inf,ajustes" && SUBGEST.length === 4 && SUBINF.length === 4));
   await sesion(page, "Wilbert");
   await caja.reload(); await caja.waitForTimeout(500);
   const secc = await caja.evaluate(() => SECC.map(s => s.id).join(","));
@@ -167,7 +185,7 @@ async function probarPruebaAplicar(vista) {
   anota(M, "franja de prueba visible", await pr.locator(".franja").isVisible());
   anota(M, "diseño Emporio System 1.1", await disenoEmporio(pr));
   const nav = await pr.locator("#nav a").evaluateAll(a => a.map(x => x.dataset.v));
-  anota(M, "quince vistas", nav.length === 15, nav.join(","));
+  anota(M, "jefe: catorce vistas, sin fichas ni costos", nav.length === 14 && !nav.includes("fichas") && await pr.evaluate(() => document.documentElement.classList.contains("sin-costos")), nav.join(","));
   for (const v of nav) { const a = pr.locator(`#nav a[data-v="${v}"]`); if (await a.isVisible()) await a.click(); else await a.evaluate(el => el.click()); await pr.waitForTimeout(250); }
   await pr.evaluate(() => go("cambios")); await pr.waitForTimeout(300);
   await pr.locator('#cbGrupos [data-cg="emp"]').click();
@@ -279,6 +297,14 @@ async function probarPruebaFichas(vista) {
   const ig = await pr.evaluate(p => ({ sube: Math.round(S.stock.palta - p), compras: S.compras.length, total: S.compras[0] && S.compras[0].total }), p0);
   anota(M, "ingreso de mercadería personalizado", ig.sube === 2000 && ig.compras === 1 && ig.total === 10000, JSON.stringify(ig));
   anota(M, "nada de esto toca la Caja", await pr.evaluate(() => localStorage.getItem("ea_pos") === null));
+  const tortas = await pr.evaluate(() => { const ing = id => fichaDe(id).ing.map(x => x[0]); return { pakari: ing("Pto-pakari").includes("amapola") && ing("Pto-pakari").includes("berries"), inti: ing("Pto-inti").includes("nueces") && ing("Pto-inti").includes("manjar"), nusta: ing("Pto-nusta").includes("berries"), killa: ing("Pto-killa").includes("cacao") && ing("Pto-killa").includes("vainilla"), amor: ing("Pto-amor").includes("manjar") && ing("Pto-amor").includes("crema") }; });
+  anota(M, "tortas de la casa con sus capas", Object.values(tortas).every(Boolean), JSON.stringify(tortas));
+  const vistas = ["contexto", "salon", "pedido", "cocina", "horno", "barra", "inventario", "caja", "clientes", "reportes", "carta", "fichas", "cambios", "datos"], sinPn = [];
+  for (const v of vistas) { await pr.evaluate(v => go(v), v); await pr.waitForTimeout(120); const ok = await pr.evaluate(v => { const e = document.querySelector(`[data-pn="${v}"]`); return !!e && !!e.querySelector(".pn-tit") && e.querySelectorAll(".pn-k").length >= 3; }, v); if (!ok) sinPn.push(v); }
+  anota(M, "resumen arriba de las catorce pestañas", sinPn.length === 0, sinPn.join(","));
+  await pr.evaluate(() => { S.stock.palta = 0; renderAll(); });
+  const avp = await pr.evaluate(() => avisosPrueba().map(a => a.tono + ":" + a.tit.replace(/<[^>]+>/g, "")));
+  anota(M, "avisos de la Prueba: se acabó la palta", avp.some(t => /^crit:Se acabó: palta/.test(t)), avp.slice(0, 4).join(" | "));
   await cierre(M, pr, errores, caidos);
   await ctx.close();
 }
@@ -337,7 +363,7 @@ for (const v of Object.keys(VISTAS)) {
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.3", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.4", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);

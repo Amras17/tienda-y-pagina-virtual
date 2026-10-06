@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.3</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.4</span></div><span class="chip num" id="loginClock">--:--</span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.3</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.4</span><small>Emporio Andino · San Pedro</small></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -114,6 +114,7 @@
       </div>
       <div class="ctl">
         <span class="clock num" id="clock">--:--</span>
+        <button class="btn sm icon avisos-btn" type="button" id="avisosBtn" aria-label="Avisos importantes" title="Avisos importantes"></button>
         <span class="chip" id="cfgChip"><span class="dot"></span><span id="cfgTxt">Configuración</span></span>
         <span class="chip" id="netChip"><span class="dot live" id="netDot"></span><span id="netTxt">En línea</span></span>
         <button class="btn warn sm" type="button" id="borradorBtn" data-go="prueba" hidden></button>
@@ -156,14 +157,15 @@
     </section>
 
     <!-- ===== MÓDULOS: cada uno es una subcapa dentro de la app ===== -->
-    <section class="view" data-view="caja" hidden><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
-    <section class="view" data-view="salon" hidden><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
-    <section class="view" data-view="cocina" hidden><article class="tile glass marco"><iframe title="Comandas" data-src="cocina/index.html"></iframe></article></section>
-    <section class="view" data-view="carta" hidden><article class="tile glass marco"><iframe title="Carta Interactiva" data-src="carta/index.html"></iframe></article></section>
-    <section class="view" data-view="prueba" hidden><article class="tile glass marco"><iframe title="Prueba y simulación" data-src="prueba/index.html"></iframe></article></section>
+    <section class="view" data-view="caja" hidden><div class="panorama tile glass" data-pn="caja"></div><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
+    <section class="view" data-view="salon" hidden><div class="panorama tile glass" data-pn="salon"></div><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
+    <section class="view" data-view="cocina" hidden><div class="panorama tile glass" data-pn="cocina"></div><article class="tile glass marco"><iframe title="Comandas" data-src="cocina/index.html"></iframe></article></section>
+    <section class="view" data-view="carta" hidden><div class="panorama tile glass" data-pn="carta"></div><article class="tile glass marco"><iframe title="Carta Interactiva" data-src="carta/index.html"></iframe></article></section>
+    <section class="view" data-view="prueba" hidden><div class="panorama tile glass" data-pn="prueba"></div><article class="tile glass marco"><iframe title="Prueba y simulación" data-src="prueba/index.html"></iframe></article></section>
 
     <!-- ===== VERIFICACIÓN ===== -->
     <section class="view" data-view="verificacion" hidden>
+      <div class="panorama tile glass" data-pn="verificacion"></div>
       <div class="grid">
         <article class="tile glass s12"><div class="tc">
           <div class="hd"><div><h2>Verificación del sistema</h2><p id="diagEstado">Revisa que los cinco módulos abran sin errores, que la carta única y la configuración se lean, que las fotos carguen y que el almacenamiento funcione en este equipo.</p></div>
@@ -180,6 +182,7 @@
 
     <!-- ===== VERSIONES Y ACCESOS ===== -->
     <section class="view" data-view="versiones" hidden>
+      <div class="panorama tile glass" data-pn="versiones"></div>
       <div class="grid">
         <article class="tile glass s7"><div class="tc">
           <div class="hd"><div><h2>Versiones aplicadas</h2><p>Cada cambio de precios, carta o metas llega desde la Prueba</p></div><button class="btn sm" type="button" data-go="prueba">Abrir Prueba</button></div>
@@ -188,8 +191,16 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 2.3</h2><p>Fichas técnicas estándar, horno en vivo e ingresos en la Prueba, sobre la base de Emporio System 1.1</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 2.4</h2><p>Resumen en cada pestaña, avisos importantes y cifras solo para dueños, sobre la base de Emporio System 1.1</p></div></div>
           <div class="notas">
+            <div><h3>Resumen y avisos (2.4)</h3><ul>
+              <li>Cada pestaña abre con un resumen: un estado en una frase, con color, y las cifras que importan; el detalle sigue debajo.</li>
+              <li>La campana junta lo importante: se acabó, queda poco, hornada lista, comandas atrasadas. No es una bitácora.</li>
+            </ul></div>
+            <div><h3>Cifras para dueños (2.4)</h3><ul>
+              <li>Ventas en pesos, panel del día, costos, metas, estadísticas y fichas: solo dueños.</li>
+              <li>Jefes y encargados mantienen cobro, stock, compras, mermas, cierre e historial. Tortas de la casa con sus capas.</li>
+            </ul></div>
             <div><h3>Fichas y escandallos (2.3)</h3><ul>
               <li>Los 130 productos tienen ficha técnica y escandallo estándar con 102 insumos y precios netos estimados con referencias públicas.</li>
               <li>Solo en la Prueba: costo por porción, food cost, margen y precio sugerido; la Caja no cambia.</li>
@@ -224,6 +235,7 @@
 
     <!-- ===== RETROALIMENTACIÓN ===== -->
     <section class="view" data-view="retro" hidden>
+      <div class="panorama tile glass" data-pn="retro"></div>
       <div class="grid">
         <article class="tile glass s12"><div class="tc">
           <div class="hd"><div><h2>Retroalimentación y mantención</h2><p id="retroDonde">Conectando…</p></div><span class="chip num" id="retroCuenta"></span></div>
@@ -278,7 +290,8 @@ function puedeVer(v){ if(!USER) return false; var rol=E.ROLES[USER.r];
   if(v==="inicio"||v==="retro") return true;
   if(v==="verificacion"||v==="versiones") return !!rol.sistema;
   return rol.m.indexOf(v)>=0; }
-function verVentas(){ return USER && E.ROLES[USER.r].caja==="todo"; }
+/* Ventas en pesos, ticket, metas y costos: solo dueños (ver nucleo.js). */
+function verVentas(){ return !!USER && E.verNumeros(USER); }
 
 /* ==================== INGRESO ==================== */
 var pinTarget=null, pinBuf="", pinFirst=null, pinFails=0;
@@ -312,7 +325,7 @@ function pinKey(k){ if(!pinTarget) return;
   if(k==="del") pinBuf=pinBuf.slice(0,-1); else if(k==="clr") pinBuf=""; else if(/^\d$/.test(k)&&pinBuf.length<4) pinBuf+=k;
   drawDots(); if(pinBuf.length===4){ var c=pinBuf; pinBuf=""; setTimeout(function(){ pinComplete(c); },120); } }
 function login(p){ E.abrirSesion(p); pinTarget=null; arrancarApp(true); U.aviso("Hola, "+p.n.split(" ")[0]+". Tienes acceso a "+(ALLV.filter(puedeVer).length-1)+" áreas"); }
-function logout(msg){ E.cerrarSesion(); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
+function logout(msg){ if(AV) AV.cerrar(); E.cerrarSesion(); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
 $("peopleList").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) openPin(E.EQUIPO[+b.dataset.p]); });
 $("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) pinKey(b.dataset.k); });
 $("pinBack").addEventListener("click",function(){ pinTarget=null; $("pinStep").hidden=true; $("whoStep").hidden=false; });
@@ -469,11 +482,105 @@ function renderView(){
   if(cur==="inicio") renderDash();
   if(cur==="versiones"){ pintarVersiones(); pintarAccesos(); }
   if(cur==="retro") pintarRetro();
+  renderPanorama(cur); refrescarAvisos();
 }
 addEventListener("storage",function(ev){ if(!USER) return;
   if(ev.key==="eapos_sesion"){ var s=E.sesion(); if(!s||s.n!==USER.n){ arrancarApp(false); return; } }
   if(["ea_pos","ea_control","eapos_comandas","eapos_cfg","eapos_prueba_cfg","eapos_versiones","eapos_diag"].indexOf(ev.key)>=0){ renderView(); subtitulo(); } });
 setInterval(function(){ if(USER&&cur==="inicio") renderDash(); },30000);
+setInterval(function(){ if(!USER) return; refrescarAvisos(); if(cur!=="inicio") renderPanorama(cur); },5000);
+
+/* ==================== RESUMEN POR PESTAÑA Y AVISOS ==================== */
+function minutosDesde(iso){ var t=new Date(iso).getTime(); return isNaN(t)?0:Math.max(0,Math.round((Date.now()-t)/60000)); }
+/* Comandas que siguen pendientes, con su antigüedad. */
+function comandasDetalle(){
+  var m=leeLocal("eapos_comandas"); if(!m||m.fecha!==hoyISO()) m={listo:{}};
+  var por={cocina:0,barra:0,horno:0}, viejas=[];
+  ventasHoy().forEach(function(v){ var est={};
+    (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; });
+    Object.keys(est).forEach(function(e){ if(!m.listo[v.id+"|"+e]){ por[e]++; viejas.push({e:e, min:minutosDesde(v.ts)}); } }); });
+  viejas.sort(function(a,b){ return b.min-a.min; });
+  return {por:por, total:por.cocina+por.barra+por.horno, max:viejas.length?viejas[0].min:0, atrasadas:viejas.filter(function(x){ return x.min>=15; })};
+}
+/* Vitrina y horno del Control de Salón (memoria compartida ea_control). */
+function hornoReal(){
+  var c=leeLocal("ea_control")||{}, uni=c.uni||{}, vit=0, ceros=[], hs=Array.isArray(c.horno)?c.horno:[], ahora=Date.now();
+  (window.EA_DATOS&&EA_DATOS.EMP||[]).forEach(function(e){ var k="E"+e.id, u=typeof uni[k]==="number"?uni[k]:null; if(u!=null){ vit+=Math.max(0,u); if(u<=0) ceros.push(e.n); } });
+  var dentro=hs.filter(function(h){ return new Date(h.eta).getTime()>ahora; }), listas=hs.filter(function(h){ return new Date(h.eta).getTime()<=ahora; });
+  var prox=dentro.length?Math.max(0,Math.ceil((Math.min.apply(null,dentro.map(function(h){ return new Date(h.eta).getTime(); }))-ahora)/60000)):null;
+  return {vit:vit, ceros:ceros, dentro:dentro.reduce(function(a,h){ return a+h.n; },0), prox:prox, listas:listas};
+}
+function nombreEmp(id){ var p=E.producto("E"+id); return p?p.n:id; }
+function lista3(a){ return a.slice(0,3).map(esc).join(", ")+(a.length>3?" y "+(a.length-3)+" más":""); }
+var PANO={
+  caja:function(){ var vs=ventasHoy(), n=vs.length, tot=vs.reduce(function(a,v){ return a+v.total; },0), sf=sinFolio(), st=stockEstado(), meta=metaDia();
+    var tono=st.off?"crit":(sf||st.bajo)?"warn":"ok";
+    /* Si hay un problema, el titular lo nombra; si no, cuenta cómo va el día. */
+    var prob=st.off?st.off+(st.off===1?" producto agotado: ":" productos agotados: ")+lista3(st.nombres):sf?sf+(sf===1?" venta sin folio de boleta":" ventas sin folio de boleta"):st.bajo?st.bajo+" productos con poco stock":"";
+    if(verVentas()) return {tono:tono, titulo:prob||"Vendido hoy "+clp(tot), sub:(prob?"Vendido hoy "+clp(tot)+" · ":"")+n+(n===1?" venta":" ventas")+" · "+Math.round(tot/meta.v*100)+"% "+(meta.ref?"del objetivo":"de la meta")+" del día",
+      kpis:[{v:clp(tot),l:"Ventas de hoy",s:n+" tickets"},{v:clp(n?tot/n:0),l:"Ticket promedio"},{v:sf,l:"Sin folio de boleta",tono:sf?"warn":"ok"},{v:st.off+st.bajo,l:"Stock por mirar",s:st.off+" agotados",tono:st.off?"crit":st.bajo?"warn":"ok",go:"salon"}]};
+    return {tono:tono, titulo:prob||n+(n===1?" venta registrada hoy":" ventas registradas hoy"), sub:(prob?n+(n===1?" venta hoy · ":" ventas hoy · "):"")+"Cobro, stock y cierre del turno · las cifras del negocio las ven los dueños",
+      kpis:[{v:n,l:"Ventas de hoy"},{v:sf,l:"Sin folio de boleta",tono:sf?"warn":"ok"},{v:st.off,l:"Agotados",tono:st.off?"crit":"ok",go:"salon"},{v:st.bajo,l:"Quedan pocos",tono:st.bajo?"warn":"ok",go:"salon"}]}; },
+  salon:function(){ var st=stockEstado(), h=hornoReal();
+    return {tono:st.off?"crit":st.bajo||h.listas.length?"warn":"ok",
+      titulo:st.off?st.off+(st.off===1?" producto agotado":" productos agotados"):st.bajo?st.bajo+" productos con poco stock":"Toda la carta disponible",
+      sub:st.off?"Agotados: "+lista3(st.nombres):h.listas.length?"Hay una hornada lista para sacar":"La Carta muestra al cliente lo mismo que ves aquí",
+      kpis:[{v:st.off,l:"Agotados",tono:st.off?"crit":"ok"},{v:st.bajo,l:"Quedan pocos",tono:st.bajo?"warn":"ok"},{v:h.vit,l:"Empanadas en vitrina",s:h.ceros.length?h.ceros.length+" variedades en cero":"",tono:h.ceros.length?"warn":""},
+        {v:h.dentro,l:"En el horno",s:h.listas.length?h.listas.length+" lista para sacar":h.prox!=null?"salen en "+h.prox+" min":"sin hornada",tono:h.listas.length?"warn":""}]}; },
+  cocina:function(){ var c=comandasDetalle();
+    return {tono:c.atrasadas.length?"warn":c.total?"info":"ok", titulo:c.total?c.total+(c.total===1?" comanda por preparar":" comandas por preparar"):"Sin comandas pendientes",
+      sub:c.total?"La más antigua espera hace "+c.max+" min"+(c.atrasadas.length?" · "+c.atrasadas.length+" pasan de 15 min":""):"Todo lo cobrado ya salió",
+      kpis:[{v:c.por.cocina,l:"Cocina"},{v:c.por.barra,l:"Barra"},{v:c.por.horno,l:"Horno"},{v:c.max+" min",l:"La más antigua",tono:c.max>=15?"warn":""}]}; },
+  carta:function(){ var g=E.general(), cat=E.catalogo(g), st=stockEstado();
+    return {tono:st.off?"warn":"ok", titulo:"Carta vigente · versión "+g.v, sub:cat.length+" productos en 10 idiomas"+(st.off?" · "+st.off+" no disponibles ahora":""),
+      kpis:[{v:cat.length,l:"En la carta"},{v:g.fuera.length,l:"Fuera de carta"},{v:st.off,l:"No disponibles hoy",tono:st.off?"warn":"ok",go:"salon"},{v:10,l:"Idiomas"}]}; },
+  prueba:function(){ var g=E.general(), pc=E.pendientes().length, ctx=leeLocal("eapos_prueba_ctx")||{}, fx=leeLocal("eapos_prueba_fichas")||{}, aj=Object.keys(fx.fichas||{}).length+Object.keys(fx.precios||{}).length;
+    var H={dia:"Día",semana:"Semana",mes:"Mes"};
+    return {tono:pc?"warn":"ok", titulo:pc?pc+(pc===1?" cambio en el borrador":" cambios en el borrador"):"Igual a la versión "+g.v,
+      sub:pc?"Se aplican al sistema general desde Cambios, dentro de la Prueba":"Nada de la Prueba cambia la operación hasta que se aplica",
+      kpis:[{v:pc,l:"Cambios por aplicar",tono:pc?"warn":"ok"},{v:H[ctx.h]||"Día",l:"Horizonte simulado",s:ctx.fecha||""},{v:"v"+g.v,l:"Versión vigente"},verVentas()?{v:aj,l:"Ajustes en fichas",s:"costos estimados"}:null]}; },
+  verificacion:function(){ var dg=leeLocal("eapos_diag"), vale=dg&&dg.version===E.version;
+    if(!vale) return {tono:"info",titulo:"Aún no se verifica esta versión en este equipo",sub:"Ejecuta la verificación: revisa módulos, carta, configuración, fotos y almacenamiento",kpis:[{v:"—",l:"Correctas"},{v:"—",l:"Con aviso"},{v:"—",l:"Fallidas"},{v:E.version,l:"Versión"}]};
+    return {tono:dg.falla?"crit":dg.aviso?"warn":"ok", titulo:dg.falla?dg.falla+(dg.falla===1?" prueba con falla":" pruebas con falla"):dg.aviso?"Funciona, con "+dg.aviso+" avisos":"Todo funciona en este equipo",
+      sub:"Última verificación: "+esc(fecha(dg.fecha)), kpis:[{v:dg.ok,l:"Correctas",tono:"ok"},{v:dg.aviso,l:"Con aviso",tono:dg.aviso?"warn":""},{v:dg.falla,l:"Fallidas",tono:dg.falla?"crit":""},{v:E.version,l:"Versión"}]}; },
+  versiones:function(){ var g=E.general(), pins=E.pins(), con=E.EQUIPO.filter(function(p){ return pins[p.n]; }).length, pc=E.pendientes().length;
+    return {tono:pc?"warn":"ok", titulo:"Versión "+g.v+" vigente", sub:g.ts?"Aplicada el "+esc(fecha(g.ts))+(g.por?" por "+esc(g.por):""):"Configuración inicial",
+      kpis:[{v:E.versiones().length,l:"Versiones aplicadas"},{v:con+" de "+E.EQUIPO.length,l:"Personas con PIN"},{v:E.EQUIPO.length-con,l:"Sin PIN todavía",tono:E.EQUIPO.length-con?"warn":"ok"},{v:pc,l:"Cambios en la Prueba",tono:pc?"warn":"",go:"prueba"}]}; },
+  retro:function(){ var act=reportes.filter(function(r){ return r.estado!=="resuelto"; }), alta=act.filter(function(r){ return r.prioridad==="alta"; }), rev=act.filter(function(r){ return r.estado==="revision"; });
+    return {tono:alta.length?"crit":act.length?"warn":"ok", titulo:act.length?act.length+(act.length===1?" reporte activo":" reportes activos"):"Sin reportes pendientes",
+      sub:alta.length?alta.length+" de prioridad alta: afectan el servicio":"Lo que falla y lo que se puede mejorar, con nombre y fecha",
+      kpis:[{v:act.length-rev.length,l:"Abiertos"},{v:rev.length,l:"En revisión"},{v:alta.length,l:"Prioridad alta",tono:alta.length?"crit":"ok"},{v:reportes.length-act.length,l:"Resueltos",tono:"ok"}]}; }
+};
+function renderPanorama(v){ if(!PANO[v]) return; var el=document.querySelector('[data-pn="'+v+'"]'); if(el) U.panorama(el,PANO[v]()); }
+/* Avisos importantes con los datos reales del local, según el cargo. */
+function avisosSistema(){
+  var L=[];
+  if(puedeVer("salon")||puedeVer("caja")){
+    var c=leeLocal("ea_control")||{}, pos=leeLocal("ea_pos")||{}, umbral=(pos.cfg&&pos.cfg.umbral)||6, off=[], bajo=[];
+    E.catalogo(E.general()).forEach(function(p){ var u=c.uni&&typeof c.uni[p.id]==="number"?c.uni[p.id]:null, e=u!=null?(u<=0?"off":u<=umbral?"bajo":"ok"):((c.st&&c.st[p.id])||"ok");
+      if(e==="off") off.push(p); else if(e==="bajo") bajo.push({p:p,u:u}); });
+    off.slice(0,6).forEach(function(p){ L.push({k:"off|"+p.id,tono:"crit",tit:"Se acabó: "+esc(p.n),det:"La Carta lo muestra no disponible",go:"salon"}); });
+    if(off.length>6) L.push({k:"off+",tono:"crit",tit:"Y "+(off.length-6)+" productos más agotados",go:"salon"});
+    bajo.slice(0,6).forEach(function(x){ L.push({k:"bajo|"+x.p.id,tono:"warn",tit:"Queda poco: "+esc(x.p.n),det:x.u!=null?x.u+" en vitrina":"Marcado con poco stock",go:"salon"}); });
+    if(bajo.length>6) L.push({k:"bajo+",tono:"warn",tit:"Y "+(bajo.length-6)+" productos más con poco stock",go:"salon"});
+    var h=hornoReal();
+    h.listas.forEach(function(x){ L.push({k:"lista|"+x.id,tono:"warn",tit:"Hornada lista: "+x.n+" "+esc(nombreEmp(x.emp)),det:"Salió hace "+minutosDesde(x.eta)+" min · sácala en el Control de Salón",go:"salon"}); });
+    if(h.dentro) L.push({k:"horno",tono:"info",tit:h.dentro+" empanadas en el horno",det:"Salen en "+h.prox+" min",go:"salon"});
+  }
+  if(puedeVer("cocina")){ var cd=comandasDetalle(); if(cd.atrasadas.length) L.push({k:"cmd",tono:"warn",tit:cd.atrasadas.length+(cd.atrasadas.length===1?" comanda espera":" comandas esperan")+" hace más de 15 min",det:"La más antigua: "+cd.max+" min",go:"cocina"}); }
+  if(USER&&E.ROLES[USER.r].caja&&E.ROLES[USER.r].caja!=="cobro"){ var sf=sinFolio(); if(sf) L.push({k:"folio",tono:"info",tit:sf+(sf===1?" venta sin folio de boleta":" ventas sin folio de boleta"),det:"Anótalo en la Caja antes del cierre",go:"caja"}); }
+  if(USER&&E.ROLES[USER.r].sistema){
+    var pc=E.pendientes().length; if(pc) L.push({k:"borrador",tono:"info",tit:pc+(pc===1?" cambio en la Prueba sin aplicar":" cambios en la Prueba sin aplicar"),go:"prueba"});
+    var alta=reportes.filter(function(r){ return r.estado!=="resuelto"&&r.prioridad==="alta"; }).length; if(alta) L.push({k:"retro",tono:"warn",tit:alta+(alta===1?" reporte de prioridad alta":" reportes de prioridad alta"),det:"Afectan el servicio",go:"retro"});
+    var dg=leeLocal("eapos_diag"); if(dg&&dg.version===E.version&&dg.falla) L.push({k:"diag",tono:"crit",tit:"La verificación tiene "+dg.falla+(dg.falla===1?" falla":" fallas"),go:"verificacion"});
+  }
+  if(navigator.onLine===false) L.push({k:"red",tono:"info",tit:"Sin internet",det:"Todo sigue guardándose en este equipo"});
+  return L;
+}
+var AV=null;
+function refrescarAvisos(){ if(!USER) return; if(!AV){ $("avisosBtn").innerHTML=U.CAMPANA;
+    AV=U.avisos($("avisosBtn"),{ir:function(v){ go(v); }, alNuevo:function(a){ U.aviso(a.tit.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&")); }}); }
+  AV.render(avisosSistema()); }
 
 /* ==================== VERSIONES Y ACCESOS ==================== */
 function pintarVersiones(){

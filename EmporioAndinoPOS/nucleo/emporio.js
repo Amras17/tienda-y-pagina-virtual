@@ -121,9 +121,77 @@
   };
   function icono(id){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICONOS[id]||"")+"</svg>"; }
 
+  /* ---------- resumen de una pestaña ----------
+     Arriba de cada área: un estado en una frase, con color, y tres o cuatro
+     cifras grandes. El detalle del área sigue debajo. Los textos llegan ya
+     escapados. tono: ok · warn · crit · info. */
+  var TONO_N={ok:"Todo en orden",warn:"Atención",crit:"Urgente",info:"En curso"};
+  var TONO_IC={ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.2v.3"/>',
+    crit:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.3v.4"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.7v.3"/>'};
+  function panorama(el, d){
+    if(!el||!d) return; var t=TONO_IC[d.tono]?d.tono:"info";
+    var h='<div class="pn-estado"><span class="pn-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+TONO_IC[t]+'</svg></span>'+
+      '<div style="min-width:0"><span class="pn-et">'+(d.etiqueta||TONO_N[t])+'</span><b class="pn-tit">'+d.titulo+'</b>'+(d.sub?'<span class="pn-sub">'+d.sub+'</span>':'')+'</div></div>'+
+      '<div class="pn-kpis">'+(d.kpis||[]).filter(Boolean).map(function(k){
+        var tag=k.go?'button type="button" data-go="'+k.go+'"':'div';
+        return '<'+tag+' class="pn-k" data-tono="'+(k.tono||"")+'"><b class="num">'+k.v+'</b><span>'+k.l+'</span>'+(k.s?'<small>'+k.s+'</small>':'')+'</'+(k.go?'button':'div')+'>';
+      }).join("")+'</div>';
+    el.setAttribute("data-tono",t); el.setAttribute("role","status");
+    if(el._pn!==h){ el._pn=h; el.innerHTML=h; }
+  }
+
+  /* ---------- avisos importantes ----------
+     Una campana con el resumen de lo que necesita atención ahora: se acabó,
+     queda poco, hornada lista, comandas atrasadas. No es una bitácora: cada
+     aviso desaparece cuando deja de ser cierto. Cada aviso: {k, tono, tit,
+     det, go}. cfg.ir(go) navega; cfg.alNuevo(aviso) avisa lo urgente nuevo. */
+  function avisos(btn, cfg){
+    cfg=cfg||{}; if(!btn) return {render:function(){}};
+    var panel=document.createElement("div"); panel.className="avisos"; panel.hidden=true;
+    panel.setAttribute("role","dialog"); panel.setAttribute("aria-label","Avisos importantes"); document.body.appendChild(panel);
+    var lista=[], vistos=null, html="";
+    function pintar(){
+      var g={crit:[],warn:[],info:[]}; lista.forEach(function(a){ (g[a.tono]||g.info).push(a); });
+      var h='<div class="av-hd"><b>Avisos importantes</b><span class="num">'+lista.length+'</span></div><p class="av-nota">Lo que necesita atención ahora. Cada aviso se va cuando se resuelve.</p>';
+      [["crit","Se acabó o urgente"],["warn","Queda poco o atención"],["info","Para tener en cuenta"]].forEach(function(x){
+        if(!g[x[0]].length) return;
+        h+='<div class="av-grupo">'+x[1]+'</div>'+g[x[0]].map(function(a){
+          var tag=a.go?'button type="button" data-av-go="'+a.go+'"':'div';
+          return '<'+tag+' class="av-item" data-tono="'+a.tono+'"><i aria-hidden="true"></i><span class="av-tx"><b>'+a.tit+'</b>'+(a.det?'<span>'+a.det+'</span>':'')+'</span><em>'+(a.go?'Ver →':'')+'</em></'+(a.go?'button':'div')+'>';
+        }).join("");
+      });
+      if(!lista.length) h+='<div class="av-vacio">Sin avisos: todo en orden.</div>';
+      if(h!==html){ html=h; panel.innerHTML=h; }
+    }
+    function render(l){
+      lista=(l||[]).slice().sort(function(a,b){ var o={crit:0,warn:1,info:2}; return (o[a.tono]||2)-(o[b.tono]||2); });
+      var urg=lista.filter(function(a){ return a.tono==="crit"; }), at=lista.filter(function(a){ return a.tono==="warn"; }), n=urg.length+at.length;
+      var b=btn.querySelector(".badge-n"); if(!b){ b=document.createElement("span"); b.className="badge-n num"; btn.appendChild(b); }
+      b.textContent=n>99?"99+":n; b.hidden=!n; btn.classList.toggle("solo-warn",!urg.length&&!!at.length);
+      btn.setAttribute("aria-label","Avisos importantes: "+(n?n+" por atender":"sin avisos"));
+      var claves=urg.map(function(a){ return a.k||a.tit; });
+      if(vistos){ var nuevos=urg.filter(function(a){ return vistos.indexOf(a.k||a.tit)<0; });
+        if(nuevos.length){ btn.classList.remove("nuevo"); void btn.offsetWidth; btn.classList.add("nuevo"); if(cfg.alNuevo) cfg.alNuevo(nuevos[0]); } }
+      vistos=claves; if(!panel.hidden) pintar();
+    }
+    /* El panel se alinea con la campana pero nunca se sale de la pantalla. */
+    function abrir(){ pintar(); panel.hidden=false; var r=btn.getBoundingClientRect(), w=panel.offsetWidth;
+      panel.style.top=Math.round(Math.min(innerHeight-120,r.bottom+10))+"px"; panel.style.right="auto";
+      panel.style.left=Math.round(Math.max(12,Math.min(innerWidth-w-12,r.right-w)))+"px"; btn.setAttribute("aria-expanded","true"); }
+    function cerrar(){ panel.hidden=true; btn.setAttribute("aria-expanded","false"); }
+    btn.setAttribute("aria-haspopup","dialog"); btn.setAttribute("aria-expanded","false");
+    btn.addEventListener("click",function(e){ e.stopPropagation(); if(panel.hidden) abrir(); else cerrar(); });
+    panel.addEventListener("click",function(e){ e.stopPropagation(); var x=e.target.closest("[data-av-go]"); if(x){ cerrar(); if(cfg.ir) cfg.ir(x.getAttribute("data-av-go")); } });
+    document.addEventListener("click",function(){ if(!panel.hidden) cerrar(); });
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!panel.hidden){ cerrar(); btn.focus(); } });
+    return {render:render, abrir:abrir, cerrar:cerrar, panel:panel};
+  }
+  var CAMPANA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V10.5a6 6 0 0 1 12 0V16l1.6 2.4H4.4L6 16z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/></svg>';
+
   function listo(fn){ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fn); else fn(); }
   listo(function(){ atmosfera(); mosaicos(document); });
 
   window.EA_UI={REDUCE:REDUCE, Spring:Spring, tween:tween, numero:numero, deslizador:deslizador, mosaicos:mosaicos, revelar:revelar,
-    atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado};
+    atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado,
+    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA};
 })();

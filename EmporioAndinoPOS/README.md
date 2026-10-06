@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.3
+# EmporioAndinoPOS v2.4
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -30,6 +30,27 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Resumen por pestaña y avisos importantes (v2.4)
+
+Cada pestaña del sistema general (Caja, Control de Salón, Comandas, Carta, Prueba, Verificación,
+Versiones y Retroalimentación) y cada una de las catorce de la Prueba abre con un **resumen**: un estado
+en una frase con su color (en orden, atención, urgente o en curso) y tres o cuatro cifras grandes. Si hay
+un problema, el titular lo nombra. El detalle de cada área sigue debajo. Las tiras de cifras que se
+repetían (Cocina, Barra, Caja simulada y vitrina del horno) pasaron al resumen.
+
+La **campana** del encabezado junta los avisos importantes, no una bitácora: cada aviso se va cuando deja
+de ser cierto. En el sistema general salen de los datos reales del equipo: productos agotados y que quedan
+pocos (Control de Salón y Caja), hornadas listas para sacar, comandas que esperan más de 15 minutos,
+ventas sin folio, cambios sin aplicar, reportes de prioridad alta y fallas de la verificación, según el
+cargo. En la Prueba salen de la simulación: insumos que se acabaron o quedan pocos, variedades de empanada
+agotadas, vitrina baja, hornadas, mesas esperando la cuenta, filas largas y cortes de internet. Lo urgente
+nuevo hace sonar la campana y deja un aviso en pantalla.
+
+Las tortas de la casa tienen sus capas en la ficha: Pakari (bizcocho de amapola y crema de arándano), Inti
+(hojarasca, manjar, nueces y crema), Ñusta (hojarasca, manjar, crema y frambuesa), Killa (bizcocho de
+chocolate y de vainilla con un poco de hojarasca, manjar y crema) y Amor (hojarasca, frambuesa, crema y
+manjar; la mini torta es una porción y media).
 
 ## Prueba: fichas estándar, horno en vivo e ingresos (v2.3)
 
@@ -116,12 +137,17 @@ menú de la Prueba también tocaba la Caja. Ahora esa regla solo aplica a la Pru
 
 ## Cargos
 
-| Cargo | Módulos | Caja |
-|---|---|---|
-| Dirección (dueños, jefes de operación) | todos, incluida la Prueba, más verificación y accesos | completa |
-| Encargados de turno | Caja, Salón, Comandas, Carta | completa |
-| Garzones | Caja, Salón, Comandas, Carta | solo cobro y stock |
-| Barra, cocina | Comandas, Salón, Carta | — |
+| Cargo | Módulos | Caja | Cifras y costos |
+|---|---|---|---|
+| Dueños | todos, incluida la Prueba, más verificación y accesos | completa | sí |
+| Jefes de operación | todos, incluida la Prueba, más verificación y accesos | cobro, stock, compras, mermas, cierre e historial | no |
+| Encargados de turno | Caja, Salón, Comandas, Carta | cobro, stock, compras, mermas, cierre e historial | no |
+| Garzones | Caja, Salón, Comandas, Carta | solo cobro y stock | no |
+| Barra, cocina | Comandas, Salón, Carta | — | no |
+
+"Cifras y costos" son las ventas en pesos del dashboard, el panel del día de la Caja, costos, metas,
+estadísticas, la entrega al contador y, en la Prueba, las fichas, precios de compra, valor del stock y
+food cost. Un módulo abierto suelto, sin sesión, muestra todo como antes del sistema general.
 
 ## Qué se fusionó, qué salió
 

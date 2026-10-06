@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "2.3";
+  var VERSION = "2.4";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -130,10 +130,13 @@
     carta:  {n:"Carta Interactiva", d:"La carta que usa el cliente en la mesa", ruta:"carta/index.html"},
     prueba: {n:"Prueba y simulación", d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos", ruta:"prueba/index.html"}
   };
+  /* caja: "todo" (dueños), "turno" (cobro, stock, compras, mermas, cierre e
+     historial) o "cobro" (cobro y stock). numeros: ventas en pesos, costos,
+     metas, estadísticas y fichas; solo los dueños. */
   var ROLES = {
-    dueno:      {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"todo", sistema:1},
-    jefe:       {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"todo", sistema:1},
-    encargado:  {n:"Caja y salón",   m:["caja","salon","cocina","carta"], caja:"todo"},
+    dueno:      {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"todo", sistema:1, numeros:1},
+    jefe:       {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"turno", sistema:1},
+    encargado:  {n:"Caja y salón",   m:["caja","salon","cocina","carta"], caja:"turno"},
     garzon:     {n:"Garzones",       m:["caja","salon","cocina","carta"], caja:"cobro"},
     barista_enc:{n:"Barra",          m:["cocina","salon","carta"]},
     barista:    {n:"Barra",          m:["cocina","salon","carta"]},
@@ -169,6 +172,9 @@
   function abrirSesion(p){ guardar(K.sesion,{n:p.n, dia:hoy(), ts:new Date().toISOString()}); avisarCambio("sesion"); }
   function cerrarSesion(){ borrar(K.sesion); avisarCambio("sesion"); }
   function puede(modulo, s){ s=s||sesion(); return !!(s && ROLES[s.r] && ROLES[s.r].m.indexOf(modulo)>=0); }
+  /* Cifras del negocio y costos: solo dueños. Sin sesión (un módulo abierto
+     suelto en el equipo del local) se muestra todo, como antes del sistema general. */
+  function verNumeros(s){ s=s===undefined?sesion():s; return !s || !!(ROLES[s.r] && ROLES[s.r].numeros); }
 
   /* Pide al sistema general (la capa superior) que abra un módulo. Busca hacia
      arriba entre los marcos del mismo origen; si no hay sistema general,
@@ -192,7 +198,7 @@
     catalogo:catalogo, datos:datos, fueraDeCarta:fueraDeCarta, precioEn:precioEn,
     MODULOS:MODULOS, ROLES:ROLES, EQUIPO:EQUIPO, COLOR_ROL:COLOR_ROL,
     hashPin:hashPin, pins:pins, guardarPin:guardarPin, borrarPin:borrarPin,
-    sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede,
+    sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede, verNumeros:verNumeros,
     abrirEnSistema:abrirEnSistema, irA:irA
   };
 })();

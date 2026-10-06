@@ -134,6 +134,9 @@ window.EA_ESTANDAR = (function(){
   ins("hojaldre","Masa de hojaldre","g",1000,"kg",5200,"pasteleria");
   ins("lechecond","Leche condensada","g",1000,"kg",4200,"pasteleria");
   ins("castana","Castaña de cajú (base vegana)","g",1000,"kg",16000,"pasteleria");
+  ins("amapola","Semilla de amapola","g",1000,"kg",9000,"pasteleria");
+  ins("cacao","Cacao en polvo","g",1000,"kg",8500,"pasteleria");
+  ins("vainilla","Esencia de vainilla","ml",1000,"botella 1 L",6000,"pasteleria");
 
   /* ===================== operativa por familia ===================== */
   var OP = {
@@ -345,6 +348,23 @@ window.EA_ESTANDAR = (function(){
     ["Pto-choco-maracuya","Torta vegana de chocolate y maracuyá","torta"],["Pto-choco-naranja","Torta vegana de chocolate y naranja","torta"],
     ["Pto-panqueque-berries","Torta panqueque de berries","panqueque"],["Pto-amor","Torta Amor","torta"],["Pto-panqueque-naranja","Torta panqueque de naranja Emporio","panqueque"]];
   PAST.forEach(function(p){ pastel(p[0],p[1],p[2]); });
+
+  /* Tortas de la casa: capas que indicó la dirección (por porción, 12 por torta). */
+  var HOJA = [["harina",30],["manteca",12],["huevo",0.3]];   // hojarasca: masa fina y crocante horneada en discos
+  function torta(id, ing, prep, extra){ ficha(id,"past",ing,6,Object.assign({prep:prep, coc:"Bizcochos a 175 °C; hojarasca en discos finos a 200 °C de 6 a 8 min, hasta dorar parejo."},extra||{})); }
+  torta("Pto-pakari",[["harina",35],["azucar",30],["huevo",1],["mantequilla",15],["amapola",6],["vainilla",1],["crema",60],["berries",35],["azucar",8]],
+    "Bizcocho de amapola en tres capas; crema batida con arándano. Armar alternando bizcocho y crema de arándano; cubrir con crema.");
+  torta("Pto-inti",HOJA.concat([["manjar",60],["nueces",20],["crema",40]]),
+    "Hojarasca en capas finas con manjar y nueces picadas entre cada una; cubierta de crema y nueces.");
+  torta("Pto-nusta",HOJA.concat([["manjar",50],["crema",40],["berries",35]]),
+    "Hojarasca con manjar, crema y frambuesa entre capas; terminar con crema y frambuesas frescas.");
+  torta("Pto-killa",[["harina",46],["azucar",36],["huevo",1],["cacao",6],["vainilla",1],["manteca",4],["manjar",40],["crema",50]],
+    "Bizcocho de chocolate y bizcocho de vainilla, con una capa delgada de hojarasca; relleno de manjar y crema.");
+  torta("Pto-amor",HOJA.concat([["berries",35],["crema",40],["manjar",45]]),
+    "Hojarasca con frambuesa, crema y manjar entre capas.");
+  torta("Pto-amor-mini",HOJA.concat([["berries",35],["crema",40],["manjar",45]]).map(function(x){ return [x[0], +(x[1]*1.5).toFixed(2)]; }),
+    "La Torta Amor en formato individual: hojarasca, frambuesa, crema y manjar. Una mini torta equivale a una porción y media.",
+    {vaj:"Base de cartón dorado individual o plato de postre"});
 
   return {
     fecha:"octubre de 2026",

@@ -768,7 +768,13 @@ function guardarCtrl(){
    mismo equipo: si se vende la última empanada en una pestaña, la otra lo
    sabe al instante. Entre equipos distintos no hay puente: para eso está
    la exportación del día (y, más adelante, un servidor). */
-function alCambiarAfuera(){ leerCtrl(); try{ var r=localStorage.getItem("ea_pos"); if(r) POS=Object.assign(POS,JSON.parse(r)); }catch(e){}
+function alCambiarAfuera(){ leerCtrl();
+  /* Lo que llega de otra pestaña puede venir incompleto: se conserva la
+     configuración y las listas que falten, igual que al abrir la caja. */
+  try{ var r=localStorage.getItem("ea_pos"); if(r){ var cfg0=POS.cfg, nuevo=JSON.parse(r)||{}; POS=Object.assign(POS,nuevo);
+    POS.cfg=Object.assign({},cfg0,POS.cfg||{}); if(!Array.isArray(POS.cfg.resp)||!POS.cfg.resp.length) POS.cfg.resp=cfg0.resp;
+    ["ventas","arqueos","compras","mermas"].forEach(function(k){ if(!Array.isArray(POS[k])) POS[k]=[]; });
+    ["precios","costos","fichas"].forEach(function(k){ if(!POS[k]||typeof POS[k]!=="object") POS[k]={}; }); } }catch(e){}
   CAT=EAPOS.catalogo(EAPOS.general()); POS.cfg.metas=EAPOS.general().metas; pintarTodo(); }
 window.addEventListener("storage", function(ev){ if(ev.key==="ea_control"||ev.key==="ea_pos"||ev.key==="eapos_cfg") alCambiarAfuera(); });
 if(canal) canal.onmessage=function(){ alCambiarAfuera(); };
@@ -2776,8 +2782,10 @@ function pintarNav(){
 function irA(id){
   /* "inf:hist" lleva a Informes y además abre su pestaña de Historial. */
   var p=String(id).split(":"); id=p[0];
-  if(p[1] && id==="inf") subInf=p[1];
-  if(p[1] && id==="gest") subGest=p[1];
+  /* Lo que el cargo no ve no se abre, aunque se llegue por un atajo. */
+  if(!SECC.some(function(s){ return s.id===id; })) id="caja";
+  if(p[1] && id==="inf" && SUBINF.some(function(s){ return s.id===p[1]; })) subInf=p[1];
+  if(p[1] && id==="gest" && SUBGEST.some(function(s){ return s.id===p[1]; })) subGest=p[1];
   seccActiva=id;
   SECC.forEach(function(s){ var v=$("#"+s.v); if(v) v.hidden = (s.id!==id); });
   pintarNav();
@@ -2807,15 +2815,21 @@ function pintarTodo(){
 
 /* ==================== SESIÓN DEL SISTEMA GENERAL ====================
    Quien entra con su PIN al sistema general queda como responsable del
-   turno. Los garzones ven el cobro y el stock; las cifras del negocio
-   quedan para dirección y encargados. */
+   turno. Los garzones ven el cobro y el stock. Jefes y encargados suman
+   compras, mermas, el cierre y el historial; el panel del día, los costos,
+   las metas, las estadísticas y la entrega al contador quedan para los dueños. */
 var SESION=EAPOS.sesion();
 if(SESION){
   if(POS.cfg.resp.indexOf(SESION.n)<0) POS.cfg.resp.unshift(SESION.n);
   POS.cfg.respActivo=SESION.n;
-  if(EAPOS.ROLES[SESION.r] && EAPOS.ROLES[SESION.r].caja==="cobro"){
+  var _nivel=EAPOS.ROLES[SESION.r] && EAPOS.ROLES[SESION.r].caja;
+  if(_nivel==="cobro"){
     SECC=SECC.filter(function(x){ return x.id==="caja"||x.id==="stock"; });
     var _ba=$("#btnAjustes"); if(_ba) _ba.hidden=true;
+  } else if(_nivel==="turno"){
+    SECC=SECC.filter(function(x){ return x.id!=="panel"; });
+    SUBGEST=SUBGEST.filter(function(x){ return x.id==="compras"||x.id==="mermas"; }); subGest="compras";
+    SUBINF=SUBINF.filter(function(x){ return x.id==="rep"||x.id==="hist"; }); subInf="rep";
   }
 }
 

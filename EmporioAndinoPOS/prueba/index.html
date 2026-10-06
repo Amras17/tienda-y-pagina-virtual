@@ -568,6 +568,7 @@ html.incrustado .franja{position:relative}
         <span class="clock num" id="clock">--:--</span>
         <span class="chip"><span class="dot live" id="liveDot"></span><span id="modeTxt">Simulación en vivo</span></span>
         <span class="chip" id="hdrSync"><span class="dot" id="hdrSyncDot"></span><span id="hdrSyncTxt">Online</span></span>
+        <button class="btn sm icon avisos-btn" type="button" id="avisosBtn" aria-label="Avisos importantes" title="Avisos importantes"></button>
         <div class="seg" role="group" aria-label="Horizonte de la simulación" id="horSeg"><span class="ind"></span>
           <button type="button" data-hor="dia" aria-pressed="true">Día</button><button type="button" data-hor="semana" aria-pressed="false">Semana</button><button type="button" data-hor="mes" aria-pressed="false">Mes</button></div>
         <div class="seg" role="group" aria-label="Velocidad de simulación" id="speedSeg"><span class="ind"></span>
@@ -615,6 +616,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== CONTEXTO Y PERÍODO ===== -->
     <section class="view" data-view="contexto" hidden>
+      <div class="panorama tile glass" data-pn="contexto"></div>
       <div class="grid">
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Contexto de la simulación</h2><p>Qué se simula y con qué demanda. El día en vivo del Dashboard usa la fecha elegida.</p></div></div>
@@ -633,6 +635,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== SALÓN ===== -->
     <section class="view" data-view="salon" hidden>
+      <div class="panorama tile glass" data-pn="salon"></div>
       <div class="grid">
         <article class="tile glass s8"><div class="sk"><i class="t"></i><i class="blk"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Mesas</h2><p>Toca una mesa para ver el pedido o cobrarla</p></div>
@@ -648,6 +651,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== TOMAR PEDIDO ===== -->
     <section class="view" data-view="pedido" hidden>
+      <div class="panorama tile glass" data-pn="pedido"></div>
       <div class="grid">
         <article class="tile glass s8"><div class="sk"><i class="t"></i><i class="blk"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd pddest"><div><h2>Carta</h2><p id="pdSub">Precios de la prueba · lo que no se puede vender ahora aparece apagado</p></div>
@@ -667,9 +671,8 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== COCINA ===== -->
     <section class="view" data-view="cocina" hidden>
+      <div class="panorama tile glass" data-pn="cocina"></div>
       <div class="grid">
-        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="kv"><div class="stat"><b class="num" id="cxHoy">0</b><span>Platos de cocina hoy</span></div><div class="stat"><b class="num" id="cxAct">0</b><span>Comandas en preparación</span></div><div class="stat"><b class="num" id="cxProx">0</b><span>Pronóstico próxima hora</span></div><div class="stat"><b class="num" id="cxTop">—</b><span>Plato más pedido hoy</span></div></div></div></article>
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Comandas activas</h2><p>Pedidos con platos de cocina de los últimos 20 minutos</p></div></div><ul class="cmd" id="comandas"></ul></div></article>
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
@@ -682,10 +685,10 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== HORNO ===== -->
     <section class="view" data-view="horno" hidden>
+      <div class="panorama tile glass" data-pn="horno"></div>
       <div class="grid">
         <article class="tile glass s5"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Vitrina por variedad</h2><p id="vtSub"></p></div></div>
-            <div class="kv"><div class="stat"><b class="num" id="ovN">0</b><span>Empanadas en vitrina</span></div><div class="stat"><b class="num" id="ovIn">0</b><span>En el horno</span></div><div class="stat"><b class="num" id="ovCosto">$0</b><span>Costo de lo horneado hoy</span></div></div>
             <ul class="vitr" id="vitrina"></ul></div></article>
         <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Cargar hornada</h2><p>Como el horno del Control de Salón: varias variedades a la vez, cuánto de cada una y el tiempo. Al entrar gasta los insumos de las fichas; al salir, las unidades pasan a la vitrina.</p></div></div>
@@ -698,15 +701,14 @@ html.incrustado .franja{position:relative}
         <article class="tile glass s5"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Empanadas vendidas hoy</h2><p>Por tipo · <span id="empTot">0</span> unidades</p></div></div><ul class="rank" id="empTipos"></ul></div></article>
         <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="hd"><div><h2>Hornadas de hoy</h2><p id="tandaSub"></p></div></div><div class="tbl-wrap"><table><thead><tr><th>Entra</th><th>Sale</th><th>Variedades</th><th class="r">Unidades</th><th class="r">Costo</th><th>Estado</th><th>Registró</th></tr></thead><tbody id="tandas"></tbody></table></div></div></article>
+          <div class="tc"><div class="hd"><div><h2>Hornadas de hoy</h2><p id="tandaSub"></p></div></div><div class="tbl-wrap"><table><thead><tr><th>Entra</th><th>Sale</th><th>Variedades</th><th class="r">Unidades</th><th class="r solo-dueno">Costo</th><th>Estado</th><th>Registró</th></tr></thead><tbody id="tandas"></tbody></table></div></div></article>
       </div>
     </section>
 
     <!-- ===== BARRA ===== -->
     <section class="view" data-view="barra" hidden>
+      <div class="panorama tile glass" data-pn="barra"></div>
       <div class="grid">
-        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="kv"><div class="stat"><b class="num" id="brBeb">0</b><span>Bebidas hoy</span></div><div class="stat"><b class="num" id="brCafe">0</b><span>Café usado hoy</span></div><div class="stat"><b class="num" id="brLeche">0</b><span>Leche usada hoy</span></div><div class="stat"><b class="num" id="brCola">0</b><span>Espera de café ahora</span></div></div></div></article>
         <article class="tile glass s6"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Bebidas por tipo</h2><p>Unidades vendidas hoy</p></div></div><ul class="rank" id="brCats"></ul></div></article>
         <article class="tile glass s6"><div class="sk"><i class="t"></i><i class="blk"></i></div>
@@ -724,6 +726,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== INVENTARIO ===== -->
     <section class="view" data-view="inventario" hidden>
+      <div class="panorama tile glass" data-pn="inventario"></div>
       <div class="grid">
         <article class="tile glass s6"><div class="sk"><i class="t"></i><i class="blk"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Alertas de inventario</h2><p id="invNote"></p></div><span class="row-end" style="margin:0;gap:6px"><button class="btn sm" id="invStd" type="button">Rellenar al estándar</button><button class="btn sm" id="invAll" type="button" aria-pressed="false">Ver todo</button></span></div><ul class="inv" id="inv"></ul></div></article>
@@ -732,22 +735,21 @@ html.incrustado .franja{position:relative}
             <div class="cxform">
               <label class="campo">Insumo<select class="fin" id="igIns"></select></label>
               <label class="campo">Cantidad de formatos<input class="fin num" type="number" id="igN" min="0.1" step="0.5" value="1"></label>
-              <label class="campo">Precio neto por formato<input class="fin num" type="number" id="igP" min="0" step="10"></label>
+              <label class="campo solo-dueno">Precio neto por formato<input class="fin num" type="number" id="igP" min="0" step="10"></label>
             </div>
-            <label class="note" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="igAct"> Usar este precio en las fichas de la prueba</label>
+            <label class="note solo-dueno" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="igAct"> Usar este precio en las fichas de la prueba</label>
             <div class="row-end"><small id="igInfo"></small><button class="btn pri sm" id="igBtn" type="button">Registrar ingreso</button></div>
             <h2 class="sec-t" style="margin-top:14px">Ingresos de hoy</h2><ul class="log" id="igLog" style="margin-top:8px"></ul></div></article>
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Consumo de hoy</h2><p>Lo que sacan las fichas de cada venta y de cada hornada · cobertura al ritmo de hoy</p></div></div>
-            <div class="scroll" style="max-height:520px"><table><thead><tr><th>Insumo</th><th>Área</th><th class="r">Usado hoy</th><th class="r">Stock</th><th class="r">Valor del stock</th><th class="r">Cobertura</th></tr></thead><tbody id="invTable"></tbody></table></div></div></article>
+            <div class="scroll" style="max-height:520px"><table><thead><tr><th>Insumo</th><th>Área</th><th class="r">Usado hoy</th><th class="r">Stock</th><th class="r solo-dueno">Valor del stock</th><th class="r">Cobertura</th></tr></thead><tbody id="invTable"></tbody></table></div></div></article>
       </div>
     </section>
 
     <!-- ===== CAJA ===== -->
     <section class="view" data-view="caja" hidden>
+      <div class="panorama tile glass" data-pn="caja"></div>
       <div class="grid">
-        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="kv"><div class="stat"><b class="num" id="cjTotal">$0</b><span>Cobrado hoy</span></div><div class="stat"><b class="num" id="cjTickets">0</b><span>Tickets</span></div><div class="stat"><b class="num" id="cjProm">$0</b><span>Ticket promedio</span></div><div class="stat"><b class="num" id="cjCola">0</b><span>Movimientos en cola offline</span></div></div></div></article>
         <article class="tile glass s4"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Por turno</h2><p>Turno 1 07:00–14:30 · Turno 2 14:30–22:00 (referencial)</p></div></div><div id="cjTurnos"></div>
             <h2 class="sec-t" style="margin-top:16px">Por método de pago</h2><div id="metodos" style="margin-top:6px"></div></div></article>
@@ -759,6 +761,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== CLIENTES ===== -->
     <section class="view" data-view="clientes" hidden>
+      <div class="panorama tile glass" data-pn="clientes"></div>
       <div class="grid">
         <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Canales de venta</h2><p>Hoy</p></div></div>
@@ -773,6 +776,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== REPORTES ===== -->
     <section class="view" data-view="reportes" hidden>
+      <div class="panorama tile glass" data-pn="reportes"></div>
       <div class="grid">
         <article class="tile glass s8"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Ventas por hora</h2><p>Cobrado hoy en pesos · pasa el cursor por las barras</p></div>
@@ -787,16 +791,18 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== CARTA ===== -->
     <section class="view" data-view="carta" hidden>
+      <div class="panorama tile glass" data-pn="carta"></div>
       <div class="grid">
         <article class="tile glass s12" id="dbTile"><div class="sk"><i class="t"></i><i class="l"></i><i class="l"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Catálogo de la prueba</h2><p id="dbSub"></p></div></div>
             <div class="filters"><input id="q" class="search" type="search" placeholder="Buscar producto, ingrediente o código…" aria-label="Buscar producto"><div class="fchips" id="fchips"></div></div>
-            <div class="scroll db" style="max-height:560px"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Área</th><th class="r">Precio prueba</th><th class="r">Costo (ficha)</th><th class="r">Food cost</th><th class="r">Vendidos</th></tr></thead><tbody id="dbBody"></tbody></table></div></div></article>
+            <div class="scroll db" style="max-height:560px"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Área</th><th class="r">Precio prueba</th><th class="r solo-dueno">Costo (ficha)</th><th class="r solo-dueno">Food cost</th><th class="r">Vendidos</th></tr></thead><tbody id="dbBody"></tbody></table></div></div></article>
       </div>
     </section>
 
     <!-- ===== FICHAS Y ESCANDALLOS ===== -->
     <section class="view" data-view="fichas" hidden>
+      <div class="panorama tile glass" data-pn="fichas"></div>
       <div class="grid">
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Fichas técnicas y escandallos de la prueba <span class="fxtag">Estimado</span></h2><p id="fxSub"></p></div><button class="btn sm" type="button" id="fxRellenar">Rellenar con el estándar</button></div>
@@ -818,6 +824,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== CAMBIOS ===== -->
     <section class="view" data-view="cambios" hidden>
+      <div class="panorama tile glass" data-pn="cambios"></div>
       <div class="grid">
         <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Borrador de cambios</h2><p id="cbSub"></p></div><span class="pend" id="cbPend"></span></div>
@@ -849,6 +856,7 @@ html.incrustado .franja{position:relative}
 
     <!-- ===== BASE DE DATOS ===== -->
     <section class="view" data-view="datos" hidden>
+      <div class="panorama tile glass" data-pn="datos"></div>
       <div class="grid">
         <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Conexión simulada</h2><p id="syncTxt"></p></div><span class="chip"><span class="dot" id="syncDot"></span><span id="syncMode">Online</span></span></div>
@@ -1235,7 +1243,11 @@ const VIEWS={
  cambios:{t:"Cambios y aplicación",g:"Configuración",c:"#FFB547",d:"Precios, carta y metas; comparar y aplicar al sistema general"},
  datos:{t:"Conexión simulada",g:"Configuración",c:"#40E0D0",d:"Qué pasa si se corta internet"}
 };
-const ALLV=Object.keys(VIEWS);
+/* Costos, fichas y precios de compra: solo dueños (ver nucleo.js). Las cifras
+   simuladas de venta se ven igual, porque no son del negocio real. */
+const VER_COSTOS=EAPOS.verNumeros();
+if(!VER_COSTOS)document.documentElement.classList.add("sin-costos");
+const ALLV=Object.keys(VIEWS).filter(v=>v!=="fichas"||VER_COSTOS);
 /* La prueba se abre desde el sistema general, que ya pidió el PIN; aquí solo
    se muestra quién está en sesión. */
 const SES=EAPOS.sesion();
@@ -1377,18 +1389,17 @@ function renderDetail(){
 function cocinaActivas(){return S.orders.filter(o=>S.t-o.t<20&&o.items.some(i=>i.a==="cocina"))}
 function renderCocina(){
   const it=MENU.filter(m=>CATS[m.c].a==="cocina");const hoy=it.reduce((a,m)=>a+(S.sold[m.id]||0),0);
-  $("cxHoy").textContent=hoy;const act=cocinaActivas();$("cxAct").textContent=act.length;$("cxProx").textContent="≈ "+Math.round(NN.pred[2]);
-  const top=it.map(m=>({m,u:S.sold[m.id]||0})).sort((a,b)=>b.u-a.u)[0];$("cxTop").textContent=top&&top.u?top.m.n:"—";
+  const act=cocinaActivas();
   $("comandas").hx=act.slice().reverse().map(o=>{const el=S.t-o.t,ready=el>=12;return `<li style="--c:${ready?"#3DDC84":"#9A80D6"}"><div class="h"><span>${esc(o.label)}</span><span class="num">${el} min</span></div><span class="lbl" style="color:${ready?"#3DDC84":"#C9B8F2"}">${ready?"Listo para salir":"En preparación"}</span><ul>${o.items.filter(i=>i.a==="cocina").map(i=>`<li>${esc(i.n)}</li>`).join("")}</ul></li>`}).join("")||`<li style="--c:#98ABA8"><span class="empty-s">Sin comandas en los últimos 20 minutos</span></li>`;
 }
 const HN={sel:{},n:LATA,min:5};
 function hornadaSel(){const it={};Object.keys(HN.sel).filter(k=>HN.sel[k]).forEach(k=>it[k]=HN.n);return it}
 const nombreEmp=k=>{const it=MENU.find(m=>m.key===k);return it?it.n:k};
 function renderHorno(){
-  const emps=empMenu(),tot=totalVit();springNum("ovN",tot,x=>Math.round(x));$("ovIn").textContent=enHorno();$("ovCosto").textContent=clp(S.costoProd);
+  const emps=empMenu(),tot=totalVit();
   $("vtSub").textContent=tot<EMP_MIN?`Bajo el mínimo de ${EMP_MIN}: el horno automático carga la variedad que más falta`:`${Math.floor(tot/LATA)} ${Math.floor(tot/LATA)===1?"lata completa":"latas completas"} · mínimo ${EMP_MIN} en vitrina`;
   $("vitrina").hx=emps.map(it=>{const v=S.vit[it.key]||0,h=S.horno.reduce((a,x)=>a+(x.items[it.key]||0),0);
-    return `<li class="${v?"":"cero"}"><span>${esc(it.n)}</span><b>${v}</b><small>${h?h+" en el horno · ":""}costo ${clp(it.costo)} c/u</small></li>`}).join("");
+    return `<li class="${v?"":"cero"}"><span>${esc(it.n)}</span><b>${v}</b><small>${h?h+" en el horno · ":""}${VER_COSTOS?"costo "+clp(it.costo)+" c/u":""}</small></li>`}).join("");
   /* cargar hornada */
   emps.forEach(it=>{if(HN.sel[it.key]===undefined)HN.sel[it.key]=false});
   $("hnSel").hx=emps.map(it=>`<button type="button" class="fchip" data-hs="${it.key}" aria-pressed="${!!HN.sel[it.key]}">${esc(it.n)}</button>`).join("");
@@ -1398,20 +1409,20 @@ function renderHorno(){
   const items=hornadaSel(),nv=Object.keys(items).length,total=nv*HN.n,libre=HORNO_CAP-enHorno(),falta=nv?faltaParaHornear(items):null;
   let costo=0;for(const k in items)costo+=(costoDe(k)||0)*items[k];
   const cerrado=S.t>=CLOSE;
-  $("hnInfo").innerHTML=nv?`${nv} ${nv===1?"variedad":"variedades"} × ${HN.n} u. = <b>${total}</b> empanadas · salen a las ${hhmm(S.t+HN.min)} · costo de la hornada <b>${clp(costo)}</b>`+
+  $("hnInfo").innerHTML=nv?`${nv} ${nv===1?"variedad":"variedades"} × ${HN.n} u. = <b>${total}</b> empanadas · salen a las ${hhmm(S.t+HN.min)}${VER_COSTOS?` · costo de la hornada <b>${clp(costo)}</b>`:""}`+
     (total>libre?` · <span style="color:var(--crit)">no caben: quedan ${libre} lugares en el horno</span>`:"")+(falta?` · <span style="color:var(--crit)">falta ${esc(INS[falta].n.toLowerCase())}</span>`:"")
     :`Capacidad del horno: ${HORNO_CAP} u. (${HORNO_CAP/LATA} latas) · ${libre} lugares libres ahora.`;
   const b=$("hnBtn");b.disabled=cerrado||!nv||total>libre||!!falta;
   b.textContent=cerrado?"Local cerrado":nv?`Al horno · ${nv} ${nv===1?"variedad":"variedades"} × ${HN.n} u.`:"Elige cuáles entran";
   $("hnDentro").hx=S.horno.map(h=>{const dur=h.end-h.start,pasa=Math.min(1,(S.t-h.start)/dur);
-    return `<li><div class="r"><b>${Object.keys(h.items).map(k=>esc(nombreEmp(k))+" ×"+h.items[k]).join(" · ")}</b><span class="num">${Math.max(0,h.end-S.t)} min</span></div><div class="bar"><i style="width:${pasa*100}%;background:#E8674A"></i></div><small style="color:var(--muted)">${esc(h.by)} · ${h.total} u. · ${clp(h.costo)}</small></li>`}).join("")||`<li><span class="empty-s">No hay nada en el horno.</span></li>`;
+    return `<li><div class="r"><b>${Object.keys(h.items).map(k=>esc(nombreEmp(k))+" ×"+h.items[k]).join(" · ")}</b><span class="num">${Math.max(0,h.end-S.t)} min</span></div><div class="bar"><i style="width:${pasa*100}%;background:#E8674A"></i></div><small style="color:var(--muted)">${esc(h.by)} · ${h.total} u.${VER_COSTOS?" · "+clp(h.costo):""}</small></li>`}).join("")||`<li><span class="empty-s">No hay nada en el horno.</span></li>`;
   /* vendidas y hornadas */
   const vend=emps.map(m=>({m,u:S.sold[m.id]||0})).sort((a,b)=>b.u-a.u),vt=vend.reduce((a,x)=>a+x.u,0),mx=Math.max(1,...vend.map(x=>x.u));
   $("empTot").textContent=vt;
   $("empTipos").hx=vend.map((x,i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(x.m.n)}</span><span class="hbar"><i style="width:${x.u/mx*100}%;background:#E8674A"></i></span></span><b class="num">${x.u}</b></li>`).join("");
   const hornT=S.batches.reduce((a,h)=>a+h.total,0);
-  $("tandaSub").textContent=`${S.batches.length} ${S.batches.length===1?"hornada":"hornadas"} · ${hornT} empanadas · ${clp(S.costoProd)} en insumos · al cierre quedan en vitrina las que no se vendan`;
-  $("tandas").hx=S.batches.slice().reverse().map(h=>`<tr><td class="num">${hhmm(h.start)}</td><td class="num">${hhmm(h.end)}</td><td>${Object.keys(h.items).map(k=>esc(nombreEmp(k))).join(", ")}</td><td class="r num">${h.total}</td><td class="r num">${clp(h.costo)}</td><td>${S.t<h.end?`<span class="fcp warn">En el horno</span>`:`<span class="fcp ok">En vitrina</span>`}</td><td>${esc(h.by)}</td></tr>`).join("")||`<tr><td colspan="7" class="empty-s">Sin hornadas todavía</td></tr>`;
+  $("tandaSub").textContent=`${S.batches.length} ${S.batches.length===1?"hornada":"hornadas"} · ${hornT} empanadas${VER_COSTOS?" · "+clp(S.costoProd)+" en insumos":""} · al cierre quedan en vitrina las que no se vendan`;
+  $("tandas").hx=S.batches.slice().reverse().map(h=>`<tr><td class="num">${hhmm(h.start)}</td><td class="num">${hhmm(h.end)}</td><td>${Object.keys(h.items).map(k=>esc(nombreEmp(k))).join(", ")}</td><td class="r num">${h.total}</td><td class="r num solo-dueno">${VER_COSTOS?clp(h.costo):""}</td><td>${S.t<h.end?`<span class="fcp warn">En el horno</span>`:`<span class="fcp ok">En vitrina</span>`}</td><td>${esc(h.by)}</td></tr>`).join("")||`<tr><td colspan="7" class="empty-s">Sin hornadas todavía</td></tr>`;
 }
 $("hnSel").addEventListener("click",e=>{const b=e.target.closest("[data-hs]");if(!b)return;HN.sel[b.dataset.hs]=!HN.sel[b.dataset.hs];renderHorno()});
 $("hnLatas").addEventListener("click",e=>{const b=e.target.closest("[data-hl]");if(!b)return;HN.n=+b.dataset.hl*LATA;renderHorno()});
@@ -1426,7 +1437,6 @@ $("hnBtn").addEventListener("click",()=>{const items=hornadaSel(),r=hornear(item
 
 function renderBarra(){
   const beb=MENU.filter(it=>CATS[it.c].a==="barra"&&it.c!=="ext");const tot=beb.reduce((a,it)=>a+(S.sold[it.id]||0),0);
-  $("brBeb").textContent=tot;$("brCafe").textContent=fmtQ((S.used.cafe||0)/1000,"kg")+" kg";$("brLeche").textContent=fmtQ((S.used.leche||0)/1000,"L")+" L";$("brCola").textContent=S.log.filter(x=>x.a==="barra"&&S.t-x.t<4).length;
   const cats=["cc","cf","tc","bf"].map(c=>({c,u:beb.filter(it=>it.c===c).reduce((a,it)=>a+(S.sold[it.id]||0),0)})),mc=Math.max(1,...cats.map(x=>x.u));
   $("brCats").hx=cats.map((x,i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${CATS[x.c].n}</span><span class="hbar"><i style="width:${x.u/mc*100}%;background:#1AA89B"></i></span></span><b class="num">${x.u}</b></li>`).join("");
   const top=beb.map(it=>({it,u:S.sold[it.id]||0})).filter(x=>x.u).sort((a,b)=>b.u-a.u).slice(0,8),mt=Math.max(1,...top.map(x=>x.u));
@@ -1447,24 +1457,23 @@ function renderInv(){
   const enUso=Object.keys(INS).filter(k=>S0.min[k]>0);
   let list=enUso.map(k=>({k,s:sev(k)})).sort((a,b)=>order[a.s]-order[b.s]||S.stock[a.k]/S0.min[a.k]-S.stock[b.k]/S0.min[b.k]);
   if(!invAll)list=list.filter(x=>x.s!=="ok");
-  $("inv").hx=list.map(({k,s})=>{const I=INS[k],v=S.stock[k],m=S0.min[k];return `<li style="--sev:${col[s]}"><div><div class="nm">${esc(I.n)}<span class="sev">${lbl[s]}</span></div><div class="meta num">${fmtU(v,I.u)} · pedir en ${fmtU(m,I.u)} · ${esc(I.fmtN)} a ${clp(insPrecio(k))}</div><div class="lvl"><i style="width:${Math.min(100,v/(m*3)*100)}%"></i></div></div><button class="btn sm" type="button" data-rep="${k}">+1 ${esc(I.fmtN)}</button></li>`}).join("")
+  $("inv").hx=list.map(({k,s})=>{const I=INS[k],v=S.stock[k],m=S0.min[k];return `<li style="--sev:${col[s]}"><div><div class="nm">${esc(I.n)}<span class="sev">${lbl[s]}</span></div><div class="meta num">${fmtU(v,I.u)} · pedir en ${fmtU(m,I.u)} · ${esc(I.fmtN)}${VER_COSTOS?" a "+clp(insPrecio(k)):""}</div><div class="lvl"><i style="width:${Math.min(100,v/(m*3)*100)}%"></i></div></div><button class="btn sm" type="button" data-rep="${k}">+1 ${esc(I.fmtN)}</button></li>`}).join("")
    ||`<li style="--sev:#3DDC84"><div><div class="nm">Todo sobre el punto de pedido</div><div class="meta">Ningún insumo de las fichas requiere reposición ahora</div></div></li>`;
   const crit=enUso.filter(k=>sev(k)==="crit").length,warn=enUso.filter(k=>sev(k)==="warn").length,valor=Object.keys(INS).reduce((a,k)=>a+S.stock[k]*cuIns(k),0);
-  $("invNote").textContent=`${enUso.length} insumos en uso según las fichas · ${crit} críticos · ${warn} en advertencia · stock valorizado ${clp(valor)}`;
+  $("invNote").textContent=`${enUso.length} insumos en uso según las fichas · ${crit} críticos · ${warn} en advertencia${VER_COSTOS?" · stock valorizado "+clp(valor):""}`;
   /* ingreso de mercadería */
   const sel=$("igIns");if(!sel.options.length){sel.innerHTML=Object.keys(INS).sort((a,b)=>INS[a].n.localeCompare(INS[b].n,"es")).map(k=>`<option value="${k}">${esc(INS[k].n)} · ${esc(INS[k].fmtN)}</option>`).join("");sel.value="harina";$("igP").value=insPrecio("harina")}
   const k=sel.value,n=+$("igN").value||0,pr=+$("igP").value||0;
-  $("igInfo").textContent=INS[k]?`Entran ${fmtU(n*INS[k].fmt,INS[k].u)} · ${clp(n*pr)} neto · estándar ${clp(INS[k].precio)} por ${INS[k].fmtN}`:"";
+  $("igInfo").textContent=INS[k]?`Entran ${fmtU(n*INS[k].fmt,INS[k].u)}`+(VER_COSTOS?` · ${clp(n*pr)} neto · estándar ${clp(INS[k].precio)} por ${INS[k].fmtN}`:""):"";
   const tc=S.compras.reduce((a,c)=>a+c.total,0);
-  $("igLog").hx=S.compras.slice(-8).reverse().map(c=>`<li><b>${hhmm(c.t)}</b>${esc(INS[c.k].n)} · ${fmtU(c.q,INS[c.k].u)} · ${clp(c.total)} · ${esc(c.by)}</li>`).join("")+(S.compras.length?`<li><b>Total</b>${S.compras.length} ingresos · ${clp(tc)} neto</li>`:"")||`<li>Sin ingresos todavía</li>`;
+  $("igLog").hx=S.compras.slice(-8).reverse().map(c=>`<li><b>${hhmm(c.t)}</b>${esc(INS[c.k].n)} · ${fmtU(c.q,INS[c.k].u)}${VER_COSTOS?" · "+clp(c.total):""} · ${esc(c.by)}</li>`).join("")+(S.compras.length?`<li><b>Total</b>${S.compras.length} ingresos${VER_COSTOS?" · "+clp(tc)+" neto":""}</li>`:"")||`<li>Sin ingresos todavía</li>`;
   /* consumo */
   const hrs=Math.max(.5,(S.t-OPEN)/60);
   $("invTable").hx=enUso.sort((a,b)=>(S.used[b]||0)*cuIns(b)-(S.used[a]||0)*cuIns(a)).map(k=>{const I=INS[k],u=S.used[k]||0,rate=u/hrs,cov=rate>0?S.stock[k]/rate:Infinity;
-    return `<tr><td>${esc(I.n)}</td><td>${AREA_N[I.area]||I.area}</td><td class="r num">${fmtU(u,I.u)}</td><td class="r num">${fmtU(S.stock[k],I.u)}</td><td class="r num">${clp(S.stock[k]*cuIns(k))}</td><td class="r">${cov===Infinity?`<span class="fcp na">Sin uso hoy</span>`:`<span class="fcp ${cov<6?"crit":cov<15?"warn":"ok"}">${cov<48?Math.round(cov)+" h":Math.round(cov/15)+" días"}</span>`}</td></tr>`}).join("");
+    return `<tr><td>${esc(I.n)}</td><td>${AREA_N[I.area]||I.area}</td><td class="r num">${fmtU(u,I.u)}</td><td class="r num">${fmtU(S.stock[k],I.u)}</td><td class="r num solo-dueno">${VER_COSTOS?clp(S.stock[k]*cuIns(k)):""}</td><td class="r">${cov===Infinity?`<span class="fcp na">Sin uso hoy</span>`:`<span class="fcp ${cov<6?"crit":cov<15?"warn":"ok"}">${cov<48?Math.round(cov)+" h":Math.round(cov/15)+" días"}</span>`}</td></tr>`}).join("");
 }
 let txF="Todos",lastTxId=0;
 function renderCaja(){
-  $("cjTotal").textContent=clp(S.revenue);$("cjTickets").textContent=S.tickets;$("cjProm").textContent=clp(S.tickets?S.revenue/S.tickets:0);$("cjCola").textContent=S.tx.filter(x=>x.q).length;
   const T=[["Turno 1",OPEN,870],["Turno 2",870,CLOSE]];
   $("cjTurnos").hx=T.map(([n,a,b])=>{const tx=S.tx.filter(x=>x.t>=a&&x.t<b),v=tx.reduce((s,x)=>s+x.amt,0);return `<div class="arow" style="grid-template-columns:minmax(0,1fr) auto 70px"><span>${n}</span><b class="num">${clp(v)}</b><span class="pct num">${tx.length} tickets</span></div>`}).join("");
   const tot=S.revenue||1,ms=Object.entries(S.methods).sort((a,b)=>b[1]-a[1]);
@@ -1540,7 +1549,7 @@ function renderDB(){
   const q=fQ.trim().toLowerCase();
   const rows=MENU.filter(it=>(fCat==="all"||it.c===fCat)&&(!q||(it.n+" "+it.d+" "+CATS[it.c].n+" "+it.code).toLowerCase().includes(q)));
   $("dbBody").hx=rows.map(it=>{const C=CATS[it.c],out=!avail(it),c=costoDe(it.key);
-    return `<tr><td class="num" style="color:var(--muted);font-size:12px">${it.code}</td><td><b>${esc(it.n)}</b>${it.v?LEAF:""}${it.local?`<span class="flag">Solo local</span>`:""}${C.note?`<span class="flag">${C.note}</span>`:""}${out?`<span class="flag out">Sin insumo</span>`:""}${it.d?`<div class="desc">${esc(it.d)}</div>`:""}</td><td>${C.n}</td><td><i class="adot" style="background:${AREAS[C.a].col}"></i>${AREAS[C.a].n}</td><td class="r"><span class="price">${clp(it.p)}</span></td><td class="r num">${c!=null?clp(c):"—"}</td><td class="r">${fcPill(it)}</td><td class="r num">${S.sold[it.id]||0}</td></tr>`}).join("")
+    return `<tr><td class="num" style="color:var(--muted);font-size:12px">${it.code}</td><td><b>${esc(it.n)}</b>${it.v?LEAF:""}${it.local?`<span class="flag">Solo local</span>`:""}${C.note?`<span class="flag">${C.note}</span>`:""}${out?`<span class="flag out">Sin insumo</span>`:""}${it.d?`<div class="desc">${esc(it.d)}</div>`:""}</td><td>${C.n}</td><td><i class="adot" style="background:${AREAS[C.a].col}"></i>${AREAS[C.a].n}</td><td class="r"><span class="price">${clp(it.p)}</span></td><td class="r num solo-dueno">${VER_COSTOS&&c!=null?clp(c):"—"}</td><td class="r solo-dueno">${VER_COSTOS?fcPill(it):""}</td><td class="r num">${S.sold[it.id]||0}</td></tr>`}).join("")
    ||`<tr><td colspan="8" class="empty-s">Sin resultados para “${esc(fQ)}”</td></tr>`;
 }
 
@@ -1607,8 +1616,8 @@ function renderClock(){if(!S)return;const t=S.t,closed=t>=CLOSE;
   $("vSub").textContent=cur==="inicio"?`${cap(fechaLarga(CTX.fecha))} · ${fr} · temporada ${CTX.temporada}`:VIEWS[cur].d+" · "+fechaCorta(CTX.fecha)+" · "+fr;
   $("modeTxt").textContent=closed?"Día terminado":playing?"Simulación en vivo":"En pausa";$("liveDot").className="dot"+(playing&&!closed?" live":" idle")}
 function renderView(){if(!USER||!S)return;
-  ({inicio:renderDash,contexto:renderContexto,pedido:renderPedido,salon:renderSalon,cocina:renderCocina,horno:renderHorno,barra:renderBarra,inventario:renderInv,caja:renderCaja,clientes:renderClientes,reportes:renderReportes,carta:renderDB,fichas:renderFichas,cambios:renderCambios,datos:renderDatos})[cur]()}
-function renderAll(){computeNN();if(NET.online&&!NET.syncing)NET.last=S.t;renderView();renderHdrSync();renderClock();spawnPulses()}
+  pintarPanorama(cur);({inicio:renderDash,contexto:renderContexto,pedido:renderPedido,salon:renderSalon,cocina:renderCocina,horno:renderHorno,barra:renderBarra,inventario:renderInv,caja:renderCaja,clientes:renderClientes,reportes:renderReportes,carta:renderDB,fichas:renderFichas,cambios:renderCambios,datos:renderDatos})[cur]()}
+function renderAll(){refrescarAvisos();computeNN();if(NET.online&&!NET.syncing)NET.last=S.t;renderView();renderHdrSync();renderClock();spawnPulses()}
 function tick(){const now=performance.now(),dt=(now-lastTick)/1000;lastTick=now;if(!booted)return;
   if(playing&&S.t<CLOSE){acc+=dt*speed/60;secs=(secs+dt*speed)%60;let n=0;while(acc>=1&&n<30){step();acc-=1;n++}
     if(n>0){if(USER)renderAll();else{renderClock();S.pulses.length=0}if(S.t>=CLOSE){playing=false;setPlay();if(USER)toast("Cierre 22:00 · usa Reiniciar día para volver a empezar")}}else renderClock()}else renderClock()}
@@ -1648,7 +1657,7 @@ $("detail").addEventListener("click",e=>{const b=e.target.closest("[data-act]");
   if(b.dataset.act==="pedido"){PD.dest="mesa";PD.mesa=tb.n;go("pedido");return}
   renderAll()});
 $("inv").addEventListener("click",e=>{const b=e.target.closest("[data-rep]");if(!b)return;const k=b.dataset.rep;
-  const r=ingresar(k,1,insPrecio(k));if(r)toast(`${INS[k].n}: +${fmtU(r.q,INS[k].u)} · ${clp(r.total)}`);renderView();renderHdrSync()});
+  const r=ingresar(k,1,insPrecio(k));if(r)toast(`${INS[k].n}: +${fmtU(r.q,INS[k].u)}${VER_COSTOS?" · "+clp(r.total):""}`);renderView();renderHdrSync()});
 $("invStd").addEventListener("click",()=>{const s0=stockInicial().s;let n=0;for(const k in INS)if(S.stock[k]<s0[k]){S.stock[k]=s0[k];n++}
   toast(n?`${n} insumos rellenados al stock estándar de las fichas`:"Todo está sobre el stock estándar");renderView()});
 $("igIns").addEventListener("change",e=>{$("igP").value=insPrecio(e.target.value);renderInv()});
@@ -1657,7 +1666,7 @@ $("igBtn").addEventListener("click",()=>{const k=$("igIns").value,n=+$("igN").va
   if(!(n>0)||!(pr>=0)){toast("Indica la cantidad y el precio");return}
   const r=ingresar(k,n,pr);if(!r)return;
   if($("igAct").checked&&pr!==INS[k].precio){FXE.precios[k]=pr;guardarFx();actualizarCostos()}
-  toast(`Ingreso: ${INS[k].n} +${fmtU(r.q,INS[k].u)} · ${clp(r.total)}`);renderView();renderHdrSync()});
+  toast(`Ingreso: ${INS[k].n} +${fmtU(r.q,INS[k].u)}${VER_COSTOS?" · "+clp(r.total):""}`);renderView();renderHdrSync()});
 $("invAll").addEventListener("click",()=>{invAll=!invAll;$("invAll").textContent=invAll?"Solo alertas":"Ver todo";$("invAll").setAttribute("aria-pressed",String(invAll));renderInv()});
 $("txFilter").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;txF=b.dataset.f;$("txFilter").querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderCaja()});
 $("q").addEventListener("input",e=>{fQ=e.target.value;renderDB()});
@@ -1733,8 +1742,8 @@ function renderPeriodo(){
       <div class="stat"><b class="num">${ok} de ${n}</b><span>Días sobre la meta diaria</span></div>
       <div class="stat"><b class="num">${clp(tk?tot/tk:0)}</b><span>Ticket promedio</span></div>
       <div class="stat"><b class="num">${D.reduce((a,x)=>a+x.abandon,0)}</b><span>Se fueron sin ser atendidos</span></div>
-      <div class="stat"><b class="num">${clp(D.reduce((a,x)=>a+x.costo,0))}</b><span>Costo de lo vendido (fichas)</span></div>
-      <div class="stat"><b class="num">${tot?pct(D.reduce((a,x)=>a+x.costo,0)/(tot/1.19)):"—"}</b><span>Food cost del período · meta ${cfg.metas.food||32}%</span></div></div>
+      ${VER_COSTOS?`<div class="stat"><b class="num">${clp(D.reduce((a,x)=>a+x.costo,0))}</b><span>Costo de lo vendido (fichas)</span></div>
+      <div class="stat"><b class="num">${tot?pct(D.reduce((a,x)=>a+x.costo,0)/(tot/1.19)):"—"}</b><span>Food cost del período · meta ${cfg.metas.food||32}%</span></div>`:""}</div>
     <div class="tbl-wrap"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:520px;height:auto;display:block" role="img" aria-label="Venta simulada por día">${g}</svg></div>
     <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:#1AA89B"></i>Sobre la meta diaria</span><span><i class="sw" style="background:#5C6F6C"></i>Bajo la meta</span><span><i class="sw" style="background:#FF7F50;border-radius:50%"></i>Día con evento</span><span>Mejor: ${esc(fechaCorta(mejor.iso))} ${clp(mejor.rev)} · Más bajo: ${esc(fechaCorta(peor.iso))} ${clp(peor.rev)}</span></div>
     ${det}${semanas}
@@ -1910,6 +1919,84 @@ $("fxRellenar").addEventListener("click",()=>{const now=Date.now();
   fxArm=0;FXE={precios:{},fichas:{},flete:8};guardarFx();actualizarCostos();const s0=stockInicial().s;for(const k in INS)S.stock[k]=s0[k];
   renderFicha();renderFichas();renderHub();toast("Fichas, precios y stock de la prueba rellenados con el estándar")});
 
+/* =============== RESUMEN POR PESTAÑA =============== */
+const UI=window.EA_UI;
+const minutos=m=>m+" min";
+const libresN=()=>S.tables.filter(x=>x.state==="libre").length;
+const ocupadasN=()=>S.tables.filter(x=>x.state==="ocupada"||x.state==="cuenta").length;
+function bebidasHoy(){return MENU.filter(it=>CATS[it.c].a==="barra").reduce((a,it)=>a+(S.sold[it.id]||0),0)}
+function topDe(f){const t=MENU.filter(f).map(it=>({it,u:S.sold[it.id]||0})).sort((a,b)=>b.u-a.u)[0];return t&&t.u?t:null}
+const PANO={
+  contexto:()=>({tono:"info",etiqueta:"Simulando",titulo:`${HORIZ[CTX.h]} · ${cap(fechaLarga(CTX.fecha))}`,sub:`Demanda ${f2(demandaDe(CTX.fecha))} · temporada ${CTX.temporada} · ${EVENTOS[eventoDe(CTX.fecha)].n.toLowerCase()}`,
+    kpis:[{v:HORIZ[CTX.h],l:"Horizonte",s:CTX.h==="dia"?"en vivo":diasDelPeriodo().length+" días"},{v:f2(demandaDe(CTX.fecha)),l:"Demanda del día",s:cap(DOW_N[fechaDe(CTX.fecha).getDay()])},{v:CTX.afl+"%",l:"Afluencia"},{v:Object.keys(CTX.dias).length,l:"Días con evento"}]}),
+  salon:()=>{const occ=ocupadasN(),cu=S.tables.filter(x=>x.state==="cuenta").length,q=S.queue.length,e=S.espEmp.length;
+    return{tono:q||e?"warn":occ>=12?"info":"ok",titulo:`${occ} de 15 mesas ocupadas`,sub:q?`${q} ${q===1?"grupo espera":"grupos esperan"} mesa · se les puede vender en la fila`:"Sin espera de mesa",
+      kpis:[{v:libresN(),l:"Mesas libres",tono:libresN()?"ok":"warn"},{v:cu,l:"Esperando la cuenta",tono:cu?"warn":""},{v:q,l:"Espera de mesa",tono:q?"warn":"",go:"pedido"},{v:e,l:"Espera de empanadas",tono:e?"warn":"",go:"horno"}]}},
+  pedido:()=>{const n=S.manual.length,v=S.manual.reduce((a,m)=>a+m.amt,0);
+    return{tono:"info",etiqueta:"Ingreso a mano",titulo:n?`${n} ${n===1?"pedido ingresado":"pedidos ingresados"} a mano · ${clp(v)}`:"Sin pedidos a mano todavía",sub:"Mesa, para llevar o fila, con la carta de la prueba",
+      kpis:[{v:libresN(),l:"Mesas libres"},{v:S.queue.length+S.espEmp.length,l:"Esperando en la fila",tono:S.queue.length+S.espEmp.length?"warn":""},{v:S.kinds.fila.n,l:"Ventas en la fila",s:clp(S.kinds.fila.v)},{v:totalVit(),l:"Empanadas en vitrina",go:"horno"}]}},
+  cocina:()=>{const it=MENU.filter(m=>CATS[m.c].a==="cocina"),hoy=it.reduce((a,m)=>a+(S.sold[m.id]||0),0),act=cocinaActivas().length,top=topDe(m=>CATS[m.c].a==="cocina"),pr=Math.round(NN.pred[2]);
+    return{tono:act>8?"warn":act?"info":"ok",titulo:act?`${act} ${act===1?"comanda":"comandas"} en preparación`:"Cocina al día",sub:`≈ ${pr} platos la próxima hora`,
+      kpis:[{v:hoy,l:"Platos de cocina hoy"},{v:act,l:"En preparación",tono:act>8?"warn":""},{v:"≈ "+pr,l:"Próxima hora"},{v:top?esc(top.it.n):"—",l:"Más pedido",s:top?top.u+" u.":""}]}},
+  horno:()=>{const tot=totalVit(),ce=empMenu().filter(it=>!(S.vit[it.key]>0)),dn=enHorno(),px=S.horno.length?Math.max(0,Math.min(...S.horno.map(h=>h.end))-S.t):null;
+    return{tono:!tot?"crit":ce.length>=3||tot<EMP_MIN?"warn":"ok",titulo:tot?`${tot} empanadas en vitrina`:"Vitrina vacía",sub:ce.length?`Agotadas: ${ce.slice(0,3).map(it=>esc(it.n)).join(", ")}${ce.length>3?" y "+(ce.length-3)+" más":""}`:dn?`${dn} en el horno · salen en ${px} min`:"Todas las variedades disponibles",
+      kpis:[{v:tot,l:"En vitrina",tono:tot<EMP_MIN?"warn":"ok"},{v:dn,l:"En el horno",s:px!=null?"salen en "+px+" min":"vacío"},{v:ce.length,l:"Variedades agotadas",tono:ce.length?"crit":"ok"},VER_COSTOS?{v:clp(S.costoProd),l:"Costo horneado hoy",s:S.batches.length+(S.batches.length===1?" hornada":" hornadas")}:{v:S.batches.length,l:"Hornadas hoy"}]}},
+  barra:()=>{const b=bebidasHoy(),sc=sev("cafe"),sl=sev("leche"),cola=S.log.filter(x=>x.a==="barra"&&S.t-x.t<4).length,top=topDe(m=>CATS[m.c].a==="barra");
+    const fal=[sc!=="ok"?"café":"",sl!=="ok"?"leche":""].filter(Boolean);
+    return{tono:sc==="crit"||sl==="crit"?"crit":sc==="warn"||sl==="warn"?"warn":"ok",titulo:fal.length?`Queda poco: ${fal.join(" y ")}`:`${b} bebidas hoy`,sub:(fal.length?`${b} bebidas hoy · `:"")+(top?`la más pedida: ${esc(top.it.n)} (${top.u})`:"sin bebidas todavía"),
+      kpis:[{v:fmtQ((S.used.cafe||0)/1000,"kg")+" kg",l:"Café usado",s:"quedan "+fmtU(S.stock.cafe,"g"),tono:sc==="ok"?"":sc,go:"inventario"},{v:fmtQ((S.used.leche||0)/1000,"L")+" L",l:"Leche usada",s:"quedan "+fmtU(S.stock.leche,"ml"),tono:sl==="ok"?"":sl,go:"inventario"},{v:cola,l:"Espera de café ahora",tono:cola>4?"warn":""},{v:b,l:"Bebidas hoy"}]}},
+  inventario:()=>{const S0=stockInicial(),uso=Object.keys(INS).filter(k=>S0.min[k]>0),cr=uso.filter(k=>sev(k)==="crit"),wa=uso.filter(k=>sev(k)==="warn");
+    return{tono:cr.length?"crit":wa.length?"warn":"ok",titulo:cr.length?`${cr.length} ${cr.length===1?"insumo crítico":"insumos críticos"}`:wa.length?`${wa.length} insumos con poco stock`:"Inventario sobre el punto de pedido",
+      sub:cr.length?"Reponer: "+cr.slice(0,3).map(k=>esc(INS[k].n)).join(", "):wa.length?"Mirar: "+wa.slice(0,3).map(k=>esc(INS[k].n)).join(", "):"Lo que sacan las fichas de cada venta y hornada",
+      kpis:[{v:cr.length,l:"Críticos",tono:cr.length?"crit":"ok"},{v:wa.length,l:"Advertencia",tono:wa.length?"warn":"ok"},{v:uso.length,l:"Insumos en uso"},VER_COSTOS?{v:clp(Object.keys(INS).reduce((a,k)=>a+S.stock[k]*cuIns(k),0)),l:"Stock valorizado",s:S.compras.length+" ingresos hoy"}:{v:S.compras.length,l:"Ingresos hoy"}]}},
+  caja:()=>({tono:NET.queue?"warn":"ok",titulo:NET.queue?`${NET.queue} registros en cola sin internet`:`${clp(S.revenue)} cobrado hoy`,sub:(NET.queue?`${clp(S.revenue)} cobrado · `:"")+`${S.tickets} tickets · cifras simuladas`,
+    kpis:[{v:clp(S.revenue),l:"Cobrado"},{v:S.tickets,l:"Tickets"},{v:clp(S.tickets?S.revenue/S.tickets:0),l:"Ticket promedio"},{v:S.tx.filter(x=>x.q).length,l:"En cola sin internet",tono:NET.queue?"warn":"",go:"datos"}]}),
+  clientes:()=>{const k=S.kinds,t=k.mesa.n+k.llevar.n+k.fila.n+k.deliv.n,ab=S.abandon+S.lostFull+S.abandonEmp;
+    return{tono:ab?"warn":"ok",titulo:ab?`${ab} ${ab===1?"cliente se fue":"clientes se fueron"} sin ser atendidos`:`${t} tickets hoy`,sub:ab?`${t} tickets hoy · revisa la espera de mesa y de empanadas`:"Nadie se fue sin ser atendido",
+      kpis:[{v:k.mesa.n,l:"Mesa"},{v:k.llevar.n,l:"Para llevar"},{v:k.fila.n,l:"En la fila"},{v:k.deliv.n,l:"Delivery DesertGo"}]}},
+  reportes:()=>{const ex=expectedAt(S.t),d=ex>0?S.revenue/ex-1:0,hs=S.sales.map((v,h)=>({h,v})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v)[0],top=topDe(()=>true);
+    return{tono:d>=-.05?"ok":"warn",titulo:`${Math.round(S.revenue/GOAL*100)}% del objetivo del día`,sub:(d>=0?"▲ ":"▼ ")+Math.abs(Math.round(d*100))+"% contra lo esperado a esta hora",
+      kpis:[{v:clp(S.revenue),l:"Cobrado"},{v:clp(GOAL),l:"Objetivo del día"},{v:hs?pad2(hs.h)+":00":"—",l:"Hora más fuerte",s:hs?clp(hs.v):""},{v:top?esc(top.it.n):"—",l:"Más vendido",s:top?top.u+" u.":""}]}},
+  carta:()=>{const sin=MENU.filter(it=>!avail(it)).length,conC=MENU.filter(it=>it.costo&&it.p),fc=conC.length?conC.reduce((a,it)=>a+it.costo/(it.p/1.19),0)/conC.length:0;
+    return{tono:sin?"warn":"ok",titulo:sin?`${sin} ${sin===1?"producto no disponible":"productos no disponibles"} ahora`:`${MENU.length} productos con precio de prueba`,sub:sin?`Sin insumo o sin stock · ${MENU.length} productos en la simulación`:"Todo lo de la carta se puede vender ahora",
+      kpis:[{v:MENU.length,l:"En la simulación"},{v:SINPRECIO,l:"Sin precio",s:"quedan fuera"},{v:sin,l:"No disponibles ahora",tono:sin?"warn":"ok"},VER_COSTOS?{v:pct(fc),l:"Food cost promedio",s:"fichas estimadas",go:"fichas"}:null]}},
+  fichas:()=>{const fs=EAPOS.base.map(filaProducto),cp=fs.filter(r=>r.fc!=null),pr=cp.length?cp.reduce((a,r)=>a+r.fc,0)/cp.length:0,so=cp.filter(r=>r.fc>metaFC()/100),aj=Object.keys(FXE.fichas).length+Object.keys(FXE.precios).length;
+    return{tono:so.length?"warn":"ok",etiqueta:"Estimado",titulo:`Food cost promedio ${pct(pr)} · meta ${metaFC()}%`,sub:so.length?`Sobre la meta: ${so.slice(0,3).map(r=>esc(r.x.n)).join(", ")}${so.length>3?" y "+(so.length-3)+" más":""}`:"Toda la carta bajo la meta",
+      kpis:[{v:so.length,l:"Sobre la meta",tono:so.length?"warn":"ok"},{v:fs.filter(r=>r.p==null).length,l:"Sin precio",s:"con precio sugerido"},{v:aj,l:"Ajustes propios"},{v:FXE.flete+"%",l:"Flete al desierto"}]}},
+  cambios:()=>{const g=EAPOS.general(),pc=EAPOS.pendientes().length;
+    return{tono:pc?"warn":"ok",titulo:pc?`${pc} ${pc===1?"cambio":"cambios"} por aplicar al sistema general`:`Igual a la versión ${g.v} del sistema general`,sub:pc?"Compara el período y aplica cuando esté listo":"Cambia un precio, saca un producto o ajusta una meta",
+      kpis:[{v:pc,l:"Cambios en el borrador",tono:pc?"warn":"ok"},{v:"v"+g.v,l:"Versión vigente"},{v:EAPOS.versiones().length,l:"Versiones aplicadas"},{v:clp(EAPOS.prueba().metas.dia||1800000),l:"Meta del día (prueba)"}]}},
+  datos:()=>({tono:NET.online?(NET.syncing?"info":"ok"):"warn",titulo:NET.online?(NET.syncing?"Sincronizando con la nube":"En línea · todo respaldado"):`Sin internet · ${NET.queue} registros en cola`,sub:NET.online?"Cada venta se guarda en el Mac del local y se copia a la nube":"Cajas y tablets siguen trabajando por el Wi-Fi del local",
+    kpis:[{v:S.records,l:"Registros hoy"},{v:NET.queue,l:"En cola",tono:NET.queue?"warn":"ok"},{v:NET.last!=null?hhmm(NET.last):"--:--",l:"Último respaldo"},{v:NET.log.filter(l=>/cortó/.test(l.m)).length,l:"Cortes hoy"}]})
+};
+function pintarPanorama(v){const f=PANO[v];if(!f||!S)return;const el=document.querySelector(`[data-pn="${v}"]`);if(el)UI.panorama(el,f())}
+document.addEventListener("click",e=>{const b=e.target.closest(".panorama [data-go]");if(b&&can(b.dataset.go))go(b.dataset.go)});
+
+/* =============== AVISOS IMPORTANTES (simulados) =============== */
+let USO_MIN=null;
+function usoMinimo(){if(USO_MIN&&USO_MIN.v===menuV)return USO_MIN.m;const m={};
+  MENU.forEach(it=>{const rec=it.c==="emp"?[]:it.rec;rec.forEach(([k,q])=>{if(q>0&&(m[k]==null||q<m[k]))m[k]=q})});USO_MIN={v:menuV,m};return m}
+function avisosPrueba(){if(!S)return[];const L=[],um=usoMinimo(),S0=stockInicial();
+  const se=Object.keys(um).filter(k=>S.stock[k]<um[k]-1e-9);
+  se.slice(0,5).forEach(k=>{const n=MENU.filter(it=>it.c!=="emp"&&it.rec.some(x=>x[0]===k)).length;L.push({k:"ins|"+k,tono:"crit",tit:"Se acabó: "+esc(INS[k].n.toLowerCase()),det:`${n} ${n===1?"producto queda":"productos quedan"} sin vender`,go:"inventario"})});
+  if(se.length>5)L.push({k:"ins+",tono:"crit",tit:`Y ${se.length-5} insumos más agotados`,go:"inventario"});
+  const bajo=Object.keys(INS).filter(k=>S0.min[k]>0&&!se.includes(k)&&sev(k)==="crit");
+  bajo.slice(0,5).forEach(k=>L.push({k:"bajo|"+k,tono:"warn",tit:"Queda poco: "+esc(INS[k].n.toLowerCase()),det:`${fmtU(S.stock[k],INS[k].u)} · pedir en ${fmtU(S0.min[k],INS[k].u)}`,go:"inventario"}));
+  if(bajo.length>5)L.push({k:"bajo+",tono:"warn",tit:`Y ${bajo.length-5} insumos más con poco stock`,go:"inventario"});
+  const ce=empMenu().filter(it=>!(S.vit[it.key]>0));
+  if(ce.length)L.push({k:"emp|"+ce.map(it=>it.key).join(","),tono:ce.length>=3?"crit":"warn",tit:ce.length===1?"Se acabó la empanada "+esc(ce[0].n.toLowerCase()):`${ce.length} variedades de empanada agotadas`,det:ce.length>1?ce.map(it=>esc(it.n)).join(", "):S.horno.some(h=>h.items[ce[0].key])?"Viene en la hornada":"Cárgala en el horno",go:"horno"});
+  const tot=totalVit();if(tot<EMP_MIN)L.push({k:"vit",tono:"warn",tit:`Vitrina baja: ${tot} empanadas`,det:`El mínimo es ${EMP_MIN}`,go:"horno"});
+  S.horno.filter(h=>h.end-S.t<=1).forEach(h=>L.push({k:"hn|"+h.id,tono:"info",tit:`Hornada lista en 1 min: ${h.total} empanadas`,go:"horno"}));
+  if(S.ovenDone!=null&&S.t-S.ovenDone<=2)L.push({k:"sal|"+S.ovenDone,tono:"info",tit:"Salió una hornada a la vitrina",go:"horno"});
+  S.tables.filter(tb=>tb.state==="cuenta"&&S.t-tb.since>=6).forEach(tb=>L.push({k:"cta|"+tb.n,tono:"warn",tit:`Mesa ${tb.n} espera la cuenta hace ${S.t-tb.since} min`,go:"salon"}));
+  const qv=S.queue.filter(g=>S.t-g.t>=8);if(qv.length)L.push({k:"q",tono:"warn",tit:`${qv.length} ${qv.length===1?"grupo espera":"grupos esperan"} mesa hace más de 8 min`,det:"Se les puede vender en la fila",go:"pedido"});
+  const ev=S.espEmp.filter(e=>S.t-e.t>=5);if(ev.length)L.push({k:"ee",tono:"warn",tit:`${ev.length} ${ev.length===1?"cliente espera":"clientes esperan"} empanadas hace más de 5 min`,go:"horno"});
+  if(!NET.online)L.push({k:"red",tono:"warn",tit:`Sin internet: ${NET.queue} registros en cola`,det:"Se envían al volver la conexión",go:"datos"});
+  const pc=EAPOS.pendientes().length;if(pc)L.push({k:"bor",tono:"info",tit:`${pc} ${pc===1?"cambio":"cambios"} en el borrador sin aplicar`,go:"cambios"});
+  return L}
+let AVP=null;
+function refrescarAvisos(){if(!AVP){$("avisosBtn").innerHTML=UI.CAMPANA;AVP=UI.avisos($("avisosBtn"),{ir:v=>{if(can(v))go(v)}})}AVP.render(avisosPrueba())}
+
 /* =============== CAMBIOS: borrador, comparación y aplicación =============== */
 let cbGrupo="all",cbQ="",descArm=0,simVieja=false;
 const GRUPO_N={all:"Todo",sinprecio:"Sin precio",emp:"Empanadas",coc:"Cocina",bar:"Barra",past:"Pastelería"};
@@ -1966,7 +2053,7 @@ $("cbComparar").addEventListener("click",()=>{
     const top=(()=>{const u={};dP.forEach(x=>{for(const id in x.sold){const it=x.menu[id];if(it)u[it.n]=(u[it.n]||0)+x.sold[id]}});return Object.entries(u).sort((x,y)=>y[1]-x[1]).slice(0,5)})();
     const dif=(x,y)=>{if(!x)return`<span class="dif eq">—</span>`;const d=(y/x-1)*100;return`<span class="dif ${Math.abs(d)<.5?"eq":d>0?"up":"dn"}">${d>0?"+":""}${d.toFixed(1)}%</span>`};
     const lado=(t,r,ref)=>`<div class="lado"><h3>${t}</h3><span class="big2">${clp(r.rev)}</span><span class="desc">venta promedio por día ${ref?dif(ref.rev,r.rev):""}</span>
-      <div class="r"><span>Tickets por día</span><b>${r.tk.toFixed(0)}</b></div><div class="r"><span>Ticket promedio</span><b>${clp(r.tic)} ${ref?dif(ref.tic,r.tic):""}</b></div><div class="r"><span>Food cost (fichas de prueba)</span><b>${pct(r.fc)}</b></div>
+      <div class="r"><span>Tickets por día</span><b>${r.tk.toFixed(0)}</b></div><div class="r"><span>Ticket promedio</span><b>${clp(r.tic)} ${ref?dif(ref.tic,r.tic):""}</b></div>${VER_COSTOS?`<div class="r"><span>Food cost (fichas de prueba)</span><b>${pct(r.fc)}</b></div>`:""}
       <div class="r"><span>Días sobre ${r.ref?"el objetivo de referencia":"la meta"} (${clp(r.meta)})</span><b>${r.ok} de ${n}</b></div></div>`;
     $("cbVs").innerHTML=`<div class="vs">${lado("Sistema general · v"+gC.v,a)}${lado("Prueba (borrador)",b,a)}</div>
       <p class="note">Más pedidos en la prueba: ${top.map(([n,u])=>esc(n)+" ("+u+")").join(" · ")||"—"}. ${n} días desde el ${fechaLarga(dias[0])} (${CTX.h==="mes"?"el mes del contexto":"una semana"}), temporada ${CTX.temporada}, con los eventos marcados y la misma semilla por día para los dos lados. El motor no cambia la demanda según el precio: muestra el efecto directo del precio, de la carta y de las metas.</p>`;
