@@ -1,7 +1,7 @@
 {
-  "version": "2.4",
-  "fecha": "2026-10-06T19:51:59.858Z",
-  "total": 196,
+  "version": "2.5",
+  "fecha": "2026-10-06T22:41:01.182Z",
+  "total": 198,
   "fallas": 0,
   "resultados": [
     {
@@ -135,6 +135,12 @@
       "prueba": "avisos importantes: se acabó",
       "ok": true,
       "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\"]}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "barra colapsable al bajar y se abre al volver arriba",
+      "ok": true,
+      "detalle": "{\"on\":true,\"chip\":\"Hoy $0 · 0 ventas · 0 comandas · 1 agotados\",\"side\":68,\"vuelve\":true}"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -723,6 +729,12 @@
       "prueba": "avisos importantes: se acabó",
       "ok": true,
       "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\"]}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "barra colapsable al bajar y se abre al volver arriba",
+      "ok": true,
+      "detalle": "{\"on\":true,\"chip\":\"Hoy $0 · 0 ventas · 0 comandas · 1 agotados\",\"side\":358,\"vuelve\":true}"
     },
     {
       "modulo": "Sistema general · telefono",

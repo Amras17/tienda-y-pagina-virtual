@@ -423,3 +423,61 @@ button.av-item:hover{border-color:var(--stroke-2);transform:translateX(2px)}
 .av-tx span{display:block;font-size:11.5px;color:var(--muted)}
 .av-item em{font-style:normal;font-size:11px;color:var(--accent);white-space:nowrap}
 .av-vacio{padding:18px 6px;text-align:center;color:var(--muted)}
+
+/* ---------- barra colapsable (al desplazar hacia abajo) ---------- */
+.top-pn{display:none;align-items:center;gap:8px;min-width:0;max-width:46ch;padding:4px 12px 4px 10px;border-radius:99px;border:1px solid var(--stroke);background:var(--glass-2);font-size:12.5px;font-weight:700;color:var(--fg-2);cursor:pointer;font-family:inherit}
+.top-pn i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.top-pn[data-tono="ok"] i{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.top-pn[data-tono="warn"] i{background:var(--warn);box-shadow:0 0 10px var(--warn)}
+.top-pn[data-tono="crit"] i{background:var(--crit);box-shadow:0 0 10px var(--crit);animation:pnPulso 1.8s ease-in-out infinite}
+.top-pn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.colapsado .top-pn:not(:empty){display:inline-flex}
+.top,.top h1,.clock{transition:padding .3s var(--spring-soft),font-size .3s var(--spring-soft)}
+html.colapsado .top{padding:6px 12px;gap:8px;background:rgba(14,22,25,.93);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+html.colapsado .top h1{font-size:16px}
+html.colapsado .top .ttl p{display:none}
+html.colapsado .clock{font-size:17px}
+html.colapsado .top .btn.icon,html.colapsado #backBtn{transform:scale(.88)}
+/* El resumen de un módulo incrustado se pliega dentro de la barra y el módulo crece. */
+.panorama.pn-modulo{max-height:420px;transition:max-height .4s var(--spring-soft),opacity .25s,padding .4s var(--spring-soft),margin .4s var(--spring-soft)}
+html.colapsado .panorama.pn-modulo{max-height:0;opacity:0;padding-block:0;margin-bottom:-16px;border-width:0;pointer-events:none}
+.marco iframe{transition:height .4s var(--spring-soft)}
+html.colapsado .marco iframe{height:calc(100vh - 92px)}
+@media (min-width:901px){
+  /* La columna fija es su propia capa: va sobre el contenido para poder abrirse encima. */
+  .side{z-index:20}
+  .app{transition:grid-template-columns .4s var(--spring-soft)}
+  html.colapsado .app{grid-template-columns:84px minmax(0,1fr)}
+  .side-in{width:100%;transition:width .35s var(--spring-soft),box-shadow .3s,background .3s;position:relative;z-index:30}
+  html.colapsado .side-in{width:68px}
+  html.colapsado .brand .row,html.colapsado .side-foot,html.colapsado .me div,html.colapsado .me .btn,html.colapsado .nav .nl{display:none}
+  html.colapsado .brand{padding:10px 0 4px;text-align:center}
+  html.colapsado .brand b{font-size:0}
+  html.colapsado .brand b::before{content:"EA";font-size:24px}
+  html.colapsado .me{justify-content:center;margin:8px 8px 2px;padding:6px}
+  html.colapsado .nav{padding:6px 8px}
+  html.colapsado .nav a{justify-content:center;padding:10px 8px}
+  html.colapsado .nav .grp{font-size:0;padding:0;height:1px;margin:8px 10px;background:var(--stroke)}
+  /* Con el cursor encima (o al navegar con el teclado), la columna se abre sobre el contenido. */
+  html.colapsado .side:hover .side-in,html.colapsado .side:has(:focus-visible) .side-in{width:232px;background:rgba(14,22,25,.94);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  html.colapsado .side:hover .brand .row,html.colapsado .side:has(:focus-visible) .brand .row,html.colapsado .side:hover .me div,html.colapsado .side:has(:focus-visible) .me div{display:block}
+  html.colapsado .side:hover .brand .row,html.colapsado .side:has(:focus-visible) .brand .row{display:flex}
+  html.colapsado .side:hover .me .btn,html.colapsado .side:has(:focus-visible) .me .btn{display:inline-flex}
+  html.colapsado .side:hover .nav .nl,html.colapsado .side:has(:focus-visible) .nav .nl{display:inline}
+  html.colapsado .side:hover .nav a,html.colapsado .side:has(:focus-visible) .nav a{justify-content:flex-start;padding:8px 10px}
+  html.colapsado .side:hover .nav .grp,html.colapsado .side:has(:focus-visible) .nav .grp{font-size:10.5px;height:auto;padding:10px 10px 4px;margin:0;background:none}
+  html.colapsado .side:hover .brand b,html.colapsado .side:has(:focus-visible) .brand b{font-size:30px}
+  html.colapsado .side:hover .brand b::before,html.colapsado .side:has(:focus-visible) .brand b::before{content:none}
+  html.colapsado .side:hover .brand,html.colapsado .side:has(:focus-visible) .brand{padding:12px 18px 6px;text-align:left}
+  html.colapsado .side:hover .me,html.colapsado .side:has(:focus-visible) .me{justify-content:flex-start;margin:8px 12px 2px;padding:8px 10px}
+}
+@media (max-width:900px){
+  /* En el teléfono queda fija arriba solo la fila del menú. */
+  html:not(.incrustado) .side{position:sticky;top:0;z-index:20}
+  html.colapsado:not(.incrustado) .side{padding-top:6px}
+  html.colapsado .brand,html.colapsado .me{display:none}
+  html.colapsado .side-in{background:rgba(14,22,25,.94)}
+  html.colapsado .nav{padding:6px}
+  html.colapsado .marco iframe{height:calc(100vh - 150px)}
+}
+@media (prefers-reduced-motion:reduce){.app,.side-in,.top,.top h1,.clock,.panorama.pn-modulo,.marco iframe{transition:none!important}}

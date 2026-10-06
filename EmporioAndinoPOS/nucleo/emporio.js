@@ -188,10 +188,35 @@
   }
   var CAMPANA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V10.5a6 6 0 0 1 12 0V16l1.6 2.4H4.4L6 16z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/></svg>';
 
+  /* ---------- barra colapsable ----------
+     Al bajar, la columna izquierda queda en íconos y el encabezado se achica
+     a una barra con el resumen de la pestaña; al volver arriba, todo se abre.
+     Cada fuente (la página, el módulo incrustado) informa cuánto bajó; con
+     margen para que no parpadee: se pliega pasando 64 px y se abre bajo 8 px. */
+  var COL={on:false, fuentes:{}, cb:null};
+  function evaluarColapso(){ var y=0; for(var k in COL.fuentes) y=Math.max(y,COL.fuentes[k]||0);
+    var on=COL.on? y>8 : y>64;
+    if(on!==COL.on){ COL.on=on; document.documentElement.classList.toggle("colapsado",on); if(COL.cb) COL.cb(on); } }
+  function desplazo(fuente,y){ COL.fuentes[fuente]=Math.max(0,+y||0); evaluarColapso(); }
+  function colapsable(cb){
+    COL.cb=cb||null; var raf=0;
+    addEventListener("scroll",function(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; desplazo("pagina",scrollY||document.documentElement.scrollTop); }); },{passive:true});
+    /* Al terminar de plegarse o abrirse la columna, se vuelve a medir el indicador del menú. */
+    var si=document.querySelector(".side-in"); if(si&&cb) si.addEventListener("transitionend",function(e){ if(e.target===si&&e.propertyName==="width") cb(COL.on,true); });
+    evaluarColapso();
+  }
+  /* Un módulo dentro del sistema general avisa hacia arriba cuánto se desplazó,
+     sea la página o un panel con su propio scroll. */
+  if(incrustado){ var rafM=0;
+    document.addEventListener("scroll",function(e){ if(rafM) return; var t=e.target;
+      rafM=requestAnimationFrame(function(){ rafM=0;
+        var y=(!t||t===document||t===document.documentElement||t===document.body)?(scrollY||document.documentElement.scrollTop):t.scrollTop;
+        try{ var S=window.parent.EAPOS_SISTEMA; if(S&&S.desplazo) S.desplazo(y); }catch(x){} }); },{capture:true,passive:true}); }
+
   function listo(fn){ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fn); else fn(); }
   listo(function(){ atmosfera(); mosaicos(document); });
 
   window.EA_UI={REDUCE:REDUCE, Spring:Spring, tween:tween, numero:numero, deslizador:deslizador, mosaicos:mosaicos, revelar:revelar,
     atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado,
-    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA};
+    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA, colapsable:colapsable, desplazo:desplazo};
 })();

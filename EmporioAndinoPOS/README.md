@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.4
+# EmporioAndinoPOS v2.5
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -30,6 +30,23 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Barra colapsable (v2.5)
+
+Al desplazarse hacia abajo (pasados 64 px; se vuelve a abrir bajo 8 px, para que no parpadee):
+
+- **Columna izquierda:** en computador pasa de 248 px a una franja de íconos de 84 px. Con el cursor
+  encima (o al navegar con el teclado) se abre sobre el contenido sin moverlo.
+- **Encabezado:** se achica a una barra fija con el título y el resumen de la pestaña en una línea, con su
+  color. Tocarlo vuelve arriba. En la Prueba quedan reloj, avisos, velocidad y pausa, y la franja PRUEBA
+  se reduce a su sello.
+- **Módulos dentro del sistema general:** el resumen se pliega dentro de la barra y el módulo crece casi a
+  pantalla completa. El desplazamiento dentro de un módulo también pliega la barra (cada módulo lo avisa
+  hacia arriba con `EAPOS_SISTEMA.desplazo`).
+- **Teléfono:** queda fija arriba solo la fila del menú.
+
+Vive en `nucleo/emporio.css` y `EA_UI.colapsable` (`nucleo/emporio.js`), compartido por el sistema
+general y la Prueba.
 
 ## Resumen por pestaña y avisos importantes (v2.4)
 

@@ -426,6 +426,13 @@ select.search,.fin,.fta{border:1px solid var(--stroke-2);background:rgba(10,16,1
 .metas4 label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--fg-2)}
 @media (max-width:900px){.top{top:auto}.side{top:auto;height:auto}}
 html.incrustado .franja{position:relative}
+/* Al bajar, la franja queda en una línea con el sello PRUEBA. */
+.franja{transition:padding .3s}
+html.colapsado .franja{padding-block:4px}
+html.colapsado .franja span{display:none}
+@media (max-width:900px){html.colapsado:not(.incrustado) .side{top:30px}}
+/* Encabezado plegado en una fila: reloj, avisos, velocidad y pausa. */
+html.colapsado #hdrSync,html.colapsado .ctl .chip:has(#liveDot),html.colapsado #horSeg,html.colapsado #reset{display:none}
 @media (max-width:640px){.vs{grid-template-columns:minmax(0,1fr)}.aplicar{grid-template-columns:minmax(0,1fr)}.aplicar label{grid-column:auto!important}.franja{font-size:11.5px;padding-block:6px}}
 
 /* responsivo */
@@ -563,6 +570,7 @@ html.incrustado .franja{position:relative}
       <div class="ttl">
         <button class="btn icon" type="button" id="backBtn" aria-label="Volver al Dashboard" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
         <div><h1 id="vTitle" tabindex="-1">Dashboard</h1><p id="vSub"></p></div>
+        <button class="top-pn" type="button" id="topPn" title="Volver arriba"></button>
       </div>
       <div class="ctl">
         <span class="clock num" id="clock">--:--</span>
@@ -1261,7 +1269,7 @@ let cur="inicio",armed=0,leaving=false,histOK=true;
 function hist(fn,st,h){if(!histOK)return;try{history[fn](st,"",h)}catch(e){histOK=false}}
 function buildNav(){
   const groups={};ALLV.filter(can).forEach(v=>{(groups[VIEWS[v].g]=groups[VIEWS[v].g]||[]).push(v)});
-  $("nav").hx=`<span class="ind" id="navInd"></span>`+Object.entries(groups).map(([g,vs])=>`<div class="grp">${g}</div>`+vs.map(v=>`<a href="#${v}" data-v="${v}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[v]}</svg>${v==="inicio"?"Dashboard":v==="cambios"?"Cambios":VIEWS[v].t.split(" · ")[0]}</a>`).join("")).join("");
+  $("nav").hx=`<span class="ind" id="navInd"></span>`+Object.entries(groups).map(([g,vs])=>`<div class="grp">${g}</div>`+vs.map(v=>{const n=v==="inicio"?"Dashboard":v==="cambios"?"Cambios":VIEWS[v].t.split(" · ")[0];return `<a href="#${v}" data-v="${v}" title="${n}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[v]}</svg><span class="nl">${n}</span></a>`}).join("")).join("");
   navSl=slider($("navInd"));
 }
 function buildHub(){
@@ -1969,7 +1977,14 @@ const PANO={
   datos:()=>({tono:NET.online?(NET.syncing?"info":"ok"):"warn",titulo:NET.online?(NET.syncing?"Sincronizando con la nube":"En línea · todo respaldado"):`Sin internet · ${NET.queue} registros en cola`,sub:NET.online?"Cada venta se guarda en el Mac del local y se copia a la nube":"Cajas y tablets siguen trabajando por el Wi-Fi del local",
     kpis:[{v:S.records,l:"Registros hoy"},{v:NET.queue,l:"En cola",tono:NET.queue?"warn":"ok"},{v:NET.last!=null?hhmm(NET.last):"--:--",l:"Último respaldo"},{v:NET.log.filter(l=>/cortó/.test(l.m)).length,l:"Cortes hoy"}]})
 };
-function pintarPanorama(v){const f=PANO[v];if(!f||!S)return;const el=document.querySelector(`[data-pn="${v}"]`);if(el)UI.panorama(el,f())}
+function pintarPanorama(v){if(!S)return;let d=null;const f=PANO[v];
+  if(f){d=f();const el=document.querySelector(`[data-pn="${v}"]`);if(el)UI.panorama(el,d)}
+  else if(v==="inicio"){const ex=expectedAt(S.t);d={tono:ex&&S.revenue<ex*.95?"warn":"ok",titulo:`${clp(S.revenue)} cobrado · ${S.tickets} tickets · ${ocupadasN()} de 15 mesas`}}
+  /* El mismo resumen, en una línea, para la barra plegada. */
+  const tp=$("topPn");if(tp&&d){const h=`<i aria-hidden="true"></i><span>${d.titulo}</span>`;if(tp._h!==h){tp._h=h;tp.innerHTML=h}tp.setAttribute("data-tono",d.tono||"info")}}
+$("topPn").addEventListener("click",()=>window.scrollTo({top:0,behavior:REDUCE?"auto":"smooth"}));
+/* Barra colapsable al bajar (dentro del sistema general, la que se pliega es la de arriba). */
+if(!UI.incrustado)UI.colapsable(()=>setSliders(true));
 document.addEventListener("click",e=>{const b=e.target.closest(".panorama [data-go]");if(b&&can(b.dataset.go))go(b.dataset.go)});
 
 /* =============== AVISOS IMPORTANTES (simulados) =============== */

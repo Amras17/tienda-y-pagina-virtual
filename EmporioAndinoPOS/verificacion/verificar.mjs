@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 2.4.
+// Agente de verificación de EmporioAndinoPOS 2.5.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -120,6 +120,13 @@ async function probarGeneral(vista) {
   const av = await page.evaluate(() => ({ badge: (document.querySelector("#avisosBtn .badge-n") || {}).textContent, items: [...document.querySelectorAll(".avisos .av-item")].map(a => a.innerText.split("\n")[0]) }));
   anota(M, "avisos importantes: se acabó", av.items.some(t => /Se acabó: Latte/.test(t)) && +av.badge >= 1, JSON.stringify(av));
   await page.keyboard.press("Escape");
+  // Barra colapsable: al bajar se pliega y al volver arriba se abre
+  await navA(page, "inicio");
+  if (vista === "escritorio") await page.mouse.move(900, 400);
+  const col = await page.evaluate(async () => { const espera = ms => new Promise(r => setTimeout(r, ms)); window.scrollTo(0, 600); await espera(400);
+    const a = { on: document.documentElement.classList.contains("colapsado"), chip: document.getElementById("topPn").innerText, side: Math.round(document.querySelector(".side-in").getBoundingClientRect().width) };
+    window.scrollTo(0, 0); await espera(600); a.vuelve = !document.documentElement.classList.contains("colapsado"); return a; });
+  anota(M, "barra colapsable al bajar y se abre al volver arriba", col.on && col.vuelve && !!col.chip && (vista === "telefono" || col.side <= 80), JSON.stringify(col));
   await navA(page, "versiones");
   anota(M, "versiones y accesos", await page.locator("#acc tr").count() === 16);
   await navA(page, "inicio");
@@ -363,7 +370,7 @@ for (const v of Object.keys(VISTAS)) {
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.4", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.5", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);

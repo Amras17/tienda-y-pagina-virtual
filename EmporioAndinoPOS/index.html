@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.4</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.5</span></div><span class="chip num" id="loginClock">--:--</span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.4</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.5</span><small>Emporio Andino · San Pedro</small></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -111,6 +111,7 @@
       <div class="ttl">
         <button class="btn icon" type="button" id="backBtn" aria-label="Volver al Dashboard" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
         <div><h1 id="vTitle" tabindex="-1">Dashboard</h1><p id="vSub"></p></div>
+        <button class="top-pn" type="button" id="topPn" title="Volver arriba"></button>
       </div>
       <div class="ctl">
         <span class="clock num" id="clock">--:--</span>
@@ -157,11 +158,11 @@
     </section>
 
     <!-- ===== MÓDULOS: cada uno es una subcapa dentro de la app ===== -->
-    <section class="view" data-view="caja" hidden><div class="panorama tile glass" data-pn="caja"></div><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
-    <section class="view" data-view="salon" hidden><div class="panorama tile glass" data-pn="salon"></div><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
-    <section class="view" data-view="cocina" hidden><div class="panorama tile glass" data-pn="cocina"></div><article class="tile glass marco"><iframe title="Comandas" data-src="cocina/index.html"></iframe></article></section>
-    <section class="view" data-view="carta" hidden><div class="panorama tile glass" data-pn="carta"></div><article class="tile glass marco"><iframe title="Carta Interactiva" data-src="carta/index.html"></iframe></article></section>
-    <section class="view" data-view="prueba" hidden><div class="panorama tile glass" data-pn="prueba"></div><article class="tile glass marco"><iframe title="Prueba y simulación" data-src="prueba/index.html"></iframe></article></section>
+    <section class="view" data-view="caja" hidden><div class="panorama tile glass pn-modulo" data-pn="caja"></div><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
+    <section class="view" data-view="salon" hidden><div class="panorama tile glass pn-modulo" data-pn="salon"></div><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
+    <section class="view" data-view="cocina" hidden><div class="panorama tile glass pn-modulo" data-pn="cocina"></div><article class="tile glass marco"><iframe title="Comandas" data-src="cocina/index.html"></iframe></article></section>
+    <section class="view" data-view="carta" hidden><div class="panorama tile glass pn-modulo" data-pn="carta"></div><article class="tile glass marco"><iframe title="Carta Interactiva" data-src="carta/index.html"></iframe></article></section>
+    <section class="view" data-view="prueba" hidden><div class="panorama tile glass pn-modulo" data-pn="prueba"></div><article class="tile glass marco"><iframe title="Prueba y simulación" data-src="prueba/index.html"></iframe></article></section>
 
     <!-- ===== VERIFICACIÓN ===== -->
     <section class="view" data-view="verificacion" hidden>
@@ -191,8 +192,12 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 2.4</h2><p>Resumen en cada pestaña, avisos importantes y cifras solo para dueños, sobre la base de Emporio System 1.1</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 2.5</h2><p>Barra colapsable para ver la pantalla completa, sobre la base de Emporio System 1.1</p></div></div>
           <div class="notas">
+            <div><h3>Barra colapsable (2.5)</h3><ul>
+              <li>Al bajar, la columna izquierda queda en íconos y el encabezado se achica a una barra con el resumen de la pestaña; al volver arriba, todo se abre.</li>
+              <li>Con el cursor sobre la columna, se abre encima del contenido. Dentro de un módulo, su resumen se pliega y el módulo ocupa casi toda la pantalla.</li>
+            </ul></div>
             <div><h3>Resumen y avisos (2.4)</h3><ul>
               <li>Cada pestaña abre con un resumen: un estado en una frase, con color, y las cifras que importan; el detalle sigue debajo.</li>
               <li>La campana junta lo importante: se acabó, queda poco, hornada lista, comandas atrasadas. No es una bitácora.</li>
@@ -341,7 +346,7 @@ var cur="inicio", navSl=null;
 function buildNav(){
   var groups={}; ALLV.filter(puedeVer).forEach(function(v){ (groups[VIEWS[v].g]=groups[VIEWS[v].g]||[]).push(v); });
   $("nav").innerHTML='<span class="ind" id="navInd"></span>'+Object.keys(groups).map(function(g){
-    return '<div class="grp">'+g+'</div>'+groups[g].map(function(v){ return '<a href="#'+v+'" data-v="'+v+'">'+U.icono(v)+(v==="inicio"?"Dashboard":VIEWS[v].t)+'</a>'; }).join("");
+    return '<div class="grp">'+g+'</div>'+groups[g].map(function(v){ var n=v==="inicio"?"Dashboard":VIEWS[v].t; return '<a href="#'+v+'" data-v="'+v+'" title="'+n+'">'+U.icono(v)+'<span class="nl">'+n+'</span></a>'; }).join("");
   }).join("");
   navSl=U.deslizador($("navInd"));
 }
@@ -355,7 +360,7 @@ function buildHub(){
 }
 function vaciarMarcos(){ document.querySelectorAll(".marco iframe").forEach(function(f){ f.removeAttribute("src"); f._cargado=false; }); }
 function show(v,silent){
-  if(!puedeVer(v)) v="inicio"; cur=v;
+  if(!puedeVer(v)) v="inicio"; cur=v; U.desplazo("modulo",0);
   document.querySelectorAll(".view").forEach(function(el){ el.hidden=el.dataset.view!==v; });
   var fr=document.querySelector('.view[data-view="'+v+'"] .marco iframe');
   if(fr&&!fr._cargado){ fr.src=fr.dataset.src; fr._cargado=true; }
@@ -378,7 +383,14 @@ $("nav").addEventListener("click",function(e){ var a=e.target.closest("[data-v]"
 document.addEventListener("click",function(e){ var t=e.target.closest("[data-go]"); if(!t||!USER) return; if(e.target.closest("a,input")&&!t.matches("button")) return; go(t.dataset.go); });
 $("backBtn").addEventListener("click",function(){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); });
 /* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
-window.EAPOS_SISTEMA={abrir:function(id){ go(id); }};
+window.EAPOS_SISTEMA={abrir:function(id){ go(id); }, desplazo:function(y){ U.desplazo("modulo",y); }};
+/* Barra colapsable: al bajar (en la página o dentro de un módulo) la columna
+   queda en íconos y el encabezado muestra el resumen de la pestaña. */
+var colapsoListo=false;
+function iniciarColapso(){ if(colapsoListo) return; colapsoListo=true;
+  U.colapsable(function(){ navSl&&navSl.to(document.querySelector("#nav a.on"),true); }); }
+$("topPn").addEventListener("click",function(){ window.scrollTo({top:0,behavior:U.REDUCE?"auto":"smooth"}); U.desplazo("modulo",0);
+  var fr=document.querySelector('.view[data-view="'+cur+'"] .marco iframe'); try{ if(fr&&fr.contentWindow) fr.contentWindow.scrollTo(0,0); }catch(e){} });
 new ResizeObserver(function(){ if(USER){ navSl&&navSl.to(document.querySelector("#nav a.on"),true); if(cur==="inicio") renderDash(); } }).observe(document.body);
 
 /* ==================== DATOS REALES ==================== */
@@ -551,7 +563,12 @@ var PANO={
       sub:alta.length?alta.length+" de prioridad alta: afectan el servicio":"Lo que falla y lo que se puede mejorar, con nombre y fecha",
       kpis:[{v:act.length-rev.length,l:"Abiertos"},{v:rev.length,l:"En revisión"},{v:alta.length,l:"Prioridad alta",tono:alta.length?"crit":"ok"},{v:reportes.length-act.length,l:"Resueltos",tono:"ok"}]}; }
 };
-function renderPanorama(v){ if(!PANO[v]) return; var el=document.querySelector('[data-pn="'+v+'"]'); if(el) U.panorama(el,PANO[v]()); }
+function renderPanorama(v){ var d=null;
+  if(PANO[v]){ d=PANO[v](); var el=document.querySelector('[data-pn="'+v+'"]'); if(el) U.panorama(el,d); }
+  else if(v==="inicio"&&USER){ var vs=ventasHoy(), tot=vs.reduce(function(a,x){ return a+x.total; },0), cp=comandasDetalle(), st=stockEstado();
+    d={tono:st.off?"crit":cp.atrasadas.length||st.bajo?"warn":"ok", titulo:(verVentas()?"Hoy "+clp(tot)+" · ":"")+vs.length+" ventas · "+cp.total+" comandas · "+st.off+" agotados"}; }
+  /* El mismo resumen, en una línea, para la barra plegada. */
+  var tp=$("topPn"); if(tp&&d){ var h='<i aria-hidden="true"></i><span>'+d.titulo+'</span>'; if(tp._h!==h){ tp._h=h; tp.innerHTML=h; } tp.setAttribute("data-tono",d.tono||"info"); } }
 /* Avisos importantes con los datos reales del local, según el cargo. */
 function avisosSistema(){
   var L=[];
@@ -753,7 +770,7 @@ function arrancarApp(primera){
   if(!s){ USER=null; $("app").hidden=true; $("login").hidden=false; renderPeople(); return; }
   USER=s; $("login").hidden=true; $("app").hidden=false;
   $("meAv").textContent=ini(s.n); $("meAv").style.background=E.COLOR_ROL[s.r]; $("meName").textContent=s.n; $("meRole").textContent=s.c;
-  buildNav(); buildHub(); red();
+  buildNav(); buildHub(); red(); iniciarColapso();
   var v=(primera===true&&VIEWS[H0])?H0:"inicio"; H0="";
   hist("replaceState",{ea:"root"},location.pathname+location.search+"#inicio");
   cur="";
