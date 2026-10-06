@@ -1,119 +1,245 @@
 {
-  "version": "1.0",
-  "fecha": "2026-10-06T05:07:53.681Z",
-  "total": 76,
+  "version": "2.0",
+  "fecha": "2026-10-06T06:01:40.580Z",
+  "total": 108,
   "fallas": 0,
   "resultados": [
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "carga la pantalla de ingreso",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "pide ingreso antes de mostrar módulos",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "lista de personas",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "equipo completo en el ingreso",
       "ok": true,
-      "detalle": "16 personas"
+      "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
+      "modulo": "Sistema general · escritorio",
       "prueba": "ingreso con PIN nuevo (crear y confirmar)",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "menú de áreas",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "dirección ve los cinco módulos",
       "ok": true,
-      "detalle": "Dashboard, Punto de venta, Cocina, Horno, Barra, Inventario, Caja y finanzas, Clientes, Reportes, Escandallo, Carta, Base de datos"
+      "detalle": "caja,salon,cocina,carta,prueba"
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Dashboard",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": ""
+      "detalle": "12/12 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Punto de venta",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Cocina",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre caja dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Horno",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre salon dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Barra",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre cocina dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Inventario",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre carta dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Caja y finanzas",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre prueba dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Clientes",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "cierra sesión con doble toque",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Reportes",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Escandallo",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Carta",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · escritorio",
-      "prueba": "abre Base de datos",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · escritorio",
+      "modulo": "Sistema general · escritorio",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
+      "modulo": "Sistema general · escritorio",
       "prueba": "sin errores de JavaScript",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · escritorio",
+      "modulo": "Sistema general · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "la Caja toma al responsable de la sesión",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "catálogo de la carta única",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "registra la venta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "la venta llega a Comandas por estación",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "filtro de cocina",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "marcar lista la comanda",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio (comandas)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio (comandas)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio (comandas)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "garzón ve solo cobro y stock",
+      "ok": true,
+      "detalle": "caja,stock"
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "garzón no ve la Prueba",
+      "ok": true,
+      "detalle": "caja,salon,cocina,carta"
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "franja de prueba visible",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "doce vistas",
+      "ok": true,
+      "detalle": "inicio,salon,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "el borrador lista los cambios",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "compara general contra prueba",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "aplicar crea una versión nueva",
+      "ok": true,
+      "detalle": "{\"v\":2,\"pino\":3700,\"fuera\":[\"Ee-napolitana\"],\"borrador\":false}"
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "la Caja usa la versión aplicada",
+      "ok": true,
+      "detalle": "{\"pino\":3700,\"napo\":false}"
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "la Carta marca lo que salió de la carta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "el sistema general muestra la versión vigente",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "proyección de 30 días",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -132,9 +258,15 @@
     },
     {
       "modulo": "Carta · escritorio",
-      "prueba": "navega capas de la carta",
+      "prueba": "sin textos indefinidos en ningún idioma directo",
       "ok": true,
-      "detalle": "4 toques"
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
+      "prueba": "sin servicios, galería ni redes",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Carta · escritorio",
@@ -174,6 +306,12 @@
     },
     {
       "modulo": "Salón · escritorio",
+      "prueba": "enlace a la Caja del paquete",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
@@ -191,157 +329,241 @@
       "detalle": ""
     },
     {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "tres módulos",
+      "modulo": "Sistema general · telefono",
+      "prueba": "pide ingreso antes de mostrar módulos",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "autodiagnóstico interno",
-      "ok": true,
-      "detalle": "8/8 pruebas"
-    },
-    {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "abre el Sistema dentro del lanzador",
+      "modulo": "Sistema general · telefono",
+      "prueba": "equipo completo en el ingreso",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "vuelve al lanzador",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "sin desborde horizontal",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "sin errores de JavaScript",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · escritorio",
-      "prueba": "recursos propios cargan",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "carga la pantalla de ingreso",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "lista de personas",
-      "ok": true,
-      "detalle": "16 personas"
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
+      "modulo": "Sistema general · telefono",
       "prueba": "ingreso con PIN nuevo (crear y confirmar)",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "menú de áreas",
+      "modulo": "Sistema general · telefono",
+      "prueba": "dirección ve los cinco módulos",
       "ok": true,
-      "detalle": "Dashboard, Punto de venta, Cocina, Horno, Barra, Inventario, Caja y finanzas, Clientes, Reportes, Escandallo, Carta, Base de datos"
+      "detalle": "caja,salon,cocina,carta,prueba"
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Dashboard",
+      "modulo": "Sistema general · telefono",
+      "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": ""
+      "detalle": "12/12 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Punto de venta",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Cocina",
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre caja dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Horno",
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre salon dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Barra",
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre cocina dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Inventario",
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre carta dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Caja y finanzas",
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre prueba dentro del sistema",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Clientes",
+      "modulo": "Sistema general · telefono",
+      "prueba": "cierra sesión con doble toque",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Reportes",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Escandallo",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Carta",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
-      "prueba": "abre Base de datos",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Sistema 1.1 · telefono",
+      "modulo": "Sistema general · telefono",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
+      "modulo": "Sistema general · telefono",
       "prueba": "sin errores de JavaScript",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Sistema 1.1 · telefono",
+      "modulo": "Sistema general · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "la Caja toma al responsable de la sesión",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "catálogo de la carta única",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "registra la venta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "la venta llega a Comandas por estación",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "filtro de cocina",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "marcar lista la comanda",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono (comandas)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono (comandas)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono (comandas)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "garzón ve solo cobro y stock",
+      "ok": true,
+      "detalle": "caja,stock"
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "garzón no ve la Prueba",
+      "ok": true,
+      "detalle": "caja,salon,cocina,carta"
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "franja de prueba visible",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "doce vistas",
+      "ok": true,
+      "detalle": "inicio,salon,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "el borrador lista los cambios",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "compara general contra prueba",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "aplicar crea una versión nueva",
+      "ok": true,
+      "detalle": "{\"v\":2,\"pino\":3700,\"fuera\":[\"Ee-napolitana\"],\"borrador\":false}"
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "la Caja usa la versión aplicada",
+      "ok": true,
+      "detalle": "{\"pino\":3700,\"napo\":false}"
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "la Carta marca lo que salió de la carta",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "el sistema general muestra la versión vigente",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "proyección de 30 días",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -360,9 +582,15 @@
     },
     {
       "modulo": "Carta · telefono",
-      "prueba": "navega capas de la carta",
+      "prueba": "sin textos indefinidos en ningún idioma directo",
       "ok": true,
-      "detalle": "4 toques"
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
+      "prueba": "sin servicios, galería ni redes",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Carta · telefono",
@@ -402,6 +630,12 @@
     },
     {
       "modulo": "Salón · telefono",
+      "prueba": "enlace a la Caja del paquete",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
@@ -414,48 +648,6 @@
     },
     {
       "modulo": "Salón · telefono",
-      "prueba": "recursos propios cargan",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · telefono",
-      "prueba": "tres módulos",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · telefono",
-      "prueba": "autodiagnóstico interno",
-      "ok": true,
-      "detalle": "8/8 pruebas"
-    },
-    {
-      "modulo": "Lanzador · telefono",
-      "prueba": "abre el Sistema dentro del lanzador",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · telefono",
-      "prueba": "vuelve al lanzador",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · telefono",
-      "prueba": "sin desborde horizontal",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · telefono",
-      "prueba": "sin errores de JavaScript",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Lanzador · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""

@@ -4,15 +4,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap">
 <style>
-/* Layout: una sola columna de noche volcánica; arriba los tres módulos como puertas,
-   abajo el banco de pruebas junto al libro de retroalimentación, y al pie las notas de versión.
-   Look único y oscuro a propósito, igual que la Carta y el Sistema. */
+/* Layout: el sistema general es la capa superior. Arriba la marca, quién está en
+   sesión y la versión de configuración vigente; después los módulos que su
+   cargo puede abrir; para dirección, el estado del sistema (verificación,
+   versiones, accesos) y para todos el libro de retroalimentación.
+   Look único y oscuro, el mismo de la Prueba y las Comandas. */
 :root{
   color-scheme:dark;
   --bg:#0A1012; --bg-2:#0F1A1D; --panel:#121D20; --panel-2:#17252A;
   --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.18);
   --fg:#F2F7F6; --fg-2:#C9D6D4; --muted:#93A6A3;
-  --turquesa:#40E0D0; --turquesa-ink:#04211E; --coral:#FF7F50; --terracota:#E2725B; --dorado:#D9A93A; --violeta:#9A80D6;
+  --turquesa:#40E0D0; --turquesa-ink:#04211E; --coral:#FF7F50; --dorado:#D9A93A; --violeta:#9A80D6; --ambar:#FFB547; --madera:#C19A6B;
   --ok:#3DDC84; --aviso:#FFB547; --falla:#FF6161;
   --f-logo:"Caveat Brush","Comic Sans MS",cursive;
   --f-num:"Sora",ui-rounded,"Segoe UI",system-ui,sans-serif;
@@ -25,6 +27,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14.5
   background-image:radial-gradient(90% 50% at 85% -10%,rgba(255,127,80,.16),transparent 70%),radial-gradient(80% 50% at 0% 0%,rgba(64,224,208,.14),transparent 70%);background-attachment:fixed}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
 :focus-visible{outline:2px solid var(--turquesa);outline-offset:2px}
 .num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
 .wrap{max-width:1120px;margin:0 auto;padding-block:20px 56px;padding-inline:16px;display:flex;flex-direction:column;gap:22px}
@@ -35,39 +38,69 @@ button{cursor:pointer}
 .cab h1{margin:0;font-family:var(--f-logo);font-weight:400;font-size:clamp(34px,6vw,46px);line-height:.95;letter-spacing:.01em}
 .cab h1 .pos{color:var(--turquesa)}
 .cab p{margin:4px 0 0;color:var(--fg-2);font-size:13px}
-.ver{display:inline-flex;align-items:center;gap:6px;background:var(--turquesa);color:var(--turquesa-ink);font-family:var(--f-num);font-weight:800;font-size:12px;padding:3px 10px;border-radius:99px;vertical-align:10px;margin-left:6px}
-.salud{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--fg-2);white-space:nowrap}
-.pt{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
-.pt.ok{background:var(--ok)}.pt.aviso{background:var(--aviso)}.pt.falla{background:var(--falla)}
+.ver{display:inline-flex;align-items:center;background:var(--turquesa);color:var(--turquesa-ink);font-family:var(--f-num);font-weight:800;font-size:12px;padding:3px 10px;border-radius:99px;vertical-align:10px;margin-left:6px}
+.quien{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:7px 8px 7px 10px}
+.quien div b{display:block;font-size:13px}
+.quien div span{display:block;font-size:11.5px;color:var(--muted)}
+.av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-family:var(--f-num);font-weight:800;font-size:13px;color:#0A1012;flex:none}
 .zigzag{height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14'%3E%3Cpath d='M0 3 L6 11 L12 3 L18 11 L24 3' fill='none' stroke='%2340E0D0' stroke-width='2'/%3E%3C/svg%3E") repeat-x;opacity:.55}
 
-/* módulos */
-.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.sec-h h2{margin:0;font-family:var(--f-num);font-size:18px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
-.sec-h p{margin:0;color:var(--muted);font-size:12.5px}
-.mods{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.mod{--c:var(--turquesa);position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;border:1px solid var(--line);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 10%,transparent),transparent 60%),var(--panel);border-radius:var(--r);padding:18px;min-width:0;transition:transform .25s cubic-bezier(.34,1.56,.64,1),border-color .2s}
-.mod:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 60%,transparent)}
-.mod:active{transform:scale(.98)}
-.mod .quien{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--c)}
-.mod h3{margin:0;font-family:var(--f-num);font-size:20px;font-weight:700;letter-spacing:-.01em}
-.mod p{margin:0;color:var(--fg-2);font-size:13px}
-.mod ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
-.mod li{font-size:11.5px;font-weight:700;color:var(--fg-2);border:1px solid var(--line);border-radius:99px;padding:3px 9px;background:rgba(255,255,255,.03)}
-.mod .abrir{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:6px;font-weight:800;font-size:13px;color:var(--c)}
-.mod .abrir small{color:var(--muted);font-weight:600;font-size:11.5px}
-.mod.carta{--c:var(--coral)} .mod.sistema{--c:var(--turquesa)} .mod.salon{--c:var(--violeta)}
-
-/* paneles */
-.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
-.panel{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:18px;min-width:0;display:flex;flex-direction:column;gap:14px}
-.btn{border:1px solid var(--line-2);background:var(--panel-2);border-radius:12px;padding:8px 14px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn{border:1px solid var(--line-2);background:var(--panel-2);border-radius:12px;padding:8px 14px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none}
 .btn:hover:not(:disabled){border-color:var(--turquesa)}
-.btn:disabled{opacity:.5;cursor:progress}
 .btn.pri{background:var(--turquesa);border-color:var(--turquesa);color:var(--turquesa-ink)}
 .btn.sm{padding:4px 10px;font-size:12px;border-radius:9px}
 .fila{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.estado{font-size:12.5px;color:var(--fg-2)}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sec-h h2{margin:0;font-family:var(--f-num);font-size:18px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.sec-h p{margin:0;color:var(--muted);font-size:12.5px}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:18px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.estado{font-size:12.5px;color:var(--fg-2);margin:0}
+.donde{font-size:12px;color:var(--muted)}
+
+/* ingreso */
+.ingreso{border:1px solid var(--line);background:var(--panel);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.ingreso h2{margin:0;font-family:var(--f-num);font-size:22px;letter-spacing:-.01em}
+.ingreso .lead{margin:0;color:var(--fg-2)}
+.grp-t{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:6px 0 0}
+.personas{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.persona{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--panel-2);border-radius:14px;padding:9px 11px;min-width:0}
+.persona:hover{border-color:rgba(64,224,208,.5)}
+.persona .pn{display:block;font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.persona .pc{display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.persona>span:last-child{min-width:0}
+.pin{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start}
+.pin-dots{display:flex;gap:12px;margin:14px 0 6px}
+.pin-dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-2)}
+.pin-dots i.on{background:var(--turquesa);border-color:var(--turquesa)}
+.pin-dots.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.pin-msg{min-height:20px;font-size:13px;color:var(--fg-2)}
+.pin-msg.err{color:var(--falla)}
+.pad{display:grid;grid-template-columns:repeat(3,64px);gap:10px}
+.pad button{height:56px;border-radius:16px;border:1px solid var(--line-2);background:var(--panel-2);font-family:var(--f-num);font-size:20px;font-weight:700}
+.pad button.fn{font-family:var(--f-ui);font-size:12px}
+
+/* versión vigente */
+.vigente{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:14px 16px}
+.vigente .vn{font-family:var(--f-num);font-weight:800;font-size:24px;color:var(--turquesa)}
+.vigente b{display:block;font-size:14px}
+.vigente span{display:block;font-size:12.5px;color:var(--fg-2)}
+.vigente.borrador{border-color:rgba(255,181,71,.5)}
+
+/* módulos */
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.mod{--c:var(--turquesa);position:relative;display:flex;flex-direction:column;gap:9px;text-align:left;border:1px solid var(--line);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 10%,transparent),transparent 60%),var(--panel);border-radius:var(--r);padding:18px;min-width:0;transition:transform .25s cubic-bezier(.34,1.56,.64,1),border-color .2s}
+.mod:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 60%,transparent)}
+.mod:active{transform:scale(.98)}
+.mod .capa{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--c)}
+.mod h3{margin:0;font-family:var(--f-num);font-size:19px;font-weight:700;letter-spacing:-.01em}
+.mod p{margin:0;color:var(--fg-2);font-size:13px}
+.mod .abrir{margin-top:auto;padding-top:6px;font-weight:800;font-size:13px;color:var(--c)}
+.mod.caja{--c:var(--madera)} .mod.salon{--c:var(--violeta)} .mod.cocina{--c:var(--coral)} .mod.carta{--c:var(--turquesa)}
+.mod.prueba{--c:var(--ambar);border-style:dashed}
+.mod.prueba .capa::after{content:" · no afecta las ventas";color:var(--muted);letter-spacing:.06em}
+
+.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
 .resumen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .resumen div{border:1px solid var(--line);border-radius:var(--r-in);padding:9px 11px;background:rgba(255,255,255,.025)}
 .resumen b{display:block;font-family:var(--f-num);font-size:22px;line-height:1.1}
@@ -75,13 +108,25 @@ button{cursor:pointer}
 .resumen .ok b{color:var(--ok)}.resumen .aviso b{color:var(--aviso)}.resumen .falla b{color:var(--falla)}
 .diag{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .diag li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid var(--line);font-size:13px}
-.diag li .pt{margin-top:5px}
 .diag li small{display:block;color:var(--muted);font-size:11.5px;overflow-wrap:anywhere}
 .diag li .ms{font-size:11px;color:var(--muted);font-family:var(--f-num)}
+.pt{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none;margin-top:5px}
 .diag li.ok .pt{background:var(--ok)}.diag li.aviso .pt{background:var(--aviso)}.diag li.falla .pt{background:var(--falla)}
 .diag li.corre .pt{background:var(--turquesa);animation:lat 1s infinite}
 @keyframes lat{50%{opacity:.25}}
 .diag li.grupo{display:block;background:none;border:0;padding:8px 2px 0;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.r,th.r{text-align:right}
+.tag{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:99px;border:1px solid var(--line-2);color:var(--fg-2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.tag.ok{color:var(--ok);border-color:rgba(61,220,132,.5)} .tag.na{color:var(--muted)}
+.vers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
+.vers li{border:1px solid var(--line);border-radius:var(--r-in);padding:9px 12px;background:rgba(255,255,255,.025)}
+.vers li b{font-family:var(--f-num)}
+.vers li .m{font-size:12px;color:var(--muted)}
+.vers li ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--fg-2)}
 
 /* retroalimentación */
 form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -91,7 +136,6 @@ select,input,textarea{border:1px solid var(--line-2);background:var(--bg-2);bord
 textarea{min-height:76px;resize:vertical;line-height:1.45}
 select:focus,input:focus,textarea:focus{outline:none;border-color:var(--turquesa);box-shadow:0 0 0 3px rgba(64,224,208,.15)}
 form .acciones{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.donde{font-size:12px;color:var(--muted)}
 .filtros{display:flex;gap:6px;flex-wrap:wrap}
 .filtros button{border:1px solid var(--line);background:transparent;border-radius:99px;padding:4px 11px;font-size:12px;font-weight:800;color:var(--fg-2)}
 .filtros button[aria-pressed="true"]{background:var(--turquesa);border-color:var(--turquesa);color:var(--turquesa-ink)}
@@ -99,13 +143,11 @@ form .acciones{grid-column:1/-1;display:flex;align-items:center;justify-content:
 .retro li{--s:var(--muted);border:1px solid var(--line);border-left:3px solid var(--s);border-radius:var(--r-in);padding:10px 12px;background:rgba(255,255,255,.025);display:flex;flex-direction:column;gap:6px}
 .retro li.alta{--s:var(--falla)}.retro li.media{--s:var(--aviso)}.retro li.baja{--s:var(--turquesa)}
 .retro .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted)}
-.tag{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:99px;border:1px solid var(--line-2);color:var(--fg-2);text-transform:uppercase;letter-spacing:.06em}
 .tag.st-abierto{color:var(--aviso);border-color:rgba(255,181,71,.5)}.tag.st-revision{color:var(--turquesa);border-color:rgba(64,224,208,.5)}.tag.st-resuelto{color:var(--ok);border-color:rgba(61,220,132,.5)}
 .retro p{margin:0;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
 .retro .acc{display:flex;gap:6px;flex-wrap:wrap}
-.vacio{color:var(--muted);font-size:13px;border:1px dashed var(--line-2);border-radius:var(--r-in);padding:14px}
+.retro li.vacio{border:1px dashed var(--line-2);color:var(--muted);font-size:13px;padding:14px}
 
-/* notas */
 .notas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .notas h3{margin:0 0 6px;font-family:var(--f-num);font-size:14px;color:var(--turquesa)}
 .notas ul{margin:0;padding-left:18px;color:var(--fg-2);font-size:13px;display:flex;flex-direction:column;gap:4px}
@@ -122,11 +164,14 @@ body.con-visor{overflow:hidden}
 #banco iframe{width:1024px;height:720px;border:0}
 
 @media (max-width:900px){
-  .mods,.dos,.notas{grid-template-columns:minmax(0,1fr)}
+  .dos,.notas{grid-template-columns:minmax(0,1fr)}
   .cab{grid-template-columns:auto minmax(0,1fr)}
-  .cab .salud{grid-column:1/-1;justify-self:start}
+  .cab .quien{grid-column:1/-1;justify-self:start}
+  .pin{grid-template-columns:minmax(0,1fr)}
+  .vigente{grid-template-columns:auto minmax(0,1fr)}
+  .vigente .btn{grid-column:1/-1;justify-self:start}
 }
-@media (max-width:560px){form{grid-template-columns:minmax(0,1fr)}.resumen b{font-size:18px}}
+@media (max-width:560px){form{grid-template-columns:minmax(0,1fr)}.resumen b{font-size:18px}.pad{grid-template-columns:repeat(3,56px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -134,63 +179,77 @@ body.con-visor{overflow:hidden}
   <header class="cab">
     <img src="carta/brand/mark.webp" alt="Sello de Emporio Andino">
     <div>
-      <h1>EmporioAndino<span class="pos">POS</span><span class="ver">v1.0</span></h1>
-      <p>Sistema gastronómico y punto de venta · Emporio Andino, San Pedro de Atacama · publicado el 6 de octubre de 2026</p>
+      <h1>EmporioAndino<span class="pos">POS</span><span class="ver">v2.0</span></h1>
+      <p>Sistema general · sistema gastronómico y punto de venta de Emporio Andino, San Pedro de Atacama</p>
     </div>
-    <div class="salud" id="salud" role="status"><span class="pt" id="saludPt"></span><span id="saludTxt">Verificación sin ejecutar en este equipo</span></div>
+    <div class="quien" id="quien" hidden><span class="av" id="qAv"></span><div><b id="qNom"></b><span id="qCar"></span></div><button class="btn sm" type="button" id="salir">Cerrar sesión</button></div>
   </header>
   <div class="zigzag" aria-hidden="true"></div>
 
-  <section aria-labelledby="hMods" style="display:flex;flex-direction:column;gap:12px">
-    <div class="sec-h"><h2 id="hMods">Módulos</h2><p>Cada módulo se abre aquí mismo; comparten los datos guardados en este equipo.</p></div>
-    <div class="mods">
-      <button type="button" class="mod carta" data-modulo="carta">
-        <span class="quien">Clientes en la mesa</span>
-        <h3>Carta Interactiva</h3>
-        <p>Carta por capas con fotos, paso a paso de barra, pedido a la mesa y aviso de cuenta al garzón.</p>
-        <ul><li>7 idiomas directos</li><li>39 fotos</li><li>Servicios del pueblo</li></ul>
-        <span class="abrir">Abrir carta <small>carta/index.html</small></span>
-      </button>
-      <button type="button" class="mod sistema" data-modulo="sistema">
-        <span class="quien">Equipo · caja, cocina, barra, horno</span>
-        <h3>Emporio System 1.1</h3>
-        <p>POS gastronómico: dashboard, punto de venta, comandas, horno, inventario, caja, escandallo y reportes.</p>
-        <ul><li>12 áreas</li><li>16 personas con PIN</li><li>Importa planilla Excel</li></ul>
-        <span class="abrir">Abrir sistema <small>sistema/index.html</small></span>
-      </button>
-      <button type="button" class="mod salon" data-modulo="salon">
-        <span class="quien">Equipo de salón</span>
-        <h3>Control de Salón</h3>
-        <p>Uso interno del turno: marca lo que falta en la carta, cuenta empanadas, controla el horno y abre la caja.</p>
-        <ul><li>Stock que ve la Carta</li><li>Reloj del horno</li><li>Estudio de la carta</li></ul>
-        <span class="abrir">Abrir salón <small>carta/salon.html</small></span>
-      </button>
+  <!-- ===== ingreso ===== -->
+  <section class="ingreso" id="ingreso" aria-labelledby="hIng">
+    <div id="paso1">
+      <h2 id="hIng">¿Quién entra?</h2>
+      <p class="lead">Elige tu nombre. Cada cargo abre los módulos que le corresponden.</p>
+      <div id="personas"></div>
+    </div>
+    <div id="paso2" hidden>
+      <div class="pin">
+        <div>
+          <button class="btn sm" type="button" id="pinVolver">← Cambiar persona</button>
+          <div class="fila" style="justify-content:flex-start;margin-top:16px"><span class="av" id="pAv" style="width:52px;height:52px;font-size:18px;border-radius:16px"></span><div><h2 id="pNom" style="margin:0"></h2><span class="donde" id="pCar"></span></div></div>
+          <div class="pin-dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="pin-msg" id="pinMsg" role="status"></div>
+          <p class="donde">El PIN se guarda cifrado solo en este equipo. Es un acceso operativo, no reemplaza una cuenta con servidor.</p>
+        </div>
+        <div class="pad" id="pad" aria-label="Teclado del PIN">
+          <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+          <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+          <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+          <button type="button" class="fn" data-k="clr">Borrar</button><button type="button" data-k="0">0</button><button type="button" class="fn" data-k="del">⌫</button>
+        </div>
+      </div>
     </div>
   </section>
 
-  <div class="dos">
-    <section class="panel" aria-labelledby="hDiag">
-      <div class="fila">
-        <div><div class="sec-h"><h2 id="hDiag">Verificación del sistema</h2></div><p class="estado" id="diagEstado">Revisa que los tres módulos abran sin errores, que las fotos carguen y que el almacenamiento funcione en este equipo.</p></div>
-        <button class="btn pri" type="button" id="btnVerificar">Ejecutar verificación</button>
-      </div>
-      <div class="resumen" aria-live="polite">
-        <div class="ok"><b class="num" id="rOk">—</b><span>Correctas</span></div>
-        <div class="aviso"><b class="num" id="rAviso">—</b><span>Con aviso</span></div>
-        <div class="falla"><b class="num" id="rFalla">—</b><span>Fallidas</span></div>
-      </div>
-      <ul class="diag" id="diagLista"></ul>
+  <!-- ===== sistema ===== -->
+  <div id="sistema" hidden style="display:flex;flex-direction:column;gap:22px">
+    <div class="vigente" id="vigente"></div>
+
+    <section aria-labelledby="hMods" style="display:flex;flex-direction:column;gap:12px">
+      <div class="sec-h"><h2 id="hMods">Módulos</h2><p>Comparten la carta, el stock y las ventas en este equipo.</p></div>
+      <div class="mods" id="mods"></div>
     </section>
+
+    <div class="dos" id="direccion">
+      <section class="panel" aria-labelledby="hDiag">
+        <div class="fila">
+          <div><div class="sec-h"><h2 id="hDiag">Verificación del sistema</h2></div><p class="estado" id="diagEstado">Revisa que los cinco módulos abran sin errores, que la carta única y la configuración se lean, que las fotos carguen y que el almacenamiento funcione en este equipo.</p></div>
+          <button class="btn pri" type="button" id="btnVerificar">Ejecutar verificación</button>
+        </div>
+        <div class="resumen" aria-live="polite">
+          <div class="ok"><b class="num" id="rOk">—</b><span>Correctas</span></div>
+          <div class="aviso"><b class="num" id="rAviso">—</b><span>Con aviso</span></div>
+          <div class="falla"><b class="num" id="rFalla">—</b><span>Fallidas</span></div>
+        </div>
+        <ul class="diag" id="diagLista"></ul>
+      </section>
+      <section class="panel" aria-labelledby="hVer">
+        <div class="sec-h"><h2 id="hVer">Versiones aplicadas</h2><p>Cada cambio llega desde la Prueba</p></div>
+        <ul class="vers" id="vers"></ul>
+        <div class="sec-h" style="margin-top:6px"><h2 id="hAcc">Accesos del equipo</h2><p id="accSub"></p></div>
+        <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>Cargo</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div>
+      </section>
+    </div>
 
     <section class="panel" aria-labelledby="hRetro">
       <div class="sec-h"><h2 id="hRetro">Retroalimentación y mantención</h2><p id="retroDonde" class="donde">Conectando…</p></div>
       <form id="formRetro" autocomplete="off">
-        <label>Módulo<select id="fModulo"><option value="carta">Carta Interactiva</option><option value="sistema">Emporio System</option><option value="salon">Control de Salón</option><option value="general">General</option></select></label>
+        <label>Módulo<select id="fModulo"><option value="caja">Caja</option><option value="salon">Control de Salón</option><option value="cocina">Comandas</option><option value="carta">Carta Interactiva</option><option value="prueba">Prueba</option><option value="general">Sistema general</option></select></label>
         <label>Tipo<select id="fTipo"><option value="error">Algo falla</option><option value="mejora">Mejora</option><option value="dato">Dato o precio</option><option value="comentario">Comentario</option></select></label>
         <label>Prioridad<select id="fPrioridad"><option value="media">Media</option><option value="alta">Alta · afecta el servicio</option><option value="baja">Baja</option></select></label>
         <label class="ancho">Qué pasó o qué cambiarías<textarea id="fTexto" required maxlength="1200" placeholder="Ej.: En Caja, el cierre no suma las propinas en efectivo."></textarea></label>
-        <label class="ancho">Tu nombre<input id="fAutor" maxlength="60" placeholder="Ej.: Camila, barra"></label>
-        <div class="acciones"><span class="donde" id="fAyuda">Se guarda con la fecha y queda abierto hasta que se resuelva.</span><button class="btn pri" type="submit" id="fEnviar">Guardar reporte</button></div>
+        <div class="acciones"><span class="donde" id="fAyuda">Se guarda con tu nombre y la fecha, y queda abierto hasta que se resuelva.</span><button class="btn pri" type="submit" id="fEnviar">Guardar reporte</button></div>
       </form>
       <div class="fila"><div class="filtros" role="group" aria-label="Filtrar por estado" id="filtros">
         <button type="button" data-f="activos" aria-pressed="true">Activos</button><button type="button" data-f="abierto" aria-pressed="false">Abiertos</button><button type="button" data-f="revision" aria-pressed="false">En revisión</button><button type="button" data-f="resuelto" aria-pressed="false">Resueltos</button><button type="button" data-f="todos" aria-pressed="false">Todos</button></div>
@@ -200,30 +259,30 @@ body.con-visor{overflow:hidden}
   </div>
 
   <section class="panel" aria-labelledby="hNotas">
-    <div class="sec-h"><h2 id="hNotas">Notas de la versión 1.0</h2><p>6 de octubre de 2026</p></div>
+    <div class="sec-h"><h2 id="hNotas">Notas de la versión 2.0</h2><p>Sistema unificado</p></div>
     <div class="notas">
-      <div><h3>Qué incluye</h3><ul>
-        <li>Carta Interactiva (versión del 30 de septiembre) con sus 39 fotos y sello de marca.</li>
-        <li>Emporio System 1.1 (versión del 1 de octubre) como sistema gastronómico y POS.</li>
-        <li>Control de Salón dentro del mismo paquete: lo que se marca como agotado aparece en la Carta.</li>
+      <div><h3>Un solo sistema</h3><ul>
+        <li>Una sola carta (130 productos) para la Caja, la Carta, el Control de Salón, las Comandas y la Prueba. Antes había tres copias con 31 precios distintos.</li>
+        <li>La Caja es el punto de venta: cobro, boleta, stock, costos, compras, mermas e informes.</li>
+        <li>Ingreso con PIN y cargos en esta capa superior; cada módulo sabe quién atiende.</li>
       </ul></div>
-      <div><h3>Correcciones</h3><ul>
-        <li>Sistema · ingreso con PIN: los dígitos tecleados mientras se valida el primer PIN ya no se pierden. Antes, al teclear rápido, aparecía "Los PIN no coinciden".</li>
-        <li>Control de Salón se abre ahora en modo estándar del navegador, como en su versión original.</li>
+      <div><h3>Prueba aparte</h3><ul>
+        <li>La simulación del día de Emporio System pasó a la página Prueba, marcada como tal.</li>
+        <li>Precios, carta y metas se cambian solo en la Prueba. Ahí se comparan con el sistema general y se aplican como una versión nueva.</li>
       </ul></div>
-      <div><h3>Nuevo en el paquete</h3><ul>
-        <li>Verificación del sistema dentro de la página, por equipo.</li>
-        <li>Libro de retroalimentación compartido por el equipo, con estados abierto, en revisión y resuelto.</li>
-        <li>Agente de pruebas automáticas en <span class="num">verificacion/verificar.mjs</span> para escritorio y teléfono.</li>
+      <div><h3>Fuera y nuevo</h3><ul>
+        <li>Fuera: servicios del pueblo, emergencias, reseñas, Instagram, galería y avisos de altura en la Carta, más el traspaso manual entre Caja y Salón y el escandallo duplicado.</li>
+        <li>Nuevo: Comandas por estación, alimentadas por las ventas reales de la Caja.</li>
+        <li>La ficha técnica completa (costo y paso a paso) quedó en la Caja.</li>
       </ul></div>
     </div>
   </section>
-  <footer>EmporioAndinoPOS v1.0 · Los datos de caja, PIN y pedidos se guardan solo en el equipo donde se usan.</footer>
+  <footer>EmporioAndinoPOS v2.0 · Las ventas, el stock y los PIN se guardan en el equipo donde se usan.</footer>
 </div>
 
 <div id="visor" hidden>
   <div class="vbar">
-    <button class="btn sm" type="button" id="visorVolver">← EmporioAndinoPOS</button>
+    <button class="btn sm" type="button" id="visorVolver">← Sistema general</button>
     <b id="visorTitulo"></b>
     <button class="btn sm" type="button" id="visorReportar">Reportar algo</button>
   </div>
@@ -231,163 +290,275 @@ body.con-visor{overflow:hidden}
 </div>
 <div id="banco" aria-hidden="true"></div>
 
+<script src="nucleo/datos.js"></script>
+<script src="nucleo/nucleo.js"></script>
 <script>
 (function(){
-var $=function(id){return document.getElementById(id)};
-var MODULOS={
-  carta:{nombre:"Carta Interactiva",ruta:"carta/index.html",prueba:function(d){return d.querySelectorAll(".langgrid button").length>0||!!d.getElementById("splash")}},
-  sistema:{nombre:"Emporio System 1.1",ruta:"sistema/index.html",prueba:function(d){return d.querySelectorAll("#peopleList .person").length>0}},
-  salon:{nombre:"Control de Salón",ruta:"carta/salon.html",prueba:function(d){return (d.body.innerText||"").trim().length>50}}
-};
-var FOTOS=["brand/mark.webp","brand/word.webp","img/altiplano.webp","img/andes.webp","img/andino.webp","img/atacama.webp","img/atacamena.webp","img/bowl.webp","img/casa.webp","img/caspana.webp","img/chileno.webp","img/g-americano.webp","img/g-atardecer.webp","img/g-cappuccino.webp","img/g-caracoles.webp","img/g-carta.webp","img/g-doble.webp","img/g-extraccion.webp","img/g-letrero-volcan.webp","img/g-letrero.webp","img/g-luz.webp","img/g-volcan.webp","img/guatin.webp","img/licancabur.webp","img/m-llevar.webp","img/m-local.webp","img/nortino.webp","img/quimal.webp","img/s-bebidas.webp","img/s-empanadas.webp","img/s-jugos.webp","img/s-pasteleria.webp","img/sanpedrino.webp","img/sanpedro.webp","img/t-huevos.webp","img/t-hummus.webp","img/t-mantequilla.webp","img/t-palta.webp","img/t-quesocrema.webp"];
-var NOMBRES={carta:"Carta Interactiva",sistema:"Emporio System",salon:"Control de Salón",general:"General"};
-var TIPOS={error:"Algo falla",mejora:"Mejora",dato:"Dato o precio",comentario:"Comentario"};
-var ESTADOS={abierto:"Abierto",revision:"En revisión",resuelto:"Resuelto"};
+var $=function(id){ return document.getElementById(id); };
+var E=EAPOS;
+var GRUPOS=[["Dirección",["dueno","jefe"]],["Caja y salón",["encargado"]],["Garzones",["garzon"]],["Barra",["barista_enc","barista"]],["Cocina y horno",["cocina"]]];
+var CAPA={caja:"Punto de venta",salon:"Equipo de salón",cocina:"Cocina, barra y horno",carta:"Clientes en la mesa",prueba:"Prueba"};
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function ini(n){ return n.split(" ").filter(Boolean).slice(0,2).map(function(w){ return w[0]; }).join("").toUpperCase(); }
+function toast(t){ var el=document.createElement("div"); el.className="toast"; el.setAttribute("role","status"); el.textContent=t; document.body.appendChild(el); setTimeout(function(){ el.remove(); },2800); }
+function fecha(iso){ try{ return new Date(iso).toLocaleString("es-CL",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); }catch(e){ return iso; } }
+function guardaLocal(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function leeLocal(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
 
-function toast(t){var el=document.createElement("div");el.className="toast";el.setAttribute("role","status");el.textContent=t;document.body.appendChild(el);setTimeout(function(){el.remove()},2600)}
-function guardaLocal(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-function leeLocal(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
-function fecha(iso){try{return new Date(iso).toLocaleString("es-CL",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}catch(e){return iso}}
+/* ==================== INGRESO CON PIN ==================== */
+var objetivo=null, buf="", primero=null, fallos=0;
+function pintarPersonas(){
+  $("personas").innerHTML=GRUPOS.map(function(g){
+    return '<p class="grp-t">'+g[0]+'</p><div class="personas">'+E.EQUIPO.filter(function(p){ return g[1].indexOf(p.r)>=0; }).map(function(p){
+      return '<button type="button" class="persona" data-p="'+p.i+'"><span class="av" style="background:'+E.COLOR_ROL[p.r]+'">'+ini(p.n)+'</span><span><span class="pn">'+esc(p.n)+'</span><span class="pc">'+esc(p.c)+'</span></span></button>';
+    }).join("")+"</div>";
+  }).join("");
+}
+function abrirPin(p){
+  objetivo=p; buf=""; primero=null; fallos=0;
+  $("paso1").hidden=true; $("paso2").hidden=false;
+  $("pAv").textContent=ini(p.n); $("pAv").style.background=E.COLOR_ROL[p.r]; $("pNom").textContent=p.n; $("pCar").textContent=p.c;
+  $("pinMsg").className="pin-msg"; $("pinMsg").textContent=E.pins()[p.n]?"Ingresa tu PIN de 4 dígitos":"Primera vez en este equipo: crea tu PIN de 4 dígitos";
+  puntos();
+}
+function puntos(){ [].forEach.call($("dots").children,function(d,i){ d.classList.toggle("on",i<buf.length); }); }
+function errorPin(t){ var d=$("dots"); d.classList.remove("shake"); void d.offsetWidth; d.classList.add("shake"); $("pinMsg").className="pin-msg err"; $("pinMsg").textContent=t; buf=""; setTimeout(puntos,250); }
+/* El código se toma al completar los 4 dígitos y el buffer queda libre al
+   instante: lo que se teclea mientras se valida no se pierde. */
+function completo(codigo){
+  var p=objetivo; if(!p) return;
+  E.hashPin(p.n,codigo).then(function(h){
+    var guardado=E.pins()[p.n];
+    if(guardado){ if(h===guardado) return entrar(p); fallos++; return errorPin(fallos>=3?"PIN incorrecto. Si lo olvidaste, dirección puede restablecerlo en Accesos del equipo.":"PIN incorrecto, intenta de nuevo"); }
+    if(!primero){ primero=h; puntos(); $("pinMsg").className="pin-msg"; $("pinMsg").textContent="Repite el PIN para confirmarlo"; return; }
+    if(primero!==h){ primero=null; return errorPin("Los PIN no coinciden. Créalo otra vez"); }
+    E.guardarPin(p.n,h); entrar(p);
+  });
+}
+function tecla(k){
+  if(!objetivo) return;
+  if(k==="del") buf=buf.slice(0,-1); else if(k==="clr") buf=""; else if(/^\d$/.test(k)&&buf.length<4) buf+=k;
+  puntos();
+  if(buf.length===4){ var c=buf; buf=""; setTimeout(function(){ completo(c); },120); }
+}
+function entrar(p){ E.abrirSesion(p); objetivo=null; $("paso2").hidden=true; $("paso1").hidden=false; pintarTodo(); toast("Hola, "+p.n.split(" ")[0]); }
+$("personas").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) abrirPin(E.EQUIPO[+b.dataset.p]); });
+$("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) tecla(b.dataset.k); });
+$("pinVolver").addEventListener("click",function(){ objetivo=null; $("paso2").hidden=true; $("paso1").hidden=false; });
+document.addEventListener("keydown",function(e){
+  if(!$("paso2").hidden && !$("ingreso").hidden){ if(/^\d$/.test(e.key)) tecla(e.key); else if(e.key==="Backspace") tecla("del"); }
+  if(e.key==="Escape" && !$("visor").hidden) cerrarVisor();
+});
+var salirArm=0;
+$("salir").addEventListener("click",function(){ var t=Date.now(); if(t-salirArm<2500){ salirArm=0; cerrarVisor(); E.cerrarSesion(); pintarTodo(); toast("Sesión cerrada"); } else { salirArm=t; toast("Toca otra vez para cerrar sesión"); } });
 
-/* ---------- visor de módulos ---------- */
+/* ==================== SISTEMA GENERAL ==================== */
+function pintarTodo(){
+  var s=E.sesion();
+  $("ingreso").hidden=!!s; $("sistema").hidden=!s; $("quien").hidden=!s;
+  if(!s){ pintarPersonas(); return; }
+  $("qAv").textContent=ini(s.n); $("qAv").style.background=E.COLOR_ROL[s.r]; $("qNom").textContent=s.n; $("qCar").textContent=s.c;
+  var rol=E.ROLES[s.r];
+  pintarVigente(s);
+  $("mods").innerHTML=rol.m.map(function(id){
+    var m=E.MODULOS[id];
+    return '<button type="button" class="mod '+id+'" data-modulo="'+id+'"><span class="capa">'+esc(CAPA[id])+'</span><h3>'+esc(m.n)+'</h3><p>'+esc(m.d)+'</p><span class="abrir">Abrir</span></button>';
+  }).join("");
+  $("direccion").hidden=!rol.sistema;
+  if(rol.sistema){ pintarVersiones(); pintarAccesos(s); }
+  pintarRetro();
+}
+function pintarVigente(s){
+  var g=E.general(), pend=E.pendientes(), dir=E.ROLES[s.r].sistema;
+  var el=$("vigente"); el.className="vigente"+(pend.length&&dir?" borrador":"");
+  el.innerHTML='<span class="vn">v'+g.v+'</span><div><b>Configuración vigente del sistema general</b><span>'+
+    (g.ts?"Aplicada el "+esc(fecha(g.ts))+(g.por?" por "+esc(g.por):"")+(g.nota?" · "+esc(g.nota):""):"")+
+    (dir? (pend.length? " · En la Prueba hay un borrador con "+pend.length+(pend.length===1?" cambio":" cambios")+" sin aplicar.":" · La Prueba está igual al sistema general.") : "")+
+    '</span></div>'+(dir?'<button class="btn" type="button" data-modulo="prueba">'+(pend.length?"Revisar borrador":"Abrir Prueba")+'</button>':"");
+}
+function pintarVersiones(){
+  var h=E.versiones().slice().reverse();
+  $("vers").innerHTML=h.map(function(v){
+    return '<li><b>v'+v.v+'</b> <span class="m">'+esc(fecha(v.ts))+' · '+esc(v.por||"")+(v.nota?" · "+esc(v.nota):"")+'</span>'+
+      (v.cambios.length?'<ul>'+v.cambios.slice(0,8).map(function(c){ return "<li>"+esc(c.texto)+"</li>"; }).join("")+(v.cambios.length>8?"<li>y "+(v.cambios.length-8)+" más</li>":"")+"</ul>":"")+"</li>";
+  }).join("")||"<li>Sin versiones todavía.</li>";
+}
+var resetArm={};
+function pintarAccesos(s){
+  var pins=E.pins();
+  $("accSub").textContent="Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar.";
+  $("acc").innerHTML=E.EQUIPO.map(function(p){
+    return '<tr><td>'+esc(p.n)+'</td><td>'+esc(p.c)+'</td><td>'+(pins[p.n]?'<span class="tag ok">Creado</span>':'<span class="tag na">Pendiente</span>')+'</td><td class="r">'+
+      (pins[p.n]&&p.n!==s.n?'<button class="btn sm" type="button" data-reset="'+p.i+'">Restablecer</button>':"")+"</td></tr>";
+  }).join("");
+}
+$("acc").addEventListener("click",function(e){ var b=e.target.closest("[data-reset]"); if(!b) return; var p=E.EQUIPO[+b.dataset.reset], t=Date.now();
+  if(t-(resetArm[p.i]||0)<2500){ resetArm={}; E.borrarPin(p.n); toast("PIN de "+p.n+" restablecido"); pintarAccesos(E.sesion()); }
+  else { resetArm[p.i]=t; toast("Toca otra vez para restablecer el PIN de "+p.n); } });
+
+/* ==================== VISOR DE MÓDULOS ==================== */
 var abierto=null;
-function abrirModulo(id){var m=MODULOS[id];abierto=id;$("visorTitulo").textContent=m.nombre;$("visorMarco").src=m.ruta;$("visor").hidden=false;document.body.classList.add("con-visor");$("visorVolver").focus()}
-function cerrarVisor(){$("visor").hidden=true;$("visorMarco").src="about:blank";document.body.classList.remove("con-visor");var b=document.querySelector('[data-modulo="'+abierto+'"]');if(b)b.focus()}
-document.querySelectorAll("[data-modulo]").forEach(function(b){b.addEventListener("click",function(){abrirModulo(b.dataset.modulo)})});
+function abrirModulo(id){
+  var s=E.sesion();
+  if(!s){ toast("Entra con tu PIN para abrir los módulos"); return; }
+  if(!E.puede(id,s)){ toast("Tu cargo no tiene acceso a "+(E.MODULOS[id]||{n:id}).n); return; }
+  abierto=id; $("visorTitulo").textContent=E.MODULOS[id].n; $("visorMarco").src=E.MODULOS[id].ruta;
+  $("visor").hidden=false; document.body.classList.add("con-visor"); $("visorVolver").focus();
+}
+function cerrarVisor(){ if($("visor").hidden) return; $("visor").hidden=true; $("visorMarco").src="about:blank"; document.body.classList.remove("con-visor"); pintarTodo(); }
+/* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
+window.EAPOS_SISTEMA={abrir:function(id){ cerrarVisorSilencioso(); abrirModulo(id); }};
+function cerrarVisorSilencioso(){ $("visor").hidden=true; document.body.classList.remove("con-visor"); }
+document.addEventListener("click",function(e){ var b=e.target.closest("[data-modulo]"); if(b) abrirModulo(b.dataset.modulo); });
 $("visorVolver").addEventListener("click",cerrarVisor);
-$("visorReportar").addEventListener("click",function(){var id=abierto;cerrarVisor();$("fModulo").value=id;$("fTexto").focus();$("hRetro").scrollIntoView({behavior:"smooth",block:"start"})});
-addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("visor").hidden)cerrarVisor()});
+$("visorReportar").addEventListener("click",function(){ var id=abierto; cerrarVisor(); $("fModulo").value=id; $("fTexto").focus(); $("hRetro").scrollIntoView({behavior:"smooth",block:"start"}); });
+addEventListener("storage",function(ev){ if(["eapos_cfg","eapos_prueba_cfg","eapos_versiones","eapos_sesion","es_pins"].indexOf(ev.key)>=0 && $("visor").hidden) pintarTodo(); });
 
-/* ---------- verificación ---------- */
+/* ==================== VERIFICACIÓN ==================== */
+var PRUEBAS_MOD={
+  caja:function(d){ return d.querySelectorAll("#rejilla .prod").length>0; },
+  salon:function(d){ return (d.body.innerText||"").trim().length>50; },
+  cocina:function(d){ return !!d.getElementById("tablero") && d.getElementById("estaciones").children.length===4; },
+  carta:function(d){ return d.querySelectorAll(".langgrid button").length>0||!!d.getElementById("splash"); },
+  prueba:function(d){ return d.querySelectorAll("#nav a").length>0; }
+};
+var FOTOS=["brand/mark.webp","brand/word.webp","img/altiplano.webp","img/andes.webp","img/andino.webp","img/atacama.webp","img/atacamena.webp","img/bowl.webp","img/caspana.webp","img/chileno.webp","img/g-extraccion.webp","img/guatin.webp","img/licancabur.webp","img/m-llevar.webp","img/m-local.webp","img/nortino.webp","img/quimal.webp","img/s-bebidas.webp","img/s-empanadas.webp","img/s-jugos.webp","img/s-pasteleria.webp","img/sanpedrino.webp","img/sanpedro.webp","img/t-huevos.webp","img/t-hummus.webp","img/t-mantequilla.webp","img/t-palta.webp","img/t-quesocrema.webp"];
 var CHECKS=[
   {g:"Equipo",n:"Almacenamiento local",f:probarAlmacen},
   {g:"Equipo",n:"Tipografías de la marca",f:probarFuentes},
-  {g:"Módulos",n:"Carta Interactiva abre sin errores",f:function(){return probarModulo("carta")}},
-  {g:"Módulos",n:"Emporio System 1.1 abre sin errores",f:function(){return probarModulo("sistema")}},
-  {g:"Módulos",n:"Control de Salón abre sin errores",f:function(){return probarModulo("salon")}},
+  {g:"Núcleo",n:"Carta única",f:probarCarta},
+  {g:"Núcleo",n:"Configuración del sistema general",f:probarConfig},
+  {g:"Módulos",n:"Caja abre sin errores",f:function(){ return probarModulo("caja"); }},
+  {g:"Módulos",n:"Control de Salón abre sin errores",f:function(){ return probarModulo("salon"); }},
+  {g:"Módulos",n:"Comandas abre sin errores",f:function(){ return probarModulo("cocina"); }},
+  {g:"Módulos",n:"Carta Interactiva abre sin errores",f:function(){ return probarModulo("carta"); }},
+  {g:"Módulos",n:"Prueba abre sin errores",f:function(){ return probarModulo("prueba"); }},
   {g:"Contenido",n:"Fotos y sello de la carta",f:probarFotos},
-  {g:"Contenido",n:"Datos de los módulos en este equipo",f:probarDatos},
+  {g:"Contenido",n:"Datos guardados en este equipo",f:probarDatos},
   {g:"Servicio",n:"Libro de retroalimentación",f:probarRetro}
 ];
 function pintarPendientes(){
-  var html="",g="";
-  CHECKS.forEach(function(c,i){if(c.g!==g){g=c.g;html+='<li class="grupo" aria-hidden="true">'+g+'</li>'}
-    html+='<li id="ck'+i+'"><span class="pt"></span><span>'+c.n+'<small>Pendiente</small></span><span class="ms"></span></li>'});
-  $("diagLista").innerHTML=html}
-function marcar(i,estado,detalle,ms){var li=$("ck"+i);li.className=estado;li.querySelector("small").textContent=detalle;li.querySelector(".ms").textContent=ms!=null?ms+" ms":""}
-
-function probarAlmacen(){try{var k="eapos_prueba";localStorage.setItem(k,"1");var ok=localStorage.getItem(k)==="1";localStorage.removeItem(k);
-  return ok?{e:"ok",d:"Lectura y escritura correctas"}:{e:"falla",d:"Se escribió pero no se pudo leer"}}
-  catch(e){return {e:"falla",d:"Bloqueado en este navegador: PIN, caja y pedidos no se guardarán. Sal del modo privado."}}}
-function probarFuentes(){if(!document.fonts)return {e:"aviso",d:"El navegador no informa tipografías"};
-  return document.fonts.ready.then(function(){var f=["Sora","Plus Jakarta Sans","Caveat Brush"].filter(function(x){return !document.fonts.check('16px "'+x+'"')});
-    return f.length?{e:"aviso",d:"Usando tipografía de respaldo para: "+f.join(", ")}:{e:"ok",d:"Sora, Plus Jakarta Sans y Caveat Brush cargadas"}})}
-
-window.__eaGancho=function(w){var errs=[];w.__eaErr=errs;
-  w.addEventListener("error",function(e){var t=e.target;
-    if(t&&t!==w&&(t.src||t.href)){var u=String(t.src||t.href);if(u.indexOf(location.origin)===0)errs.push("No carga "+u.slice(u.lastIndexOf("/")+1))}
-    else errs.push(e.message||"Error de script")},true);
-  w.addEventListener("unhandledrejection",function(e){errs.push("Promesa rechazada: "+(e.reason&&e.reason.message||e.reason))})};
+  var html="", g="";
+  CHECKS.forEach(function(c,i){ if(c.g!==g){ g=c.g; html+='<li class="grupo" aria-hidden="true">'+g+'</li>'; }
+    html+='<li id="ck'+i+'"><span class="pt"></span><span>'+c.n+'<small>Pendiente</small></span><span class="ms"></span></li>'; });
+  $("diagLista").innerHTML=html;
+}
+function marcar(i,estado,detalle,ms){ var li=$("ck"+i); if(!li) return; li.className=estado; li.querySelector("small").textContent=detalle; li.querySelector(".ms").textContent=ms!=null?ms+" ms":""; }
+function probarAlmacen(){ try{ var k="eapos_prueba_alm"; localStorage.setItem(k,"1"); var ok=localStorage.getItem(k)==="1"; localStorage.removeItem(k);
+  return ok?{e:"ok",d:"Lectura y escritura correctas"}:{e:"falla",d:"Se escribió pero no se pudo leer"}; }
+  catch(e){ return {e:"falla",d:"Bloqueado en este navegador: ventas, stock y PIN no se guardarán. Sal del modo privado."}; } }
+function probarFuentes(){ if(!document.fonts) return {e:"aviso",d:"El navegador no informa tipografías"};
+  return document.fonts.ready.then(function(){ var f=["Sora","Plus Jakarta Sans","Caveat Brush"].filter(function(x){ return !document.fonts.check('16px "'+x+'"'); });
+    return f.length?{e:"aviso",d:"Usando tipografía de respaldo para: "+f.join(", ")}:{e:"ok",d:"Sora, Plus Jakarta Sans y Caveat Brush cargadas"}; }); }
+function probarCarta(){ var n=E.base.length, sin=E.base.filter(function(p){ return p.p==null; }).length;
+  return n===130?{e:"ok",d:n+" productos · "+sin+" sin precio en la carta base"}:{e:"aviso",d:n+" productos (se esperaban 130)"}; }
+function probarConfig(){ var g=E.general(), cat=E.catalogo(g);
+  return {e:"ok",d:"Versión "+g.v+" · "+cat.length+" productos en carta · "+Object.keys(g.precios).length+" precios definidos aparte"}; }
+window.__eaGancho=function(w){ var errs=[]; w.__eaErr=errs;
+  w.addEventListener("error",function(e){ var t=e.target;
+    if(t&&t!==w&&(t.src||t.href)){ var u=String(t.src||t.href); if(u.indexOf(location.origin)===0) errs.push("No carga "+u.slice(u.lastIndexOf("/")+1)); }
+    else errs.push(e.message||"Error de script"); },true);
+  w.addEventListener("unhandledrejection",function(e){ errs.push("Promesa rechazada: "+(e.reason&&e.reason.message||e.reason)); }); };
 function probarModulo(id){
-  var m=MODULOS[id],kb=0;
-  return fetch(m.ruta,{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("El archivo "+m.ruta+" respondió "+r.status);return r.text()}).then(function(html){
+  var m=E.MODULOS[id], kb=0;
+  return fetch(m.ruta,{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("El archivo "+m.ruta+" respondió "+r.status); return r.text(); }).then(function(html){
     kb=Math.round(html.length/1024);
     return new Promise(function(res){
-      var fr=document.createElement("iframe");fr.title="Prueba "+m.nombre;
-      var listo=false;
-      var fin=setTimeout(function(){terminar("falla","No terminó de cargar en 20 segundos")},20000);
-      function terminar(e,d){if(listo)return;listo=true;clearTimeout(fin);setTimeout(function(){fr.remove()},50);res({e:e,d:d})}
-      fr.addEventListener("load",function(){setTimeout(function(){
-        try{var w=fr.contentWindow,d=fr.contentDocument,errs=w.__eaErr;
-          if(!errs)return terminar("aviso","Abrió, pero sin el gancho de verificación: errores no observados");
-          if(errs.length)return terminar("falla",errs.slice(0,2).join(" · "));
-          if(!m.prueba(d))return terminar("falla","Abrió, pero la pantalla inicial quedó vacía");
-          terminar("ok",kb+" KB · pantalla inicial completa")}
-        catch(e){terminar("aviso","No se pudo inspeccionar: "+e.message)}},2500)});
-      fr.src=m.ruta;$("banco").appendChild(fr)})
-  }).catch(function(e){return {e:"falla",d:e.message}})}
-
-function probarFotos(){
-  var malas=[];
-  return Promise.all(FOTOS.map(function(p){return fetch("carta/"+p).then(function(r){var t=r.headers.get("content-type")||"";if(!r.ok||t.indexOf("image")<0)malas.push(p)}).catch(function(){malas.push(p)})})).then(function(){
-    return malas.length?{e:"falla",d:malas.length+" sin cargar: "+malas.slice(0,4).join(", ")}:{e:"ok",d:FOTOS.length+" de "+FOTOS.length+" imágenes disponibles"}})}
-function probarDatos(){try{var es=0,ea=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(/^es_/.test(k))es++;else if(/^ea_/.test(k))ea++}
-  var pl=function(n){return n+(n===1?" registro":" registros")};var d="Sistema: "+pl(es)+" · Carta y Salón: "+pl(ea);
-  return {e:"ok",d:(es+ea)?d:"Sin datos todavía: el equipo está listo para el primer turno"}}catch(e){return {e:"aviso",d:"No se pudo leer el almacenamiento"}}}
-function probarRetro(){return dbListo.then(function(db){return db?{e:"ok",d:"Conectado: los reportes los ve todo el equipo"}:{e:"aviso",d:"Sin conexión compartida: los reportes quedan solo en este equipo"}})}
-
+      var fr=document.createElement("iframe"); fr.title="Prueba de "+m.n; var listo=false;
+      var fin=setTimeout(function(){ terminar("falla","No terminó de cargar en 20 segundos"); },20000);
+      function terminar(e,d){ if(listo) return; listo=true; clearTimeout(fin); setTimeout(function(){ fr.remove(); },50); res({e:e,d:d}); }
+      fr.addEventListener("load",function(){ setTimeout(function(){
+        try{ var w=fr.contentWindow, d=fr.contentDocument, errs=w.__eaErr;
+          if(!errs) return terminar("aviso","Abrió, pero sin el gancho de verificación: errores no observados");
+          if(errs.length) return terminar("falla",errs.slice(0,2).join(" · "));
+          if(!PRUEBAS_MOD[id](d)) return terminar("falla","Abrió, pero la pantalla inicial quedó vacía");
+          terminar("ok",kb+" KB · pantalla inicial completa"); }
+        catch(e){ terminar("aviso","No se pudo inspeccionar: "+e.message); } },2500); });
+      fr.src=m.ruta; $("banco").appendChild(fr);
+    });
+  }).catch(function(e){ return {e:"falla",d:e.message}; });
+}
+function probarFotos(){ var malas=[];
+  return Promise.all(FOTOS.map(function(p){ return fetch("carta/"+p).then(function(r){ var t=r.headers.get("content-type")||""; if(!r.ok||t.indexOf("image")<0) malas.push(p); }).catch(function(){ malas.push(p); }); })).then(function(){
+    return malas.length?{e:"falla",d:malas.length+" sin cargar: "+malas.slice(0,4).join(", ")}:{e:"ok",d:FOTOS.length+" de "+FOTOS.length+" imágenes disponibles"}; }); }
+function probarDatos(){ try{ var pos=leeLocal("ea_pos")||{}, v=(pos.ventas||[]).length, ctrl=leeLocal("ea_control");
+  return {e:"ok",d:v+(v===1?" venta":" ventas")+" en la Caja · stock "+(ctrl?"marcado hoy":"sin marcar todavía")+" · "+Object.keys(E.pins()).length+" PIN creados"}; }
+  catch(e){ return {e:"aviso",d:"No se pudo leer el almacenamiento"}; } }
+function probarRetro(){ return dbListo.then(function(db){ return db?{e:"ok",d:"Conectado: los reportes los ve todo el equipo"}:{e:"aviso",d:"Sin conexión compartida: los reportes quedan solo en este equipo"}; }); }
 var corriendo=false;
 function verificar(){
-  if(corriendo)return;corriendo=true;$("btnVerificar").disabled=true;$("diagEstado").removeAttribute("data-fin");$("diagEstado").textContent="Verificando…";
-  pintarPendientes();var res=[],t0=performance.now();
-  var cadena=Promise.resolve();
-  CHECKS.forEach(function(c,i){cadena=cadena.then(function(){var li=$("ck"+i);li.className="corre";li.querySelector("small").textContent="Revisando…";var t=performance.now();
-    return Promise.resolve().then(c.f).catch(function(e){return {e:"falla",d:e.message}}).then(function(r){var ms=Math.round(performance.now()-t);marcar(i,r.e,r.d,ms);res.push({prueba:c.n,estado:r.e,detalle:r.d,ms:ms})})})});
+  if(corriendo) return; corriendo=true; $("btnVerificar").disabled=true; $("diagEstado").removeAttribute("data-fin"); $("diagEstado").textContent="Verificando…";
+  pintarPendientes(); var res=[], t0=performance.now(), cadena=Promise.resolve();
+  CHECKS.forEach(function(c,i){ cadena=cadena.then(function(){ var li=$("ck"+i); li.className="corre"; li.querySelector("small").textContent="Revisando…"; var t=performance.now();
+    return Promise.resolve().then(c.f).catch(function(e){ return {e:"falla",d:e.message}; }).then(function(r){ var ms=Math.round(performance.now()-t); marcar(i,r.e,r.d,ms); res.push({prueba:c.n,estado:r.e,detalle:r.d,ms:ms}); }); }); });
   cadena.then(function(){
-    var n={ok:0,aviso:0,falla:0};res.forEach(function(r){n[r.estado]++});
-    $("rOk").textContent=n.ok;$("rAviso").textContent=n.aviso;$("rFalla").textContent=n.falla;
+    var n={ok:0,aviso:0,falla:0}; res.forEach(function(r){ n[r.estado]++; });
+    $("rOk").textContent=n.ok; $("rAviso").textContent=n.aviso; $("rFalla").textContent=n.falla;
     var total=Math.round((performance.now()-t0)/100)/10;
     $("diagEstado").textContent=(n.falla?n.falla+" con falla. Revisa el detalle y repórtalo abajo.":"Todo en orden.")+" "+res.length+" pruebas en "+String(total).replace(".",",")+" s.";
     $("diagEstado").setAttribute("data-fin","1");
-    pintarSalud(n,new Date().toISOString());
-    var registro={fecha:new Date().toISOString(),version:"1.0",ok:n.ok,aviso:n.aviso,falla:n.falla,resultados:res,navegador:navigator.userAgent.slice(0,160)};
-    guardaLocal("eapos_diag",registro);
-    dbListo.then(function(db){if(db)db.doc("diagnosticos/ultimo").set(registro).catch(function(){})});
-    corriendo=false;$("btnVerificar").disabled=false;$("btnVerificar").textContent="Verificar de nuevo"});
+    var reg={fecha:new Date().toISOString(),version:E.version,ok:n.ok,aviso:n.aviso,falla:n.falla,resultados:res,por:(E.sesion()||{}).n||"",navegador:navigator.userAgent.slice(0,160)};
+    guardaLocal("eapos_diag",reg);
+    dbListo.then(function(db){ if(db) db.doc("diagnosticos/ultimo").set(reg).catch(function(){}); });
+    corriendo=false; $("btnVerificar").disabled=false; $("btnVerificar").textContent="Verificar de nuevo";
+  });
 }
-function pintarSalud(n,iso){var e=n.falla?"falla":n.aviso?"aviso":"ok";$("saludPt").className="pt "+e;
-  $("saludTxt").textContent=(e==="ok"?"Sistema verificado":e==="aviso"?"Verificado con avisos":n.falla+" prueba(s) con falla")+" · "+fecha(iso)}
 $("btnVerificar").addEventListener("click",verificar);
 pintarPendientes();
-(function(){var u=leeLocal("eapos_diag");if(u&&u.fecha){pintarSalud(u,u.fecha);$("rOk").textContent=u.ok;$("rAviso").textContent=u.aviso;$("rFalla").textContent=u.falla;
+(function(){ var u=leeLocal("eapos_diag"); if(u&&u.fecha&&u.version===E.version){ $("rOk").textContent=u.ok; $("rAviso").textContent=u.aviso; $("rFalla").textContent=u.falla;
   $("diagEstado").textContent="Última verificación en este equipo: "+fecha(u.fecha)+". Puedes repetirla cuando quieras.";
-  (u.resultados||[]).forEach(function(r){var i=CHECKS.findIndex(function(c){return c.n===r.prueba});if(i>=0)marcar(i,r.estado,r.detalle,r.ms)})}})();
+  (u.resultados||[]).forEach(function(r){ var i=CHECKS.findIndex(function(c){ return c.n===r.prueba; }); if(i>=0) marcar(i,r.estado,r.detalle,r.ms); }); } })();
 
-/* ---------- retroalimentación ---------- */
-var dbListo=(window.claude&&window.claude.use?window.claude.use("db"):Promise.resolve(null)).catch(function(){return null});
-var reportes=[],filtro="activos",modo="local";
+/* ==================== RETROALIMENTACIÓN ==================== */
+var dbListo=(window.claude&&window.claude.use?window.claude.use("db"):Promise.resolve(null)).catch(function(){ return null; });
+var NOMBRES={caja:"Caja",salon:"Control de Salón",cocina:"Comandas",carta:"Carta Interactiva",prueba:"Prueba",general:"Sistema general",sistema:"Emporio System"};
+var TIPOS={error:"Algo falla",mejora:"Mejora",dato:"Dato o precio",comentario:"Comentario"};
+var ESTADOS={abierto:"Abierto",revision:"En revisión",resuelto:"Resuelto"};
+var reportes=[], filtro="activos", modo="local";
 function pintarRetro(){
-  var vis=reportes.filter(function(r){return filtro==="todos"?true:filtro==="activos"?r.estado!=="resuelto":r.estado===filtro});
-  var abiertos=reportes.filter(function(r){return r.estado!=="resuelto"}).length;
-  $("retroCuenta").textContent=abiertos+" activos · "+reportes.length+" en total";
-  var ul=$("retroLista");ul.textContent="";
-  if(!vis.length){var li=document.createElement("li");li.className="vacio";li.style.borderLeft="1px dashed var(--line-2)";
-    li.textContent=reportes.length?"No hay reportes con este estado.":"Todavía no hay reportes. Cuando algo falle en un módulo, o se te ocurra una mejora, escríbelo arriba: queda con fecha y estado hasta que se resuelva.";ul.appendChild(li);return}
+  var vis=reportes.filter(function(r){ return filtro==="todos"?true:filtro==="activos"?r.estado!=="resuelto":r.estado===filtro; });
+  $("retroCuenta").textContent=reportes.filter(function(r){ return r.estado!=="resuelto"; }).length+" activos · "+reportes.length+" en total";
+  var ul=$("retroLista"); ul.textContent="";
+  if(!vis.length){ var li=document.createElement("li"); li.className="vacio";
+    li.textContent=reportes.length?"No hay reportes con este estado.":"Todavía no hay reportes. Cuando algo falle en un módulo, o se te ocurra una mejora, escríbelo arriba: queda con fecha y estado hasta que se resuelva."; ul.appendChild(li); return; }
   vis.forEach(function(r){
-    var li=document.createElement("li");li.className=r.prioridad||"media";
-    var meta=document.createElement("div");meta.className="meta";
-    [["tag st-"+r.estado,ESTADOS[r.estado]||r.estado],["tag",NOMBRES[r.modulo]||r.modulo],["tag",TIPOS[r.tipo]||r.tipo]].forEach(function(t){var s=document.createElement("span");s.className=t[0];s.textContent=t[1];meta.appendChild(s)});
-    var quien=document.createElement("span");quien.textContent=(r.autor?r.autor+" · ":"")+fecha(r.creado)+(r.prioridad==="alta"?" · prioridad alta":"");meta.appendChild(quien);
-    var p=document.createElement("p");p.textContent=r.texto;
-    var acc=document.createElement("div");acc.className="acc";
-    Object.keys(ESTADOS).filter(function(k){return k!==r.estado}).forEach(function(k){var b=document.createElement("button");b.type="button";b.className="btn sm";b.textContent=k==="resuelto"?"Marcar resuelto":k==="revision"?"Pasar a revisión":"Reabrir";
-      b.addEventListener("click",function(){cambiarEstado(r,k,b)});acc.appendChild(b)});
-    li.appendChild(meta);li.appendChild(p);li.appendChild(acc);ul.appendChild(li)})}
-function guardarTodosLocal(){guardaLocal("eapos_retro",reportes)}
-function cambiarEstado(r,k,b){b.disabled=true;var ahora=new Date().toISOString();
-  if(modo==="db"){dbListo.then(function(db){return db.doc("retro/"+r.id).update({estado:k,actualizado:ahora})}).then(function(){toast("Reporte: "+ESTADOS[k])}).catch(function(e){b.disabled=false;toast(e&&e.code==="permission_denied"?"Tu acceso es de solo lectura: no puedes cambiar el estado.":"No se pudo guardar el cambio. Intenta de nuevo.")})}
-  else{reportes=reportes.map(function(x){return x.id===r.id?Object.assign({},x,{estado:k,actualizado:ahora}):x});guardarTodosLocal();pintarRetro();toast("Reporte: "+ESTADOS[k])}}
-$("filtros").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;filtro=b.dataset.f;
-  [].forEach.call($("filtros").children,function(x){x.setAttribute("aria-pressed",String(x===b))});pintarRetro()});
-$("formRetro").addEventListener("submit",function(e){e.preventDefault();
-  var texto=$("fTexto").value.trim();if(!texto){$("fTexto").focus();return}
-  var ahora=new Date().toISOString();
-  var r={modulo:$("fModulo").value,tipo:$("fTipo").value,prioridad:$("fPrioridad").value,texto:texto,autor:$("fAutor").value.trim(),estado:"abierto",version:"1.0",creado:ahora,actualizado:ahora};
-  var btn=$("fEnviar");btn.disabled=true;
-  var listo=function(){btn.disabled=false;$("fTexto").value="";toast("Reporte guardado")};
-  if(modo==="db"){dbListo.then(function(db){return db.collection("retro").add(r)}).then(listo).catch(function(err){btn.disabled=false;
-    toast(err&&err.code==="permission_denied"?"Tu acceso es de solo lectura: pide acceso de edición para reportar.":err&&err.code==="quota_exceeded"?"El libro está lleno: borra reportes resueltos antiguos.":"No se pudo guardar. Revisa la conexión e intenta de nuevo.")})}
-  else{r.id="l"+Date.now().toString(36);reportes=[r].concat(reportes);guardarTodosLocal();pintarRetro();listo()}});
-
-reportes=leeLocal("eapos_retro")||[];pintarRetro();
+    var li=document.createElement("li"); li.className=r.prioridad||"media";
+    var meta=document.createElement("div"); meta.className="meta";
+    [["tag st-"+r.estado,ESTADOS[r.estado]||r.estado],["tag",NOMBRES[r.modulo]||r.modulo],["tag",TIPOS[r.tipo]||r.tipo]].forEach(function(t){ var s=document.createElement("span"); s.className=t[0]; s.textContent=t[1]; meta.appendChild(s); });
+    var quien=document.createElement("span"); quien.textContent=(r.autor?r.autor+" · ":"")+fecha(r.creado)+(r.prioridad==="alta"?" · prioridad alta":""); meta.appendChild(quien);
+    var p=document.createElement("p"); p.textContent=r.texto;
+    var acc=document.createElement("div"); acc.className="acc";
+    Object.keys(ESTADOS).filter(function(k){ return k!==r.estado; }).forEach(function(k){ var b=document.createElement("button"); b.type="button"; b.className="btn sm";
+      b.textContent=k==="resuelto"?"Marcar resuelto":k==="revision"?"Pasar a revisión":"Reabrir"; b.addEventListener("click",function(){ cambiarEstado(r,k,b); }); acc.appendChild(b); });
+    li.appendChild(meta); li.appendChild(p); li.appendChild(acc); ul.appendChild(li);
+  });
+}
+function cambiarEstado(r,k,b){ b.disabled=true; var ahora=new Date().toISOString();
+  if(modo==="db"){ dbListo.then(function(db){ return db.doc("retro/"+r.id).update({estado:k,actualizado:ahora}); }).then(function(){ toast("Reporte: "+ESTADOS[k]); })
+    .catch(function(e){ b.disabled=false; toast(e&&e.code==="permission_denied"?"Tu acceso es de solo lectura: no puedes cambiar el estado.":"No se pudo guardar el cambio. Intenta de nuevo."); }); }
+  else { reportes=reportes.map(function(x){ return x.id===r.id?Object.assign({},x,{estado:k,actualizado:ahora}):x; }); guardaLocal("eapos_retro",reportes); pintarRetro(); toast("Reporte: "+ESTADOS[k]); } }
+$("filtros").addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b) return; filtro=b.dataset.f;
+  [].forEach.call($("filtros").children,function(x){ x.setAttribute("aria-pressed",String(x===b)); }); pintarRetro(); });
+$("formRetro").addEventListener("submit",function(e){ e.preventDefault();
+  var texto=$("fTexto").value.trim(); if(!texto){ $("fTexto").focus(); return; }
+  var ahora=new Date().toISOString(), s=E.sesion();
+  var r={modulo:$("fModulo").value,tipo:$("fTipo").value,prioridad:$("fPrioridad").value,texto:texto,autor:s?s.n:"",estado:"abierto",version:E.version,configuracion:E.general().v,creado:ahora,actualizado:ahora};
+  var btn=$("fEnviar"); btn.disabled=true;
+  var listo=function(){ btn.disabled=false; $("fTexto").value=""; toast("Reporte guardado"); };
+  if(modo==="db"){ dbListo.then(function(db){ return db.collection("retro").add(r); }).then(listo).catch(function(err){ btn.disabled=false;
+    toast(err&&err.code==="permission_denied"?"Tu acceso es de solo lectura: pide acceso de edición para reportar.":err&&err.code==="quota_exceeded"?"El libro está lleno: borra reportes resueltos antiguos.":"No se pudo guardar. Revisa la conexión e intenta de nuevo."); }); }
+  else { r.id="l"+Date.now().toString(36); reportes=[r].concat(reportes); guardaLocal("eapos_retro",reportes); pintarRetro(); listo(); } });
+reportes=leeLocal("eapos_retro")||[];
 $("retroDonde").textContent="Guardado en este equipo";
 dbListo.then(function(db){
-  if(!db){$("retroDonde").textContent="Guardado solo en este equipo";return}
-  modo="db";$("retroDonde").textContent="Compartido con el equipo";
+  if(!db){ $("retroDonde").textContent="Guardado solo en este equipo"; return; }
+  modo="db"; $("retroDonde").textContent="Compartido con el equipo";
   db.collection("retro").orderBy("creado","desc").limit(300).onSnapshot(function(snap){
-    reportes=snap.docs.map(function(d){return Object.assign({id:d.id},d.data())});pintarRetro()},
-    function(){$("retroDonde").textContent="Sin conexión con el libro compartido";});
+    reportes=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }); pintarRetro(); },
+    function(){ $("retroDonde").textContent="Sin conexión con el libro compartido"; });
 });
+
+pintarTodo();
 })();
 </script>
 </body></html>

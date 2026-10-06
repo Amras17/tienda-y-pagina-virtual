@@ -1,0 +1,2834 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>/* EmporioAndinoPOS: deja que el lanzador escuche errores desde el inicio */try{if(parent!==window&&parent.__eaGancho)parent.__eaGancho(window)}catch(e){}</script></head><body>
+<title>Caja · EmporioAndinoPOS</title>
+<meta name="description" content="Punto de venta y administración gastronómica de Emporio Andino: cobro, stock, costos, compras, mermas, estadísticas e informes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ===== Caja Emporio Andino ==========================================
+   Herramienta interna de caja. La carta del cliente vive en la noche del
+   desierto (turquesa profundo); la caja es el otro lado del mesón: madera,
+   arena y crema, con cactus y dorado para los estados. Misma marca, otro
+   registro, porque quien la usa trabaja ocho horas frente a ella.
+   Paleta de marca: marrón #8B5A2B · arena #D9CBA3 · madera clara #C19A6B
+   cactus #6BBF59 · dorado envejecido #B8860B · tinta #2B2420
+   Los tres estados de stock se verificaron para visión con deficiencia de
+   color (ΔE deutan 8.3) y siempre llevan texto, nunca solo color.
+   ================================================================== */
+:root{
+  --crema:#FBF6EC; --papel:#FFFFFF; --papel2:#F4ECDD; --papel3:#EDE1CB;
+  --linea:#E3D6BF; --linea-f:#C19A6B;
+  --tinta:#2B2420; --tinta2:#6E5C4B; --tinta3:#8C7A67;
+  --marron:#6B4423; --marron2:#8B5A2B; --madera:#C19A6B; --arena:#D9CBA3;
+  --bien:#3F7A34; --bien-f:rgba(63,122,52,.13);
+  --avisa:#A8760C; --avisa-f:rgba(200,146,26,.20);
+  --grave:#8E2515; --grave-f:rgba(142,37,21,.12);
+  --dato:#8B5A2B; --dato-f:rgba(139,90,43,.14); --oro:#B8860B;
+  --sobre-accion:#FFF9EF;
+  --sombra:0 1px 2px rgba(43,36,32,.07), 0 10px 26px -18px rgba(43,36,32,.30);
+  --sombra-alta:0 2px 4px rgba(43,36,32,.10), 0 18px 40px -22px rgba(43,36,32,.40);
+  --r:13px; --r-s:9px;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --crema:#16110D; --papel:#201812; --papel2:#291F17; --papel3:#33271C;
+  --linea:#3C2E22; --linea-f:#6B4E36;
+  --tinta:#F7F0E3; --tinta2:#C4B098; --tinta3:#9C8770;
+  --marron:#EBCFA8; --marron2:#D9B68A; --madera:#C19A6B; --arena:#D9CBA3;
+  --bien:#7FC46B; --bien-f:rgba(127,196,107,.16);
+  --avisa:#E3B33C; --avisa-f:rgba(227,179,60,.18);
+  --grave:#F09277; --grave-f:rgba(240,146,119,.16);
+  --dato:#D9B68A; --dato-f:rgba(217,182,138,.16); --oro:#E3B33C;
+  --sobre-accion:#1C1510;
+  --sombra:0 1px 2px rgba(0,0,0,.30), 0 12px 28px -18px rgba(0,0,0,.70);
+  --sombra-alta:0 2px 6px rgba(0,0,0,.36), 0 20px 44px -22px rgba(0,0,0,.75);
+}}
+:root[data-theme="dark"]{
+  --crema:#16110D; --papel:#201812; --papel2:#291F17; --papel3:#33271C;
+  --linea:#3C2E22; --linea-f:#6B4E36;
+  --tinta:#F7F0E3; --tinta2:#C4B098; --tinta3:#9C8770;
+  --marron:#EBCFA8; --marron2:#D9B68A; --madera:#C19A6B; --arena:#D9CBA3;
+  --bien:#7FC46B; --bien-f:rgba(127,196,107,.16);
+  --avisa:#E3B33C; --avisa-f:rgba(227,179,60,.18);
+  --grave:#F09277; --grave-f:rgba(240,146,119,.16);
+  --dato:#D9B68A; --dato-f:rgba(217,182,138,.16); --oro:#E3B33C;
+  --sobre-accion:#1C1510;
+  --sombra:0 1px 2px rgba(0,0,0,.30), 0 12px 28px -18px rgba(0,0,0,.70);
+  --sombra-alta:0 2px 6px rgba(0,0,0,.36), 0 20px 44px -22px rgba(0,0,0,.75);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; background:var(--crema); color:var(--tinta); font-family:var(--sans);
+  font-size:15px; line-height:1.45; -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent}
+h1,h2,h3{margin:0; font-weight:600; letter-spacing:-.015em; text-wrap:balance}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2.5px solid var(--marron2); outline-offset:2px}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+
+/* ---------- armazón ----------
+   Vertical: barra de pestañas abajo, al alcance del pulgar.
+   Horizontal: riel de iconos a la izquierda y la cuenta fija a la derecha,
+   que es como se usa una caja apoyada en el mesón. */
+.app{display:grid; grid-template-rows:auto 1fr auto; grid-template-columns:minmax(0,1fr);
+  height:100%; min-height:0; min-width:0; overflow-x:clip}
+.barra{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; min-width:0;
+  display:flex; align-items:center; gap:10px; padding:10px 16px;
+  background:color-mix(in srgb,var(--crema) 88%,transparent);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--linea)}
+.barra .marca{display:flex; align-items:center; gap:9px; min-width:0}
+.barra .sig{width:30px; height:30px; border-radius:8px; flex:none; display:grid; place-items:center;
+  background:var(--marron); color:var(--sobre-accion)}
+.barra .sig svg{width:18px; height:18px}
+.barra .tit{flex:1 1 auto; min-width:0; overflow:hidden}
+.barra .tit b{display:block; font-size:14.5px; font-weight:600; letter-spacing:-.01em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.barra .tit span{display:block; font-size:10.5px; color:var(--tinta2); letter-spacing:.04em}
+.barra .der{margin-left:auto; display:flex; align-items:center; gap:7px; flex:none}
+.turno{display:flex; align-items:center; gap:6px; border:1px solid var(--linea); min-width:0;
+  background:var(--papel); border-radius:999px; padding:5px 6px 5px 10px; max-width:46vw}
+.turno label{font-size:9.5px; font-weight:600; letter-spacing:.11em; text-transform:uppercase; color:var(--tinta3)}
+.turno select{border:0; background:transparent; font-size:12.5px; font-weight:600; max-width:22ch; min-width:0;
+  -webkit-appearance:none; appearance:none; padding:0 2px}
+.icobtn{width:34px; height:34px; border-radius:999px; border:1px solid var(--linea);
+  background:var(--papel); color:var(--tinta2); display:grid; place-items:center; padding:0; flex:none;
+  position:relative}
+.icobtn svg{width:17px; height:17px}
+.icobtn[aria-pressed="true"]{background:var(--dato-f); border-color:var(--madera); color:var(--marron)}
+.icobtn .punto{position:absolute; top:-2px; right:-2px; min-width:16px; height:16px; border-radius:999px;
+  background:var(--grave); color:var(--sobre-accion); font-family:var(--mono); font-size:9.5px;
+  font-weight:600; display:grid; place-items:center; padding:0 4px; border:2px solid var(--crema)}
+.vista{overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
+  min-height:0; min-width:0; padding:14px 16px 20px}
+.vista[hidden]{display:none!important}
+.pestanas{position:sticky; bottom:0; z-index:20; min-width:0; display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:2px; background:color-mix(in srgb,var(--crema) 92%,transparent);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--linea); padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.pestanas button{display:grid; justify-items:center; gap:3px; border:0; background:transparent;
+  color:var(--tinta3); padding:6px 2px; border-radius:10px; font-size:10px; font-weight:600;
+  letter-spacing:.01em; position:relative}
+.pestanas button svg{width:21px; height:21px}
+.pestanas button[aria-current="true"]{color:var(--marron); background:var(--dato-f)}
+.pestanas .sello{position:absolute; top:2px; right:calc(50% - 20px); min-width:15px; height:15px;
+  border-radius:999px; background:var(--grave); color:var(--sobre-accion); font-family:var(--mono);
+  font-size:9px; font-weight:600; display:grid; place-items:center; padding:0 3px}
+.riel{display:none}
+
+/* ---------- piezas ---------- */
+.tarjeta{background:var(--papel); border:1px solid var(--linea); border-radius:var(--r);
+  box-shadow:var(--sombra)}
+.seccion{display:grid; gap:12px; margin-bottom:18px}
+.seccion:last-child{margin-bottom:0}
+.rotulo{font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--tinta3); display:flex; align-items:center; gap:9px}
+.rotulo::after{content:""; flex:1; height:1px; background:var(--linea)}
+.rotulo b{font-weight:600; color:var(--marron)}
+h2.vt{font-size:19px; letter-spacing:-.02em}
+p.vs{margin:0; font-size:12.5px; color:var(--tinta2); line-height:1.5; max-width:62ch}
+.fila{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.crece{flex:1; min-width:0}
+
+.btn{border:0; border-radius:11px; padding:13px 16px; font-size:14.5px; font-weight:600;
+  background:var(--marron); color:var(--sobre-accion); box-shadow:var(--sombra);
+  letter-spacing:-.01em; display:inline-flex; align-items:center; justify-content:center; gap:8px}
+.btn svg{width:17px; height:17px}
+.btn:disabled{opacity:.42; box-shadow:none}
+.btn.lleno{width:100%}
+.btn.suave{background:var(--papel); color:var(--tinta); border:1.5px solid var(--linea); box-shadow:none}
+.btn.suave:hover{border-color:var(--madera)}
+.btn.grave{background:var(--grave); color:var(--sobre-accion)}
+.btn.chico{padding:9px 12px; font-size:13px; border-radius:9px}
+.pilas{display:flex; gap:6px; flex-wrap:wrap}
+.pila{border:1.5px solid var(--linea); background:var(--papel); color:var(--tinta2);
+  border-radius:999px; padding:7px 13px; font-size:12.5px; font-weight:600}
+.pila[aria-pressed="true"]{background:var(--dato-f); border-color:var(--marron2); color:var(--marron)}
+.campo{display:grid; gap:5px}
+.campo label{font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--tinta3)}
+.campo input,.campo select,.campo textarea{border:1.5px solid var(--linea); background:var(--papel);
+  border-radius:10px; padding:10px 12px; font-size:14.5px; width:100%}
+.campo input.num,.campo input[type="number"]{font-family:var(--mono)}
+.buscador{position:relative; flex:1; min-width:180px}
+.buscador input{width:100%; border:1.5px solid var(--linea); background:var(--papel);
+  border-radius:11px; padding:11px 12px 11px 38px; font-size:14.5px}
+.buscador svg{position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  width:17px; height:17px; color:var(--tinta3); pointer-events:none}
+
+.estado{display:inline-flex; align-items:center; gap:5px; border-radius:999px; padding:3px 9px 3px 7px;
+  font-size:10.5px; font-weight:600; letter-spacing:.02em; border:1px solid transparent}
+.estado svg{width:12px; height:12px; flex:none}
+.estado.ok{background:var(--bien-f); color:var(--bien); border-color:var(--bien)}
+.estado.bajo{background:var(--avisa-f); color:var(--avisa); border-color:var(--avisa)}
+.estado.off{background:var(--grave-f); color:var(--grave); border-color:var(--grave)}
+.estado.neutro{background:var(--papel2); color:var(--tinta2); border-color:var(--linea)}
+
+/* ---------- caja: rejilla de productos + cuenta ---------- */
+.caja{display:grid; gap:14px; min-height:0; min-width:0}
+.grupos{display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; margin:0 -16px; padding-inline:16px;
+  scrollbar-width:none}
+.grupos::-webkit-scrollbar{display:none}
+.grupos button{flex:none}
+.rejilla{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; min-width:0}
+.prod{display:grid; gap:6px; align-content:start; text-align:left; border:1px solid var(--linea);
+  background:var(--papel); border-radius:var(--r-s); padding:10px 11px; box-shadow:var(--sombra);
+  min-height:82px; transition:transform .12s ease, border-color .15s ease}
+.prod:active{transform:scale(.975)}
+.prod:hover{border-color:var(--madera)}
+.prod .pn{font-size:13.5px; font-weight:600; line-height:1.25; letter-spacing:-.01em}
+.prod .pp{font-family:var(--mono); font-size:13px; font-weight:600; color:var(--marron);
+  font-variant-numeric:tabular-nums}
+.prod .pf{display:flex; align-items:center; gap:5px; margin-top:auto; flex-wrap:wrap}
+.prod.sinprecio{border-style:dashed; border-color:var(--avisa)}
+.prod.sinprecio .pp{color:var(--avisa)}
+.prod.agotado{opacity:.55}
+.prod .en{position:absolute}
+.vacio{text-align:center; color:var(--tinta2); font-size:13.5px; padding:26px 14px;
+  border:1px dashed var(--linea); border-radius:var(--r); background:var(--papel2)}
+
+.cuenta{display:grid; gap:0; align-content:start; min-width:0; background:var(--papel);
+  border:1px solid var(--linea); border-radius:var(--r); box-shadow:var(--sombra); overflow:hidden}
+.cuenta .ch{display:flex; align-items:center; gap:9px; padding:12px 14px;
+  background:var(--papel2); border-bottom:1px solid var(--linea)}
+.cuenta .ch svg{width:18px; height:18px; color:var(--marron); flex:none}
+.cuenta .ch b{font-size:14px; font-weight:600; letter-spacing:-.01em; flex:1}
+.cuenta .ch .n{font-family:var(--mono); font-size:12px; color:var(--tinta2)}
+.modo{display:grid; grid-template-columns:repeat(3,1fr); gap:5px; padding:11px 14px 0}
+.modo button{border:1.5px solid var(--linea); background:var(--papel); color:var(--tinta2);
+  border-radius:9px; padding:8px 4px; font-size:11.5px; font-weight:600}
+.modo button[aria-pressed="true"]{background:var(--dato-f); border-color:var(--marron2); color:var(--marron)}
+.lineas{display:grid; padding:6px 14px; max-height:38vh; overflow:auto}
+.lin{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 10px; padding:10px 0; min-width:0;
+  border-bottom:1px solid var(--linea)}
+.lin:last-child{border-bottom:0}
+.lin .ln{font-size:13.5px; font-weight:600; line-height:1.25}
+.lin .lo{font-size:11px; color:var(--tinta2); margin-top:2px; line-height:1.35}
+.lin .lt{font-family:var(--mono); font-size:13.5px; font-weight:600; text-align:right;
+  font-variant-numeric:tabular-nums; align-self:start}
+.paso{display:inline-flex; align-items:center; gap:1px; border:1.5px solid var(--linea);
+  background:var(--papel2); border-radius:999px; padding:2px; grid-column:1/-1; justify-self:start}
+.paso button{width:27px; height:27px; border:0; background:transparent; border-radius:50%;
+  font-size:16px; font-weight:600; line-height:1; color:var(--tinta); padding:0}
+.paso .q{min-width:26px; text-align:center; font-family:var(--mono); font-size:13.5px; font-weight:600}
+.sumas{display:grid; gap:7px; padding:12px 14px; border-top:1px solid var(--linea);
+  background:var(--papel2)}
+.sm{display:flex; align-items:baseline; gap:10px; font-size:12.5px; color:var(--tinta2)}
+.sm span{flex:1; min-width:0}
+.sm b{font-family:var(--mono); font-weight:600; font-variant-numeric:tabular-nums; color:var(--tinta)}
+.sm.legal{font-size:11px; color:var(--tinta3)}
+.sm.total{font-size:16px; color:var(--tinta); align-items:center; padding-top:8px;
+  border-top:1px dashed var(--linea)}
+.sm.total b{font-size:21px; letter-spacing:-.02em; color:var(--marron)}
+.propina{display:flex; align-items:center; gap:9px; padding:10px 14px; border-top:1px solid var(--linea);
+  background:var(--papel); font-size:12px; color:var(--tinta2); line-height:1.4}
+.propina .sw{flex:none}
+.sw{width:42px; height:24px; border-radius:999px; border:1.5px solid var(--linea);
+  background:var(--papel2); position:relative; padding:0; flex:none}
+.sw i{position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%;
+  background:var(--tinta3); transition:transform .16s ease, background .16s ease}
+.sw[aria-pressed="true"]{background:var(--bien-f); border-color:var(--bien)}
+.sw[aria-pressed="true"] i{transform:translateX(18px); background:var(--bien)}
+.pagos{display:grid; grid-template-columns:repeat(2,1fr); gap:6px; padding:12px 14px 0}
+.pagos button{display:flex; align-items:center; gap:7px; border:1.5px solid var(--linea);
+  background:var(--papel); color:var(--tinta2); border-radius:10px; padding:10px 11px;
+  font-size:12.5px; font-weight:600; text-align:left}
+.pagos button svg{width:16px; height:16px; flex:none}
+.pagos button[aria-pressed="true"]{background:var(--dato-f); border-color:var(--marron2); color:var(--marron)}
+.cierre{display:grid; gap:9px; padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.efectivo{display:grid; grid-template-columns:1fr 1fr; gap:9px; align-items:end}
+.vuelto{background:var(--bien-f); border:1px solid var(--bien); border-radius:10px; padding:9px 11px}
+.vuelto .k{font-size:9.5px; font-weight:600; letter-spacing:.11em; text-transform:uppercase; color:var(--bien)}
+.vuelto .v{font-family:var(--mono); font-size:19px; font-weight:600; color:var(--bien);
+  font-variant-numeric:tabular-nums; line-height:1.2}
+</style>
+
+<style>
+/* ---------- panel: primero el resumen, después el detalle ---------- */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(142px,1fr)); gap:8px; min-width:0}
+.kpi{background:var(--papel); border:1px solid var(--linea); border-radius:var(--r);
+  padding:12px 13px; display:grid; gap:3px; box-shadow:var(--sombra)}
+.kpi .k{font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--tinta3)}
+.kpi .v{font-family:var(--mono); font-size:24px; font-weight:600; letter-spacing:-.02em;
+  line-height:1.15; font-variant-numeric:tabular-nums}
+.kpi .p{font-size:11px; color:var(--tinta2); line-height:1.35}
+.kpi.principal{background:var(--marron); border-color:var(--marron); color:var(--sobre-accion)}
+.kpi.principal .k{color:rgba(255,249,239,.72)}
+.kpi.principal .v{font-size:30px}
+.kpi.principal .p{color:rgba(255,249,239,.82)}
+:root[data-theme="dark"] .kpi.principal,
+:root:not([data-theme="light"]) .kpi.principal{color:var(--tinta)}
+.kpi.ojo{border-left:3px solid var(--avisa)}
+.kpi.ojo .v{color:var(--avisa)}
+.kpi.mal{border-left:3px solid var(--grave)}
+.kpi.mal .v{color:var(--grave)}
+
+.aviso{display:grid; grid-template-columns:auto 1fr auto; gap:11px; align-items:center;
+  border:1px solid var(--linea); border-radius:var(--r); padding:12px 13px; background:var(--papel)}
+.aviso.alerta{border-color:var(--grave); background:var(--grave-f)}
+.aviso.ojo{border-color:var(--avisa); background:var(--avisa-f)}
+.aviso > svg{width:20px; height:20px; flex:none}
+.aviso.alerta > svg{color:var(--grave)} .aviso.ojo > svg{color:var(--avisa)}
+.aviso b{display:block; font-size:13px; font-weight:600}
+.aviso span{display:block; font-size:11.5px; color:var(--tinta2); line-height:1.4; margin-top:2px}
+
+/* ---------- gráficos: dibujados a la escala, con eje y etiquetas ---------- */
+.graf{background:var(--papel); border:1px solid var(--linea); border-radius:var(--r);
+  padding:13px 14px 11px; box-shadow:var(--sombra); display:grid; gap:10px}
+.graf .gt{display:flex; align-items:baseline; gap:9px}
+.graf .gt b{font-size:13.5px; font-weight:600; letter-spacing:-.01em}
+.graf .gt em{font-style:normal; font-size:11px; color:var(--tinta2); margin-left:auto;
+  font-family:var(--mono)}
+.graf svg{width:100%; height:auto; display:block; overflow:visible}
+.barras{display:grid; gap:7px}
+.br{display:grid; grid-template-columns:minmax(0,30%) minmax(0,1fr) auto; gap:9px; align-items:center;
+  font-size:12.5px}
+.br .bn{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--tinta)}
+.br .bt{height:11px; background:var(--papel3); border-radius:3px; overflow:hidden; position:relative}
+.br .bt i{display:block; height:100%; background:var(--dato); border-radius:0 4px 4px 0; min-width:2px}
+.br .bv{font-family:var(--mono); font-size:12px; font-weight:600; color:var(--tinta2);
+  font-variant-numeric:tabular-nums; white-space:nowrap}
+
+/* ---------- tablas ---------- */
+.tabox{overflow-x:auto; border:1px solid var(--linea); border-radius:var(--r); background:var(--papel);
+  box-shadow:var(--sombra)}
+table{border-collapse:collapse; width:100%; min-width:min(100%,520px); font-size:13px}
+thead th{text-align:left; font-size:9.5px; font-weight:600; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--tinta3); padding:10px 12px; border-bottom:1px solid var(--linea);
+  background:var(--papel2); white-space:nowrap; position:sticky; top:0}
+tbody td{padding:9px 12px; border-bottom:1px solid var(--linea); vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+tfoot td{padding:10px 12px; font-weight:600; background:var(--papel2); border-top:1px solid var(--linea-f)}
+.mini{font-size:11px; color:var(--tinta2); line-height:1.4}
+
+/* ---------- historial ---------- */
+.filtros{display:grid; grid-template-columns:repeat(auto-fit,minmax(138px,1fr)); gap:8px;
+  background:var(--papel); border:1px solid var(--linea); border-radius:var(--r); padding:12px;
+  box-shadow:var(--sombra)}
+.venta{border:1px solid var(--linea); border-radius:var(--r); background:var(--papel);
+  box-shadow:var(--sombra); overflow:hidden}
+.venta + .venta{margin-top:8px}
+.venta > summary{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center;
+  padding:11px 13px; cursor:pointer; list-style:none}
+.venta > summary::-webkit-details-marker{display:none}
+.venta .hora{font-family:var(--mono); font-size:12px; color:var(--tinta2)}
+.venta .qn{font-size:13px; font-weight:600; line-height:1.25}
+.venta .qs{font-size:11px; color:var(--tinta2); margin-top:2px}
+.venta .imp{font-family:var(--mono); font-size:14.5px; font-weight:600; text-align:right}
+.venta .cuerpo{padding:0 13px 13px; display:grid; gap:10px; border-top:1px solid var(--linea)}
+.venta.anulada{opacity:.68}
+.venta.anulada .imp{text-decoration:line-through}
+.dl{display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:12px}
+.dl dt{color:var(--tinta3); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  padding-top:2px}
+.dl dd{margin:0; font-family:var(--mono); font-size:12.5px}
+
+/* ---------- hoja modal ---------- */
+.hoja{position:fixed; inset:0; z-index:60; display:grid; align-items:end; justify-items:stretch}
+.hoja[hidden]{display:none!important}
+.hoja .velo{position:absolute; inset:0; border:0; padding:0; background:rgba(43,36,32,.52);
+  backdrop-filter:blur(2px)}
+.hoja .panel{position:relative; background:var(--crema); border-radius:20px 20px 0 0;
+  border-top:1px solid var(--linea); max-height:90%; display:flex; flex-direction:column;
+  box-shadow:0 -18px 46px -20px rgba(43,36,32,.55)}
+.hoja .ph{display:flex; align-items:center; gap:10px; padding:15px 16px 11px;
+  border-bottom:1px solid var(--linea); background:var(--papel2); border-radius:20px 20px 0 0}
+.hoja .ph b{flex:1; font-size:16px; font-weight:600; letter-spacing:-.015em}
+.hoja .pb{padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px)); overflow:auto; display:grid; gap:13px}
+/* La hoja crece con la ficha técnica: sin min-height:0 el cuerpo no se desplaza dentro del panel. */
+.hoja .pb{min-height:0}
+.campo textarea{font-size:14px; line-height:1.45; resize:vertical}
+.hoja .cerrar{width:32px; height:32px; border-radius:50%; border:1px solid var(--linea);
+  background:var(--papel); display:grid; place-items:center; padding:0; flex:none}
+.hoja .cerrar svg{width:15px; height:15px}
+body.conhoja{overflow:hidden}
+
+/* ---------- vale: se ve en pantalla como saldrá impreso ---------- */
+.vale{background:#FFFFFF; color:#1C1512; border:1px solid var(--linea); border-radius:8px;
+  padding:16px 15px; font-family:var(--mono); font-size:11.5px; line-height:1.55;
+  max-width:340px; margin:0 auto; width:100%; box-shadow:var(--sombra)}
+.vale h4{margin:0 0 2px; font-family:var(--sans); font-size:14px; font-weight:700; letter-spacing:.02em;
+  text-align:center}
+.vale .sub{text-align:center; font-size:10px; line-height:1.5}
+.vale .sep{border-top:1px dashed #A99A86; margin:9px 0}
+.vale .l{display:flex; gap:8px}
+.vale .l span{flex:1; min-width:0}
+.vale .l b{font-weight:600; white-space:nowrap}
+.vale .tot{font-size:14px; font-weight:700}
+.vale .nota{font-family:var(--sans); font-size:9.5px; line-height:1.5; text-align:center;
+  border:1px solid #1C1512; border-radius:5px; padding:6px 7px; margin-top:9px; font-weight:600}
+.vale .pie{text-align:center; font-size:9.5px; margin-top:8px; line-height:1.5}
+
+/* ---------- toast ---------- */
+.toast{position:fixed; left:50%; bottom:calc(84px + env(safe-area-inset-bottom,0px)); z-index:70;
+  transform:translate(-50%,14px); max-width:min(92vw,420px); opacity:0; pointer-events:none;
+  background:var(--tinta); color:var(--crema); border-radius:12px; padding:11px 15px;
+  font-size:12.5px; font-weight:600; line-height:1.4; text-align:center;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.5);
+  transition:opacity .18s ease, transform .22s cubic-bezier(.2,.75,.3,1)}
+.toast.ver{opacity:1; transform:translate(-50%,0)}
+.toast.bien{background:var(--bien); color:#FFF}
+.toast.mal{background:var(--grave); color:#FFF}
+
+/* ---------- marco legal ---------- */
+.normativa{background:var(--papel); border:1px solid var(--linea); border-left:3px solid var(--oro);
+  border-radius:var(--r); padding:13px 14px; display:grid; gap:8px}
+.normativa b{font-size:13px; font-weight:600}
+.normativa ul{margin:0; padding-left:18px; display:grid; gap:6px; font-size:12px; color:var(--tinta2);
+  line-height:1.5}
+.normativa code{font-family:var(--mono); font-size:11.5px; background:var(--papel2); padding:1px 5px;
+  border-radius:4px; color:var(--marron)}
+
+/* ---------- horizontal: riel a la izquierda, cuenta fija a la derecha ---------- */
+@media (min-width:760px){
+  .rejilla{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
+}
+@media (orientation:landscape) and (min-width:820px){
+  .app{grid-template-rows:auto 1fr; grid-template-columns:78px minmax(0,1fr); height:100%}
+  .barra{grid-column:1/-1}
+  .pestanas{display:none}
+  .riel{display:grid; align-content:start; gap:4px; padding:12px 8px; border-right:1px solid var(--linea);
+    background:color-mix(in srgb,var(--papel2) 70%,transparent); overflow:auto}
+  .riel button{display:grid; justify-items:center; gap:4px; border:0; background:transparent;
+    color:var(--tinta3); padding:9px 2px; border-radius:11px; font-size:9.5px; font-weight:600;
+    position:relative; letter-spacing:.02em}
+  .riel button svg{width:22px; height:22px}
+  .riel button[aria-current="true"]{color:var(--marron); background:var(--dato-f)}
+  .riel .sello{position:absolute; top:4px; right:8px; min-width:15px; height:15px; border-radius:999px;
+    background:var(--grave); color:var(--sobre-accion); font-family:var(--mono); font-size:9px;
+    font-weight:600; display:grid; place-items:center; padding:0 3px}
+  .vista{padding:16px 20px 22px}
+  .caja{grid-template-columns:minmax(0,1fr) minmax(300px,348px); align-items:start; height:100%}
+  .caja .izq{display:grid; gap:12px; align-content:start; min-height:0; min-width:0}
+  .cuenta{position:sticky; top:0; max-height:calc(100dvh - 118px); overflow:auto}
+  .lineas{max-height:none}
+  .dos{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; align-items:start}
+  .tres{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; align-items:start}
+  .hoja{place-items:center}
+  .hoja .panel{max-width:560px; width:92%; border-radius:18px; max-height:86%}
+  .hoja .ph{border-radius:18px 18px 0 0}
+  .toast{bottom:24px}
+}
+@media (orientation:landscape) and (min-width:1180px){
+  .caja{grid-template-columns:minmax(0,1fr) minmax(330px,382px)}
+  .rejilla{grid-template-columns:repeat(auto-fill,minmax(172px,1fr))}
+  .vista{padding:18px 26px 26px}
+  .vista > .ancho{max-width:1320px; margin:0 auto}
+}
+/* Teléfono acostado: poco alto, así que todo se aprieta y nada se corta. */
+@media (orientation:landscape) and (max-height:520px){
+  .barra{padding:7px 14px}
+  .barra .tit span{display:none}
+  .vista{padding:11px 14px 16px}
+  .seccion{gap:9px; margin-bottom:13px}
+  .prod{min-height:70px; padding:8px 10px}
+  .kpi .v{font-size:20px} .kpi.principal .v{font-size:24px}
+  .lineas{max-height:30vh}
+  .pestanas button{font-size:9px} .pestanas button svg{width:18px; height:18px}
+  .cuenta{max-height:calc(100dvh - 92px)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+
+/* ---------- impresión: sale solo el vale ---------- */
+@media print{
+  .barra,.pestanas,.riel,.toast,.hoja .velo,.hoja .ph,.noimp{display:none!important}
+  body,.app,.vista{background:#FFF; color:#000; height:auto; overflow:visible; display:block}
+  .hoja{position:static; display:block}
+  .hoja .panel{box-shadow:none; border:0; max-height:none; background:#FFF}
+  .hoja .pb{padding:0; display:block}
+  .vale{border:0; box-shadow:none; max-width:72mm; padding:0; font-size:10.5px}
+  .vista[hidden]{display:none!important}
+}
+
+/* ===== Administración: tablas, fichas, metas e informes ===== */
+.subtabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; padding-bottom:2px}
+.subtabs .pila{font-size:12px; padding:6px 12px}
+
+.tbl{width:100%; border-collapse:collapse; font-size:12.5px}
+.tbl th{text-align:left; font-size:9.5px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--tinta3); padding:10px 11px; border-bottom:1px solid var(--linea); white-space:nowrap;
+  background:var(--papel2); position:sticky; top:0}
+.tbl td{padding:9px 11px; border-bottom:1px solid var(--linea); vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.num{font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap}
+.tbl td b{display:block; font-weight:600; line-height:1.25}
+.tbl td .mini{display:block}
+.tbl tbody tr:hover{background:var(--papel2)}
+input.mininum{width:86px; border:1.5px solid var(--linea); background:var(--papel); border-radius:8px;
+  padding:6px 8px; font-family:var(--mono); font-size:12.5px; text-align:right}
+input.mininum:focus{outline:2px solid var(--madera); outline-offset:1px}
+
+.fichaing{display:grid; gap:7px; margin:12px 0}
+.ingfila{display:grid; grid-template-columns:minmax(0,1fr) 72px 78px 96px 34px; gap:6px; align-items:center}
+.ingfila input,.ingfila select{border:1.5px solid var(--linea); background:var(--papel); border-radius:9px;
+  padding:8px 9px; font-size:13px; min-width:0; width:100%}
+.ingfila input[type="number"]{font-family:var(--mono); text-align:right}
+.icobtn.chico{width:32px; height:32px; font-size:17px; line-height:1}
+@media (max-width:520px){
+  .ingfila{grid-template-columns:minmax(0,1fr) 34px; grid-auto-rows:min-content}
+  .ingfila input[data-i="n"]{grid-column:1}
+  .ingfila button{grid-column:2; grid-row:1}
+  .ingfila input[data-i="c"],.ingfila select,.ingfila input[data-i="cu"]{grid-column:1/-1}
+}
+
+.clase{margin-bottom:16px; border-left:3px solid var(--linea); padding-left:12px}
+.clase.estrella{border-left-color:var(--bien)}
+.clase.caballo{border-left-color:var(--dato)}
+.clase.enigma{border-left-color:var(--avisa)}
+.clase.perro{border-left-color:var(--grave)}
+.clase .ct{display:grid; gap:3px; margin-bottom:9px}
+.clase .ct b{font-size:14px}
+.clase .ct span{font-size:12px; color:var(--tinta2); line-height:1.45; max-width:62ch}
+
+.dlt{font-family:var(--mono); font-size:11px; font-weight:600}
+.dlt.sube{color:var(--bien)}
+.dlt.baja{color:var(--grave)}
+.dlt.neutro{color:var(--tinta3)}
+.kpi.principal .dlt.sube,.kpi.principal .dlt.baja,.kpi.principal .dlt.neutro{color:inherit; opacity:.86}
+
+.metabar{background:var(--papel); border:1px solid var(--linea); border-radius:var(--r); padding:13px 14px;
+  display:grid; gap:9px; box-shadow:var(--sombra)}
+.metabar.hecha{border-color:var(--bien); background:var(--bien-f)}
+.metabar .mt{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.metabar .mt b{font-size:13.5px}
+.metabar .mt span{font-family:var(--mono); font-size:12px; color:var(--tinta2)}
+.metabar .mb{height:10px; background:var(--papel3); border-radius:999px; overflow:hidden}
+.metabar .mb i{display:block; height:100%; background:var(--marron2); border-radius:999px; transition:width .4s ease}
+.metabar.hecha .mb i{background:var(--bien)}
+
+.informe{font-size:12.5px; color:var(--tinta)}
+.informe .ih{display:grid; gap:2px; padding-bottom:10px; margin-bottom:12px; border-bottom:2px solid var(--tinta)}
+.informe .ih b{font-size:16px; letter-spacing:-.01em}
+.informe .ih span{font-size:11px; color:var(--tinta2)}
+.informe h3{font-size:14px; margin:0 0 12px}
+.informe h4{font-size:12px; margin:18px 0 8px; letter-spacing:.06em; text-transform:uppercase; color:var(--tinta3)}
+.informe .tbl td:first-child{width:46%}
+.informe .pie{margin-top:16px; font-size:10.5px; color:var(--tinta3); line-height:1.5}
+
+@media print{
+  .informe{color:#000; font-size:11px}
+  .informe .tbl th{background:transparent; color:#000}
+  .informe .tbl td,.informe .tbl th{border-bottom:1px solid #999}
+  .hoja .panel{max-width:none; width:100%}
+}
+
+/* El rótulo de la barra en una sola línea: con la fecha larga, en un
+   teléfono angosto el título se partía en cinco renglones. */
+.barra .tit{min-width:0; overflow:hidden}
+.barra .tit b,.barra .tit span{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+/* Las tablas anchas viven dentro de .tabox y se desplazan solas; sin
+   min-width:0 la rejilla las deja empujar toda la página hacia el lado. */
+.seccion{min-width:0}
+.seccion>*{min-width:0}
+.clase{min-width:0}
+.tabox{max-width:100%}
+
+/* La hoja se mide contra la ventana: un porcentaje dentro de la rejilla
+   crecía con el contenido y la ficha técnica larga quedaba fuera de vista. */
+.hoja .panel{max-height:90vh; max-height:90dvh}
+@media (orientation:landscape) and (min-width:820px){ .hoja .panel{max-height:86vh; max-height:86dvh} }
+
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<g id="i-grano"><path d="M12 3c4 2.4 6 5.3 6 9s-2 6.6-6 9c-4-2.4-6-5.3-6-9s2-6.6 6-9z"/><path d="M12 3c-1.6 2.6-2.4 5.6-2.4 9s.8 6.4 2.4 9"/></g>
+<g id="i-taza"><path d="M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M16 9h2.2A2.8 2.8 0 0 1 21 11.8 2.8 2.8 0 0 1 18.2 14.6H16"/><path d="M6 4.6c.7.6.7 1.4 0 2M10 4c.8.7.8 1.7 0 2.4M14 4.6c.7.6.7 1.4 0 2"/></g>
+<g id="i-caja"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V6.5A2.5 2.5 0 0 1 8.5 4h7A2.5 2.5 0 0 1 18 6.5V9"/><path d="M8 13h3M14 13h2M8 16.5h8"/></g>
+<g id="i-panel"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 19v-6M12.5 19V8M17 19v-9"/></g>
+<g id="i-ticket"><path d="M5 5h14v5a2 2 0 0 0 0 4v5H5v-5a2 2 0 0 0 0-4V5z"/><path d="M9 9h6M9 13h6M9 16h4"/></g>
+<g id="i-reporte"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/><path d="M9.5 17v-3M12.5 17v-6M15.5 17v-4"/></g>
+<g id="i-stock"><path d="M3 8l9-4.5L21 8v8l-9 4.5L3 16V8z"/><path d="M3 8l9 4.5L21 8M12 12.5V21"/></g>
+<g id="i-ajustes"><path d="M4 7h10M18 7h2M4 12h3M11 12h9M4 17h8M16 17h4"/><circle cx="16" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="17" r="2"/></g>
+<g id="i-campana"><path d="M6 16V10.5a6 6 0 0 1 12 0V16l1.6 2.4H4.4L6 16z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/></g>
+<g id="i-alerta"><path d="M12 4.5 21 19.5H3L12 4.5z"/><path d="M12 10v4"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></g>
+<g id="i-check"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></g>
+<g id="i-lupa"><circle cx="11" cy="11" r="6.2"/><path d="M15.6 15.6 20 20"/></g>
+<g id="i-x"><path d="M6 6l12 12M18 6 6 18"/></g>
+<g id="i-billete"><rect x="2.5" y="6.5" width="19" height="11" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 10v4M18 10v4"/></g>
+<g id="i-tarjeta"><rect x="2.5" y="5.5" width="19" height="13" rx="2.2"/><path d="M2.5 10h19M6 14.5h4"/></g>
+<g id="i-transfer"><path d="M4 8h13l-3-3M20 16H7l3 3"/></g>
+<g id="i-moto"><circle cx="5.5" cy="17" r="2.6"/><circle cx="18" cy="17" r="2.6"/><path d="M8.1 17h7.3l-3-8H9.5M13.4 11h4.1l1.6 4.6M6 9h3"/></g>
+<g id="i-descarga"><path d="M12 4v10M8 10.5l4 4 4-4M5 19h14"/></g>
+<g id="i-imprime"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7" rx="1.6"/><path d="M7 16h10v4H7z"/></g>
+<g id="i-folio"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 16.5h4"/></g>
+<g id="i-reloj"><circle cx="12" cy="12" r="8.2"/><path d="M12 7.5V12l3.2 2"/></g>
+<g id="i-mesa"><path d="M3 9h18M5.5 9v10M18.5 9v10M12 9v4M7 19h4M13 19h4"/><path d="M4 6.2C7 4.7 17 4.7 20 6.2"/></g>
+<g id="i-nube"><path d="M7.5 18.5A4 4 0 0 1 7.2 10.6 5.4 5.4 0 0 1 17.6 11a3.8 3.8 0 0 1-.6 7.5H7.5z"/></g>
+</defs></svg>
+
+<div class="app">
+  <header class="barra">
+    <span class="sig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-caja"/></svg></span>
+    <span class="tit"><b>Caja · Emporio Andino</b><span id="barFecha">Caracoles 151 · San Pedro de Atacama</span></span>
+    <span class="der">
+      <span class="turno"><label for="selResp">Turno</label><select id="selResp"></select></span>
+      <button class="icobtn" id="btnSon" type="button" aria-pressed="true" title="Avisos con sonido" aria-label="Avisos con sonido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-campana"/></svg><em class="punto num" id="puntoAlerta" hidden></em></button>
+      <button class="icobtn" id="btnAjustes" type="button" title="Ajustes" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-ajustes"/></svg></button>
+    </span>
+  </header>
+
+  <nav class="riel" id="riel" aria-label="Secciones"></nav>
+
+  <main class="vista" id="vCaja">
+    <div class="caja">
+      <div class="izq">
+        <div class="fila">
+          <span class="buscador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-lupa"/></svg><input id="buscaProd" type="search" placeholder="Buscar producto, empanada, café…" autocomplete="off"></span>
+        </div>
+        <div class="grupos" id="grupos" role="tablist" aria-label="Grupos de la carta"></div>
+        <div class="rejilla" id="rejilla"></div>
+      </div>
+      <aside class="cuenta" aria-label="Cuenta en curso">
+        <div class="ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="#i-ticket"/></svg><b>Cuenta</b><span class="n" id="cuentaN">0 ítems</span></div>
+        <div class="modo" id="modoVenta" role="group" aria-label="Destino del pedido">
+          <button type="button" data-modo="local" aria-pressed="true">Para el local</button>
+          <button type="button" data-modo="llevar" aria-pressed="false">Para llevar</button>
+          <button type="button" data-modo="delivery" aria-pressed="false">DesertGo</button>
+        </div>
+        <div class="lineas" id="lineas"></div>
+        <div class="propina" id="cajaPropina">
+          <button class="sw" id="swPropina" type="button" aria-pressed="true" aria-label="Sugerir propina"><i></i></button>
+          <span id="txtPropina">Propina sugerida 10% · el cliente puede rechazarla (Art. 64 Código del Trabajo)</span>
+        </div>
+        <div class="sumas" id="sumas"></div>
+        <div class="pagos" id="pagos" role="group" aria-label="Medio de pago"></div>
+        <div class="cierre">
+          <div class="efectivo" id="bloqueEfectivo" hidden>
+            <span class="campo"><label for="inEfectivo">Efectivo recibido</label><input id="inEfectivo" type="number" inputmode="numeric" min="0" step="10" placeholder="0"></span>
+            <span class="vuelto"><span class="k">Vuelto</span><span class="v num" id="txtVuelto">$0</span></span>
+          </div>
+          <button class="btn lleno" id="btnRegistrar" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg>Registrar venta</button>
+          <button class="btn suave lleno chico" id="btnCuentaMesa" type="button" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-mesa"/></svg>Cuenta para la mesa</button>
+          <button class="btn suave lleno chico" id="btnVaciar" type="button" disabled>Vaciar cuenta</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <main class="vista ancho" id="vPanel" hidden></main>
+  <main class="vista ancho" id="vStock" hidden></main>
+  <main class="vista ancho" id="vGest" hidden><div id="gestTabs"></div><div id="gestCuerpo"></div></main>
+  <main class="vista ancho" id="vInf" hidden><div id="infTabs"></div><div id="infCuerpo"></div></main>
+  <main class="vista ancho" id="vAjustes" hidden></main>
+
+  <nav class="pestanas" id="pestanas" aria-label="Secciones"></nav>
+</div>
+
+<div class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-labelledby="hojaTit">
+  <button class="velo" id="hojaVelo" type="button" aria-label="Cerrar"></button>
+  <div class="panel">
+    <div class="ph"><b id="hojaTit">—</b><button class="cerrar" id="hojaX" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-x"/></svg></button></div>
+    <div class="pb" id="hojaBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="../nucleo/datos.js"></script>
+<script src="../nucleo/nucleo.js"></script>
+<script>
+/* ====================================================================
+   Caja Emporio Andino · lógica
+   --------------------------------------------------------------------
+   Qué hace esta herramienta y qué no, para que nadie se confunde:
+   REGISTRA la venta (productos, cantidades, precios, medio de pago),
+   descuenta stock, guarda el historial y arma los reportes. El vale que
+   imprime es un documento INTERNO de control: no es boleta.
+   La boleta electrónica (DTE 39 afecta / 41 exenta) la emite el sistema
+   autorizado por el SII —el portal gratuito del SII o un proveedor
+   autorizado— y su folio se anota aquí para dejar la venta cuadrada.
+   Los precios de la carta ya incluyen IVA (Ley 19.496 art. 30), así que
+   el neto y el IVA 19% se calculan hacia atrás desde el total.
+   ==================================================================== */
+/* El catálogo ya no se copia aquí: sale de la carta única (nucleo/datos.js)
+   con los precios y la carta vigentes del sistema general. */
+var CAT = EAPOS.catalogo(EAPOS.general());
+
+var GRUPOS=[
+  {id:"emp", n:"Empanadas", ico:"i-grano"},
+  {id:"bar", n:"Barra",     ico:"i-taza"},
+  {id:"coc", n:"Cocina",    ico:"i-mesa"},
+  {id:"past",n:"Pastelería",ico:"i-ticket"}
+];
+var SUBN={Empanadas:"Empanadas", desayunos:"Desayunos", brunch:"Brunch", bruschettas:"Bruschettas",
+  tostadas:"Tostadas", ensaladas:"Ensaladas", cafe:"Café de máquina", metodo:"Filtrados y tónicas",
+  te:"Tés e infusiones", choc:"Chocolates", jugo:"Jugos y refrescos", tarta:"Tartas",
+  treslech:"Tres leches", galleton:"Galletones", paquete:"Paquetes", galleta:"Galletas",
+  kuchen:"Kuchen", cheese:"Cheesecakes", muffin:"Muffins", milhojas:"Milhojas", torta:"Tortas",
+  minitorta:"Mini tortas", panqueque:"Panqueques"};
+var PAGOS=[
+  {id:"efectivo",   n:"Efectivo",     ico:"i-billete"},
+  {id:"debito",     n:"Débito",       ico:"i-tarjeta"},
+  {id:"credito",    n:"Crédito",      ico:"i-tarjeta"},
+  {id:"transfer",   n:"Transferencia",ico:"i-transfer"},
+  {id:"desertgo",   n:"DesertGo",     ico:"i-moto"}
+];
+var MODOS={local:"Para el local", llevar:"Para llevar", delivery:"DesertGo"};
+var EXTRAS=[{id:"sirope", n:"Sirope"},{id:"vegetal", n:"Leche vegetal"}];
+var LATA=15;          /* cada lata de empanadas trae 15 unidades */
+var IVA_TASA=0.19;    /* DL 825, art. 14 */
+var PROPINA_MIN=10;   /* Art. 64 Código del Trabajo (Ley 20.729) */
+
+/* ---------- utilidades ---------- */
+function $(s,r){ return (r||document).querySelector(s); }
+function el(t,c,x){ var n=document.createElement(t); if(c) n.className=c; if(x!=null) n.textContent=x; return n; }
+function ico(id,sw){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.8)+'" stroke-linecap="round" stroke-linejoin="round"><use href="#'+id+'"/></svg>'; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function plata(n){ return "$"+Math.round(n||0).toLocaleString("es-CL"); }
+function neto(total){ return Math.round(total/(1+IVA_TASA)); }
+function ivaDe(total){ return Math.round(total)-neto(total); }
+function hoyISO(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function diaDe(ts){ return hoyISO(new Date(ts)); }
+function hora(ts){ var d=new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function fechaLarga(iso){
+  var p=iso.split("-"), m=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  return Number(p[2])+" de "+m[Number(p[1])-1]+" de "+p[0];
+}
+function sumaBy(a,f){ var t=0; for(var i=0;i<a.length;i++) t+=f(a[i])||0; return t; }
+
+/* ---------- estado guardado ----------
+   ea_pos  : ventas, precios que faltaban, ajustes y arqueos. No se borra
+             sola: el historial es lo que después se exporta al contador.
+   ea_control : el mismo estado de disponibilidad que leen la carta del
+             cliente y el Control de Salón. Aquí se le agregan unidades. */
+var POS={v:1, ventas:[], precios:{}, arqueos:[], cfg:{}};
+try{ var rp=localStorage.getItem("ea_pos"); if(rp){ var op=JSON.parse(rp); if(op&&typeof op==="object") POS=Object.assign(POS,op); } }catch(e){}
+POS.cfg=Object.assign({
+  propina:PROPINA_MIN, son:1, umbral:6, resp:["Jefe de operación","Encargado de caja","Barista"],
+  respActivo:"", emisor:{razon:"", rut:"", giro:"Empanadería y cafetería", dir:"Caracoles 151, San Pedro de Atacama"},
+  emisorDTE:"Portal gratuito del SII", extras:{sirope:null, vegetal:null}
+}, POS.cfg||{});
+if(!Array.isArray(POS.ventas)) POS.ventas=[];
+if(!Array.isArray(POS.arqueos)) POS.arqueos=[];
+if(!POS.precios||typeof POS.precios!=="object") POS.precios={};
+if(!POS.costos||typeof POS.costos!=="object") POS.costos={};
+if(!POS.fichas||typeof POS.fichas!=="object") POS.fichas={};
+if(!Array.isArray(POS.compras)) POS.compras=[];
+if(!Array.isArray(POS.mermas)) POS.mermas=[];
+/* Las metas son del sistema general: se cambian en la Prueba y se aplican. */
+POS.cfg.metas=EAPOS.general().metas;
+if(!Array.isArray(POS.cfg.provee)) POS.cfg.provee=[];
+
+var CTRL={fecha:"", st:{}, uni:{}, milks:{}, decaf:1, tocado:"", son:1};
+function leerCtrl(){
+  try{ var r=localStorage.getItem("ea_control"); if(r){ var o=JSON.parse(r); if(o&&typeof o==="object") CTRL=Object.assign(CTRL,o); } }catch(e){}
+  if(!CTRL.uni||typeof CTRL.uni!=="object") CTRL.uni={};
+  if(!CTRL.st||typeof CTRL.st!=="object") CTRL.st={};
+}
+leerCtrl();
+
+var canal=null;
+try{ canal=new BroadcastChannel("emporio-andino"); }catch(e){}
+function guardarPOS(){
+  try{ localStorage.setItem("ea_pos", JSON.stringify(POS)); }catch(e){ avisar("No se pudo guardar en este equipo. Exporta el día antes de cerrar.","mal"); }
+  if(canal) try{ canal.postMessage({t:"pos"}); }catch(e){}
+}
+function guardarCtrl(){
+  CTRL.tocado=new Date().toISOString();
+  try{ localStorage.setItem("ea_control", JSON.stringify(CTRL)); }catch(e){}
+  if(canal) try{ canal.postMessage({t:"ctrl"}); }catch(e){}
+}
+/* La caja, la carta y el Control de Salón conversan en vivo dentro del
+   mismo equipo: si se vende la última empanada en una pestaña, la otra lo
+   sabe al instante. Entre equipos distintos no hay puente: para eso está
+   la exportación del día (y, más adelante, un servidor). */
+function alCambiarAfuera(){ leerCtrl(); try{ var r=localStorage.getItem("ea_pos"); if(r) POS=Object.assign(POS,JSON.parse(r)); }catch(e){}
+  CAT=EAPOS.catalogo(EAPOS.general()); POS.cfg.metas=EAPOS.general().metas; pintarTodo(); }
+window.addEventListener("storage", function(ev){ if(ev.key==="ea_control"||ev.key==="ea_pos"||ev.key==="eapos_cfg") alCambiarAfuera(); });
+if(canal) canal.onmessage=function(){ alCambiarAfuera(); };
+
+/* ---------- precio y stock ---------- */
+function precioDe(p){ return p.p!=null ? p.p : null; }
+/* Abre la Prueba: dentro del sistema general lo resuelve la capa superior (que revisa el cargo);
+   abierta sola, navega a la página. */
+function abrirPrueba(){ EAPOS.irA("prueba"); }
+function unidades(id){ var u=CTRL.uni[id]; return typeof u==="number"? u : null; }
+function estadoDe(id){
+  var u=unidades(id);
+  if(u!=null) return u<=0 ? "off" : (u<=POS.cfg.umbral ? "bajo" : "ok");
+  return CTRL.st[id]||"ok";
+}
+function fijarEstadoDesdeUnidades(id){
+  var u=unidades(id); if(u==null) return;
+  CTRL.st[id] = u<=0 ? "off" : (u<=POS.cfg.umbral ? "bajo" : "ok");
+}
+function descontar(id,q){
+  var u=unidades(id); if(u==null) return;
+  CTRL.uni[id]=Math.max(0,u-q); fijarEstadoDesdeUnidades(id);
+}
+function devolver(id,q){
+  var u=unidades(id); if(u==null) return;
+  CTRL.uni[id]=u+q; fijarEstadoDesdeUnidades(id);
+}
+function criticos(){
+  var out=[];
+  CAT.forEach(function(p){ var e=estadoDe(p.id); if(e==="off"||e==="bajo") out.push({p:p, e:e, u:unidades(p.id)}); });
+  return out.sort(function(a,b){ return (a.e==="off"?0:1)-(b.e==="off"?0:1); });
+}
+function sinPrecio(){ return CAT.filter(function(p){ return precioDe(p)==null; }); }
+function pendientesFolio(){ return POS.ventas.filter(function(v){ return !v.anulada && (!v.doc||!v.doc.folio); }); }
+
+/* ---------- avisos: se ven y se oyen ---------- */
+var AC=null;
+function pito(clase){
+  if(!POS.cfg.son) return;
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    var notas = clase==="mal" ? [[392,0,.16],[311,.18,.26]] : clase==="alerta" ? [[740,0,.1],[740,.16,.1],[740,.32,.14]] : [[659,0,.1],[880,.11,.18]];
+    notas.forEach(function(n){
+      var o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+n[1];
+      o.type="sine"; o.frequency.value=n[0];
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.16,t+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,t+n[2]);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+n[2]+.04);
+    });
+  }catch(e){}
+}
+var tToast=null;
+function avisar(txt,clase){
+  var t=$("#toast"); t.textContent=txt;
+  t.className="toast ver"+(clase?" "+clase:"");
+  pito(clase);
+  clearTimeout(tToast); tToast=setTimeout(function(){ t.className="toast"+(clase?" "+clase:""); }, 3200);
+}
+</script>
+
+<script>
+/* ==================== CAJA ==================== */
+var carro=[];              /* [{id,n,p,q,mod:[]}] */
+var grupoActivo="emp";
+var modoActivo="local";
+var pagoActivo="";
+var conPropina=true;
+
+function itemCat(id){ for(var i=0;i<CAT.length;i++) if(CAT[i].id===id) return CAT[i]; return null; }
+function totalCarro(){ return sumaBy(carro,function(l){ return l.p*l.q + sumaBy(l.mod,function(m){ return m.p||0; })*l.q; }); }
+function propinaSug(){ return conPropina ? Math.round(totalCarro()*POS.cfg.propina/100) : 0; }
+
+function pintarGrupos(){
+  var c=$("#grupos"); c.innerHTML="";
+  GRUPOS.forEach(function(g){
+    var n=CAT.filter(function(p){ return p.g===g.id; }).length;
+    var b=el("button","pila"); b.type="button"; b.setAttribute("role","tab");
+    b.setAttribute("aria-pressed", g.id===grupoActivo ? "true":"false");
+    b.innerHTML=ico(g.ico)+" "+esc(g.n)+' <span class="num" style="opacity:.6">'+n+"</span>";
+    b.style.display="inline-flex"; b.style.alignItems="center"; b.style.gap="6px";
+    b.querySelector("svg").style.width="15px"; b.querySelector("svg").style.height="15px";
+    b.onclick=function(){ grupoActivo=g.id; pintarGrupos(); pintarRejilla(); };
+    c.appendChild(b);
+  });
+}
+function pintarRejilla(){
+  var q=($("#buscaProd").value||"").trim().toLowerCase();
+  var lista=CAT.filter(function(p){
+    if(q) return p.n.toLowerCase().indexOf(q)>=0;
+    return p.g===grupoActivo;
+  });
+  var cont=$("#rejilla"); cont.innerHTML="";
+  if(!lista.length){ cont.appendChild(el("div","vacio","Sin resultados para «"+q+"».")); return; }
+  var sub="";
+  lista.forEach(function(p){
+    if(!q && p.sub!==sub){
+      sub=p.sub;
+      var r=el("div","rotulo"); r.style.gridColumn="1/-1";
+      r.innerHTML="<b>"+esc(SUBN[sub]||sub)+"</b>";
+      cont.appendChild(r);
+    }
+    var pr=precioDe(p), es=estadoDe(p.id), u=unidades(p.id);
+    var b=el("button","prod"+(pr==null?" sinprecio":"")+(es==="off"?" agotado":"")); b.type="button";
+    var pie="";
+    if(es==="off") pie+='<span class="estado off">'+ico("i-x",2.4)+"Agotado</span>";
+    else if(es==="bajo") pie+='<span class="estado bajo">'+ico("i-alerta",2)+(u!=null? "Quedan "+u : "Quedan pocas")+"</span>";
+    else if(u!=null) pie+='<span class="estado ok">'+ico("i-check",2.4)+u+" u.</span>";
+    if(p.loc) pie+='<span class="estado neutro">Solo local</span>';
+    b.innerHTML='<span class="pn">'+esc(p.n)+'</span><span class="pp">'+(pr==null?"Precio por definir":plata(pr))+
+      '</span><span class="pf">'+pie+"</span>";
+    b.onclick=function(){ agregar(p); };
+    cont.appendChild(b);
+  });
+}
+function agregar(p){
+  var pr=precioDe(p);
+  if(pr==null){ avisar("«"+p.n+"» todavía no tiene precio. Se define en la Prueba y se aplica al sistema general.","mal"); return; }
+  if(estadoDe(p.id)==="off"){ avisar("«"+p.n+"» está marcado como agotado. Repón o corrige el stock antes de venderlo.","mal"); return; }
+  if(p.loc && modoActivo!=="local"){ avisar("«"+p.n+"» se sirve solo para comer en el local.","mal"); return; }
+  var ex=null;
+  for(var i=0;i<carro.length;i++) if(carro[i].id===p.id && !carro[i].mod.length) ex=carro[i];
+  if(ex) ex.q++; else carro.push({id:p.id, n:p.n, p:pr, q:1, mod:[], leche:!!p.leche});
+  pintarCuenta(); pintarRejilla();
+}
+function pintarCuenta(){
+  var L=$("#lineas"); L.innerHTML="";
+  var items=sumaBy(carro,function(l){ return l.q; });
+  $("#cuentaN").textContent = items===1 ? "1 ítem" : items+" ítems";
+  if(!carro.length){
+    L.appendChild(el("div","vacio","Toca un producto para empezar la cuenta."));
+  } else carro.forEach(function(l,idx){
+    var d=el("div","lin");
+    var izq=el("div");
+    izq.innerHTML='<div class="ln">'+esc(l.n)+"</div>"+
+      (l.mod.length?'<div class="lo">'+l.mod.map(function(m){ return esc(m.n)+(m.p?" +"+plata(m.p):""); }).join(" · ")+"</div>":"")+
+      (l.leche?'<div class="lo"><button class="pila" type="button" data-ex="'+idx+'" style="padding:3px 9px;font-size:11px">Extras</button></div>':"");
+    var der=el("div","lt", plata(l.p*l.q + sumaBy(l.mod,function(m){return m.p||0;})*l.q));
+    var paso=el("div","paso");
+    paso.innerHTML='<button type="button" data-m="'+idx+'" aria-label="Quitar uno">−</button><span class="q">'+l.q+
+      '</span><button type="button" data-p="'+idx+'" aria-label="Agregar uno">+</button>';
+    d.appendChild(izq); d.appendChild(der); d.appendChild(paso);
+    L.appendChild(d);
+  });
+  L.querySelectorAll("[data-m]").forEach(function(b){ b.onclick=function(){ var i=+b.dataset.m; carro[i].q--; if(carro[i].q<=0) carro.splice(i,1); pintarCuenta(); }; });
+  L.querySelectorAll("[data-p]").forEach(function(b){ b.onclick=function(){ carro[+b.dataset.p].q++; pintarCuenta(); }; });
+  L.querySelectorAll("[data-ex]").forEach(function(b){ b.onclick=function(){ hojaExtras(+b.dataset.ex); }; });
+
+  var t=totalCarro(), pr=propinaSug();
+  var S=$("#sumas"); S.innerHTML="";
+  function sm(k,v,cl){ var d=el("div","sm"+(cl?" "+cl:"")); d.innerHTML="<span>"+k+'</span><b class="num">'+v+"</b>"; S.appendChild(d); }
+  sm("Neto", plata(neto(t)), "legal");
+  sm("IVA 19%", plata(ivaDe(t)), "legal");
+  sm("Consumo (IVA incluido)", plata(t));
+  if(pr) sm("Propina sugerida "+POS.cfg.propina+"%", plata(pr));
+  sm("Total a pagar", plata(t+pr), "total");
+  $("#txtPropina").textContent = conPropina
+    ? "Propina sugerida "+POS.cfg.propina+"% · el cliente puede rechazarla (Art. 64 del Código del Trabajo)"
+    : "Propina sin sugerir en esta cuenta";
+  $("#swPropina").setAttribute("aria-pressed", conPropina?"true":"false");
+  $("#cajaPropina").hidden = (modoActivo!=="local");
+
+  var listo = carro.length>0 && pagoActivo;
+  $("#btnRegistrar").disabled=!listo;
+  $("#btnVaciar").disabled=!carro.length;
+  $("#btnCuentaMesa").disabled=!carro.length;
+  $("#bloqueEfectivo").hidden = pagoActivo!=="efectivo";
+  calcVuelto();
+}
+function calcVuelto(){
+  var t=totalCarro()+propinaSug(), rec=Number($("#inEfectivo").value||0);
+  $("#txtVuelto").textContent = plata(Math.max(0,rec-t));
+}
+function pintarPagos(){
+  var c=$("#pagos"); c.innerHTML="";
+  PAGOS.forEach(function(p){
+    var b=el("button"); b.type="button"; b.setAttribute("aria-pressed", p.id===pagoActivo?"true":"false");
+    b.innerHTML=ico(p.ico)+"<span>"+esc(p.n)+"</span>";
+    b.onclick=function(){ pagoActivo = (pagoActivo===p.id? "" : p.id); pintarPagos(); pintarCuenta(); };
+    c.appendChild(b);
+  });
+}
+function hojaExtras(i){
+  var l=carro[i];
+  abrirHoja("Extras de "+l.n, function(b){
+    var p=el("p","vs","En desayunos y brunch el café va incluido, pero el sirope y la leche vegetal se cobran aparte. Si el precio del extra no está definido, se define en Ajustes.");
+    b.appendChild(p);
+    EXTRAS.forEach(function(x){
+      var pr=POS.cfg.extras[x.id];
+      var puesto=l.mod.some(function(m){ return m.id===x.id; });
+      var btn=el("button","btn suave lleno"); btn.type="button";
+      btn.textContent=(puesto?"Quitar ":"Agregar ")+x.n+(pr!=null?" ("+plata(pr)+")":" (sin precio definido)");
+      btn.onclick=function(){
+        if(puesto) l.mod=l.mod.filter(function(m){ return m.id!==x.id; });
+        else l.mod.push({id:x.id, n:x.n, p:pr||0});
+        pintarCuenta(); cerrarHoja();
+      };
+      b.appendChild(btn);
+    });
+  });
+}
+
+/* ---------- registrar ---------- */
+function registrar(){
+  if(!carro.length || !pagoActivo) return;
+  var t=totalCarro(), pr=propinaSug(), rec=Number($("#inEfectivo").value||0);
+  var v={
+    id:"V"+Date.now().toString(36).toUpperCase(),
+    ts:new Date().toISOString(),
+    resp:POS.cfg.respActivo||"(sin asignar)",
+    modo:modoActivo, pago:pagoActivo,
+    lineas:carro.map(function(l){ return {id:l.id, n:l.n, q:l.q, p:l.p, mod:l.mod.slice()}; }),
+    total:t, neto:neto(t), iva:ivaDe(t), propina:pr,
+    efectivo: pagoActivo==="efectivo" ? {rec:rec, vuelto:Math.max(0,rec-(t+pr))} : null,
+    doc:null, anulada:null
+  };
+  POS.ventas.push(v);
+  v.lineas.forEach(function(l){ descontar(l.id, l.q); });
+  guardarPOS(); guardarCtrl();
+  carro=[]; pagoActivo=""; $("#inEfectivo").value="";
+  pintarPagos(); pintarCuenta(); pintarRejilla(); pintarPanel(); pintarStock();
+  var cr=criticos().filter(function(c){ return c.e==="off"; });
+  avisar("Venta "+v.id+" registrada por "+plata(v.total+v.propina)+".","bien");
+  if(cr.length) setTimeout(function(){ avisar(cr.length+(cr.length===1?" producto quedó":" productos quedaron")+" en cero. Avisa a cocina y a la barra.","alerta"); }, 1400);
+  hojaVenta(v, true);
+}
+function anular(v){
+  abrirHoja("Anular venta "+v.id, function(b){
+    b.appendChild(el("p","vs","La venta queda en el historial marcada como anulada y el stock vuelve atrás. Si ya se emitió la boleta electrónica, la anulación tributaria se hace con una nota de crédito electrónica (DTE 61) en el sistema emisor: aquí solo queda el registro y el motivo."));
+    var c=el("div","campo");
+    c.innerHTML='<label for="inMotivo">Motivo</label><input id="inMotivo" type="text" placeholder="Error de digitación, producto devuelto…">';
+    b.appendChild(c);
+    var btn=el("button","btn grave lleno","Anular y devolver stock"); btn.type="button";
+    btn.onclick=function(){
+      var m=($("#inMotivo").value||"").trim();
+      if(!m){ avisar("Escribe el motivo: es lo que después explica el descuadre.","mal"); return; }
+      v.anulada={ts:new Date().toISOString(), motivo:m, por:POS.cfg.respActivo||"(sin asignar)"};
+      v.lineas.forEach(function(l){ devolver(l.id, l.q); });
+      guardarPOS(); guardarCtrl(); cerrarHoja(); pintarTodo();
+      avisar("Venta "+v.id+" anulada. Recuerda la nota de crédito si ya tenía boleta.","bien");
+    };
+    b.appendChild(btn);
+  });
+}
+</script>
+
+<script>
+/* ==================== HOJA, VALE Y DOCUMENTOS ==================== */
+function abrirHoja(tit, armar){
+  $("#hojaTit").textContent=tit;
+  var b=$("#hojaBody"); b.innerHTML=""; armar(b);
+  $("#hoja").hidden=false; document.body.classList.add("conhoja");
+}
+function cerrarHoja(){ $("#hoja").hidden=true; document.body.classList.remove("conhoja"); }
+
+function lineasTexto(v){
+  return v.lineas.map(function(l){
+    var ex=l.mod&&l.mod.length? " ("+l.mod.map(function(m){return m.n;}).join(", ")+")" : "";
+    return {n:l.q+" × "+l.n+ex, v:plata(l.p*l.q + (l.mod?sumaBy(l.mod,function(m){return m.p||0;}):0)*l.q)};
+  });
+}
+/* El vale en pantalla es igual al que sale impreso: 80 mm, monoespaciado y
+   con el aviso de que no es boleta, que es lo que evita que un cliente se
+   vaya creyendo que ya tiene su documento tributario. */
+function valeHTML(v, tipo){
+  var em=POS.cfg.emisor, esCuenta=(tipo==="cuenta");
+  var h='<div class="vale" id="imprimible">';
+  h+='<h4>EMPORIO ANDINO</h4><div class="sub">'+esc(em.giro||"")+"<br>"+esc(em.dir||"")+
+     (em.razon?"<br>"+esc(em.razon):"")+(em.rut?"<br>RUT "+esc(em.rut):"")+"</div>";
+  h+='<div class="sep"></div>';
+  h+='<div class="l"><span>'+(esCuenta?"CUENTA":"VALE INTERNO")+'</span><b>'+esc(v.id)+"</b></div>";
+  h+='<div class="l"><span>'+fechaLarga(diaDe(v.ts))+'</span><b>'+hora(v.ts)+"</b></div>";
+  h+='<div class="l"><span>'+esc(MODOS[v.modo]||v.modo)+'</span><b>'+esc(v.resp||"")+"</b></div>";
+  h+='<div class="sep"></div>';
+  lineasTexto(v).forEach(function(l){ h+='<div class="l"><span>'+esc(l.n)+'</span><b>'+l.v+"</b></div>"; });
+  h+='<div class="sep"></div>';
+  h+='<div class="l"><span>Neto</span><b>'+plata(v.neto)+"</b></div>";
+  h+='<div class="l"><span>IVA 19%</span><b>'+plata(v.iva)+"</b></div>";
+  h+='<div class="l tot"><span>Consumo</span><b>'+plata(v.total)+"</b></div>";
+  if(v.propina){
+    h+='<div class="l"><span>Propina sugerida '+POS.cfg.propina+"%</span><b>"+plata(v.propina)+"</b></div>";
+    h+='<div class="l tot"><span>Total con propina</span><b>'+plata(v.total+v.propina)+"</b></div>";
+  }
+  if(!esCuenta){
+    h+='<div class="sep"></div><div class="l"><span>Pago</span><b>'+esc((PAGOS.filter(function(p){return p.id===v.pago;})[0]||{}).n||v.pago)+"</b></div>";
+    if(v.efectivo) h+='<div class="l"><span>Recibido / vuelto</span><b>'+plata(v.efectivo.rec)+" / "+plata(v.efectivo.vuelto)+"</b></div>";
+    h+='<div class="l"><span>Boleta electrónica</span><b>'+(v.doc&&v.doc.folio? "DTE "+esc(v.doc.tipo)+" folio "+esc(v.doc.folio) : "pendiente")+"</b></div>";
+  }
+  if(esCuenta){
+    h+='<div class="nota">La propina de '+POS.cfg.propina+'% es una sugerencia y es voluntaria: puedes pedir que se retire (Art. 64 del Código del Trabajo). Este documento es la cuenta del consumo, no es la boleta.</div>';
+  } else {
+    h+='<div class="nota">DOCUMENTO INTERNO DE CONTROL · NO CONSTITUYE BOLETA NI FACTURA. La boleta electrónica se emite en el sistema autorizado por el SII y se entrega impresa o por medio digital.</div>';
+  }
+  h+='<div class="pie">Emporio Andino · @emporio.andino<br>Gracias por venir al desierto.</div>';
+  return h+"</div>";
+}
+
+/* ---------- PDF de 80 mm, escrito a mano ----------
+   Sin librerías: el visor de artefactos no permite traer archivos de
+   fuera, así que el PDF se arma con Helvetica y codificación WinAnsi,
+   que cubre las tildes y la ñ. */
+function pdfEsc(s){
+  var o="";
+  for(var i=0;i<s.length;i++){ var c=s.charCodeAt(i);
+    if(c>255) o+="?"; else if(c===40||c===41||c===92) o+="\\"+s[i]; else o+=s[i]; }
+  return o;
+}
+function valePDF(v, tipo){
+  var W=226.77, MG=14, ancho=W-MG*2, esCuenta=(tipo==="cuenta"), em=POS.cfg.emisor;
+  var fil=[];  /* {t:texto, s:tamaño, b:negrita, a:alineación, d:derecha} */
+  function L(t,s,b,a){ fil.push({t:t,s:s||8,b:!!b,a:a||"l"}); }
+  function P(t,d,s,b){ fil.push({t:t,d:d,s:s||8,b:!!b,a:"p"}); }
+  function R(){ fil.push({r:1}); }
+  L("EMPORIO ANDINO",12,true,"c");
+  if(em.giro) L(em.giro,7.2,false,"c");
+  if(em.dir) L(em.dir,7.2,false,"c");
+  if(em.razon) L(em.razon,7.2,false,"c");
+  if(em.rut) L("RUT "+em.rut,7.2,false,"c");
+  R();
+  P(esCuenta?"CUENTA":"VALE INTERNO", v.id, 8.6, true);
+  P(fechaLarga(diaDe(v.ts)), hora(v.ts));
+  P(MODOS[v.modo]||v.modo, v.resp||"");
+  R();
+  lineasTexto(v).forEach(function(l){ P(l.n, l.v); });
+  R();
+  P("Neto", plata(v.neto));
+  P("IVA 19%", plata(v.iva));
+  P("CONSUMO", plata(v.total), 9.4, true);
+  if(v.propina){
+    P("Propina sugerida "+POS.cfg.propina+"%", plata(v.propina));
+    P("TOTAL CON PROPINA", plata(v.total+v.propina), 9.4, true);
+  }
+  if(!esCuenta){
+    R();
+    P("Pago", (PAGOS.filter(function(p){return p.id===v.pago;})[0]||{}).n||v.pago);
+    if(v.efectivo){ P("Recibido", plata(v.efectivo.rec)); P("Vuelto", plata(v.efectivo.vuelto)); }
+    P("Boleta electrónica", v.doc&&v.doc.folio ? "DTE "+v.doc.tipo+" · "+v.doc.folio : "pendiente");
+    R();
+    L("DOCUMENTO INTERNO DE CONTROL.",7.4,true,"c");
+    L("NO CONSTITUYE BOLETA NI FACTURA.",7.4,true,"c");
+    L("La boleta electrónica se emite en el",6.8,false,"c");
+    L("sistema autorizado por el SII.",6.8,false,"c");
+  } else {
+    R();
+    L("La propina de "+POS.cfg.propina+"% es sugerida y",6.8,false,"c");
+    L("voluntaria (Art. 64 Cód. del Trabajo).",6.8,false,"c");
+    L("Esta cuenta no es la boleta.",7.4,true,"c");
+  }
+  R();
+  L("Emporio Andino · @emporio.andino",6.8,false,"c");
+
+  /* alto: cada fila ocupa su tamaño más un aire, cada regla 7 pt */
+  var alto=MG*2;
+  fil.forEach(function(f){ alto += f.r ? 7 : f.s*1.45; });
+  var H=Math.max(200, Math.round(alto));
+  var ops=[], y=H-MG;
+  fil.forEach(function(f){
+    if(f.r){ y-=3.5; ops.push("0.55 0.50 0.45 RG 0.6 w [1.6 1.6] 0 d "+MG+" "+y.toFixed(1)+" m "+(W-MG)+" "+y.toFixed(1)+" l S [] 0 d"); y-=3.5; return; }
+    y -= f.s*1.12;
+    var fuente=f.b?"/F2":"/F1", x=MG;
+    if(f.a==="c"){ var w=f.t.length*f.s*(f.b?.56:.50); x=Math.max(MG,(W-w)/2); }
+    ops.push("BT "+fuente+" "+f.s+" Tf 0.11 0.08 0.06 rg 1 0 0 1 "+x.toFixed(1)+" "+y.toFixed(1)+" Tm ("+pdfEsc(f.t)+") Tj ET");
+    if(f.a==="p"){
+      var wd=String(f.d).length*f.s*(f.b?.58:.52);
+      ops.push("BT "+fuente+" "+f.s+" Tf 0.11 0.08 0.06 rg 1 0 0 1 "+(W-MG-wd).toFixed(1)+" "+y.toFixed(1)+" Tm ("+pdfEsc(String(f.d))+") Tj ET");
+    }
+    y -= f.s*.33;
+  });
+  var flujo=ops.join("\n");
+  var objs=[null,
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Count 1 /Kids [4 0 R] >>",
+    "<< /Font << /F1 6 0 R /F2 7 0 R >> >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+W.toFixed(2)+" "+H+"] /Resources 3 0 R /Contents 5 0 R >>",
+    {s:flujo},
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>"];
+  var out="%PDF-1.4\n", pos=[];
+  for(var n=1;n<objs.length;n++){
+    pos[n]=out.length; var o=objs[n];
+    out += (o&&o.s!==undefined)
+      ? n+" 0 obj\n<< /Length "+o.s.length+" >>\nstream\n"+o.s+"\nendstream\nendobj\n"
+      : n+" 0 obj\n"+o+"\nendobj\n";
+  }
+  var xref=out.length;
+  out+="xref\n0 "+objs.length+"\n0000000000 65535 f \n";
+  for(var n2=1;n2<objs.length;n2++) out+=("0000000000"+pos[n2]).slice(-10)+" 00000 n \n";
+  out+="trailer\n<< /Size "+objs.length+" /Root 1 0 R >>\nstartxref\n"+xref+"\n%%EOF";
+  var by=new Uint8Array(out.length);
+  for(var i=0;i<out.length;i++) by[i]=out.charCodeAt(i)&0xFF;
+  return by;
+}
+
+var DESCARGAS=null, descargasListas=false;
+(async function(){
+  try{ DESCARGAS = window.claude && claude.use ? await claude.use("downloads") : null; }catch(e){ DESCARGAS=null; }
+  descargasListas=true;
+  if(typeof pintarTodo==="function") pintarTodo();
+})();
+async function bajar(nombre, datos, texto){
+  if(DESCARGAS){
+    try{ await DESCARGAS.save({filename:nombre, data:datos}); avisar("Archivo guardado: "+nombre,"bien"); return true; }
+    catch(err){
+      var c=(err&&err.code)||"unavailable";
+      if(c==="declined") return false;
+      if(c==="rate_limited"){ avisar("Hay otra descarga esperando respuesta. Termínala y vuelve a intentar.","mal"); return false; }
+      avisar("No se pudo guardar el archivo aquí. Usa Imprimir para el vale, o copia los datos del reporte.","mal");
+      return false;
+    }
+  }
+  if(texto!==undefined){
+    abrirHoja("Copiar "+nombre, function(b){
+      b.appendChild(el("p","vs","Este visor no permite descargar archivos. Copia el contenido y pégalo en una planilla."));
+      var t=el("textarea"); t.value=texto; t.rows=12; t.style.width="100%"; t.style.fontFamily="var(--mono)"; t.style.fontSize="11px";
+      t.style.border="1.5px solid var(--linea)"; t.style.borderRadius="10px"; t.style.padding="10px";
+      b.appendChild(t); t.focus(); t.select();
+    });
+    return false;
+  }
+  avisar("Este visor no permite descargar. Usa Imprimir.","mal");
+  return false;
+}
+function imprimirVale(){ window.print(); }
+
+/* ---------- ficha de una venta ---------- */
+function hojaVenta(v, recien){
+  abrirHoja(recien? "Venta registrada" : "Venta "+v.id, function(b){
+    if(recien){
+      var ok=el("div","aviso");
+      ok.innerHTML=ico("i-check",2.2)+"<div><b>"+plata(v.total+v.propina)+" cobrados en "+
+        esc((PAGOS.filter(function(p){return p.id===v.pago;})[0]||{}).n||v.pago)+
+        "</b><span>Stock descontado. Falta emitir la boleta electrónica y anotar su folio.</span></div><span></span>";
+      ok.style.borderColor="var(--bien)"; ok.style.background="var(--bien-f)";
+      ok.querySelector("svg").style.color="var(--bien)";
+      b.appendChild(ok);
+    }
+    var caja=el("div"); caja.innerHTML=valeHTML(v,"vale"); b.appendChild(caja);
+
+    var f=el("div","seccion noimp");
+    f.innerHTML='<div class="rotulo"><b>Boleta electrónica</b></div>';
+    var g=el("div","filtros");
+    g.innerHTML=
+      '<span class="campo"><label for="inTipo">Documento</label><select id="inTipo">'+
+      '<option value="39">39 · Boleta electrónica afecta</option>'+
+      '<option value="41">41 · Boleta exenta</option>'+
+      '<option value="33">33 · Factura electrónica</option></select></span>'+
+      '<span class="campo"><label for="inFolio">Folio</label><input id="inFolio" inputmode="numeric" placeholder="Nº del folio emitido"></span>';
+    f.appendChild(g);
+    var nota=el("p","mini","El folio viene del sistema emisor autorizado por el SII (portal gratuito o proveedor). Anotarlo aquí deja la venta cuadrada con el libro de ventas; esta caja no emite documentos tributarios.");
+    f.appendChild(nota);
+    var bg=el("button","btn lleno","Guardar folio"); bg.type="button";
+    bg.onclick=function(){
+      var fo=($("#inFolio").value||"").trim();
+      if(!fo){ avisar("Escribe el folio que entregó el sistema emisor.","mal"); return; }
+      v.doc={tipo:$("#inTipo").value, folio:fo, ts:new Date().toISOString()};
+      guardarPOS(); cerrarHoja(); pintarTodo(); avisar("Folio "+fo+" anotado en la venta "+v.id+".","bien");
+    };
+    f.appendChild(bg);
+    b.appendChild(f);
+
+    var acc=el("div","seccion noimp");
+    var b1=el("button","btn suave lleno"); b1.type="button";
+    b1.innerHTML=ico("i-descarga")+"Descargar vale en PDF";
+    b1.onclick=function(){ bajar("vale-"+v.id+".pdf", valePDF(v,"vale")); };
+    var b2=el("button","btn suave lleno"); b2.type="button";
+    b2.innerHTML=ico("i-imprime")+"Imprimir vale";
+    b2.onclick=imprimirVale;
+    var b3=el("button","btn suave lleno"); b3.type="button";
+    b3.innerHTML=ico("i-mesa")+"Cuenta con propina para la mesa";
+    b3.onclick=function(){ cerrarHoja(); setTimeout(function(){ hojaCuenta(v); },60); };
+    acc.appendChild(b1); acc.appendChild(b2); if(v.propina) acc.appendChild(b3);
+    if(!v.anulada && !recien){
+      var b4=el("button","btn suave lleno","Anular esta venta"); b4.type="button";
+      b4.style.color="var(--grave)";
+      b4.onclick=function(){ cerrarHoja(); setTimeout(function(){ anular(v); },60); };
+      acc.appendChild(b4);
+    }
+    b.appendChild(acc);
+  });
+}
+function hojaCuenta(v){
+  abrirHoja("Cuenta para la mesa", function(b){
+    var caja=el("div"); caja.innerHTML=valeHTML(v,"cuenta"); b.appendChild(caja);
+    var p=el("p","mini noimp","La ley pide que la propina se sugiera en la cuenta —no en la boleta— y que el cliente pueda rechazarla. Si la rechaza, se cobra solo el consumo.");
+    b.appendChild(p);
+    var b1=el("button","btn lleno noimp"); b1.type="button";
+    b1.innerHTML=ico("i-descarga")+"Descargar cuenta en PDF";
+    b1.onclick=function(){ bajar("cuenta-"+v.id+".pdf", valePDF(v,"cuenta")); };
+    var b2=el("button","btn suave lleno noimp"); b2.type="button";
+    b2.innerHTML=ico("i-imprime")+"Imprimir";
+    b2.onclick=imprimirVale;
+    b.appendChild(b1); b.appendChild(b2);
+  });
+}
+function cuentaPrevia(){
+  if(!carro.length) return;
+  var t=totalCarro();
+  hojaCuenta({id:"PRE-"+hora(Date.now()).replace(":",""), ts:new Date().toISOString(),
+    resp:POS.cfg.respActivo||"(sin asignar)", modo:modoActivo,
+    lineas:carro.map(function(l){ return {id:l.id,n:l.n,q:l.q,p:l.p,mod:l.mod.slice()}; }),
+    total:t, neto:neto(t), iva:ivaDe(t), propina:propinaSug(), pago:"", efectivo:null, doc:null, anulada:null});
+}
+/* ---------- CSV ---------- */
+function csv(filas){
+  return filas.map(function(f){ return f.map(function(c){
+    var s=String(c==null?"":c);
+    return /[;"\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(";"); }).join("\r\n");
+}
+function exportarVentas(desde,hasta){
+  var f=[["ID","Fecha","Hora","Responsable","Destino","Medio de pago","Producto","Cantidad","Precio unitario","Total línea","Neto venta","IVA venta","Total venta","Propina","Documento","Folio","Anulada","Motivo anulación"]];
+  ventasEntre(desde,hasta).forEach(function(v){
+    v.lineas.forEach(function(l){
+      f.push([v.id, diaDe(v.ts), hora(v.ts), v.resp, MODOS[v.modo]||v.modo,
+        (PAGOS.filter(function(p){return p.id===v.pago;})[0]||{}).n||v.pago,
+        l.n+(l.mod&&l.mod.length?" ("+l.mod.map(function(m){return m.n;}).join(", ")+")":""),
+        l.q, l.p, l.p*l.q, v.neto, v.iva, v.total, v.propina,
+        v.doc?("DTE "+v.doc.tipo):"", v.doc?v.doc.folio:"",
+        v.anulada?"SÍ":"", v.anulada?v.anulada.motivo:""]);
+    });
+  });
+  var texto=csv(f);
+  bajar("ventas-"+desde+"-a-"+hasta+".csv", texto, texto);
+}
+</script>
+
+<script>
+/* ==================== PANEL Y HISTORIAL ==================== */
+function ventasEntre(desde,hasta){
+  return POS.ventas.filter(function(v){ var d=diaDe(v.ts); return d>=desde && d<=hasta; });
+}
+function vivas(vs){ return vs.filter(function(v){ return !v.anulada; }); }
+function hace(dias){ var d=new Date(); d.setDate(d.getDate()-dias); return hoyISO(d); }
+
+/* Barras verticales dibujadas a la escala: una sola serie (plata vendida),
+   con el eje en cero, la línea del máximo rotulada y el valor en el aire
+   solo donde hay algo que leer. */
+function graficoHoras(datos){
+  var W=320, H=132, T=12, B=26, L=46, R=4;   /* L deja un canal para las cifras del eje */
+  var max=Math.max.apply(null,datos.map(function(d){ return d.v; }).concat([1]));
+  var paso=(W-L-R)/datos.length, ancho=Math.max(6,paso-4);
+  var esc=function(v){ return (H-T-B)*(v/max); };
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Ventas por hora del día">';
+  [1,.5].forEach(function(f){
+    var y=(H-B)-esc(max*f);
+    s+='<line x1="'+L+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'" stroke="var(--linea)" stroke-width="1" stroke-dasharray="3 3"/>';
+    s+='<text x="'+(L-6)+'" y="'+(y+3).toFixed(1)+'" font-size="8" text-anchor="end" fill="var(--tinta3)" font-family="var(--mono)">'+plata(Math.round(max*f))+"</text>";
+  });
+  s+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-R)+'" y2="'+(H-B)+'" stroke="var(--linea-f)" stroke-width="1"/>';
+  datos.forEach(function(d,i){
+    var h=d.v>0? Math.max(2,esc(d.v)) : 0, x=L+i*paso+(paso-ancho)/2, y=(H-B)-h;
+    if(h>0) s+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+ancho.toFixed(1)+'" height="'+h.toFixed(1)+
+      '" rx="3" fill="var(--dato)"><title>'+d.h+":00 · "+plata(d.v)+"</title></rect>";
+    if(i%2===0) s+='<text x="'+(x+ancho/2).toFixed(1)+'" y="'+(H-B+12)+'" font-size="8.5" text-anchor="middle" fill="var(--tinta3)" font-family="var(--mono)">'+d.h+"</text>";
+  });
+  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-3)+'" font-size="8.5" text-anchor="middle" fill="var(--tinta3)">hora del día · 07:00 a 23:00</text>';
+  return s+"</svg>";
+}
+function barrasHTML(items, fmt){
+  var max=Math.max.apply(null,items.map(function(i){ return i.v; }).concat([1]));
+  return '<div class="barras">'+items.map(function(i){
+    return '<div class="br"><span class="bn">'+esc(i.n)+'</span>'+
+      '<span class="bt"><i style="width:'+Math.max(2,Math.round(i.v/max*100))+'%"></i></span>'+
+      '<span class="bv">'+(fmt?fmt(i):plata(i.v))+"</span></div>";
+  }).join("")+"</div>";
+}
+function tarjetaGraf(tit, extra, cuerpo){
+  return '<div class="graf"><div class="gt"><b>'+esc(tit)+"</b>"+(extra?"<em>"+esc(extra)+"</em>":"")+"</div>"+cuerpo+"</div>";
+}
+
+function pintarPanel(){
+  var c=$("#vPanel"); if(!c) return;
+  var hoy=hoyISO(), vs=vivas(ventasEntre(hoy,hoy));
+  var totalHoy=sumaBy(vs,function(v){ return v.total; });
+  var propHoy=sumaBy(vs,function(v){ return v.propina; });
+  var prom=vs.length? Math.round(totalHoy/vs.length):0;
+  var cr=criticos(), off=cr.filter(function(x){ return x.e==="off"; });
+  var pend=pendientesFolio(), falt=sinPrecio();
+
+  var h='<div class="seccion"><h2 class="vt">Cómo va el día</h2>'+
+    '<p class="vs">'+fechaLarga(hoy)+" · horario continuo de 07:00 a 23:00. Todo lo que ves aquí sale de las ventas registradas en este equipo.</p></div>";
+
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Vendido hoy</span><span class="v num">'+plata(totalHoy)+'</span><span class="p">'+vs.length+(vs.length===1?" venta":" ventas")+" · ticket promedio "+plata(prom)+"</span></div>"+
+    '<div class="kpi"><span class="k">Neto</span><span class="v num">'+plata(neto(totalHoy))+'</span><span class="p">base imponible del día</span></div>'+
+    '<div class="kpi"><span class="k">IVA débito</span><span class="v num">'+plata(ivaDe(totalHoy))+'</span><span class="p">19% ya incluido en los precios</span></div>'+
+    '<div class="kpi"><span class="k">Propinas</span><span class="v num">'+plata(propHoy)+'</span><span class="p">no forman parte de la base del IVA</span></div>'+
+    '<div class="kpi'+(off.length?" mal":(cr.length?" ojo":""))+'"><span class="k">Stock crítico</span><span class="v num">'+cr.length+'</span><span class="p">'+off.length+" en cero · "+(cr.length-off.length)+" por reponer</span></div>"+
+    '<div class="kpi'+(pend.length?" ojo":"")+'"><span class="k">Sin folio</span><span class="v num">'+pend.length+'</span><span class="p">ventas sin boleta anotada</span></div>'+
+    kpisGestion(hoy,hoy)+
+    "</div></div>"+bloqueMeta(totalHoy);
+
+  if(off.length){
+    h+='<div class="seccion"><div class="aviso alerta">'+ico("i-alerta",2)+
+      "<div><b>"+off.length+(off.length===1?" producto en cero":" productos en cero")+"</b><span>"+
+      off.slice(0,4).map(function(x){ return esc(x.p.n); }).join(" · ")+(off.length>4?" y "+(off.length-4)+" más":"")+
+      '</span></div><button class="btn chico suave" type="button" data-ir="stock">Ver stock</button></div></div>';
+  }
+  if(pend.length){
+    h+='<div class="seccion"><div class="aviso ojo">'+ico("i-folio",1.9)+
+      "<div><b>"+pend.length+(pend.length===1?" venta sin folio de boleta":" ventas sin folio de boleta")+
+      "</b><span>Anota el folio del documento emitido en el sistema SII para cerrar el día cuadrado.</span></div>"+
+      '<button class="btn chico suave" type="button" data-ir="inf:hist">Ver historial</button></div></div>';
+  }
+  if(falt.length){
+    h+='<div class="seccion"><div class="aviso ojo">'+ico("i-alerta",1.9)+
+      "<div><b>"+falt.length+" productos sin precio</b><span>Hasta que tengan precio no se pueden cobrar. Los precios se definen en la Prueba y se aplican al sistema general.</span></div>"+
+      '<button class="btn chico suave" type="button" data-prueba="1">Definir en Prueba</button></div></div>';
+  }
+
+  var horas=[]; for(var i=7;i<=23;i++) horas.push({h:String(i).padStart(2,"0"), v:0});
+  vs.forEach(function(v){ var hh=new Date(v.ts).getHours(); var f=horas.filter(function(x){ return +x.h===hh; })[0]; if(f) f.v+=v.total; });
+  var top={}; vs.forEach(function(v){ v.lineas.forEach(function(l){ top[l.n]=(top[l.n]||0)+l.q; }); });
+  var topArr=Object.keys(top).map(function(k){ return {n:k, v:top[k]}; }).sort(function(a,b){ return b.v-a.v; }).slice(0,7);
+  var pag={}; vs.forEach(function(v){ pag[v.pago]=(pag[v.pago]||0)+v.total; });
+  var pagArr=PAGOS.filter(function(p){ return pag[p.id]; }).map(function(p){ return {n:p.n, v:pag[p.id]}; }).sort(function(a,b){ return b.v-a.v; });
+
+  h+='<div class="seccion dos">';
+  h+=tarjetaGraf("Ventas por hora", plata(totalHoy)+" en el día", vs.length? graficoHoras(horas) : '<div class="vacio">Todavía no hay ventas registradas hoy.</div>');
+  h+=tarjetaGraf("Más vendidos hoy","unidades", topArr.length? barrasHTML(topArr,function(i){ return i.v+" u."; }) : '<div class="vacio">Sin ventas aún.</div>');
+  h+="</div>";
+  h+='<div class="seccion dos">';
+  h+=tarjetaGraf("Por medio de pago","del día", pagArr.length? barrasHTML(pagArr) : '<div class="vacio">Sin ventas aún.</div>');
+  h+=tarjetaGraf("Últimos 7 días","cierre por día", (function(){
+    var dd=[]; for(var k=6;k>=0;k--){ var f=hace(k); dd.push({n:f.slice(8)+"/"+f.slice(5,7), v:sumaBy(vivas(ventasEntre(f,f)),function(v){ return v.total; })}); }
+    return sumaBy(dd,function(x){ return x.v; })? barrasHTML(dd) : '<div class="vacio">Aún no hay una semana de historia.</div>';
+  })());
+  h+="</div>";
+  c.innerHTML=h;
+  c.querySelectorAll("[data-ir]").forEach(function(b){ b.onclick=function(){ irA(b.dataset.ir); }; });
+  c.querySelectorAll("[data-prueba]").forEach(function(b){ b.onclick=abrirPrueba; });
+  var n=pend.length+off.length;
+  $("#puntoAlerta").hidden = !n; $("#puntoAlerta").textContent=n;
+  document.querySelectorAll("[data-sello]").forEach(function(s){ s.textContent=n; s.hidden=!n; });
+}
+
+/* ---------- historial ---------- */
+var filtro={desde:"", hasta:"", prod:"", resp:"", pago:"", folio:""};
+function pintarHist(){
+  var c=$("#infCuerpo"); if(!c) return;
+  if(!filtro.desde){ filtro.desde=hace(7); filtro.hasta=hoyISO(); }
+  var lista=ventasEntre(filtro.desde, filtro.hasta).slice().reverse();
+  if(filtro.prod) lista=lista.filter(function(v){ return v.lineas.some(function(l){ return l.n.toLowerCase().indexOf(filtro.prod.toLowerCase())>=0; }); });
+  if(filtro.resp) lista=lista.filter(function(v){ return v.resp===filtro.resp; });
+  if(filtro.pago) lista=lista.filter(function(v){ return v.pago===filtro.pago; });
+  if(filtro.folio==="sin") lista=lista.filter(function(v){ return !v.anulada && (!v.doc||!v.doc.folio); });
+  if(filtro.folio==="con") lista=lista.filter(function(v){ return v.doc&&v.doc.folio; });
+  var viv=vivas(lista);
+
+  var h='<div class="seccion"><h2 class="vt">Historial de ventas</h2>'+
+    '<p class="vs">Cada venta queda con su hora, su responsable y su folio. Lo que se exporta desde aquí es lo que se le entrega al contador.</p></div>';
+  h+='<div class="seccion"><div class="filtros">'+
+    '<span class="campo"><label for="fDesde">Desde</label><input id="fDesde" type="date" value="'+filtro.desde+'"></span>'+
+    '<span class="campo"><label for="fHasta">Hasta</label><input id="fHasta" type="date" value="'+filtro.hasta+'"></span>'+
+    '<span class="campo"><label for="fProd">Producto</label><input id="fProd" type="search" placeholder="Café, empanada…" value="'+esc(filtro.prod)+'"></span>'+
+    '<span class="campo"><label for="fResp">Responsable</label><select id="fResp"><option value="">Todos</option>'+
+      POS.cfg.resp.map(function(r){ return '<option'+(filtro.resp===r?" selected":"")+">"+esc(r)+"</option>"; }).join("")+"</select></span>"+
+    '<span class="campo"><label for="fPago">Medio de pago</label><select id="fPago"><option value="">Todos</option>'+
+      PAGOS.map(function(p){ return '<option value="'+p.id+'"'+(filtro.pago===p.id?" selected":"")+">"+esc(p.n)+"</option>"; }).join("")+"</select></span>"+
+    '<span class="campo"><label for="fFolio">Boleta</label><select id="fFolio"><option value="">Todas</option>'+
+      '<option value="sin"'+(filtro.folio==="sin"?" selected":"")+">Sin folio anotado</option>"+
+      '<option value="con"'+(filtro.folio==="con"?" selected":"")+">Con folio</option></select></span>"+
+    "</div></div>";
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi"><span class="k">Ventas en el filtro</span><span class="v num">'+viv.length+'</span><span class="p">'+(lista.length-viv.length)+" anuladas</span></div>"+
+    '<div class="kpi"><span class="k">Consumo</span><span class="v num">'+plata(sumaBy(viv,function(v){return v.total;}))+'</span><span class="p">IVA incluido</span></div>'+
+    '<div class="kpi"><span class="k">Propinas</span><span class="v num">'+plata(sumaBy(viv,function(v){return v.propina;}))+'</span><span class="p">van al equipo</span></div>'+
+    "</div></div>";
+  h+='<div class="seccion"><button class="btn suave chico" id="btnCSV" type="button">'+ico("i-descarga")+"Exportar el filtro a CSV</button></div>";
+  h+='<div class="seccion" id="listaVentas"></div>';
+  c.innerHTML=h;
+
+  var L=$("#listaVentas");
+  if(!lista.length) L.appendChild(el("div","vacio","No hay ventas con estos filtros."));
+  lista.forEach(function(v){
+    var d=el("details","venta"+(v.anulada?" anulada":""));
+    var pago=(PAGOS.filter(function(p){return p.id===v.pago;})[0]||{}).n||v.pago;
+    var est = v.anulada ? '<span class="estado off">Anulada</span>'
+      : (v.doc&&v.doc.folio ? '<span class="estado ok">DTE '+esc(v.doc.tipo)+" · "+esc(v.doc.folio)+"</span>"
+      : '<span class="estado bajo">Sin folio</span>');
+    var s=el("summary");
+    s.innerHTML='<span class="hora num">'+hora(v.ts)+"</span><span><span class=\"qn\">"+
+      v.lineas.length+(v.lineas.length===1?" ítem":" ítems")+" · "+esc(pago)+
+      '</span><span class="qs">'+esc(MODOS[v.modo]||v.modo)+" · "+esc(v.resp)+" · "+est+
+      '</span></span><span class="imp num">'+plata(v.total+v.propina)+"</span>";
+    d.appendChild(s);
+    var cu=el("div","cuerpo");
+    var dl=el("dl","dl");
+    dl.innerHTML="<dt>Venta</dt><dd>"+esc(v.id)+"</dd>"+
+      "<dt>Detalle</dt><dd>"+v.lineas.map(function(l){ return l.q+" × "+esc(l.n); }).join("<br>")+"</dd>"+
+      "<dt>Neto</dt><dd>"+plata(v.neto)+"</dd><dt>IVA</dt><dd>"+plata(v.iva)+"</dd>"+
+      "<dt>Consumo</dt><dd>"+plata(v.total)+"</dd>"+
+      (v.propina?"<dt>Propina</dt><dd>"+plata(v.propina)+"</dd>":"")+
+      (v.efectivo?"<dt>Efectivo</dt><dd>recibido "+plata(v.efectivo.rec)+" · vuelto "+plata(v.efectivo.vuelto)+"</dd>":"")+
+      (v.anulada?"<dt>Anulación</dt><dd>"+esc(v.anulada.motivo)+" · "+hora(v.anulada.ts)+"</dd>":"");
+    cu.appendChild(dl);
+    var bb=el("button","btn suave chico","Abrir ficha, folio y vale"); bb.type="button";
+    bb.onclick=function(){ hojaVenta(v); };
+    cu.appendChild(bb);
+    d.appendChild(cu);
+    L.appendChild(d);
+  });
+  function cambia(id,campo,fn){ var e=$("#"+id); if(e) e.onchange=function(){ filtro[campo]= fn?fn(e.value):e.value; pintarHist(); }; }
+  cambia("fDesde","desde"); cambia("fHasta","hasta"); cambia("fResp","resp");
+  cambia("fPago","pago"); cambia("fFolio","folio");
+  var fp=$("#fProd"); if(fp) fp.oninput=function(){ filtro.prod=fp.value; clearTimeout(fp._t); fp._t=setTimeout(pintarHist,320); };
+  $("#btnCSV").onclick=function(){ exportarVentas(filtro.desde, filtro.hasta); };
+}
+</script>
+
+<script>
+/* ==================== REPORTES ==================== */
+var rep={modo:"dia", desde:hoyISO(), hasta:hoyISO()};
+function rangoRep(){
+  if(rep.modo==="dia") return [hoyISO(), hoyISO()];
+  if(rep.modo==="semana") return [hace(6), hoyISO()];
+  if(rep.modo==="mes"){ var d=new Date(); return [hoyISO(new Date(d.getFullYear(),d.getMonth(),1)), hoyISO()]; }
+  return [rep.desde, rep.hasta];
+}
+function pintarRep(){
+  var c=$("#infCuerpo"); if(!c) return;
+  var r=rangoRep(), vs=vivas(ventasEntre(r[0],r[1])), anul=ventasEntre(r[0],r[1]).length-vs.length;
+  var total=sumaBy(vs,function(v){ return v.total; });
+  var prop=sumaBy(vs,function(v){ return v.propina; });
+  var porPago={}, porGrupo={}, porProd={}, porDia={}, unidades=0;
+  vs.forEach(function(v){
+    porPago[v.pago]=(porPago[v.pago]||0)+v.total;
+    porDia[diaDe(v.ts)]=(porDia[diaDe(v.ts)]||0)+v.total;
+    v.lineas.forEach(function(l){
+      var it=itemCat(l.id), g=it?it.g:"otro";
+      porGrupo[g]=(porGrupo[g]||0)+l.p*l.q;
+      porProd[l.n]=porProd[l.n]||{q:0,m:0}; porProd[l.n].q+=l.q; porProd[l.n].m+=l.p*l.q;
+      unidades+=l.q;
+    });
+  });
+  var h='<div class="seccion"><h2 class="vt">Reportes</h2>'+
+    '<p class="vs">El mismo corte que se le pide a la caja: cuánto entró, cuánto de eso es IVA y en qué se vendió. El neto y el IVA salen del total porque los precios de la carta ya lo incluyen.</p></div>';
+  h+='<div class="seccion"><div class="pilas" id="repModos">'+
+    [["dia","Hoy"],["semana","Últimos 7 días"],["mes","Mes en curso"],["rango","Rango a elegir"]].map(function(m){
+      return '<button class="pila" type="button" data-m="'+m[0]+'" aria-pressed="'+(rep.modo===m[0])+'">'+m[1]+"</button>";
+    }).join("")+"</div>";
+  if(rep.modo==="rango"){
+    h+='<div class="filtros" style="margin-top:8px">'+
+      '<span class="campo"><label for="rD">Desde</label><input id="rD" type="date" value="'+rep.desde+'"></span>'+
+      '<span class="campo"><label for="rH">Hasta</label><input id="rH" type="date" value="'+rep.hasta+'"></span></div>';
+  }
+  h+='<p class="mini" style="margin-top:8px">Período: '+fechaLarga(r[0])+" al "+fechaLarga(r[1])+"</p></div>";
+
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Total del período</span><span class="v num">'+plata(total)+'</span><span class="p">'+vs.length+" ventas · "+unidades+" unidades"+(anul?" · "+anul+" anuladas":"")+"</span></div>"+
+    '<div class="kpi"><span class="k">Neto</span><span class="v num">'+plata(neto(total))+'</span><span class="p">para el F29, línea de ventas afectas</span></div>'+
+    '<div class="kpi"><span class="k">IVA débito</span><span class="v num">'+plata(ivaDe(total))+'</span><span class="p">19% sobre el neto</span></div>'+
+    '<div class="kpi"><span class="k">Propinas</span><span class="v num">'+plata(prop)+'</span><span class="p">fuera de la base imponible</span></div>'+
+    "</div></div>";
+
+  function tabla(tit, filas, pie){
+    var t='<div class="seccion"><div class="rotulo"><b>'+esc(tit)+'</b></div><div class="tabox"><table><thead><tr>'+
+      filas[0].map(function(x,i){ return '<th'+(i?' class="n"':"")+">"+esc(x)+"</th>"; }).join("")+"</tr></thead><tbody>";
+    filas.slice(1).forEach(function(f){
+      t+="<tr>"+f.map(function(x,i){ return "<td"+(i?' class="n"':"")+">"+esc(x)+"</td>"; }).join("")+"</tr>";
+    });
+    t+="</tbody>"+(pie?"<tfoot><tr>"+pie.map(function(x,i){ return "<td"+(i?' class="n"':"")+">"+esc(x)+"</td>"; }).join("")+"</tr></tfoot>":"")+"</table></div></div>";
+    return t;
+  }
+  var fp=[["Medio de pago","Monto","Participación"]];
+  PAGOS.forEach(function(p){ if(porPago[p.id]) fp.push([p.n, plata(porPago[p.id]), Math.round(porPago[p.id]/(total||1)*100)+"%"]); });
+  h+=tabla("Ingresos por medio de pago", fp, ["Total", plata(total), "100%"]);
+
+  var fg=[["Área de la carta","Monto","Participación"]];
+  GRUPOS.forEach(function(g){ if(porGrupo[g.id]) fg.push([g.n, plata(porGrupo[g.id]), Math.round(porGrupo[g.id]/(total||1)*100)+"%"]); });
+  h+=tabla("Ventas por área", fg);
+
+  var pr=Object.keys(porProd).map(function(k){ return [k, porProd[k].q, porProd[k].m]; })
+    .sort(function(a,b){ return b[2]-a[2]; }).slice(0,15);
+  var ft=[["Producto","Unidades","Monto"]];
+  pr.forEach(function(p){ ft.push([p[0], p[1], plata(p[2])]); });
+  h+=tabla("Los 15 que más dejaron", ft);
+
+  var fd=[["Día","Ventas","Monto","Neto","IVA"]];
+  Object.keys(porDia).sort().forEach(function(d){
+    var n=vs.filter(function(v){ return diaDe(v.ts)===d; }).length;
+    fd.push([d, n, plata(porDia[d]), plata(neto(porDia[d])), plata(ivaDe(porDia[d]))]);
+  });
+  if(fd.length>1) h+=tabla("Día por día", fd, ["Total","", plata(total), plata(neto(total)), plata(ivaDe(total))]);
+
+  /* cierre de caja */
+  var efe=sumaBy(vs.filter(function(v){ return v.pago==="efectivo"; }),function(v){ return v.total+v.propina; });
+  h+='<div class="seccion"><div class="rotulo"><b>Cierre de caja</b></div>'+
+    '<div class="filtros">'+
+    '<span class="campo"><label>Efectivo esperado</label><input value="'+plata(efe)+'" readonly class="num"></span>'+
+    '<span class="campo"><label for="inContado">Efectivo contado</label><input id="inContado" type="number" inputmode="numeric" placeholder="0"></span>'+
+    '<span class="campo"><label>Diferencia</label><input id="inDif" value="—" readonly class="num"></span>'+
+    "</div>"+
+    '<button class="btn suave chico" id="btnArqueo" type="button" style="margin-top:9px">Guardar arqueo del período</button>'+
+    (POS.arqueos.length? '<p class="mini" style="margin-top:8px">Último arqueo: '+esc(POS.arqueos[POS.arqueos.length-1].ts.slice(0,10))+" · diferencia "+plata(POS.arqueos[POS.arqueos.length-1].dif)+"</p>":"")+
+    "</div>";
+  h+='<div class="seccion"><button class="btn lleno" id="btnRepCSV" type="button">'+ico("i-descarga")+"Exportar el período a CSV</button>"+
+    '<p class="mini" style="margin-top:8px">La ley pide conservar los documentos tributarios electrónicos por seis años. Los XML de las boletas los guarda el sistema emisor; este archivo es el respaldo operativo de la caja.</p></div>';
+  c.innerHTML=h;
+
+  c.querySelectorAll("#repModos [data-m]").forEach(function(b){ b.onclick=function(){ rep.modo=b.dataset.m; pintarRep(); }; });
+  if($("#rD")) $("#rD").onchange=function(){ rep.desde=$("#rD").value; pintarRep(); };
+  if($("#rH")) $("#rH").onchange=function(){ rep.hasta=$("#rH").value; pintarRep(); };
+  var ic=$("#inContado");
+  if(ic) ic.oninput=function(){ var d=Number(ic.value||0)-efe; $("#inDif").value=(ic.value===""?"—":(d>0?"+":"")+plata(d)); };
+  $("#btnArqueo").onclick=function(){
+    var v=Number(($("#inContado")||{}).value||0);
+    if(!v){ avisar("Anota primero el efectivo contado.","mal"); return; }
+    POS.arqueos.push({ts:new Date().toISOString(), desde:r[0], hasta:r[1], esperado:efe, contado:v, dif:v-efe, por:POS.cfg.respActivo||"(sin asignar)"});
+    guardarPOS(); pintarRep(); avisar("Arqueo guardado. Diferencia "+plata(v-efe)+".", (v-efe)===0?"bien":"alerta");
+  };
+  $("#btnRepCSV").onclick=function(){ exportarVentas(r[0], r[1]); };
+}
+
+/* ==================== STOCK ==================== */
+var stockGrupo="emp";
+function pintarStock(){
+  var c=$("#vStock"); if(!c) return;
+  var falt=sinPrecio(), cr=criticos();
+  var h='<div class="seccion"><h2 class="vt">Stock</h2>'+
+    '<p class="vs">Lo que se cambia acá lo ven al instante la carta del cliente, el Control de Salón y las Comandas en este mismo equipo. Las empanadas se cuentan por lata de '+LATA+" unidades.</p></div>";
+  if(cr.length){
+    h+='<div class="seccion"><div class="aviso '+(cr.some(function(x){return x.e==="off";})?"alerta":"ojo")+'">'+ico("i-alerta",2)+
+      "<div><b>"+cr.length+" para mirar</b><span>"+cr.slice(0,6).map(function(x){ return esc(x.p.n)+(x.u!=null?" ("+x.u+")":""); }).join(" · ")+"</span></div><span></span></div></div>";
+  }
+  if(falt.length){
+    h+='<div class="seccion"><div class="aviso ojo">'+ico("i-alerta",1.9)+
+      "<div><b>"+falt.length+" productos sin precio</b><span>Los precios se definen en la Prueba, se simulan y se aplican al sistema general. Desde ahí llegan a esta caja y a la carta.</span></div>"+
+      '<button class="btn chico suave" type="button" id="btnIrPrueba">Abrir Prueba</button></div></div>';
+  }
+  h+='<div class="seccion"><div class="pilas" id="stGrupos">'+GRUPOS.map(function(g){
+      return '<button class="pila" type="button" data-g="'+g.id+'" aria-pressed="'+(stockGrupo===g.id)+'">'+esc(g.n)+"</button>";
+    }).join("")+"</div></div>";
+  var lista=CAT.filter(function(p){ return p.g===stockGrupo; });
+  h+='<div class="seccion"><div class="tabox"><table><thead><tr><th>Producto</th><th class="n">Unidades</th><th class="n">Estado</th><th class="n">Ajustar</th></tr></thead><tbody>';
+  lista.forEach(function(p){
+    var u=unidades(p.id), e=estadoDe(p.id);
+    var etq = e==="off"?'<span class="estado off">Agotado</span>' : e==="bajo"?'<span class="estado bajo">Quedan pocas</span>' : '<span class="estado ok">Disponible</span>';
+    h+="<tr><td>"+esc(p.n)+'</td><td class="n"><input data-u="'+p.id+'" type="number" inputmode="numeric" min="0" value="'+(u==null?"":u)+
+      '" placeholder="—" style="width:76px;border:1.5px solid var(--linea);border-radius:8px;padding:5px 7px;font-family:var(--mono)"></td>'+
+      '<td class="n">'+etq+'</td><td class="n"><span class="pilas" style="justify-content:flex-end">'+
+      (p.g==="emp"?'<button class="pila" type="button" data-lata="'+p.id+'">+ lata</button>':"")+
+      '<button class="pila" type="button" data-mas="'+p.id+'">+1</button>'+
+      '<button class="pila" type="button" data-off="'+p.id+'">'+(e==="off"?"Reponer":"Agotado")+"</button></span></td></tr>";
+  });
+  h+="</tbody></table></div>"+
+    '<p class="mini" style="margin-top:8px">Un producto sin número queda con el estado que le puso el Control de Salón (disponible, quedan pocas o agotado). Con número, la caja lo descuenta sola en cada venta y avisa bajo '+POS.cfg.umbral+" unidades.</p></div>";
+  c.innerHTML=h;
+
+  c.querySelectorAll("#stGrupos [data-g]").forEach(function(b){ b.onclick=function(){ stockGrupo=b.dataset.g; pintarStock(); }; });
+  if($("#btnIrPrueba")) $("#btnIrPrueba").onclick=abrirPrueba;
+  c.querySelectorAll("[data-u]").forEach(function(i){ i.onchange=function(){
+    var id=i.dataset.u;
+    if(i.value===""){ delete CTRL.uni[id]; } else { CTRL.uni[id]=Math.max(0,Math.round(Number(i.value))); fijarEstadoDesdeUnidades(id); }
+    guardarCtrl(); pintarStock(); pintarRejilla(); pintarPanel();
+  }; });
+  c.querySelectorAll("[data-lata]").forEach(function(b){ b.onclick=function(){
+    var id=b.dataset.lata; CTRL.uni[id]=(unidades(id)||0)+LATA; fijarEstadoDesdeUnidades(id);
+    guardarCtrl(); pintarStock(); pintarRejilla(); pintarPanel(); avisar("Lata de "+LATA+" agregada.","bien");
+  }; });
+  c.querySelectorAll("[data-mas]").forEach(function(b){ b.onclick=function(){
+    var id=b.dataset.mas; CTRL.uni[id]=(unidades(id)||0)+1; fijarEstadoDesdeUnidades(id);
+    guardarCtrl(); pintarStock(); pintarRejilla(); pintarPanel();
+  }; });
+  c.querySelectorAll("[data-off]").forEach(function(b){ b.onclick=function(){
+    var id=b.dataset.off;
+    if(estadoDe(id)==="off"){ if(unidades(id)!=null) CTRL.uni[id]=LATA; CTRL.st[id]="ok"; }
+    else { if(unidades(id)!=null) CTRL.uni[id]=0; CTRL.st[id]="off"; }
+    guardarCtrl(); pintarStock(); pintarRejilla(); pintarPanel();
+  }; });
+}
+</script>
+
+<script>
+/* ==================== ADMINISTRACIÓN GASTRONÓMICA ====================
+   La caja registra lo que entra. Esta parte registra lo que cuesta.
+   Sin las dos mitades, el total del día no dice si el día fue bueno.
+
+   Vocabulario, para que signifique lo mismo en toda la herramienta:
+   COSTO      lo que cuesta producir una unidad, sin IVA.
+   FOOD COST  ese costo dividido por la venta neta del producto, en %.
+              Se calcula sobre el NETO, no sobre el precio de carta: el
+              IVA no es ingreso del local, se le entrega al fisco.
+   MARGEN     venta neta menos costo. Es lo que queda para pagar todo
+              lo demás: arriendo, sueldos, luz, agua, el propio sueldo.
+   MERMA      lo que se produjo o se compró y no se vendió.
+   ==================================================================== */
+
+var CATCOMPRA=[
+  {id:"insumo-coc", n:"Insumos de cocina"},
+  {id:"insumo-bar", n:"Insumos de barra"},
+  {id:"cafe",       n:"Café en grano"},
+  {id:"pasteleria", n:"Pastelería"},
+  {id:"envases",    n:"Envases y desechables"},
+  {id:"aseo",       n:"Aseo e higiene"},
+  {id:"servicios",  n:"Servicios básicos"},
+  {id:"arriendo",   n:"Arriendo"},
+  {id:"sueldos",    n:"Sueldos y honorarios"},
+  {id:"mantencion", n:"Mantención y equipos"},
+  {id:"otros",      n:"Otros"}
+];
+var MOTIVOS=[
+  {id:"vencido",   n:"Se venció"},
+  {id:"quemado",   n:"Se quemó o se pasó"},
+  {id:"caida",     n:"Se cayó o se rompió"},
+  {id:"error",     n:"Error de preparación"},
+  {id:"devuelto",  n:"Devuelto por el cliente"},
+  {id:"cortesia",  n:"Cortesía de la casa"},
+  {id:"degusta",   n:"Degustación o prueba"},
+  {id:"personal",  n:"Consumo del personal"}
+];
+var UNID=[{id:"g",n:"g"},{id:"kg",n:"kg"},{id:"ml",n:"ml"},{id:"l",n:"L"},{id:"u",n:"unidad"}];
+
+/* ---------- costos ---------- */
+function costoDe(id){ var c=POS.costos[id]; return (typeof c==="number" && c>=0) ? c : null; }
+function netoDe(p){ var pr=precioDe(p); return pr==null? null : neto(pr); }
+function foodCost(p){ var c=costoDe(p.id), n=netoDe(p); if(c==null||!n) return null; return c/n*100; }
+function margenU(p){ var c=costoDe(p.id), n=netoDe(p); if(c==null||n==null) return null; return n-c; }
+function metaFC(){ return Number(POS.cfg.metas.food)||32; }
+function semFC(fc){ return fc==null ? "neutro" : fc<=metaFC() ? "ok" : (fc<=metaFC()+8 ? "bajo" : "off"); }
+function textoFC(fc){ return fc==null ? "sin costo" : fc.toFixed(1)+"%"; }
+function sinCosto(){ return CAT.filter(function(p){ return precioDe(p)!=null && costoDe(p.id)==null; }); }
+
+/* Ficha de costo (escandallo). Cada ingrediente con su cantidad y su
+   precio por unidad de compra. El factor de merma cubre lo que se pierde
+   al limpiar, pelar o porcionar; el rendimiento reparte el total entre
+   las porciones que salen de una preparación. */
+function fichaDe(id){
+  var f=POS.fichas[id];
+  if(!f||typeof f!=="object") f={ing:[], merma:0, rinde:1};
+  if(!Array.isArray(f.ing)) f.ing=[];
+  if(!(Number(f.rinde)>0)) f.rinde=1;
+  if(!(Number(f.merma)>=0)) f.merma=0;
+  return f;
+}
+function costoFicha(f){
+  var base=sumaBy(f.ing,function(i){ return (Number(i.c)||0)*(Number(i.cu)||0); });
+  return Math.round(base*(1+(Number(f.merma)||0)/100)/(Number(f.rinde)||1));
+}
+
+/* ---------- compras y gastos ---------- */
+function comprasEntre(d,h){ return POS.compras.filter(function(c){ return c.dia>=d && c.dia<=h; }); }
+function nombreCat(id){ for(var i=0;i<CATCOMPRA.length;i++) if(CATCOMPRA[i].id===id) return CATCOMPRA[i].n; return id; }
+function esMercaderia(id){ return ["insumo-coc","insumo-bar","cafe","pasteleria","envases"].indexOf(id)>=0; }
+
+/* ---------- mermas ---------- */
+function mermasEntre(d,h){ return POS.mermas.filter(function(m){ return m.dia>=d && m.dia<=h; }); }
+function valorMerma(m){ var c=costoDe(m.id); return c!=null ? c*m.q : 0; }
+function nombreMotivo(id){ for(var i=0;i<MOTIVOS.length;i++) if(MOTIVOS[i].id===id) return MOTIVOS[i].n; return id; }
+
+/* ---------- registro ---------- */
+function anotarCompra(o){
+  o.id="C"+Date.now().toString(36).toUpperCase();
+  o.ts=new Date().toISOString();
+  POS.compras.push(o); guardarPOS();
+  avisar("Compra anotada: "+plata(o.monto)+" en "+nombreCat(o.cat)+".","bien");
+}
+function anotarMerma(o){
+  o.id="M"+Date.now().toString(36).toUpperCase();
+  o.ts=new Date().toISOString();
+  POS.mermas.push(o);
+  descontar(o.id2, o.q);
+  guardarPOS(); guardarCtrl();
+  var v=valorMerma({id:o.id2,q:o.q});
+  avisar("Merma anotada: "+o.q+" de "+o.n+(v?" ("+plata(v)+")":"")+".","alerta");
+}
+
+/* ==================== VISTAS DE GESTIÓN ==================== */
+var SUBGEST=[
+  {id:"costos",  n:"Costos"},
+  {id:"compras", n:"Compras"},
+  {id:"mermas",  n:"Mermas"},
+  {id:"metas",   n:"Metas"}
+];
+var subGest="costos";
+function barraSub(lista, activo, alElegir){
+  var h='<div class="subtabs" role="tablist">';
+  lista.forEach(function(s){
+    h+='<button class="pila" type="button" role="tab" data-sub="'+s.id+'" aria-pressed="'+(s.id===activo?"true":"false")+'">'+esc(s.n)+"</button>";
+  });
+  return h+"</div>";
+}
+function colgarSub(cont, alElegir){
+  cont.querySelectorAll("[data-sub]").forEach(function(b){ b.onclick=function(){ alElegir(b.dataset.sub); }; });
+}
+function pintarGest(){
+  var t=$("#gestTabs"); if(!t) return;
+  t.innerHTML=barraSub(SUBGEST, subGest);
+  colgarSub(t, function(id){ subGest=id; pintarGest(); });
+  if(subGest==="costos") pintarCostos();
+  if(subGest==="compras") pintarCompras();
+  if(subGest==="mermas") pintarMermas();
+  if(subGest==="metas") pintarMetas();
+}
+
+/* ---------- costos ---------- */
+var grupoCosto="emp", ordenCosto="grupo";
+function pintarCostos(){
+  var c=$("#gestCuerpo"); if(!c) return;
+  var r=[hace(29), hoyISO()], m=metricas(r[0],r[1]);
+  var falta=sinCosto(), falta2=sinPrecio();
+
+  var h='<div class="seccion"><h2 class="vt">Cuánto cuesta lo que vendes</h2>'+
+    '<p class="vs">El food cost se calcula sobre la venta neta, sin el IVA: ese 19% no es tuyo, se le entrega al fisco. '+
+    'Un café de máquina sano anda entre 15% y 25%; un plato de cocina, entre 28% y 35%. Tu meta actual es '+metaFC()+'%.</p></div>';
+
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Food cost real · 30 días</span><span class="v num">'+
+      (m.fcReal==null?"—":m.fcReal.toFixed(1)+"%")+'</span><span class="p">'+
+      (m.fcReal==null? "faltan costos para calcularlo" : "meta "+metaFC()+"% · "+(m.fcReal<=metaFC()?"dentro":"sobre la meta"))+"</span></div>"+
+    '<div class="kpi"><span class="k">Margen bruto · 30 días</span><span class="v num">'+plata(m.margen)+'</span><span class="p">venta neta menos costo de lo vendido</span></div>'+
+    '<div class="kpi'+(falta.length?" ojo":"")+'"><span class="k">Sin costo</span><span class="v num">'+falta.length+'</span><span class="p">productos con precio pero sin costo</span></div>'+
+    '<div class="kpi'+(falta2.length?" ojo":"")+'"><span class="k">Sin precio</span><span class="v num">'+falta2.length+'</span><span class="p">no se pueden cobrar todavía</span></div>'+
+    "</div></div>";
+
+  if(falta.length){
+    h+='<div class="seccion"><div class="aviso ojo">'+ico("i-alerta",1.9)+
+      "<div><b>"+falta.length+" productos sin costo</b><span>Mientras falten, el food cost del local es una estimación incompleta. "+
+      "Empieza por los que más vendes: "+esc(falta.slice(0,3).map(function(p){ return p.n; }).join(" · "))+"</span></div></div></div>";
+  }
+
+  h+='<div class="seccion"><div class="pilas" id="cGrupos">'+GRUPOS.map(function(g){
+    return '<button class="pila" type="button" data-cg="'+g.id+'" aria-pressed="'+(g.id===grupoCosto?"true":"false")+'">'+esc(g.n)+"</button>";
+  }).join("")+'<button class="pila" type="button" data-cg="peores" aria-pressed="'+(grupoCosto==="peores"?"true":"false")+'">Peor margen</button></div></div>';
+
+  var lista;
+  if(grupoCosto==="peores"){
+    lista=CAT.filter(function(p){ return foodCost(p)!=null; }).sort(function(a,b){ return foodCost(b)-foodCost(a); }).slice(0,25);
+  } else {
+    lista=CAT.filter(function(p){ return p.g===grupoCosto; });
+  }
+
+  h+='<div class="seccion"><div class="tabox"><table class="tbl"><thead><tr>'+
+    "<th>Producto</th><th>Precio</th><th>Neto</th><th>Costo</th><th>Margen</th><th>Food cost</th><th></th>"+
+    "</tr></thead><tbody>";
+  if(!lista.length) h+='<tr><td colspan="7"><div class="vacio">No hay productos en este grupo.</div></td></tr>';
+  lista.forEach(function(p){
+    var pr=precioDe(p), n=netoDe(p), co=costoDe(p.id), mg=margenU(p), fc=foodCost(p);
+    h+="<tr><td><b>"+esc(p.n)+"</b><span class='mini'>"+esc(SUBN[p.sub]||p.sub)+"</span></td>"+
+      '<td class="num">'+(pr==null?"—":plata(pr))+"</td>"+
+      '<td class="num">'+(n==null?"—":plata(n))+"</td>"+
+      '<td><input class="mininum" data-costo="'+p.id+'" type="number" inputmode="numeric" min="0" step="10" value="'+(co==null?"":co)+'" placeholder="—" aria-label="Costo de '+esc(p.n)+'"></td>'+
+      '<td class="num">'+(mg==null?"—":plata(mg))+"</td>"+
+      '<td><span class="estado '+semFC(fc)+'">'+textoFC(fc)+"</span></td>"+
+      '<td><button class="btn chico suave" type="button" data-ficha="'+p.id+'">Ficha</button></td></tr>';
+  });
+  h+="</tbody></table></div></div>";
+
+  h+='<div class="seccion"><div class="fila"><button class="btn suave chico" id="btnCostoCSV" type="button">'+ico("i-descarga")+"Exportar costos y márgenes</button>"+
+     '<button class="btn suave chico" id="btnCostoPegar" type="button">Pegar costos desde una planilla</button></div></div>';
+
+  c.innerHTML=h;
+  c.querySelectorAll("[data-cg]").forEach(function(b){ b.onclick=function(){ grupoCosto=b.dataset.cg; pintarCostos(); }; });
+  c.querySelectorAll("[data-costo]").forEach(function(i){
+    i.onchange=function(){
+      var v=i.value===""? null : Math.max(0, Math.round(Number(i.value)||0));
+      if(v==null) delete POS.costos[i.dataset.costo]; else POS.costos[i.dataset.costo]=v;
+      guardarPOS(); pintarCostos();
+    };
+  });
+  c.querySelectorAll("[data-ficha]").forEach(function(b){ b.onclick=function(){ hojaFicha(itemCat(b.dataset.ficha)); }; });
+  $("#btnCostoCSV").onclick=function(){ exportarCostos(); };
+  $("#btnCostoPegar").onclick=hojaPegarCostos;
+}
+
+/* Ficha técnica completa: el costo (ingredientes, merma y rendimiento) y,
+   desde la versión 2.0, la estandarización operativa que antes vivía en el
+   escandallo de Emporio System: vajilla, utensilios, paso a paso, puntos
+   críticos y guía visual. Una sola ficha por producto. */
+var CAMPOS_FICHA=[
+  ["vaj","Vajilla y montaje"],["ute","Utensilios clave"],["prep","1 · Preparación"],
+  ["coc","2 · Cocción (temperaturas y tiempos)"],["mont","3 · Emplatado y montaje"],
+  ["crit","Puntos críticos (uno por línea)"],["vis","Guía visual de emplatado"]];
+function fichaMarkdown(p,f){
+  var total=costoFicha(f), pr=precioDe(p), n=pr==null?null:neto(pr), P=function(t){ return "[COMPLETAR "+t+"]"; };
+  var L=["# Ficha técnica: "+p.n, "", "**Rendimiento:** "+f.rinde+(+f.rinde===1?" porción":" porciones")+" · **Merma:** "+f.merma+"%", "",
+    "## Escandallo", "", "| Ingrediente | Cantidad | Costo por unidad | Costo |", "| :--- | ---: | ---: | ---: |"];
+  f.ing.forEach(function(i){ L.push("| "+(i.n||P(""))+" | "+(i.c||P("CANTIDAD"))+" "+(i.u||"")+" | "+(i.cu?plata(i.cu):P("PRECIO"))+" | "+plata((+i.c||0)*(+i.cu||0))+" |"); });
+  L.push("", "- **Costo por porción:** "+plata(total));
+  if(n) L.push("- **Precio en carta:** "+plata(pr)+" (neto "+plata(n)+") · **food cost:** "+(total?(total/n*100).toFixed(1)+"%":P("COSTOS")));
+  L.push("", "## Estandarización operativa", "");
+  CAMPOS_FICHA.forEach(function(c){
+    var v=(f[c[0]]||"").trim();
+    if(c[0]==="crit"){ L.push("**"+c[1].replace(" (uno por línea)","")+":**"); (v?v.split("\n"):[P("PUNTOS CRÍTICOS")]).forEach(function(x){ if(x.trim()) L.push("- "+x.trim()); }); }
+    else L.push("**"+c[1]+":** "+(v||P("")));
+  });
+  return L.join("\n");
+}
+function hojaFicha(p){
+  if(!p) return;
+  abrirHoja("Ficha técnica · "+p.n, function(b){
+    var f=fichaDe(p.id);
+    b.appendChild(el("p","vs","Anota los ingredientes con la cantidad que lleva una porción y lo que cuesta esa unidad al comprarla. "+
+      "El factor de merma cubre lo que se pierde al limpiar o porcionar. El rendimiento reparte el total entre las porciones que salen de una sola preparación."));
+    var cont=el("div","fichaing"); b.appendChild(cont);
+    var pie=el("div","seccion"); b.appendChild(pie);
+    var op=el("div","seccion");
+    op.innerHTML='<div class="rotulo"><b>Estandarización operativa</b></div>'+CAMPOS_FICHA.map(function(c){
+      return '<span class="campo"><label for="fo-'+c[0]+'">'+esc(c[1])+'</label><textarea id="fo-'+c[0]+'" data-fo="'+c[0]+'" rows="'+(c[0]==="crit"||c[0]==="prep"?3:2)+'">'+esc(f[c[0]]||"")+'</textarea></span>';
+    }).join("");
+    b.appendChild(op);
+    op.querySelectorAll("[data-fo]").forEach(function(t){ t.oninput=function(){ f[t.dataset.fo]=t.value; }; });
+    var acc=el("div","seccion"); b.appendChild(acc);
+
+    function pintar(){
+      cont.innerHTML="";
+      f.ing.forEach(function(ing,idx){
+        var fila=el("div","ingfila");
+        fila.innerHTML='<input data-i="n" type="text" value="'+esc(ing.n||"")+'" placeholder="Ingrediente" aria-label="Ingrediente">'+
+          '<input data-i="c" type="number" inputmode="decimal" step="any" min="0" value="'+(ing.c==null?"":ing.c)+'" placeholder="Cant." aria-label="Cantidad">'+
+          '<select data-i="u" aria-label="Unidad">'+UNID.map(function(u){ return '<option value="'+u.id+'"'+(ing.u===u.id?" selected":"")+">"+u.n+"</option>"; }).join("")+"</select>"+
+          '<input data-i="cu" type="number" inputmode="decimal" step="any" min="0" value="'+(ing.cu==null?"":ing.cu)+'" placeholder="$ por unidad" aria-label="Costo por unidad">'+
+          '<button class="icobtn chico" type="button" data-quita="'+idx+'" aria-label="Quitar">×</button>';
+        fila.querySelectorAll("[data-i]").forEach(function(inp){
+          inp.onchange=function(){
+            var k=inp.dataset.i;
+            ing[k] = (k==="n"||k==="u") ? inp.value : Number(inp.value)||0;
+            pintarPie();   /* solo los totales: rehacer las filas borraba lo que se tecleaba en el campo siguiente */
+          };
+        });
+        fila.querySelector("[data-quita]").onclick=function(){ f.ing.splice(idx,1); pintar(); };
+        cont.appendChild(fila);
+      });
+      var add=el("button","btn suave chico","Agregar ingrediente"); add.type="button";
+      add.onclick=function(){ f.ing.push({n:"",c:0,u:"g",cu:0}); pintar(); };
+      cont.appendChild(add);
+      pintarPie();
+    }
+    function pintarPie(){
+      var total=costoFicha(f), pr=precioDe(p), n=pr==null?null:neto(pr);
+      var fc = (n&&total) ? total/n*100 : null;
+      pie.innerHTML='<div class="filtros">'+
+        '<span class="campo"><label for="fMerma">Merma (%)</label><input id="fMerma" type="number" min="0" max="80" step="1" value="'+f.merma+'"></span>'+
+        '<span class="campo"><label for="fRinde">Rinde (porciones)</label><input id="fRinde" type="number" min="1" step="1" value="'+f.rinde+'"></span></div>'+
+        '<div class="kpis"><div class="kpi principal"><span class="k">Costo por porción</span><span class="v num">'+plata(total)+'</span>'+
+        '<span class="p">'+(n? "sobre un neto de "+plata(n) : "este producto todavía no tiene precio")+'</span></div>'+
+        '<div class="kpi"><span class="k">Food cost</span><span class="v num">'+(fc==null?"—":fc.toFixed(1)+"%")+'</span><span class="p">meta '+metaFC()+"%</span></div></div>";
+      $("#fMerma").onchange=function(){ f.merma=Math.max(0,Number(this.value)||0); pintarPie(); };
+      $("#fRinde").onchange=function(){ f.rinde=Math.max(1,Number(this.value)||1); pintarPie(); };
+    }
+    var usar=el("button","btn lleno","Guardar la ficha"); usar.type="button";
+    usar.onclick=function(){
+      POS.fichas[p.id]=f;
+      var con=f.ing.some(function(i){ return (+i.c||0)*(+i.cu||0)>0; });
+      if(con) POS.costos[p.id]=costoFicha(f);
+      guardarPOS(); cerrarHoja(); pintarCostos();
+      avisar(con? "Ficha guardada. Costo de "+p.n+" fijado en "+plata(POS.costos[p.id])+"." : "Ficha guardada. Falta el costo de los ingredientes.","bien");
+    };
+    var md=el("button","btn suave lleno chico","Copiar ficha en Markdown"); md.type="button";
+    md.onclick=function(){
+      var t=fichaMarkdown(p,f);
+      try{ navigator.clipboard.writeText(t).then(function(){ avisar("Ficha copiada.","bien"); },function(){ mostrarTexto(t); }); }
+      catch(e){ mostrarTexto(t); }
+    };
+    function mostrarTexto(t){
+      var ta=el("textarea"); ta.value=t; ta.rows=12; ta.style.width="100%"; ta.style.fontFamily="var(--mono)"; ta.style.fontSize="11px";
+      ta.style.border="1.5px solid var(--linea)"; ta.style.borderRadius="10px"; ta.style.padding="10px";
+      acc.appendChild(ta); ta.select(); avisar("El texto quedó seleccionado: cópialo con el teclado.","alerta");
+    }
+    acc.appendChild(usar); acc.appendChild(md);
+    pintar();
+  });
+}
+
+function hojaPegarCostos(){
+  abrirHoja("Pegar costos", function(b){
+    b.appendChild(el("p","vs","Pega dos columnas: nombre del producto y costo, separadas por tabulación, punto y coma o coma. "+
+      "Se buscan los nombres tal como aparecen en la carta; lo que no calce se informa y no se toca."));
+    var t=el("textarea"); t.rows=10; t.placeholder="Pino; 900\nCappuccino; 620";
+    t.style.width="100%"; t.style.fontFamily="var(--mono)"; t.style.fontSize="12px";
+    t.style.border="1.5px solid var(--linea)"; t.style.borderRadius="10px"; t.style.padding="10px";
+    b.appendChild(t);
+    var btn=el("button","btn lleno","Aplicar"); btn.type="button";
+    btn.onclick=function(){
+      var ok=0, malas=[];
+      t.value.split(/\r?\n/).forEach(function(l){
+        if(!l.trim()) return;
+        var p=l.split(/[\t;,]/);
+        if(p.length<2){ malas.push(l); return; }
+        var nom=p[0].trim().toLowerCase(), val=Math.round(Number(String(p[1]).replace(/[^\d.-]/g,""))||0);
+        var it=CAT.filter(function(x){ return x.n.toLowerCase()===nom; })[0];
+        if(!it||!val){ malas.push(l); return; }
+        POS.costos[it.id]=val; ok++;
+      });
+      guardarPOS(); cerrarHoja(); pintarCostos();
+      avisar(ok+" costos aplicados"+(malas.length? " · "+malas.length+" líneas no calzaron":"")+".", malas.length?"alerta":"bien");
+    };
+    b.appendChild(btn);
+  });
+}
+function exportarCostos(){
+  var f=[["Producto","Grupo","Subgrupo","Precio de carta","Neto","Costo","Margen","Food cost %"]];
+  CAT.forEach(function(p){
+    var pr=precioDe(p), n=netoDe(p), co=costoDe(p.id), fc=foodCost(p);
+    f.push([p.n, (GRUPOS.filter(function(g){return g.id===p.g;})[0]||{}).n||p.g, SUBN[p.sub]||p.sub,
+      pr==null?"":pr, n==null?"":n, co==null?"":co, margenU(p)==null?"":margenU(p), fc==null?"":fc.toFixed(1)]);
+  });
+  var t=csv(f); bajar("costos-y-margenes.csv", t, t);
+}
+
+/* ---------- compras y gastos ---------- */
+var rangoComp={modo:"mes", desde:hoyISO(), hasta:hoyISO()};
+function rangoDe(r){
+  if(r.modo==="dia") return [hoyISO(), hoyISO()];
+  if(r.modo==="semana") return [hace(6), hoyISO()];
+  if(r.modo==="mes"){ var d=new Date(); return [hoyISO(new Date(d.getFullYear(),d.getMonth(),1)), hoyISO()]; }
+  return [r.desde, r.hasta];
+}
+function barraRango(r, pre){
+  var M=[{id:"dia",n:"Hoy"},{id:"semana",n:"7 días"},{id:"mes",n:"Este mes"},{id:"rango",n:"Elegir fechas"}];
+  var h='<div class="pilas">'+M.map(function(m){
+    return '<button class="pila" type="button" data-rg="'+m.id+'" aria-pressed="'+(r.modo===m.id?"true":"false")+'">'+m.n+"</button>";
+  }).join("")+"</div>";
+  if(r.modo==="rango"){
+    h+='<div class="filtros"><span class="campo"><label for="'+pre+'D">Desde</label><input id="'+pre+'D" type="date" value="'+r.desde+'"></span>'+
+       '<span class="campo"><label for="'+pre+'H">Hasta</label><input id="'+pre+'H" type="date" value="'+r.hasta+'"></span></div>';
+  }
+  return h;
+}
+function colgarRango(c, r, pre, repintar){
+  c.querySelectorAll("[data-rg]").forEach(function(b){ b.onclick=function(){ r.modo=b.dataset.rg; repintar(); }; });
+  if(r.modo==="rango"){
+    var d=$("#"+pre+"D"), h=$("#"+pre+"H");
+    if(d) d.onchange=function(){ r.desde=d.value; repintar(); };
+    if(h) h.onchange=function(){ r.hasta=h.value; repintar(); };
+  }
+}
+
+function pintarCompras(){
+  var c=$("#gestCuerpo"); if(!c) return;
+  var r=rangoDe(rangoComp), cs=comprasEntre(r[0],r[1]);
+  var total=sumaBy(cs,function(x){ return x.monto; });
+  var merc=sumaBy(cs.filter(function(x){ return esMercaderia(x.cat); }),function(x){ return x.monto; });
+  var vtas=sumaBy(vivas(ventasEntre(r[0],r[1])),function(v){ return v.total; });
+  var netoV=neto(vtas);
+  var porCat={}; cs.forEach(function(x){ porCat[x.cat]=(porCat[x.cat]||0)+x.monto; });
+  var catArr=CATCOMPRA.filter(function(k){ return porCat[k.id]; }).map(function(k){ return {n:k.n, v:porCat[k.id]}; })
+    .sort(function(a,b){ return b.v-a.v; });
+
+  var h='<div class="seccion"><h2 class="vt">Lo que sale</h2>'+
+    '<p class="vs">Todo lo que pagas: mercadería, envases, aseo, servicios, arriendo, sueldos. '+
+    'Lo que no anotes aquí no aparece después en el resultado, y el mes se ve mejor de lo que fue.</p></div>';
+
+  h+='<div class="seccion">'+barraRango(rangoComp,"cp")+"</div>";
+
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Gastos del período</span><span class="v num">'+plata(total)+'</span><span class="p">'+cs.length+(cs.length===1?" compra anotada":" compras anotadas")+"</span></div>"+
+    '<div class="kpi"><span class="k">Mercadería</span><span class="v num">'+plata(merc)+'</span><span class="p">'+(netoV? (merc/netoV*100).toFixed(1)+"% de la venta neta" : "sin ventas en el período")+"</span></div>"+
+    '<div class="kpi"><span class="k">Venta neta</span><span class="v num">'+plata(netoV)+'</span><span class="p">para comparar contra el gasto</span></div>'+
+    '<div class="kpi'+((netoV&&total>netoV)?" mal":"")+'"><span class="k">Queda</span><span class="v num">'+plata(netoV-total)+'</span><span class="p">venta neta menos todo lo anotado</span></div>'+
+    "</div></div>";
+
+  h+='<div class="seccion"><button class="btn lleno" id="btnNuevaCompra" type="button">'+ico("i-check",2)+"Anotar una compra o un gasto</button></div>";
+
+  if(catArr.length){
+    h+='<div class="seccion">'+tarjetaGraf("En qué se fue", plata(total)+" en el período", barrasHTML(catArr))+"</div>";
+  }
+
+  h+='<div class="seccion"><div class="rotulo">Detalle</div><div class="tabox"><table class="tbl"><thead><tr>'+
+    "<th>Fecha</th><th>Proveedor</th><th>Categoría</th><th>Detalle</th><th>Documento</th><th>Monto</th><th></th></tr></thead><tbody>";
+  if(!cs.length) h+='<tr><td colspan="7"><div class="vacio">Todavía no hay compras anotadas en este período.</div></td></tr>';
+  cs.slice().sort(function(a,b){ return a.dia<b.dia?1:-1; }).forEach(function(x){
+    h+="<tr><td>"+esc(x.dia)+"</td><td>"+esc(x.prov||"—")+"</td><td>"+esc(nombreCat(x.cat))+"</td>"+
+      "<td>"+esc(x.det||"—")+"</td><td>"+esc(x.doc||"—")+'</td><td class="num">'+plata(x.monto)+"</td>"+
+      '<td><button class="btn chico suave" type="button" data-borrac="'+x.id+'">Borrar</button></td></tr>';
+  });
+  h+="</tbody></table></div></div>";
+  h+='<div class="seccion"><button class="btn suave chico" id="btnCompCSV" type="button">'+ico("i-descarga")+"Exportar las compras del período</button></div>";
+
+  c.innerHTML=h;
+  colgarRango(c, rangoComp, "cp", pintarCompras);
+  $("#btnNuevaCompra").onclick=hojaCompra;
+  $("#btnCompCSV").onclick=function(){ exportarCompras(r[0],r[1]); };
+  c.querySelectorAll("[data-borrac]").forEach(function(b){
+    b.onclick=function(){
+      var id=b.dataset.borrac;
+      POS.compras=POS.compras.filter(function(x){ return x.id!==id; });
+      guardarPOS(); pintarCompras(); avisar("Compra borrada.","bien");
+    };
+  });
+}
+
+function hojaCompra(){
+  abrirHoja("Anotar compra o gasto", function(b){
+    var provs=(POS.cfg.provee||[]).slice();
+    POS.compras.forEach(function(x){ if(x.prov && provs.indexOf(x.prov)<0) provs.push(x.prov); });
+    b.innerHTML='<div class="filtros">'+
+      '<span class="campo"><label for="kDia">Fecha</label><input id="kDia" type="date" value="'+hoyISO()+'"></span>'+
+      '<span class="campo"><label for="kProv">Proveedor</label><input id="kProv" type="text" list="lProv" placeholder="Nombre"><datalist id="lProv">'+
+        provs.map(function(p){ return '<option value="'+esc(p)+'">'; }).join("")+"</datalist></span>"+
+      '<span class="campo"><label for="kCat">Categoría</label><select id="kCat">'+
+        CATCOMPRA.map(function(k){ return '<option value="'+k.id+'">'+esc(k.n)+"</option>"; }).join("")+"</select></span>"+
+      '<span class="campo"><label for="kMonto">Monto total</label><input id="kMonto" type="number" inputmode="numeric" min="0" step="100" placeholder="$"></span>'+
+      '<span class="campo"><label for="kPago">Cómo se pagó</label><select id="kPago">'+
+        PAGOS.map(function(p){ return '<option value="'+p.id+'">'+esc(p.n)+"</option>"; }).join("")+"</select></span>"+
+      '<span class="campo"><label for="kDoc">Documento</label><input id="kDoc" type="text" placeholder="Factura 1234"></span>'+
+      '</div><div class="campo" style="margin-top:10px"><label for="kDet">Detalle</label><input id="kDet" type="text" placeholder="Harina, 25 kg"></div>';
+    var btn=el("button","btn lleno","Anotar"); btn.type="button"; btn.style.marginTop="12px";
+    btn.onclick=function(){
+      var monto=Math.round(Number($("#kMonto").value)||0);
+      if(monto<=0){ avisar("Falta el monto de la compra.","mal"); return; }
+      anotarCompra({dia:$("#kDia").value||hoyISO(), prov:($("#kProv").value||"").trim(),
+        cat:$("#kCat").value, monto:monto, pago:$("#kPago").value,
+        doc:($("#kDoc").value||"").trim(), det:($("#kDet").value||"").trim(),
+        resp:POS.cfg.respActivo||"(sin asignar)"});
+      cerrarHoja(); pintarCompras();
+    };
+    b.appendChild(btn);
+  });
+}
+function exportarCompras(d,h){
+  var f=[["ID","Fecha","Proveedor","Categoría","Detalle","Documento","Medio de pago","Monto","Anotó"]];
+  comprasEntre(d,h).forEach(function(x){
+    f.push([x.id,x.dia,x.prov,nombreCat(x.cat),x.det,x.doc,
+      (PAGOS.filter(function(p){return p.id===x.pago;})[0]||{}).n||x.pago, x.monto, x.resp]);
+  });
+  var t=csv(f); bajar("compras-"+d+"-a-"+h+".csv", t, t);
+}
+
+/* ---------- mermas ---------- */
+var rangoMer={modo:"mes", desde:hoyISO(), hasta:hoyISO()};
+function pintarMermas(){
+  var c=$("#gestCuerpo"); if(!c) return;
+  var r=rangoDe(rangoMer), ms=mermasEntre(r[0],r[1]);
+  var valor=sumaBy(ms,function(m){ return valorMerma({id:m.id2,q:m.q}); });
+  var unid=sumaBy(ms,function(m){ return m.q; });
+  var netoV=neto(sumaBy(vivas(ventasEntre(r[0],r[1])),function(v){ return v.total; }));
+  var pct=netoV? valor/netoV*100 : null;
+  var meta=Number(POS.cfg.metas.merma)||3;
+  var porMot={}, porProd={};
+  ms.forEach(function(m){ porMot[m.motivo]=(porMot[m.motivo]||0)+valorMerma({id:m.id2,q:m.q}); porProd[m.n]=(porProd[m.n]||0)+m.q; });
+  var motArr=MOTIVOS.filter(function(k){ return porMot[k.id]; }).map(function(k){ return {n:k.n, v:porMot[k.id]}; }).sort(function(a,b){ return b.v-a.v; });
+  var prodArr=Object.keys(porProd).map(function(k){ return {n:k, v:porProd[k]}; }).sort(function(a,b){ return b.v-a.v; }).slice(0,8);
+
+  var h='<div class="seccion"><h2 class="vt">Lo que se perdió</h2>'+
+    '<p class="vs">Anotar la merma no es castigar a nadie: es la única forma de saber si conviene hornear una lata más a las nueve de la noche. '+
+    'Lo que anotes aquí se descuenta del stock y se valoriza con el costo de la ficha.</p></div>';
+
+  h+='<div class="seccion">'+barraRango(rangoMer,"mr")+"</div>";
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi'+(pct!=null&&pct>meta?" mal":" principal")+'"><span class="k">Merma del período</span><span class="v num">'+plata(valor)+'</span>'+
+      '<span class="p">'+(pct==null? "sin ventas para comparar" : pct.toFixed(1)+"% de la venta neta · meta "+meta+"%")+"</span></div>"+
+    '<div class="kpi"><span class="k">Unidades</span><span class="v num">'+unid+'</span><span class="p">'+ms.length+(ms.length===1?" registro":" registros")+"</span></div>"+
+    '<div class="kpi"><span class="k">Equivale a</span><span class="v num">'+(valor&&netoV? Math.round(valor/ (netoV/Math.max(1,sumaBy(vivas(ventasEntre(r[0],r[1])),function(v){return 1;})) )) : 0)+'</span><span class="p">tickets promedio perdidos</span></div>'+
+    "</div></div>";
+
+  h+='<div class="seccion"><button class="btn lleno" id="btnNuevaMerma" type="button">'+ico("i-alerta",2)+"Anotar una merma</button></div>";
+
+  if(motArr.length){
+    h+='<div class="seccion dos">'+
+      tarjetaGraf("Por qué se perdió", plata(valor)+" en el período", barrasHTML(motArr))+
+      tarjetaGraf("Qué se perdió","unidades", barrasHTML(prodArr,function(i){ return i.v+" u."; }))+"</div>";
+  }
+
+  h+='<div class="seccion"><div class="rotulo">Detalle</div><div class="tabox"><table class="tbl"><thead><tr>'+
+    "<th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Motivo</th><th>Costo</th><th>Anotó</th><th></th></tr></thead><tbody>";
+  if(!ms.length) h+='<tr><td colspan="7"><div class="vacio">Sin mermas anotadas en este período. Ojalá sea cierto.</div></td></tr>';
+  ms.slice().sort(function(a,b){ return a.ts<b.ts?1:-1; }).forEach(function(m){
+    h+="<tr><td>"+esc(m.dia)+"</td><td>"+esc(m.n)+'</td><td class="num">'+m.q+"</td><td>"+esc(nombreMotivo(m.motivo))+
+      '</td><td class="num">'+plata(valorMerma({id:m.id2,q:m.q}))+"</td><td>"+esc(m.resp||"—")+
+      '</td><td><button class="btn chico suave" type="button" data-borram="'+m.id+'">Borrar</button></td></tr>';
+  });
+  h+="</tbody></table></div></div>";
+  h+='<div class="seccion"><button class="btn suave chico" id="btnMerCSV" type="button">'+ico("i-descarga")+"Exportar las mermas del período</button></div>";
+
+  c.innerHTML=h;
+  colgarRango(c, rangoMer, "mr", pintarMermas);
+  $("#btnNuevaMerma").onclick=hojaMerma;
+  $("#btnMerCSV").onclick=function(){ exportarMermas(r[0],r[1]); };
+  c.querySelectorAll("[data-borram]").forEach(function(b){
+    b.onclick=function(){
+      var id=b.dataset.borram, m=POS.mermas.filter(function(x){ return x.id===id; })[0];
+      if(m) devolver(m.id2, m.q);
+      POS.mermas=POS.mermas.filter(function(x){ return x.id!==id; });
+      guardarPOS(); guardarCtrl(); pintarMermas(); avisar("Merma borrada y stock devuelto.","bien");
+    };
+  });
+}
+function hojaMerma(){
+  abrirHoja("Anotar merma", function(b){
+    b.innerHTML='<div class="filtros">'+
+      '<span class="campo"><label for="mProd">Producto</label><input id="mProd" type="text" list="lProd" placeholder="Escribe y elige"><datalist id="lProd">'+
+        CAT.map(function(p){ return '<option value="'+esc(p.n)+'">'; }).join("")+"</datalist></span>"+
+      '<span class="campo"><label for="mCant">Cantidad</label><input id="mCant" type="number" inputmode="numeric" min="1" step="1" value="1"></span>'+
+      '<span class="campo"><label for="mMot">Motivo</label><select id="mMot">'+
+        MOTIVOS.map(function(k){ return '<option value="'+k.id+'">'+esc(k.n)+"</option>"; }).join("")+"</select></span>"+
+      '<span class="campo"><label for="mDia">Fecha</label><input id="mDia" type="date" value="'+hoyISO()+'"></span>'+
+      "</div>";
+    var nota=el("p","vs","El stock baja al anotar. Si te equivocas, borra el registro y vuelve solo.");
+    nota.style.marginTop="10px"; b.appendChild(nota);
+    var btn=el("button","btn lleno","Anotar merma"); btn.type="button"; btn.style.marginTop="10px";
+    btn.onclick=function(){
+      var nom=($("#mProd").value||"").trim().toLowerCase();
+      var it=CAT.filter(function(p){ return p.n.toLowerCase()===nom; })[0];
+      if(!it){ avisar("No encontré ese producto en la carta.","mal"); return; }
+      var q=Math.max(1, Math.round(Number($("#mCant").value)||1));
+      anotarMerma({dia:$("#mDia").value||hoyISO(), id2:it.id, n:it.n, q:q,
+        motivo:$("#mMot").value, resp:POS.cfg.respActivo||"(sin asignar)"});
+      cerrarHoja(); pintarMermas();
+    };
+    b.appendChild(btn);
+  });
+}
+function exportarMermas(d,h){
+  var f=[["ID","Fecha","Hora","Producto","Cantidad","Motivo","Costo unitario","Costo total","Anotó"]];
+  mermasEntre(d,h).forEach(function(m){
+    var cu=costoDe(m.id2);
+    f.push([m.id,m.dia,hora(m.ts),m.n,m.q,nombreMotivo(m.motivo), cu==null?"":cu, valorMerma({id:m.id2,q:m.q}), m.resp]);
+  });
+  var t=csv(f); bajar("mermas-"+d+"-a-"+h+".csv", t, t);
+}
+
+/* ---------- metas ---------- */
+function pintarMetas(){
+  var c=$("#gestCuerpo"); if(!c) return;
+  var mt=POS.cfg.metas, g=EAPOS.general();
+  var r=[hace(29), hoyISO()], m=metricas(r[0],r[1]);
+  var diasConVenta=Object.keys(m.porDia).length||1;
+  var promDia=Math.round(m.total/diasConVenta);
+  var sugDia=Math.round(promDia*1.05/1000)*1000;
+
+  var h='<div class="seccion"><h2 class="vt">Contra qué te mides</h2>'+
+    '<p class="vs">Estas cuatro cifras alimentan el semáforo del panel y del informe. Son parte de la configuración del sistema general: '+
+    'se cambian en la Prueba, se simulan y se aplican.</p></div>';
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Meta por día</span><span class="v num">'+(mt.dia?plata(mt.dia):"—")+'</span><span class="p">'+(mt.dia?"vigente":"sin meta")+'</span></div>'+
+    '<div class="kpi"><span class="k">Meta del mes</span><span class="v num">'+(mt.mes?plata(mt.mes):"—")+'</span><span class="p">venta con IVA</span></div>'+
+    '<div class="kpi"><span class="k">Food cost máximo</span><span class="v num">'+mt.food+'%</span><span class="p">sobre la venta neta</span></div>'+
+    '<div class="kpi"><span class="k">Merma máxima</span><span class="v num">'+mt.merma+'%</span><span class="p">de la venta neta</span></div>'+
+    "</div></div>";
+  h+='<div class="seccion"><div class="aviso">'+ico("i-panel",1.9)+
+    "<div><b>Tus últimos 30 días</b><span>Vendiste "+plata(m.total)+" en "+diasConVenta+" días con venta: "+plata(promDia)+" por día en promedio"+
+    (m.fcReal!=null? " · food cost real "+m.fcReal.toFixed(1)+"%":"")+(m.total?". Una meta diaria creíble rondaría "+plata(sugDia)+".":".")+"</span></div>"+
+    '<button class="btn chico suave" type="button" id="btnMetaPrueba">Cambiar en Prueba</button></div></div>';
+  h+='<p class="mini">Configuración vigente: versión '+g.v+(g.ts?" · aplicada el "+fechaLarga(diaDe(g.ts))+(g.por?" por "+esc(g.por):""):"")+".</p>";
+  c.innerHTML=h;
+  $("#btnMetaPrueba").onclick=abrirPrueba;
+}
+
+/* ==================== MEDICIÓN ====================
+   Un solo lugar que calcula. Todo lo que se muestra en el panel, en las
+   estadísticas y en el informe sale de esta función, para que tres
+   pantallas no puedan contradecirse entre ellas.
+   ================================================================== */
+function metricas(desde,hasta){
+  var todas=ventasEntre(desde,hasta), vs=vivas(todas);
+  var m={
+    desde:desde, hasta:hasta,
+    nVentas:vs.length, anuladas:todas.length-vs.length,
+    total:0, neto:0, iva:0, propina:0, unidades:0,
+    porHora:{}, porDia:{}, porGrupo:{}, porProd:{}, porPago:{}, porModo:{}, porResp:{}, porSemana:{},
+    costoVendido:0, conCosto:0, sinCosto:0
+  };
+  vs.forEach(function(v){
+    m.total+=v.total; m.neto+=v.neto; m.iva+=v.iva; m.propina+=v.propina;
+    var hh=String(new Date(v.ts).getHours()).padStart(2,"0");
+    m.porHora[hh]=(m.porHora[hh]||0)+v.total;
+    m.porDia[diaDe(v.ts)]=(m.porDia[diaDe(v.ts)]||0)+v.total;
+    m.porSemana[new Date(v.ts).getDay()]=(m.porSemana[new Date(v.ts).getDay()]||0)+v.total;
+    m.porPago[v.pago]=(m.porPago[v.pago]||0)+v.total;
+    m.porModo[v.modo]=(m.porModo[v.modo]||0)+v.total;
+    m.porResp[v.resp]=m.porResp[v.resp]||{v:0,n:0}; m.porResp[v.resp].v+=v.total; m.porResp[v.resp].n++;
+    v.lineas.forEach(function(l){
+      var it=itemCat(l.id), g=it?it.g:"otro", co=costoDe(l.id);
+      m.unidades+=l.q;
+      m.porGrupo[g]=(m.porGrupo[g]||0)+l.p*l.q;
+      var P=m.porProd[l.id]=m.porProd[l.id]||{id:l.id, n:l.n, q:0, m:0, costo:0, conCosto:co!=null};
+      P.q+=l.q; P.m+=l.p*l.q;
+      if(co!=null){ P.costo+=co*l.q; m.costoVendido+=co*l.q; m.conCosto+=neto(l.p*l.q); }
+      else m.sinCosto+=neto(l.p*l.q);
+    });
+  });
+  m.ticket = m.nVentas ? Math.round(m.total/m.nVentas) : 0;
+  m.unidadesPorVenta = m.nVentas ? (m.unidades/m.nVentas) : 0;
+  /* El food cost real solo puede calcularse sobre lo que sí tiene costo.
+     Mezclarlo con lo que no lo tiene daría un número bonito y falso. */
+  m.fcReal = m.conCosto ? (m.costoVendido/m.conCosto*100) : null;
+  m.cobertura = (m.conCosto+m.sinCosto) ? m.conCosto/(m.conCosto+m.sinCosto)*100 : 0;
+  m.margen = Math.round(m.conCosto - m.costoVendido);
+  var cs=comprasEntre(desde,hasta);
+  m.compras=sumaBy(cs,function(x){ return x.monto; });
+  m.comprasMerc=sumaBy(cs.filter(function(x){ return esMercaderia(x.cat); }),function(x){ return x.monto; });
+  m.porCatCompra={}; cs.forEach(function(x){ m.porCatCompra[x.cat]=(m.porCatCompra[x.cat]||0)+x.monto; });
+  var ms=mermasEntre(desde,hasta);
+  m.mermaValor=sumaBy(ms,function(x){ return valorMerma({id:x.id2,q:x.q}); });
+  m.mermaUnid=sumaBy(ms,function(x){ return x.q; });
+  m.mermaPct = m.neto ? m.mermaValor/m.neto*100 : null;
+  /* Resultado de caja: lo que entró sin IVA menos todo lo que se anotó
+     que salió. No es la utilidad contable: solo ve lo que registraste. */
+  m.resultado = Math.round(m.neto - m.compras);
+  m.dias = Object.keys(m.porDia).length;
+  var hs=Object.keys(m.porHora).sort(function(a,b){ return m.porHora[b]-m.porHora[a]; });
+  m.horaPunta = hs.length? hs[0] : null;
+  return m;
+}
+function periodoAnterior(desde,hasta){
+  var d1=new Date(desde+"T12:00:00"), d2=new Date(hasta+"T12:00:00");
+  var largo=Math.round((d2-d1)/86400000)+1;
+  var f2=new Date(d1); f2.setDate(f2.getDate()-1);
+  var f1=new Date(f2); f1.setDate(f1.getDate()-(largo-1));
+  return [hoyISO(f1), hoyISO(f2)];
+}
+function delta(a,b){ if(!b) return null; return (a-b)/b*100; }
+function flecha(d, alReves){
+  if(d==null) return '<span class="dlt neutro">sin base</span>';
+  var bien = alReves ? d<=0 : d>=0;
+  return '<span class="dlt '+(bien?"sube":"baja")+'">'+(d>=0?"▲":"▼")+" "+Math.abs(d).toFixed(1)+"%</span>";
+}
+
+/* ---------- ingeniería de menú ----------
+   Clasifica cada producto por dos ejes: cuánto se vende comparado con el
+   promedio, y cuánto margen deja comparado con el promedio. La regla del
+   70% viene de Kasavana y Smith (1982) y sigue siendo el estándar.
+   ESTRELLA  se vende y deja: cuídala, no la cambies.
+   CABALLO   se vende y deja poco: sube el precio de a poco o baja el costo.
+   ENIGMA    deja pero no se vende: muéstralo mejor, ofrécelo primero.
+   PERRO     ni se vende ni deja: sácalo de la carta.                  */
+function ingenieriaMenu(m){
+  var items=Object.keys(m.porProd).map(function(k){ return m.porProd[k]; })
+    .filter(function(p){ return p.conCosto && p.q>0; });
+  if(items.length<4) return null;
+  var totQ=sumaBy(items,function(p){ return p.q; });
+  var totMargen=sumaBy(items,function(p){ return neto(p.m)-p.costo; });
+  var margenProm=totMargen/totQ;
+  var umbralQ=(totQ/items.length)*0.7;
+  items.forEach(function(p){
+    p.margenU=(neto(p.m)-p.costo)/p.q;
+    p.pop = p.q>=umbralQ;
+    p.rico = p.margenU>=margenProm;
+    p.clase = p.pop ? (p.rico?"estrella":"caballo") : (p.rico?"enigma":"perro");
+  });
+  return {items:items.sort(function(a,b){ return b.q-a.q; }), margenProm:margenProm, umbralQ:umbralQ};
+}
+var CLASES={
+  estrella:{n:"Estrellas", d:"Se venden y dejan margen. No les muevas nada: son la razón por la que el mes cierra."},
+  caballo: {n:"Caballos de batalla", d:"Se venden mucho y dejan poco. Sube el precio de a poco, o baja el costo sin tocar la porción."},
+  enigma:  {n:"Enigmas", d:"Dejan margen pero casi nadie los pide. Ponlos adelante en la carta y que el equipo los ofrezca primero."},
+  perro:   {n:"Perros", d:"Ni se venden ni dejan. Ocupan espacio en la carta y en la cámara: sácalos o reinvéntalos."}
+};
+
+/* ==================== ESTADÍSTICAS ==================== */
+var rangoEst={modo:"semana", desde:hoyISO(), hasta:hoyISO()};
+var DIASEM=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+
+function pintarEstad(){
+  var c=$("#infCuerpo"); if(!c) return;
+  var r=rangoDe(rangoEst), m=metricas(r[0],r[1]);
+  var pa=periodoAnterior(r[0],r[1]), ma=metricas(pa[0],pa[1]);
+
+  var h='<div class="seccion"><h2 class="vt">Cómo va el local</h2>'+
+    '<p class="vs">Del '+fechaLarga(r[0])+" al "+fechaLarga(r[1])+". Cada cifra se compara con los "+
+    (Math.round((new Date(r[1])-new Date(r[0]))/86400000)+1)+" días anteriores, del "+fechaLarga(pa[0])+" al "+fechaLarga(pa[1])+".</p></div>";
+
+  h+='<div class="seccion">'+barraRango(rangoEst,"es")+"</div>";
+
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Vendido</span><span class="v num">'+plata(m.total)+'</span>'+
+      '<span class="p">'+flecha(delta(m.total,ma.total))+" · "+m.nVentas+" ventas</span></div>"+
+    '<div class="kpi"><span class="k">Ticket promedio</span><span class="v num">'+plata(m.ticket)+'</span><span class="p">'+flecha(delta(m.ticket,ma.ticket))+"</span></div>"+
+    '<div class="kpi"><span class="k">Venta neta</span><span class="v num">'+plata(m.neto)+'</span><span class="p">IVA '+plata(m.iva)+"</span></div>"+
+    '<div class="kpi"><span class="k">Unidades</span><span class="v num">'+m.unidades+'</span><span class="p">'+m.unidadesPorVenta.toFixed(1)+" por venta</span></div>"+
+    '<div class="kpi'+(m.fcReal!=null&&m.fcReal>metaFC()?" ojo":"")+'"><span class="k">Food cost</span><span class="v num">'+
+      (m.fcReal==null?"—":m.fcReal.toFixed(1)+"%")+'</span><span class="p">'+
+      (m.fcReal==null? "faltan costos" : "meta "+metaFC()+"% · calculado sobre el "+m.cobertura.toFixed(0)+"% de la venta")+"</span></div>"+
+    '<div class="kpi"><span class="k">Margen bruto</span><span class="v num">'+plata(m.margen)+'</span><span class="p">neto menos costo de lo vendido</span></div>'+
+    '<div class="kpi"><span class="k">Gastos anotados</span><span class="v num">'+plata(m.compras)+'</span><span class="p">'+flecha(delta(m.compras,ma.compras),true)+"</span></div>"+
+    '<div class="kpi'+(m.resultado<0?" mal":"")+'"><span class="k">Resultado de caja</span><span class="v num">'+plata(m.resultado)+'</span><span class="p">neto menos lo que anotaste que salió</span></div>'+
+    "</div></div>";
+
+  if(m.mermaValor){
+    h+='<div class="seccion"><div class="aviso'+((m.mermaPct||0)>(Number(POS.cfg.metas.merma)||3)?" alerta":"")+'">'+ico("i-alerta",1.9)+
+      "<div><b>"+plata(m.mermaValor)+" de merma</b><span>"+m.mermaUnid+" unidades"+
+      (m.mermaPct!=null? " · "+m.mermaPct.toFixed(1)+"% de la venta neta (meta "+(POS.cfg.metas.merma||3)+"%)":"")+"</span></div></div></div>";
+  }
+
+  var horas=[]; for(var i=7;i<=23;i++){ var k=String(i).padStart(2,"0"); horas.push({h:k, v:m.porHora[k]||0}); }
+  var sem=[1,2,3,4,5,6,0].map(function(d){ return {n:DIASEM[d].slice(0,3), v:m.porSemana[d]||0}; });
+  var prods=Object.keys(m.porProd).map(function(k){ return m.porProd[k]; });
+  var topQ=prods.slice().sort(function(a,b){ return b.q-a.q; }).slice(0,8).map(function(p){ return {n:p.n, v:p.q}; });
+  var topM=prods.slice().sort(function(a,b){ return b.m-a.m; }).slice(0,8).map(function(p){ return {n:p.n, v:p.m}; });
+  var grup=GRUPOS.filter(function(g){ return m.porGrupo[g.id]; }).map(function(g){ return {n:g.n, v:m.porGrupo[g.id]}; }).sort(function(a,b){ return b.v-a.v; });
+  var modo=Object.keys(m.porModo).map(function(k){ return {n:MODOS[k]||k, v:m.porModo[k]}; }).sort(function(a,b){ return b.v-a.v; });
+  var pago=PAGOS.filter(function(p){ return m.porPago[p.id]; }).map(function(p){ return {n:p.n, v:m.porPago[p.id]}; }).sort(function(a,b){ return b.v-a.v; });
+  var resp=Object.keys(m.porResp).map(function(k){ return {n:k+" ("+m.porResp[k].n+")", v:m.porResp[k].v}; }).sort(function(a,b){ return b.v-a.v; });
+
+  h+='<div class="seccion dos">';
+  h+=tarjetaGraf("A qué hora se vende", m.horaPunta? "la punta es a las "+m.horaPunta+":00" : "sin datos", m.total? graficoHoras(horas) : '<div class="vacio">Sin ventas en el período.</div>');
+  h+=tarjetaGraf("Qué día se vende","de lunes a domingo", m.total? barrasHTML(sem) : '<div class="vacio">Sin ventas en el período.</div>');
+  h+="</div>";
+  h+='<div class="seccion dos">';
+  h+=tarjetaGraf("Más pedidos","unidades", topQ.length? barrasHTML(topQ,function(i){ return i.v+" u."; }) : '<div class="vacio">Sin datos.</div>');
+  h+=tarjetaGraf("Los que más dinero traen","venta bruta", topM.length? barrasHTML(topM) : '<div class="vacio">Sin datos.</div>');
+  h+="</div>";
+  h+='<div class="seccion dos">';
+  h+=tarjetaGraf("Por sector de la carta","", grup.length? barrasHTML(grup) : '<div class="vacio">Sin datos.</div>');
+  h+=tarjetaGraf("Local, llevar y DesertGo","", modo.length? barrasHTML(modo) : '<div class="vacio">Sin datos.</div>');
+  h+="</div>";
+  h+='<div class="seccion dos">';
+  h+=tarjetaGraf("Medio de pago","", pago.length? barrasHTML(pago) : '<div class="vacio">Sin datos.</div>');
+  h+=tarjetaGraf("Por turno","quién registró la venta", resp.length? barrasHTML(resp) : '<div class="vacio">Sin datos.</div>');
+  h+="</div>";
+
+  var ing=ingenieriaMenu(m);
+  h+='<div class="seccion"><div class="rotulo"><b>Ingeniería de carta</b></div>';
+  if(!ing){
+    h+='<div class="vacio">Hace falta vender al menos cuatro productos con costo definido para clasificarlos. '+
+       "Completa los costos en Gestión → Costos.</div>";
+  } else {
+    h+='<p class="vs">Cada producto se compara con el promedio del período en dos cosas: cuánto se pide y cuánto margen deja. '+
+       "Se usa la regla del 70%: un producto es popular si vende al menos el 70% de lo que vendería si todos se pidieran por igual.</p>";
+    ["estrella","caballo","enigma","perro"].forEach(function(cl){
+      var lista=ing.items.filter(function(p){ return p.clase===cl; });
+      if(!lista.length) return;
+      h+='<div class="clase '+cl+'"><div class="ct"><b>'+CLASES[cl].n+"</b><span>"+esc(CLASES[cl].d)+"</span></div>"+
+        '<div class="tabox"><table class="tbl"><thead><tr><th>Producto</th><th>Unidades</th><th>Margen por unidad</th><th>Margen total</th></tr></thead><tbody>';
+      lista.forEach(function(p){
+        h+="<tr><td>"+esc(p.n)+'</td><td class="num">'+p.q+'</td><td class="num">'+plata(p.margenU)+'</td><td class="num">'+plata(neto(p.m)-p.costo)+"</td></tr>";
+      });
+      h+="</tbody></table></div></div>";
+    });
+  }
+  h+="</div>";
+
+  c.innerHTML=h;
+  colgarRango(c, rangoEst, "es", pintarEstad);
+}
+
+/* ==================== ENTREGAR ==================== */
+var rangoEnt={modo:"mes", desde:hoyISO(), hasta:hoyISO()};
+function resumenTexto(d,h){
+  var m=metricas(d,h), pa=periodoAnterior(d,h), ma=metricas(pa[0],pa[1]);
+  var prods=Object.keys(m.porProd).map(function(k){ return m.porProd[k]; }).sort(function(a,b){ return b.q-a.q; }).slice(0,5);
+  var L=[];
+  L.push("EMPORIO ANDINO · "+(d===h? fechaLarga(d) : fechaLarga(d)+" al "+fechaLarga(h)));
+  L.push("");
+  L.push("Vendido: "+plata(m.total)+" en "+m.nVentas+" ventas");
+  L.push("Ticket promedio: "+plata(m.ticket));
+  L.push("Venta neta: "+plata(m.neto)+" · IVA: "+plata(m.iva));
+  if(m.propina) L.push("Propinas: "+plata(m.propina));
+  var dl=delta(m.total,ma.total);
+  if(dl!=null) L.push("Contra el período anterior: "+(dl>=0?"+":"")+dl.toFixed(1)+"%");
+  L.push("");
+  if(m.fcReal!=null) L.push("Food cost: "+m.fcReal.toFixed(1)+"% (meta "+metaFC()+"%)");
+  L.push("Margen bruto: "+plata(m.margen));
+  L.push("Gastos anotados: "+plata(m.compras));
+  L.push("Resultado de caja: "+plata(m.resultado));
+  if(m.mermaValor) L.push("Merma: "+plata(m.mermaValor)+" ("+m.mermaUnid+" unidades)");
+  L.push("");
+  if(m.horaPunta) L.push("Hora punta: "+m.horaPunta+":00");
+  if(prods.length){
+    L.push("Más pedidos:");
+    prods.forEach(function(p){ L.push("  "+p.q+" × "+p.n); });
+  }
+  var off=criticos().filter(function(x){ return x.e==="off"; });
+  if(off.length) L.push("", "En cero ahora: "+off.map(function(x){ return x.p.n; }).join(", "));
+  var pend=pendientesFolio().length;
+  if(pend) L.push("", "Ventas sin folio de boleta: "+pend);
+  return L.join("\n");
+}
+function informeHTML(d,h){
+  var m=metricas(d,h), pa=periodoAnterior(d,h), ma=metricas(pa[0],pa[1]);
+  var prods=Object.keys(m.porProd).map(function(k){ return m.porProd[k]; }).sort(function(a,b){ return b.m-a.m; }).slice(0,12);
+  var cat=CATCOMPRA.filter(function(k){ return m.porCatCompra[k.id]; });
+  function fila(k,v,p){ return "<tr><td>"+k+'</td><td class="num">'+v+"</td><td>"+(p||"")+"</td></tr>"; }
+  var H='<div class="informe">';
+  H+='<div class="ih"><b>Emporio Andino</b><span>Caracoles 151 · San Pedro de Atacama</span></div>';
+  H+="<h3>Informe "+(d===h? "del "+fechaLarga(d) : "del "+fechaLarga(d)+" al "+fechaLarga(h))+"</h3>";
+  H+='<table class="tbl"><tbody>';
+  H+=fila("Ventas registradas", m.nVentas, m.anuladas? m.anuladas+" anuladas":"");
+  H+=fila("Total vendido", plata(m.total), (delta(m.total,ma.total)!=null? (delta(m.total,ma.total)>=0?"+":"")+delta(m.total,ma.total).toFixed(1)+"% contra el período anterior":""));
+  H+=fila("Venta neta", plata(m.neto), "base imponible");
+  H+=fila("IVA débito", plata(m.iva), "19% incluido en los precios");
+  H+=fila("Propinas", plata(m.propina), "no forman parte de la base del IVA");
+  H+=fila("Ticket promedio", plata(m.ticket), m.unidades+" unidades vendidas");
+  H+=fila("Costo de lo vendido", plata(m.costoVendido), "sobre el "+m.cobertura.toFixed(0)+"% de la venta con costo definido");
+  H+=fila("Food cost", m.fcReal==null?"—":m.fcReal.toFixed(1)+"%", "meta "+metaFC()+"%");
+  H+=fila("Margen bruto", plata(m.margen), "");
+  H+=fila("Merma", plata(m.mermaValor), m.mermaUnid+" unidades");
+  H+=fila("Gastos anotados", plata(m.compras), cat.length+" categorías");
+  H+=fila("Resultado de caja", plata(m.resultado), "neto menos lo anotado");
+  H+="</tbody></table>";
+  if(cat.length){
+    H+="<h4>En qué se fue</h4><table class='tbl'><tbody>";
+    cat.sort(function(a,b){ return m.porCatCompra[b.id]-m.porCatCompra[a.id]; }).forEach(function(k){
+      H+="<tr><td>"+esc(k.n)+'</td><td class="num">'+plata(m.porCatCompra[k.id])+"</td></tr>";
+    });
+    H+="</tbody></table>";
+  }
+  if(prods.length){
+    H+="<h4>Los doce que más trajeron</h4><table class='tbl'><thead><tr><th>Producto</th><th>Unidades</th><th>Venta</th></tr></thead><tbody>";
+    prods.forEach(function(p){ H+="<tr><td>"+esc(p.n)+'</td><td class="num">'+p.q+'</td><td class="num">'+plata(p.m)+"</td></tr>"; });
+    H+="</tbody></table>";
+  }
+  H+='<p class="pie">Documento interno de control, emitido el '+fechaLarga(hoyISO())+" a las "+hora(new Date().toISOString())+
+     ". No reemplaza a la boleta electrónica ni a la contabilidad. Solo contiene lo que se registró en este equipo.</p></div>";
+  return H;
+}
+function pintarEntrega(){
+  var c=$("#infCuerpo"); if(!c) return;
+  var r=rangoDe(rangoEnt), m=metricas(r[0],r[1]);
+
+  var h='<div class="seccion"><h2 class="vt">Entregar lo medido</h2>'+
+    '<p class="vs">Los números sirven cuando salen de aquí: al contador, al socio, al cuaderno. '+
+    'Elige el período y la forma. Todo sale de las ventas, compras y mermas registradas en este equipo.</p></div>';
+
+  h+='<div class="seccion">'+barraRango(rangoEnt,"en")+"</div>";
+  h+='<div class="seccion"><div class="kpis">'+
+    '<div class="kpi principal"><span class="k">Período elegido</span><span class="v num">'+plata(m.total)+'</span>'+
+      "<span class=\"p\">"+m.nVentas+" ventas · "+m.dias+(m.dias===1?" día":" días")+" con movimiento</span></div>"+
+    '<div class="kpi"><span class="k">Resultado de caja</span><span class="v num">'+plata(m.resultado)+'</span><span class="p">neto menos gastos anotados</span></div>'+
+    "</div></div>";
+
+  h+='<div class="seccion"><div class="rotulo"><b>Para leer</b></div><div class="pilas">'+
+    '<button class="btn suave chico" id="eImp" type="button">'+ico("i-imprime")+"Informe para imprimir o guardar en PDF</button>"+
+    '<button class="btn suave chico" id="eTxt" type="button">Resumen corto para mandar por mensaje</button>'+
+    "</div></div>";
+
+  h+='<div class="seccion"><div class="rotulo"><b>Para el contador o la planilla</b></div><div class="pilas">'+
+    '<button class="btn suave chico" id="eVen" type="button">'+ico("i-descarga")+"Ventas, línea por línea</button>"+
+    '<button class="btn suave chico" id="eCom" type="button">'+ico("i-descarga")+"Compras y gastos</button>"+
+    '<button class="btn suave chico" id="eMer" type="button">'+ico("i-descarga")+"Mermas</button>"+
+    '<button class="btn suave chico" id="eRes" type="button">'+ico("i-descarga")+"Resumen por día</button>"+
+    '<button class="btn suave chico" id="eProd" type="button">'+ico("i-descarga")+"Ranking de productos</button>"+
+    '<button class="btn suave chico" id="eCos" type="button">'+ico("i-descarga")+"Costos y márgenes</button>"+
+    "</div></div>";
+
+  h+='<div class="seccion"><div class="rotulo"><b>Respaldo</b></div>'+
+    '<p class="vs">La caja guarda todo en este navegador. Si se borran los datos del sitio o se cambia de equipo, se pierde. '+
+    "Un respaldo por semana, guardado donde puedas encontrarlo, evita ese susto.</p>"+
+    '<div class="pilas"><button class="btn suave chico" id="eBack" type="button">'+ico("i-descarga")+"Bajar respaldo completo</button>"+
+    '<button class="btn suave chico" id="eRest" type="button">Restaurar desde un respaldo</button></div></div>';
+
+  c.innerHTML=h;
+  colgarRango(c, rangoEnt, "en", pintarEntrega);
+  $("#eImp").onclick=function(){ hojaInforme(r[0],r[1]); };
+  $("#eTxt").onclick=function(){ hojaResumen(r[0],r[1]); };
+  $("#eVen").onclick=function(){ exportarVentas(r[0],r[1]); };
+  $("#eCom").onclick=function(){ exportarCompras(r[0],r[1]); };
+  $("#eMer").onclick=function(){ exportarMermas(r[0],r[1]); };
+  $("#eRes").onclick=function(){ exportarResumen(r[0],r[1]); };
+  $("#eProd").onclick=function(){ exportarProductos(r[0],r[1]); };
+  $("#eCos").onclick=exportarCostos;
+  $("#eBack").onclick=respaldar;
+  $("#eRest").onclick=hojaRestaurar;
+}
+function hojaInforme(d,h){
+  abrirHoja("Informe del período", function(b){
+    b.innerHTML=informeHTML(d,h);
+    var btn=el("button","btn lleno noimp","Imprimir o guardar como PDF"); btn.type="button";
+    btn.style.marginTop="14px"; btn.onclick=function(){ window.print(); };
+    b.appendChild(btn);
+  });
+}
+function hojaResumen(d,h){
+  abrirHoja("Resumen para mandar", function(b){
+    b.appendChild(el("p","vs","Cópialo y pégalo donde lo necesites. Cabe en un mensaje."));
+    var t=el("textarea"); t.value=resumenTexto(d,h); t.rows=18;
+    t.style.width="100%"; t.style.fontFamily="var(--mono)"; t.style.fontSize="12px";
+    t.style.border="1.5px solid var(--linea)"; t.style.borderRadius="10px"; t.style.padding="10px";
+    b.appendChild(t);
+    var btn=el("button","btn lleno","Copiar"); btn.type="button"; btn.style.marginTop="10px";
+    btn.onclick=function(){
+      t.select();
+      try{ if(navigator.clipboard) navigator.clipboard.writeText(t.value); else document.execCommand("copy"); avisar("Resumen copiado.","bien"); }
+      catch(e){ avisar("Copia manualmente: el texto ya está seleccionado.","alerta"); }
+    };
+    b.appendChild(btn);
+  });
+}
+function exportarResumen(d,h){
+  var f=[["Fecha","Ventas","Total","Neto","IVA","Propinas","Unidades","Ticket promedio","Gastos","Merma"]];
+  var dias=[], x=new Date(d+"T12:00:00"), fin=new Date(h+"T12:00:00");
+  while(x<=fin){ dias.push(hoyISO(x)); x.setDate(x.getDate()+1); }
+  dias.forEach(function(dd){
+    var m=metricas(dd,dd);
+    if(!m.nVentas && !m.compras && !m.mermaValor) return;
+    f.push([dd, m.nVentas, m.total, m.neto, m.iva, m.propina, m.unidades, m.ticket, m.compras, m.mermaValor]);
+  });
+  var t=csv(f); bajar("resumen-"+d+"-a-"+h+".csv", t, t);
+}
+function exportarProductos(d,h){
+  var m=metricas(d,h);
+  var f=[["Producto","Grupo","Unidades","Venta bruta","Venta neta","Costo","Margen","Food cost %","Clase"]];
+  var ing=ingenieriaMenu(m), clases={};
+  if(ing) ing.items.forEach(function(p){ clases[p.id]=CLASES[p.clase].n; });
+  Object.keys(m.porProd).map(function(k){ return m.porProd[k]; })
+    .sort(function(a,b){ return b.m-a.m; }).forEach(function(p){
+      var it=itemCat(p.id), nv=neto(p.m);
+      f.push([p.n, it? ((GRUPOS.filter(function(g){return g.id===it.g;})[0]||{}).n||it.g) : "",
+        p.q, p.m, nv, p.conCosto?p.costo:"", p.conCosto?(nv-p.costo):"",
+        p.conCosto&&nv? (p.costo/nv*100).toFixed(1):"", clases[p.id]||""]);
+    });
+  var t=csv(f); bajar("productos-"+d+"-a-"+h+".csv", t, t);
+}
+function respaldar(){
+  var datos={marca:"emporio-andino", version:2, fecha:new Date().toISOString(), pos:POS, control:CTRL};
+  var t=JSON.stringify(datos);
+  bajar("respaldo-caja-"+hoyISO()+".json", t, t);
+}
+function hojaRestaurar(){
+  abrirHoja("Restaurar desde un respaldo", function(b){
+    var av=el("div","aviso alerta");
+    av.innerHTML=ico("i-alerta",2)+"<div><b>Esto reemplaza todo lo que hay en este equipo</b>"+
+      "<span>Las ventas, compras, mermas, costos y ajustes actuales se pierden. Baja un respaldo antes, si acaso.</span></div>";
+    b.appendChild(av);
+    b.appendChild(el("p","vs","Pega el contenido del archivo de respaldo."));
+    var t=el("textarea"); t.rows=8; t.style.width="100%"; t.style.fontFamily="var(--mono)"; t.style.fontSize="11px";
+    t.style.border="1.5px solid var(--linea)"; t.style.borderRadius="10px"; t.style.padding="10px";
+    b.appendChild(t);
+    var btn=el("button","btn grave lleno","Restaurar"); btn.type="button"; btn.style.marginTop="10px";
+    btn.onclick=function(){
+      var o;
+      try{ o=JSON.parse(t.value); }catch(e){ avisar("Ese texto no es un respaldo válido.","mal"); return; }
+      if(!o||o.marca!=="emporio-andino"||!o.pos){ avisar("Ese respaldo no es de esta caja.","mal"); return; }
+      POS=o.pos; if(o.control) CTRL=o.control;
+      guardarPOS(); guardarCtrl(); cerrarHoja(); pintarTodo();
+      avisar("Respaldo restaurado.","bien");
+    };
+    b.appendChild(btn);
+  });
+}
+
+/* ==================== INFORMES: pestañas ==================== */
+var SUBINF=[
+  {id:"rep",   n:"Cierre"},
+  {id:"estad", n:"Estadísticas"},
+  {id:"hist",  n:"Historial"},
+  {id:"ent",   n:"Entregar"}
+];
+var subInf="rep";
+function pintarInf(){
+  var t=$("#infTabs"); if(!t) return;
+  t.innerHTML=barraSub(SUBINF, subInf);
+  colgarSub(t, function(id){ subInf=id; pintarInf(); });
+  if(subInf==="rep") pintarRep();
+  if(subInf==="estad") pintarEstad();
+  if(subInf==="hist") pintarHist();
+  if(subInf==="ent") pintarEntrega();
+}
+
+/* ==================== PIEZAS PARA EL PANEL ==================== */
+function kpisGestion(d,h){
+  var m=metricas(d,h);
+  return '<div class="kpi'+(m.fcReal!=null&&m.fcReal>metaFC()?" ojo":"")+'"><span class="k">Food cost</span><span class="v num">'+
+      (m.fcReal==null?"—":m.fcReal.toFixed(1)+"%")+'</span><span class="p">'+(m.fcReal==null?"faltan costos":"meta "+metaFC()+"%")+"</span></div>"+
+    '<div class="kpi"><span class="k">Margen bruto</span><span class="v num">'+plata(m.margen)+'</span><span class="p">neto menos costo de lo vendido</span></div>'+
+    '<div class="kpi'+(m.mermaValor?" ojo":"")+'"><span class="k">Merma de hoy</span><span class="v num">'+plata(m.mermaValor)+'</span><span class="p">'+m.mermaUnid+" unidades perdidas</span></div>";
+}
+function bloqueMeta(totalHoy){
+  var meta=Number(POS.cfg.metas.dia)||0;
+  if(!meta) return '<div class="seccion"><div class="aviso">'+ico("i-panel",1.9)+
+    "<div><b>Todavía no hay una meta de venta</b><span>Con una meta diaria, el panel muestra cuánto falta y a qué hora se suele alcanzar.</span></div>"+
+    '<button class="btn chico suave" type="button" data-prueba="1">Poner una meta</button></div></div>';
+  var pct=Math.min(100, totalHoy/meta*100), falta=Math.max(0, meta-totalHoy);
+  return '<div class="seccion"><div class="metabar'+(pct>=100?" hecha":"")+'">'+
+    '<div class="mt"><b>'+(pct>=100? "Meta del día cumplida" : "Meta del día")+"</b><span>"+plata(totalHoy)+" de "+plata(meta)+
+    (falta? " · faltan "+plata(falta) : " · "+plata(totalHoy-meta)+" sobre la meta")+"</span></div>"+
+    '<div class="mb"><i style="width:'+pct.toFixed(1)+'%"></i></div></div></div>';
+}
+
+/* ==================== SISTEMA GENERAL ====================
+   La caja, la carta, el Control de Salón y las Comandas viven en el mismo
+   paquete y comparten la memoria del equipo: ya no hay que traspasar la
+   disponibilidad a mano. */
+function bloqueSistema(){
+  var g=EAPOS.general(), s=EAPOS.sesion();
+  return '<div class="seccion"><div class="rotulo"><b>EmporioAndinoPOS '+EAPOS.version+'</b></div>'+
+    '<p class="mini">Esta caja es el punto de venta del sistema general. Comparte el stock con la <b>Carta interactiva</b>, el <b>Control de Salón</b> y las <b>Comandas</b> en este mismo equipo. '+
+    'Precios, carta y metas vienen de la configuración vigente (versión '+g.v+(g.ts?", aplicada el "+fechaLarga(diaDe(g.ts)):"")+'), que solo cambia desde la Prueba.'+
+    (s? ' Sesión abierta: <b>'+esc(s.n)+'</b>.':'')+'</p></div>';
+}
+
+</script>
+
+<script>
+/* ==================== AJUSTES ==================== */
+function pintarAjustes(){
+  var c=$("#vAjustes"); if(!c) return;
+  var cf=POS.cfg, em=cf.emisor;
+  var h='<div class="seccion"><h2 class="vt">Ajustes</h2>'+
+    '<p class="vs">Lo que se configura una vez y queda: quién atiende, cómo se sugiere la propina, los datos que van impresos en el vale y desde dónde se emite la boleta electrónica.</p></div>';
+
+  h+='<div class="seccion"><div class="rotulo"><b>Equipo del turno</b></div>'+
+    '<div id="listaResp" class="pilas"></div>'+
+    '<div class="filtros" style="margin-top:9px"><span class="campo"><label for="inResp">Agregar a alguien</label>'+
+    '<input id="inResp" type="text" placeholder="Nombre o cargo"></span>'+
+    '<span class="campo"><label>&nbsp;</label><button class="btn suave" id="btnAddResp" type="button">Agregar</button></span></div></div>';
+
+  h+='<div class="seccion"><div class="rotulo"><b>Cuenta y propina</b></div><div class="filtros">'+
+    '<span class="campo"><label for="inProp">Propina sugerida (%)</label><input id="inProp" type="number" min="0" max="20" step="1" value="'+cf.propina+'"></span>'+
+    '<span class="campo"><label for="inUmb">Avisar bajo (unidades)</label><input id="inUmb" type="number" min="1" step="1" value="'+cf.umbral+'"></span>'+
+    '<span class="campo"><label for="inSirope">Extra sirope ($)</label><input id="inSirope" type="number" min="0" step="100" value="'+(cf.extras.sirope==null?"":cf.extras.sirope)+'" placeholder="por definir"></span>'+
+    '<span class="campo"><label for="inVeg">Extra leche vegetal ($)</label><input id="inVeg" type="number" min="0" step="100" value="'+(cf.extras.vegetal==null?"":cf.extras.vegetal)+'" placeholder="por definir"></span>'+
+    '</div><p class="mini" style="margin-top:8px">La ley obliga a sugerir al menos un 10%; bajarlo de ahí deja la cuenta fuera de norma. Por eso el mínimo que acepta este campo es 10.</p></div>';
+
+  h+='<div class="seccion"><div class="rotulo"><b>Datos que van en el vale</b></div><div class="filtros">'+
+    '<span class="campo"><label for="inRazon">Razón social</label><input id="inRazon" type="text" value="'+esc(em.razon)+'" placeholder="Como está en el SII"></span>'+
+    '<span class="campo"><label for="inRut">RUT</label><input id="inRut" type="text" value="'+esc(em.rut)+'" placeholder="76.XXX.XXX-X"></span>'+
+    '<span class="campo"><label for="inGiro">Giro</label><input id="inGiro" type="text" value="'+esc(em.giro)+'"></span>'+
+    '<span class="campo"><label for="inDir">Dirección</label><input id="inDir" type="text" value="'+esc(em.dir)+'"></span>'+
+    '<span class="campo"><label for="inEmisor">Emisor de la boleta electrónica</label><select id="inEmisor">'+
+      ["Portal gratuito del SII","Proveedor autorizado de facturación electrónica","Otro"].map(function(o){
+        return '<option'+(cf.emisorDTE===o?" selected":"")+">"+o+"</option>"; }).join("")+"</select></span>"+
+    "</div></div>";
+
+  h+='<div class="seccion"><div class="normativa">'+
+    "<b>En qué se apoya esta caja</b><ul>"+
+    "<li><b>La boleta la emite el sistema autorizado.</b> Desde marzo de 2021 la boleta electrónica es obligatoria (<code>DTE 39</code> afecta, <code>DTE 41</code> exenta) y se emite con certificado digital y folios <code>CAF</code> del SII. Esta caja registra la venta y guarda el folio; no emite documentos tributarios ni los reemplaza.</li>"+
+    "<li><b>Entrega al cliente.</b> La representación impresa o, desde marzo de 2026, la entrega por medio digital (correo, QR u otro equivalente) cuando no hay impresora. Desde enero de 2026 ya no se exige el timbre en la representación impresa.</li>"+
+    "<li><b>IVA 19% (DL 825).</b> Los precios de la carta se exhiben con IVA incluido, como pide la Ley 19.496 sobre derechos del consumidor, así que el neto y el impuesto se calculan hacia atrás desde el total.</li>"+
+    "<li><b>Propina (Ley 20.729, Art. 64 del Código del Trabajo).</b> El local debe sugerirla —al menos 10%— en la cuenta, que es un documento distinto de la boleta, y el cliente puede rechazarla.</li>"+
+    "<li><b>Anulaciones.</b> Si la boleta ya se emitió, la corrección tributaria es una nota de crédito electrónica (<code>DTE 61</code>) en el sistema emisor. Aquí queda el registro y el motivo.</li>"+
+    "<li><b>Respaldo por seis años.</b> Los XML los conserva el emisor; la exportación CSV de esta caja es el respaldo operativo que se le entrega al contador.</li>"+
+    "<li><b>Datos personales (Ley 21.719, vigente desde el 1 de diciembre de 2026).</b> Esta caja no guarda datos del cliente: ni nombre, ni RUT, ni correo. Si alguna vez se piden para una factura, se piden solo para ese documento y se registran en el sistema emisor, no aquí.</li>"+
+    "</ul></div></div>";
+
+  h+=bloqueSistema();
+
+  h+='<div class="seccion"><div class="rotulo"><b>Datos de este equipo</b></div>'+
+    '<p class="mini">Las ventas viven en este navegador: sobreviven al cierre de la app, pero no viajan a otro teléfono ni a otro computador. Exporta el día antes de cambiar de equipo o de limpiar el navegador.</p>'+
+    '<div class="pilas" style="margin-top:9px">'+
+    '<button class="btn suave chico" id="btnExpTodo" type="button">Exportar todo el historial</button>'+
+    '<button class="btn suave chico" id="btnBorrar" type="button" style="color:var(--grave)">Borrar historial de la caja</button>'+
+    "</div>"+
+    '<p class="mini" style="margin-top:8px">'+POS.ventas.length+" ventas guardadas · "+POS.arqueos.length+" arqueos · "+
+    (descargasListas ? (DESCARGAS? "las descargas están disponibles en este visor" : "este visor no permite descargar archivos: se ofrece copiar o imprimir") : "verificando descargas…")+"</p></div>";
+  c.innerHTML=h;
+
+  var LR=$("#listaResp");
+  POS.cfg.resp.forEach(function(r,i){
+    var b=el("button","pila"); b.type="button"; b.innerHTML=esc(r)+' <span style="opacity:.55">×</span>';
+    b.onclick=function(){
+      if(POS.cfg.resp.length<=1){ avisar("Tiene que quedar al menos una persona en la lista.","mal"); return; }
+      POS.cfg.resp.splice(i,1);
+      if(POS.cfg.respActivo===r) POS.cfg.respActivo=POS.cfg.resp[0];
+      guardarPOS(); pintarAjustes(); pintarResp();
+    };
+    LR.appendChild(b);
+  });
+  $("#btnAddResp").onclick=function(){
+    var v=($("#inResp").value||"").trim();
+    if(!v) return;
+    POS.cfg.resp.push(v); guardarPOS(); pintarAjustes(); pintarResp(); avisar("«"+v+"» agregado al turno.","bien");
+  };
+  function liga(id, fn){ var e=$("#"+id); if(e) e.onchange=function(){ fn(e); guardarPOS(); }; }
+  liga("inProp", function(e){
+    var v=Math.round(Number(e.value||0));
+    if(v<PROPINA_MIN){ v=PROPINA_MIN; e.value=v; avisar("El mínimo legal de la sugerencia es 10%.","mal"); }
+    POS.cfg.propina=v; pintarCuenta();
+  });
+  liga("inUmb", function(e){ POS.cfg.umbral=Math.max(1,Math.round(Number(e.value||6))); pintarStock(); pintarPanel(); });
+  liga("inSirope", function(e){ POS.cfg.extras.sirope = e.value===""? null : Math.round(Number(e.value)); });
+  liga("inVeg", function(e){ POS.cfg.extras.vegetal = e.value===""? null : Math.round(Number(e.value)); });
+  liga("inRazon", function(e){ POS.cfg.emisor.razon=e.value.trim(); });
+  liga("inRut", function(e){ POS.cfg.emisor.rut=e.value.trim(); });
+  liga("inGiro", function(e){ POS.cfg.emisor.giro=e.value.trim(); });
+  liga("inDir", function(e){ POS.cfg.emisor.dir=e.value.trim(); });
+  liga("inEmisor", function(e){ POS.cfg.emisorDTE=e.value; });
+  $("#btnExpTodo").onclick=function(){
+    if(!POS.ventas.length){ avisar("Todavía no hay ventas que exportar.","mal"); return; }
+    var dias=POS.ventas.map(function(v){ return diaDe(v.ts); }).sort();
+    exportarVentas(dias[0], dias[dias.length-1]);
+  };
+  $("#btnBorrar").onclick=function(){
+    abrirHoja("Borrar el historial", function(b){
+      b.appendChild(el("p","vs","Esto borra las ventas y los arqueos guardados en este equipo. Exporta antes: no hay vuelta atrás y el respaldo del período es obligación del negocio."));
+      var btn=el("button","btn grave lleno","Sí, borrar todo el historial"); btn.type="button";
+      btn.onclick=function(){
+        POS.ventas=[]; POS.arqueos=[]; guardarPOS(); cerrarHoja(); pintarTodo();
+        avisar("Historial borrado en este equipo.","alerta");
+      };
+      b.appendChild(btn);
+    });
+  };
+}
+
+/* ==================== NAVEGACIÓN ==================== */
+/* Cinco secciones abajo, porque cinco son las que caben en el pulgar sin
+   que ninguna quede a medias. Lo que antes eran Historial y Reportes vive
+   ahora dentro de Informes, junto a las estadísticas y la entrega. */
+var SECC=[
+  {id:"caja",  n:"Caja",     ico:"i-caja",    v:"vCaja"},
+  {id:"panel", n:"Panel",    ico:"i-panel",   v:"vPanel"},
+  {id:"stock", n:"Stock",    ico:"i-stock",   v:"vStock"},
+  {id:"gest",  n:"Gestión",  ico:"i-grano",   v:"vGest"},
+  {id:"inf",   n:"Informes", ico:"i-reporte", v:"vInf"},
+  {id:"ajustes",n:"Ajustes", ico:"i-ajustes", v:"vAjustes", oculta:true}
+];
+var seccActiva="caja";
+function pintarNav(){
+  var pe=$("#pestanas"); if(pe) pe.style.gridTemplateColumns="repeat("+SECC.filter(function(x){ return !x.oculta; }).length+",minmax(0,1fr))";
+  ["#pestanas","#riel"].forEach(function(sel){
+    var c=$(sel); if(!c) return; c.innerHTML="";
+    SECC.forEach(function(s){
+      if(s.oculta && sel==="#pestanas") return;
+      var b=el("button"); b.type="button";
+      b.setAttribute("aria-current", s.id===seccActiva? "true":"false");
+      b.innerHTML=ico(s.ico,1.7)+"<span>"+s.n+"</span>"+
+        ((s.id==="panel")? '<em class="sello num" data-sello="1" hidden></em>' : "");
+      b.onclick=function(){ irA(s.id); };
+      c.appendChild(b);
+    });
+  });
+}
+function irA(id){
+  /* "inf:hist" lleva a Informes y además abre su pestaña de Historial. */
+  var p=String(id).split(":"); id=p[0];
+  if(p[1] && id==="inf") subInf=p[1];
+  if(p[1] && id==="gest") subGest=p[1];
+  seccActiva=id;
+  SECC.forEach(function(s){ var v=$("#"+s.v); if(v) v.hidden = (s.id!==id); });
+  pintarNav();
+  if(id==="panel") pintarPanel();
+  if(id==="stock") pintarStock();
+  if(id==="gest") pintarGest();
+  if(id==="inf") pintarInf();
+  if(id==="ajustes") pintarAjustes();
+  var v=$("#"+(SECC.filter(function(s){ return s.id===id; })[0]||{}).v); if(v) v.scrollTop=0;
+}
+function pintarResp(){
+  var s=$("#selResp"); s.innerHTML="";
+  if(!POS.cfg.respActivo) POS.cfg.respActivo=POS.cfg.resp[0]||"";
+  POS.cfg.resp.forEach(function(r){
+    var o=el("option",null,r); o.value=r; if(r===POS.cfg.respActivo) o.selected=true; s.appendChild(o);
+  });
+}
+function pintarTodo(){
+  pintarResp(); pintarGrupos(); pintarRejilla(); pintarPagos(); pintarCuenta(); pintarNav();
+  if(seccActiva==="panel") pintarPanel();
+  if(seccActiva==="stock") pintarStock();
+  if(seccActiva==="gest") pintarGest();
+  if(seccActiva==="inf") pintarInf();
+  if(seccActiva==="ajustes") pintarAjustes();
+  pintarPanel();
+}
+
+/* ==================== SESIÓN DEL SISTEMA GENERAL ====================
+   Quien entra con su PIN al sistema general queda como responsable del
+   turno. Los garzones ven el cobro y el stock; las cifras del negocio
+   quedan para dirección y encargados. */
+var SESION=EAPOS.sesion();
+if(SESION){
+  if(POS.cfg.resp.indexOf(SESION.n)<0) POS.cfg.resp.unshift(SESION.n);
+  POS.cfg.respActivo=SESION.n;
+  if(EAPOS.ROLES[SESION.r] && EAPOS.ROLES[SESION.r].caja==="cobro"){
+    SECC=SECC.filter(function(x){ return x.id==="caja"||x.id==="stock"; });
+    var _ba=$("#btnAjustes"); if(_ba) _ba.hidden=true;
+  }
+}
+
+/* ==================== ARRANQUE ==================== */
+$("#barFecha").textContent = fechaLarga(hoyISO())+" · Caracoles 151";
+$("#buscaProd").oninput=function(){ pintarRejilla(); };
+$("#selResp").onchange=function(){ POS.cfg.respActivo=$("#selResp").value; guardarPOS(); };
+$("#btnSon").onclick=function(){
+  POS.cfg.son = POS.cfg.son?0:1; guardarPOS();
+  $("#btnSon").setAttribute("aria-pressed", POS.cfg.son?"true":"false");
+  avisar(POS.cfg.son? "Avisos con sonido activados." : "Avisos en silencio: quedan solo en pantalla.");
+};
+$("#btnSon").setAttribute("aria-pressed", POS.cfg.son?"true":"false");
+$("#btnAjustes").onclick=function(){ irA("ajustes"); };
+$("#modoVenta").querySelectorAll("[data-modo]").forEach(function(b){
+  b.onclick=function(){
+    modoActivo=b.dataset.modo;
+    $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(x){ x.setAttribute("aria-pressed", x===b?"true":"false"); });
+    if(modoActivo!=="local") conPropina=false; else conPropina=true;
+    var fuera=carro.filter(function(l){ var it=itemCat(l.id); return it&&it.loc&&modoActivo!=="local"; });
+    if(fuera.length){
+      carro=carro.filter(function(l){ return fuera.indexOf(l)<0; });
+      avisar(fuera.length+(fuera.length===1?" ítem se sirve":" ítems se sirven")+" solo en el local: salieron de la cuenta.","alerta");
+    }
+    pintarCuenta(); pintarRejilla();
+  };
+});
+$("#swPropina").onclick=function(){ conPropina=!conPropina; pintarCuenta(); };
+$("#inEfectivo").oninput=calcVuelto;
+$("#btnRegistrar").onclick=registrar;
+$("#btnVaciar").onclick=function(){ carro=[]; pintarCuenta(); pintarRejilla(); };
+$("#btnCuentaMesa").onclick=cuentaPrevia;
+$("#hojaX").onclick=cerrarHoja;
+$("#hojaVelo").onclick=cerrarHoja;
+document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !$("#hoja").hidden) cerrarHoja(); });
+
+function arrancar(estado){
+  if(estado && estado.carro){ carro=estado.carro; modoActivo=estado.modo||"local"; grupoActivo=estado.grupo||"emp"; }
+  pintarTodo();
+  if(pendientesFolio().length) setTimeout(function(){ avisar(pendientesFolio().length+" ventas quedaron sin folio de boleta.","alerta"); }, 900);
+}
+try{
+  if(window.claude && claude.hot && claude.hot.snapshot) claude.hot.snapshot(function(){ return {carro:carro, modo:modoActivo, grupo:grupoActivo}; });
+  if(window.claude && claude.hot && claude.hot.ready) claude.hot.ready(arrancar); else arrancar(window.claude&&claude.hot?claude.hot.data:null);
+}catch(e){ arrancar(null); }
+</script>
+
+</body></html>

@@ -1,0 +1,179 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>/* EmporioAndinoPOS: deja que el lanzador escuche errores desde el inicio */try{if(parent!==window&&parent.__eaGancho)parent.__eaGancho(window)}catch(e){}</script></head><body>
+<title>Comandas · EmporioAndinoPOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap">
+<style>
+/* Layout: pantalla de cocina. Una franja de estaciones arriba y las comandas
+   como tickets en columnas que se leen de izquierda a derecha, la más antigua
+   primero. Noche volcánica como el resto del sistema; look único y oscuro. */
+:root{
+  color-scheme:dark;
+  --bg:#0A1012; --panel:#121D20; --panel-2:#18262B; --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.2);
+  --fg:#F2F7F6; --fg-2:#C9D6D4; --muted:#93A6A3;
+  --turquesa:#40E0D0; --turquesa-ink:#04211E;
+  --cocina:#9A80D6; --barra:#1AA89B; --horno:#E8674A;
+  --ok:#3DDC84; --aviso:#FFB547; --falla:#FF6161;
+  --f-num:"Sora",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --f-ui:"Plus Jakarta Sans",ui-sans-serif,"Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--turquesa);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.wrap{padding-block:14px 40px;padding-inline:16px;display:flex;flex-direction:column;gap:14px;max-width:1500px;margin:0 auto}
+.cab{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cab h1{margin:0;font-family:var(--f-num);font-size:22px;letter-spacing:-.01em}
+.cab p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.der{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.reloj{font-family:var(--f-num);font-size:22px;font-weight:700}
+.btn{border:1px solid var(--line-2);background:var(--panel-2);border-radius:11px;padding:7px 12px;font-weight:800;font-size:13px}
+.btn[aria-pressed="true"]{border-color:var(--turquesa);color:var(--turquesa)}
+.estaciones{display:flex;gap:8px;flex-wrap:wrap}
+.est{--c:var(--turquesa);display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:9px 14px;font-weight:800}
+.est b{font-family:var(--f-num);font-size:20px;color:var(--c)}
+.est[aria-pressed="true"]{border-color:var(--c);box-shadow:inset 0 0 0 1px var(--c);background:color-mix(in srgb,var(--c) 12%,var(--panel))}
+.est.cocina{--c:var(--cocina)} .est.barra{--c:var(--barra)} .est.horno{--c:var(--horno)}
+.tablero{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;align-items:start}
+.cmd{--c:var(--ok);border:1px solid var(--line);border-top:4px solid var(--c);background:var(--panel);border-radius:14px;padding:12px 13px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.cmd.aviso{--c:var(--aviso)} .cmd.tarde{--c:var(--falla)}
+.cmd .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.cmd .h b{font-family:var(--f-num);font-size:16px}
+.cmd .min{font-family:var(--f-num);font-weight:800;font-size:18px;color:var(--c)}
+.cmd .meta{font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line-2);border-radius:99px;padding:1px 8px;color:var(--fg-2)}
+.tag.cocina{color:var(--cocina);border-color:color-mix(in srgb,var(--cocina) 55%,transparent)}
+.tag.barra{color:var(--barra);border-color:color-mix(in srgb,var(--barra) 55%,transparent)}
+.tag.horno{color:var(--horno);border-color:color-mix(in srgb,var(--horno) 55%,transparent)}
+.cmd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cmd li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px;align-items:start;font-size:15px;font-weight:600}
+.cmd li .q{font-family:var(--f-num);font-weight:800;color:var(--fg);background:var(--panel-2);border-radius:8px;text-align:center;padding:1px 0}
+.cmd li small{display:block;color:var(--aviso);font-size:12px;font-weight:700}
+.listo{border:0;border-radius:11px;padding:11px;font-weight:800;font-size:14px;background:var(--turquesa);color:var(--turquesa-ink)}
+.vacio{border:1px dashed var(--line-2);border-radius:14px;padding:24px;color:var(--fg-2);text-align:center;grid-column:1/-1}
+.vacio b{display:block;font-family:var(--f-num);font-size:17px;color:var(--fg);margin-bottom:4px}
+details.hechas{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:10px 13px}
+details.hechas summary{cursor:pointer;font-weight:800;color:var(--fg-2)}
+.hlist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hlist li{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:13px;color:var(--fg-2);border-top:1px solid var(--line);padding-top:6px}
+.hlist button{border:1px solid var(--line-2);background:transparent;border-radius:9px;padding:3px 9px;font-size:12px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--panel-2);border:1px solid rgba(64,224,208,.45);padding:10px 16px;border-radius:12px;font-weight:700;font-size:13px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="cab">
+    <div><h1>Comandas</h1><p id="sub">Lo cobrado en la Caja, separado por estación</p></div>
+    <div class="der"><span class="reloj" id="reloj">--:--</span><button class="btn" type="button" id="sonido" aria-pressed="false">Campana apagada</button></div>
+  </header>
+  <div class="estaciones" role="group" aria-label="Estación" id="estaciones"></div>
+  <section class="tablero" id="tablero" aria-live="polite"></section>
+  <details class="hechas" id="hechas"><summary id="hechasT">Listas</summary><ul class="hlist" id="hlist"></ul></details>
+</div>
+
+<script src="../nucleo/datos.js"></script>
+<script src="../nucleo/nucleo.js"></script>
+<script>
+/* ====================================================================
+   Comandas: la pieza que faltaba entre la Caja y la cocina.
+   Cada venta registrada en la Caja se reparte por estación según el grupo
+   de cada producto. Marcar "Listo" queda guardado por día en este equipo
+   (eapos_comandas); la venta en sí no se toca.
+   ==================================================================== */
+var ESTACIONES=[
+  {id:"cocina", n:"Cocina",          g:["coc"]},
+  {id:"barra",  n:"Barra",           g:["bar"]},
+  {id:"horno",  n:"Horno y vitrina", g:["emp","past"]},
+  {id:"todo",   n:"Todo",            g:["coc","bar","emp","past"]}
+];
+var MODOS={local:"Local", llevar:"Para llevar", delivery:"DesertGo"};
+var AVISO_MIN=8, TARDE_MIN=15;
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function hoyISO(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function hora(ts){ var d=new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function leer(k,def){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):def; }catch(e){ return def; } }
+function guardar(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+var est=(function(){ try{ return localStorage.getItem("eapos_comandas_est")||""; }catch(e){ return ""; } })();
+/* La estación por defecto sale del cargo de quien está en sesión. */
+if(!est){ var s0=EAPOS.sesion(); est = !s0 ? "todo" : (s0.r==="cocina" ? "cocina" : (s0.r==="barista"||s0.r==="barista_enc") ? "barra" : "todo"); }
+var sonido=false, vistos=null, tAviso=null;
+
+function marcas(){ var m=leer("eapos_comandas",null); if(!m||m.fecha!==hoyISO()) m={fecha:hoyISO(), listo:{}}; return m; }
+function grupoDe(id){ var p=EAPOS.producto(id); return p?p.g:"otro"; }
+function estacionDe(g){ return g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":"todo"; }
+
+/* Todas las comandas del día: una por venta y estación con algo que preparar. */
+function comandas(){
+  var pos=leer("ea_pos",{}), vs=(pos&&Array.isArray(pos.ventas))?pos.ventas:[], hoy=hoyISO(), out=[];
+  vs.forEach(function(v){
+    if(v.anulada || hoyISO(new Date(v.ts))!==hoy) return;
+    var por={};
+    (v.lineas||[]).forEach(function(l){ var e=estacionDe(grupoDe(l.id)); (por[e]=por[e]||[]).push(l); });
+    Object.keys(por).forEach(function(e){ out.push({clave:v.id+"|"+e, venta:v, est:e, lineas:por[e]}); });
+  });
+  return out;
+}
+function minutos(ts){ return Math.max(0, Math.floor((Date.now()-new Date(ts).getTime())/60000)); }
+
+function pintar(){
+  var todas=comandas(), m=marcas();
+  var pend=todas.filter(function(c){ return !m.listo[c.clave]; });
+  var cuenta={cocina:0,barra:0,horno:0,todo:pend.length};
+  pend.forEach(function(c){ cuenta[c.est]=(cuenta[c.est]||0)+1; });
+  $("estaciones").innerHTML=ESTACIONES.map(function(e){
+    return '<button type="button" class="est '+e.id+'" data-est="'+e.id+'" aria-pressed="'+(est===e.id)+'">'+esc(e.n)+' <b>'+(cuenta[e.id]||0)+'</b></button>';
+  }).join("");
+  var vis=pend.filter(function(c){ return est==="todo" || c.est===est; }).sort(function(a,b){ return a.venta.ts<b.venta.ts?-1:1; });
+  if(!vis.length){
+    $("tablero").innerHTML='<div class="vacio"><b>Sin comandas pendientes</b>Lo que se cobre en la Caja aparece aquí al instante, separado por estación.</div>';
+  } else {
+    $("tablero").innerHTML=vis.map(function(c){
+      var mi=minutos(c.venta.ts), cl=mi>=TARDE_MIN?" tarde":mi>=AVISO_MIN?" aviso":"";
+      return '<article class="cmd'+cl+'"><div class="h"><b>'+esc(c.venta.id.slice(-5))+'</b><span class="min">'+mi+' min</span></div>'+
+        '<div class="meta"><span class="tag '+c.est+'">'+esc((ESTACIONES.filter(function(e){ return e.id===c.est; })[0]||{}).n||"")+'</span>'+
+        '<span>'+hora(c.venta.ts)+' · '+esc(MODOS[c.venta.modo]||c.venta.modo)+' · '+esc(c.venta.resp||"")+'</span></div>'+
+        '<ul>'+c.lineas.map(function(l){
+          return '<li><span class="q">'+l.q+'</span><span>'+esc(l.n)+((l.mod&&l.mod.length)?'<small>'+esc(l.mod.map(function(x){ return x.n; }).join(" · "))+'</small>':'')+'</span></li>';
+        }).join("")+'</ul>'+
+        '<button class="listo" type="button" data-listo="'+esc(c.clave)+'">Listo</button></article>';
+    }).join("");
+  }
+  var hechas=todas.filter(function(c){ return m.listo[c.clave] && (est==="todo"||c.est===est); })
+    .sort(function(a,b){ return m.listo[b.clave]<m.listo[a.clave]?-1:1; }).slice(0,30);
+  $("hechasT").textContent="Listas hoy ("+hechas.length+")";
+  $("hlist").innerHTML=hechas.map(function(c){
+    return '<li><span>'+hora(m.listo[c.clave])+' · '+esc(c.venta.id.slice(-5))+' · '+esc(c.lineas.map(function(l){ return l.q+"× "+l.n; }).join(", "))+'</span><button type="button" data-volver="'+esc(c.clave)+'">Volver a pendiente</button></li>';
+  }).join("")||'<li>Nada marcado como listo todavía.</li>';
+  $("sub").textContent=pend.length? pend.length+(pend.length===1?" comanda pendiente":" comandas pendientes")+" en total" : "Lo cobrado en la Caja, separado por estación";
+  /* campana: suena cuando entra una comanda nueva a la estación que se mira */
+  var claves=vis.map(function(c){ return c.clave; });
+  if(vistos && sonido && claves.some(function(k){ return vistos.indexOf(k)<0; })) campana();
+  vistos=claves;
+}
+function reloj(){ var d=new Date(); $("reloj").textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+var AC=null;
+function campana(){
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume();
+    [[880,0],[660,.18]].forEach(function(n){ var o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+n[1];
+      o.frequency.value=n[0]; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.18,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+.25);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+.3); }); }catch(e){}
+}
+function toast(t){ clearTimeout(tAviso); var el=document.querySelector(".toast"); if(!el){ el=document.createElement("div"); el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el); }
+  el.textContent=t; el.hidden=false; tAviso=setTimeout(function(){ el.hidden=true; },2400); }
+
+$("estaciones").addEventListener("click",function(e){ var b=e.target.closest("[data-est]"); if(!b) return; est=b.dataset.est; try{ localStorage.setItem("eapos_comandas_est",est); }catch(x){} vistos=null; pintar(); });
+$("tablero").addEventListener("click",function(e){ var b=e.target.closest("[data-listo]"); if(!b) return;
+  var m=marcas(); m.listo[b.dataset.listo]=new Date().toISOString(); guardar("eapos_comandas",m); toast("Comanda lista"); pintar(); });
+$("hlist").addEventListener("click",function(e){ var b=e.target.closest("[data-volver]"); if(!b) return;
+  var m=marcas(); delete m.listo[b.dataset.volver]; guardar("eapos_comandas",m); pintar(); });
+$("sonido").addEventListener("click",function(){ sonido=!sonido; this.setAttribute("aria-pressed",String(sonido)); this.textContent=sonido?"Campana encendida":"Campana apagada"; if(sonido) campana(); });
+addEventListener("storage",function(ev){ if(ev.key==="ea_pos"||ev.key==="eapos_comandas") pintar(); });
+if(EAPOS.canal) EAPOS.canal.onmessage=function(){ pintar(); };
+reloj(); pintar();
+setInterval(function(){ reloj(); pintar(); },15000);
+</script>
+</body></html>

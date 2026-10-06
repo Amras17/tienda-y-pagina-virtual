@@ -1,19 +1,61 @@
-# EmporioAndinoPOS v1.0
+# EmporioAndinoPOS v2.0
 
-Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama).
-Publicado el 6 de octubre de 2026.
+Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
-| Módulo | Archivo | Quién lo usa |
+## Capas
+
+```
+Sistema general (index.html) ── capa superior: ingreso con PIN, cargos, versión vigente,
+│                                verificación, versiones aplicadas, accesos y retroalimentación
+├── Caja            caja/index.html      punto de venta: cobro, boleta, stock, costos y fichas técnicas,
+│                                         compras, mermas, metas (lectura) e informes
+├── Control de Salón carta/salon.html    disponibilidad de la carta, horno y estudio de la carta
+├── Comandas        cocina/index.html    ventas de la Caja repartidas por estación (cocina, barra, horno)
+├── Carta Interactiva carta/index.html   la carta que usa el cliente en la mesa
+└── Prueba          prueba/index.html    simulación del día y borrador de cambios; "Aplicar al sistema
+                                          general" es el único camino para cambiar precios, carta y metas
+nucleo/datos.js   la carta única (130 productos, 10 idiomas)
+nucleo/nucleo.js  catálogo, configuración general y de prueba, versiones, equipo, cargos, PIN y sesión
+```
+
+Cómo fluye el dato:
+
+1. En la **Prueba** se cambian precios, se sacan productos de la carta o se ajustan metas. El borrador
+   se compara con el sistema general en siete días simulados y se proyecta a 30 días.
+2. **Aplicar al sistema general** guarda una versión nueva (quién, cuándo, qué cambió).
+3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
+   descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
+   Comandas.
+
+## Cargos
+
+| Cargo | Módulos | Caja |
 |---|---|---|
-| Lanzador, verificación y retroalimentación | `index.html` | Dirección y mantención |
-| Carta Interactiva | `carta/index.html` (+ `carta/img`, `carta/brand`) | Clientes en la mesa |
-| Control de Salón | `carta/salon.html` | Equipo de salón |
-| Emporio System 1.1 (POS) | `sistema/index.html` | Caja, cocina, barra, horno |
+| Dirección (dueños, jefes de operación) | todos, incluida la Prueba, más verificación y accesos | completa |
+| Encargados de turno | Caja, Salón, Comandas, Carta | completa |
+| Garzones | Caja, Salón, Comandas, Carta | solo cobro y stock |
+| Barra, cocina | Comandas, Salón, Carta | — |
 
-Todo es HTML estático: no necesita compilación. Con el Apache del repo se abre en
-`/EmporioAndinoPOS/` (la regla de `.htaccess` no reescribe archivos ni carpetas que existen).
-Los módulos comparten el `localStorage` del mismo origen: lo que Control de Salón marca
-como agotado (`ea_control`) lo lee la Carta.
+## Qué se fusionó, qué salió
+
+- **Carta:** antes había tres copias (Carta y Salón con 130 productos; Emporio System con 79 sacados de
+  fotos, 31 con otro precio). Queda una sola, la de la Carta y la Caja.
+- **Emporio System 1.1:** su simulación pasó entera a la Prueba. El ingreso con PIN y los cargos pasaron
+  al sistema general. Su escandallo se fusionó con la ficha de costo de la Caja (ahora una ficha técnica
+  completa con paso a paso, puntos críticos y copia en Markdown). Salieron las 4 fotos de la carta física
+  (250 KB) y la tabla de "arquitectura sugerida".
+- **Caja:** dejó de editar precios y metas (vienen del sistema general) y salió el traspaso manual de
+  disponibilidad, que ya no hace falta porque todo comparte memoria.
+- **Carta:** salieron servicios del pueblo, números de emergencia, reseñas de Google y TripAdvisor,
+  Instagram, galería, banda de fotos y avisos de altura, junto con sus 49 textos en 10 idiomas y 11 fotos.
+  Queda el enlace a DesertGo, que es un canal de venta.
+- **Control de Salón:** los enlaces a la Caja y a la Pizarra de Empanadas, que eran artefactos aparte,
+  se reemplazaron por la Caja del paquete.
+- **Nuevo:** Comandas por estación, alimentadas por las ventas reales de la Caja.
+
+Correcciones encontradas al probar: los dígitos del PIN tecleados mientras se valida ya no se pierden;
+en la ficha de la Caja, lo escrito en un ingrediente ya no se borra al pasar al campo siguiente, y la hoja
+larga ahora se desplaza dentro de la pantalla.
 
 ## Verificación
 
@@ -22,29 +64,13 @@ cd EmporioAndinoPOS
 NODE_PATH=$(npm root -g) node verificacion/verificar.mjs
 ```
 
-El agente levanta un servidor local, abre cada módulo en Chromium a ancho de escritorio
-(1366 px) y de teléfono (390 px), recorre el ingreso con PIN y las 12 áreas del Sistema,
-las capas de la Carta, Control de Salón y el lanzador (incluido su autodiagnóstico).
-Falla si hay errores de JavaScript, recursos propios que no cargan o desborde horizontal.
-Deja el resultado en `verificacion/informe.json`. Resultado del lanzamiento: 76/76.
+Prueba cada módulo a 1366 px y a 390 px, y los flujos que cruzan módulos: ingreso con PIN → venta en la
+Caja → comanda en Comandas; borrador en la Prueba → aplicar → precio nuevo en la Caja y producto fuera
+en la Carta; garzón → Caja con solo cobro y stock; la Carta en cada idioma directo sin textos
+indefinidos. Resultado en `verificacion/informe.json`.
 
-El lanzador incluye además una verificación que corre en el navegador de cada equipo
-(almacenamiento, tipografías, apertura de los tres módulos, 39 fotos, datos guardados).
-Para escuchar errores desde el primer instante, cada módulo lleva una línea en su `<head>`
-que avisa al lanzador cuando se abre dentro de él; fuera del lanzador no hace nada.
+El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
+para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre
+dentro de él, para escuchar errores desde el primer instante; fuera del sistema no hace nada.
 
-## Cambios respecto de los artefactos originales
-
-- Sistema: el ingreso con PIN perdía los dígitos tecleados mientras validaba el primer PIN
-  (unos 120 ms), y al teclear rápido mostraba "Los PIN no coinciden". Ahora el código se
-  toma al completar los 4 dígitos y el buffer queda libre al instante.
-- Control de Salón: ahora tiene `<!doctype html>` y se abre en modo estándar, como
-  en su versión original.
-- Los tres módulos: línea de enganche para la verificación (ver arriba).
-
-## Retroalimentación y mantención
-
-En la versión publicada como artefacto, los reportes se guardan en la base compartida del
-artefacto (colección `retro`; el último diagnóstico queda en `diagnosticos/ultimo`).
-Así el equipo los ve y se pueden leer en la próxima sesión de mantención. Abierto fuera de
-claude.ai, el libro se guarda solo en ese equipo.
+Con el Apache del repo se abre en `/EmporioAndinoPOS/`. Todo es HTML estático, sin compilación.
