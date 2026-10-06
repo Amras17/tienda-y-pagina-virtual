@@ -501,6 +501,30 @@ html.incrustado .franja{position:relative}
 .pdpax{display:flex;align-items:center;gap:8px;margin:4px 0 10px}
 .pdpax b{min-width:22px;text-align:center;font-size:16px}
 .queues{grid-template-columns:repeat(4,minmax(0,1fr))}
+/* Horno en vivo */
+.hnrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0}
+.hnrow .lbl{min-width:150px}
+.hornadas{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.hornadas li{padding:9px 12px;border-radius:12px;background:var(--glass-2);border:1px solid var(--stroke);display:grid;gap:6px;font-size:12.5px}
+.hornadas li .r{display:flex;justify-content:space-between;gap:10px}
+.hornadas .bar{height:6px}
+.vitr{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.vitr li{padding:9px 11px;border-radius:12px;background:var(--glass-2);border:1px solid var(--stroke);display:grid;gap:4px}
+.vitr li b{font-family:var(--f-num);font-size:20px}
+.vitr li.cero b{color:var(--crit)}
+.vitr li small{color:var(--muted);font-size:11px}
+/* Fichas y escandallos */
+.fxtbl tr{cursor:pointer}
+.fxtbl tr.sel td{background:rgba(64,224,208,.09)}
+.fxing{width:100%;border-collapse:collapse;margin-top:10px}
+.fxing td,.fxing th{padding:5px 6px;font-size:12.5px;border-bottom:1px solid var(--stroke)}
+.fxing input.fin{width:78px;text-align:right;padding:4px 6px}
+.fxop{display:grid;gap:8px;margin-top:12px}
+.fxop div{font-size:12.5px;color:var(--fg-2)}
+.fxop b{display:block;color:var(--fg);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.fxop ul{margin:2px 0 0;padding-left:18px}
+.fxacc{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fxtag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);border:1px solid rgba(255,181,71,.45);border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:middle}
 .pdbarra{display:none;position:sticky;bottom:12px;z-index:6;margin-top:12px;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px 10px 16px;border-radius:16px;border:1px solid rgba(64,224,208,.45);font-weight:700;background:rgba(14,22,25,.94)}
 @media (max-width:1280px){.pdbarra{display:flex}}
 @media (max-width:640px){.queues{grid-template-columns:repeat(2,minmax(0,1fr))}.pdgrid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:none}}
@@ -660,14 +684,21 @@ html.incrustado .franja{position:relative}
     <section class="view" data-view="horno" hidden>
       <div class="grid">
         <article class="tile glass s5"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="hd"><div><h2>Vitrina y horno</h2><p>Latas de 15 · tanda de unos 5 minutos</p></div></div>
-            <div class="oven"><svg viewBox="0 0 84 84" width="96" height="96" role="img" aria-label="Empanadas en vitrina sobre 30"><circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="9"/><circle id="ovRing" cx="42" cy="42" r="34" fill="none" stroke="#E8674A" stroke-width="9" stroke-linecap="round" transform="rotate(-90 42 42)" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
-              <div><div class="v num" id="ovN">0</div><small>empanadas en vitrina · mínimo 12</small><small id="ovTxt"></small><div class="bar"><i id="ovBar" style="background:#E8674A"></i></div></div></div>
-            <div class="row-end"><small id="ovNext"></small><button class="btn sm" id="ovBtn" type="button">Hornear lata +15</button></div></div></article>
+          <div class="tc"><div class="hd"><div><h2>Vitrina por variedad</h2><p id="vtSub"></p></div></div>
+            <div class="kv"><div class="stat"><b class="num" id="ovN">0</b><span>Empanadas en vitrina</span></div><div class="stat"><b class="num" id="ovIn">0</b><span>En el horno</span></div><div class="stat"><b class="num" id="ovCosto">$0</b><span>Costo de lo horneado hoy</span></div></div>
+            <ul class="vitr" id="vitrina"></ul></div></article>
         <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Cargar hornada</h2><p>Como el horno del Control de Salón: varias variedades a la vez, cuánto de cada una y el tiempo. Al entrar gasta los insumos de las fichas; al salir, las unidades pasan a la vitrina.</p></div></div>
+            <span class="lbl">¿Cuáles entran?</span><div class="fchips" id="hnSel" style="margin-top:6px"></div>
+            <div class="hnrow"><span class="lbl">Cuánto de cada una</span><span class="fchips" id="hnLatas"></span><span class="pdpax" style="margin:0"><button type="button" class="btn sm" data-hn="-1" aria-label="Una unidad menos">−</button><b class="num" id="hnN">15</b><button type="button" class="btn sm" data-hn="1" aria-label="Una unidad más">+</button></span></div>
+            <div class="hnrow"><span class="lbl">Tiempo en el horno</span><span class="fchips" id="hnMins"></span><span class="pdpax" style="margin:0"><button type="button" class="btn sm" data-hm="-1" aria-label="Un minuto menos">−</button><b class="num" id="hnM">5</b><button type="button" class="btn sm" data-hm="1" aria-label="Un minuto más">+</button></span></div>
+            <p class="note" id="hnInfo"></p>
+            <button class="btn pri" type="button" id="hnBtn" disabled>Elige cuáles entran</button>
+            <h2 class="sec-t" style="margin-top:16px">Adentro ahora</h2><ul class="hornadas" id="hnDentro"></ul></div></article>
+        <article class="tile glass s5"><div class="sk"><i class="t"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Empanadas vendidas hoy</h2><p>Por tipo · <span id="empTot">0</span> unidades</p></div></div><ul class="rank" id="empTipos"></ul></div></article>
-        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="hd"><div><h2>Tandas de hoy</h2><p id="tandaSub"></p></div></div><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Entra</th><th>Sale</th><th class="r">Unidades</th><th>Estado</th><th>Registró</th></tr></thead><tbody id="tandas"></tbody></table></div></div></article>
+        <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Hornadas de hoy</h2><p id="tandaSub"></p></div></div><div class="tbl-wrap"><table><thead><tr><th>Entra</th><th>Sale</th><th>Variedades</th><th class="r">Unidades</th><th class="r">Costo</th><th>Estado</th><th>Registró</th></tr></thead><tbody id="tandas"></tbody></table></div></div></article>
       </div>
     </section>
 
@@ -695,10 +726,20 @@ html.incrustado .franja{position:relative}
     <section class="view" data-view="inventario" hidden>
       <div class="grid">
         <article class="tile glass s6"><div class="sk"><i class="t"></i><i class="blk"></i><i class="blk"></i></div>
-          <div class="tc"><div class="hd"><div><h2>Alertas de inventario</h2><p id="invNote"></p></div><button class="btn sm" id="invAll" type="button" aria-pressed="false">Ver todo</button></div><ul class="inv" id="inv"></ul></div></article>
+          <div class="tc"><div class="hd"><div><h2>Alertas de inventario</h2><p id="invNote"></p></div><span class="row-end" style="margin:0;gap:6px"><button class="btn sm" id="invStd" type="button">Rellenar al estándar</button><button class="btn sm" id="invAll" type="button" aria-pressed="false">Ver todo</button></span></div><ul class="inv" id="inv"></ul></div></article>
         <article class="tile glass s6"><div class="sk"><i class="t"></i><i class="blk"></i></div>
-          <div class="tc"><div class="hd"><div><h2>Consumo de hoy</h2><p>Cobertura estimada al ritmo de hoy</p></div></div>
-            <div class="tbl-wrap"><table><thead><tr><th>Insumo</th><th class="r">Usado hoy</th><th class="r">Stock</th><th class="r">Cobertura</th></tr></thead><tbody id="invTable"></tbody></table></div></div></article>
+          <div class="tc"><div class="hd"><div><h2>Ingreso de mercadería</h2><p>Compras simuladas: suben el stock de la prueba con la cantidad y el precio que indiques.</p></div></div>
+            <div class="cxform">
+              <label class="campo">Insumo<select class="fin" id="igIns"></select></label>
+              <label class="campo">Cantidad de formatos<input class="fin num" type="number" id="igN" min="0.1" step="0.5" value="1"></label>
+              <label class="campo">Precio neto por formato<input class="fin num" type="number" id="igP" min="0" step="10"></label>
+            </div>
+            <label class="note" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="igAct"> Usar este precio en las fichas de la prueba</label>
+            <div class="row-end"><small id="igInfo"></small><button class="btn pri sm" id="igBtn" type="button">Registrar ingreso</button></div>
+            <h2 class="sec-t" style="margin-top:14px">Ingresos de hoy</h2><ul class="log" id="igLog" style="margin-top:8px"></ul></div></article>
+        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Consumo de hoy</h2><p>Lo que sacan las fichas de cada venta y de cada hornada · cobertura al ritmo de hoy</p></div></div>
+            <div class="scroll" style="max-height:520px"><table><thead><tr><th>Insumo</th><th>Área</th><th class="r">Usado hoy</th><th class="r">Stock</th><th class="r">Valor del stock</th><th class="r">Cobertura</th></tr></thead><tbody id="invTable"></tbody></table></div></div></article>
       </div>
     </section>
 
@@ -750,7 +791,28 @@ html.incrustado .franja{position:relative}
         <article class="tile glass s12" id="dbTile"><div class="sk"><i class="t"></i><i class="l"></i><i class="l"></i><i class="blk"></i></div>
           <div class="tc"><div class="hd"><div><h2>Catálogo de la prueba</h2><p id="dbSub"></p></div></div>
             <div class="filters"><input id="q" class="search" type="search" placeholder="Buscar producto, ingrediente o código…" aria-label="Buscar producto"><div class="fchips" id="fchips"></div></div>
-            <div class="scroll db" style="max-height:560px"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Área</th><th class="r">Precio prueba</th><th class="r">Costo (Caja)</th><th class="r">Food cost</th><th class="r">Vendidos</th></tr></thead><tbody id="dbBody"></tbody></table></div></div></article>
+            <div class="scroll db" style="max-height:560px"><table><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Área</th><th class="r">Precio prueba</th><th class="r">Costo (ficha)</th><th class="r">Food cost</th><th class="r">Vendidos</th></tr></thead><tbody id="dbBody"></tbody></table></div></div></article>
+      </div>
+    </section>
+
+    <!-- ===== FICHAS Y ESCANDALLOS ===== -->
+    <section class="view" data-view="fichas" hidden>
+      <div class="grid">
+        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Fichas técnicas y escandallos de la prueba <span class="fxtag">Estimado</span></h2><p id="fxSub"></p></div><button class="btn sm" type="button" id="fxRellenar">Rellenar con el estándar</button></div>
+            <div class="kv" id="fxKpis"></div>
+            <div class="cxform" style="margin-top:12px"><label class="campo">Flete a San Pedro de Atacama (%)<input class="fin num" type="number" id="fxFlete" min="0" max="50" step="1"></label><div class="campo">Meta de food cost<span class="num" id="fxMeta" style="font-size:14px;color:var(--fg)"></span></div></div>
+            <p class="note" id="fxNota"></p></div></article>
+        <article class="tile glass s7"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Productos</h2><p>Costo por porción con las fichas de la prueba · toca uno para ver su escandallo</p></div></div>
+            <div class="filters"><input id="fxQ" class="search" type="search" placeholder="Buscar producto…" aria-label="Buscar producto"><div class="fchips" id="fxGrupos"></div></div>
+            <div class="scroll" style="max-height:640px"><table class="fxtbl"><thead><tr><th>Producto</th><th class="r">Costo</th><th class="r">Precio</th><th class="r">Food cost</th><th class="r">Margen</th><th class="r">Sugerido</th></tr></thead><tbody id="fxBody"></tbody></table></div></div></article>
+        <article class="tile glass s5"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc" id="fxFicha"></div></article>
+        <article class="tile glass s12"><div class="sk"><i class="t"></i><i class="blk"></i></div>
+          <div class="tc"><div class="hd"><div><h2>Insumos y precios de compra</h2><p>Precio neto por formato de compra. Cambiarlo recalcula todas las fichas que lo usan.</p></div></div>
+            <div class="filters"><input id="fxIq" class="search" type="search" placeholder="Buscar insumo…" aria-label="Buscar insumo"></div>
+            <div class="scroll" style="max-height:520px"><table class="ptbl"><thead><tr><th>Insumo</th><th>Área</th><th>Formato</th><th class="r">Precio neto</th><th class="r">Por unidad</th><th class="r">Fichas</th><th>Referencia</th></tr></thead><tbody id="fxIns"></tbody></table></div></div></article>
       </div>
     </section>
 
@@ -812,6 +874,7 @@ html.incrustado .franja{position:relative}
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
 <script src="../nucleo/emporio.js"></script>
+<script src="estandar.js"></script>
 <script>
 /*ENGINE-START*/
 /* Categorías de la simulación: a qué área sale cada producto, si es comida o
@@ -865,19 +928,8 @@ const PERFIL_11=[
  ["Torta","pas",5500,1.5,"",1],["Cheesecake","pas",4800,1.5,""],["Kuchen, pie, tarta","pas",4500,1.5,"",1],["Alfajores","pas",2500,2,"",1],
  ["Licancabur","ens",8900,1,"",1,0,"Mozarella, cherry, pesto, aceitunas y nueces"],["Quimal","ens",9700,1,"pa",1,0,"Quinoa, cherry, pepino, palta y almendras"]
 ];
-const REC={e1:["cafe",.012],e2:["cafe",.024],f:["cafe",.028],m:["leche",.2],lv:["lveg",.2],ch:["chanar",20],co:["choco",.04],mt:["matcha",4],pa:["palta",.12],qc:["qcabra",.05],pn:["pan",2],yo:["yog",.2],nj:["naranja",.7],em:["emp",1]};
-const MINQ={};for(const c in REC){const[k,q]=REC[c];MINQ[k]=Math.min(MINQ[k]===undefined?Infinity:MINQ[k],q)}
-const INS0={
- cafe:{n:"Café en grano",u:"kg",s:24,min:20,rep:14,act:"Ingreso +14 kg",hint:"Pedido por email"},
- emp:{n:"Empanadas en vitrina",u:"unid.",s:30,min:12,rep:15,act:"Hornear +15",hint:"Lata de 15"},
- leche:{n:"Leche entera",u:"L",s:15,min:8,rep:12,act:"Reponer +12 L"},lveg:{n:"Leche vegetal",u:"L",s:4.4,min:3,rep:6,act:"Reponer +6 L"},
- chanar:{n:"Sirope de chañar",u:"ml",s:1300,min:500,rep:1000,act:"Reponer +1 L"},choco:{n:"Chocolate en polvo",u:"kg",s:2,min:1,rep:2,act:"Reponer +2 kg",hint:"2 scoops por taza"},
- matcha:{n:"Matcha",u:"g",s:210,min:120,rep:250,act:"Reponer +250 g"},palta:{n:"Palta hass",u:"kg",s:3.8,min:2,rep:4,act:"Reponer +4 kg"},
- qcabra:{n:"Queso de cabra",u:"kg",s:1.4,min:.8,rep:1.5,act:"Reponer +1,5 kg"},pan:{n:"Pan masa madre",u:"rebanadas",s:52,min:20,rep:40,act:"Reponer +40"},
- yog:{n:"Yoghurt natural",u:"L",s:5.5,min:3,rep:5,act:"Reponer +5 L"},naranja:{n:"Naranjas",u:"kg",s:15,min:6,rep:10,act:"Reponer +10 kg"}
-};
 const norm=x=>String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
-const P11={};PERFIL_11.forEach(r=>{P11[norm(r[0])]={w:r[3],r:(r[4]||"").split(" ").filter(Boolean),v:!!r[5]}});
+const P11={};PERFIL_11.forEach(r=>{P11[norm(r[0])]={w:r[3],v:!!r[5]}});
 /* Nombres de la carta única que en 1.1 se llamaban distinto */
 const ALIAS={"espresso":"espresso simple","cappuccino":"capuccino","caprese":"capresse","guatin":"guatin",
  "bowl antioxidante":"antioxidante","bowl energizante":"tropical","bowl desintoxicante":"detox",
@@ -902,17 +954,27 @@ function catSim(p){
   if(p.sub==="te"||p.sub==="choc")return frio?"bf":"tc";
   return"bf";
 }
-function insumosDef(p,c,d){
-  const n=norm(p.n+" "+d),r=[];
-  if(c==="emp")return["em"];
-  if(c==="des"||c==="bru"){r.push("e1");if(/tostad|pan|masa madre/.test(n))r.push("pn");if(/palta/.test(n))r.push("pa");if(/cabra/.test(n))r.push("qc");if(/yogh|yogur/.test(n))r.push("yo");if(/jugo|naranja/.test(n))r.push("nj");return r}
-  if(c==="brus"||c==="tos"){r.push("pn");if(/palta/.test(n))r.push("pa");return r}
-  if(c==="bowl")return["yo"];
-  if(c==="ens")return /palta/.test(n)?["pa"]:[];
-  if(c==="cc"||c==="cf"){if(/v60|chemex/.test(n))return["f"];r.push(/latte|flat|frappe|doble/.test(n)||c==="cf"?"e2":"e1");if(p.leche)r.push("m");if(/chanar/.test(n))r.push("ch");if(/moca|mocaccino/.test(n))r.push("co");return r}
-  if(c==="tc"||c==="bf"){if(/matcha/.test(n))return["mt","m"];if(/chocolate/.test(n))return["co","m"];if(/naranja/.test(n))return["nj"];return p.leche?["m"]:[]}
-  return[];
-}
+/* =============== FICHAS Y ESCANDALLOS DE LA PRUEBA ===============
+   Recetas y precios estándar (prueba/estandar.js) más lo que se edite en la
+   vista de fichas. Se guardan aparte, en "eapos_prueba_fichas": nada de esto
+   toca la Caja ni el sistema general. */
+const STD=window.EA_ESTANDAR||{INS:{},FICHAS:{}};
+const INS=STD.INS;
+const FX_KEY="eapos_prueba_fichas";
+function leerFx(){let f=null;try{f=JSON.parse(localStorage.getItem(FX_KEY))}catch(e){}f=f&&typeof f==="object"?f:{};
+  if(!f.precios||typeof f.precios!=="object")f.precios={};if(!f.fichas||typeof f.fichas!=="object")f.fichas={};
+  if(!(f.flete>=0&&f.flete<=50))f.flete=8;return f}
+let FXE=leerFx();
+function guardarFx(){try{localStorage.setItem(FX_KEY,JSON.stringify(FXE))}catch(e){}}
+const insPrecio=k=>FXE.precios[k]!=null?FXE.precios[k]:INS[k].precio;
+/* Costo por unidad base (g, ml o u), con el flete al desierto. */
+const cuIns=k=>INS[k]?insPrecio(k)/INS[k].fmt*(1+FXE.flete/100):0;
+function fichaDe(id){const s=STD.FICHAS[id],e=FXE.fichas[id];if(!s&&!e)return null;
+  const f=Object.assign({},s||{ing:[],merma:0,rinde:1},e||{});f.ing=((e&&e.ing)||(s&&s.ing)||[]).filter(x=>INS[x[0]]);return f}
+function costoFicha(f){if(!f)return null;return f.ing.reduce((a,[k,q])=>a+q*cuIns(k),0)*(1+(+f.merma||0)/100)/(+f.rinde||1)}
+function costoDe(id){const c=costoFicha(fichaDe(id));return c==null?null:Math.round(c)}
+/* Lo que saca del inventario una porción vendida (o una empanada horneada), con merma. */
+function recDe(id){const f=fichaDe(id);if(!f)return[];const m=(1+(+f.merma||0)/100)/(+f.rinde||1);return f.ing.map(([k,q])=>[k,q*m])}
 function descDe(p){
   const D=window.EA_DATOS,id=p.id;
   const x=p.g==="emp"?D.EMP.find(e=>"E"+e.id===id):p.g==="coc"?D.COMIDA.find(e=>e.id===id):p.g==="bar"?D.BEB.find(e=>e.id===id):null;
@@ -927,7 +989,7 @@ function construirMenu(cfg){
   const cuenta={};base.forEach(x=>{if(x.pf)cuenta[x.al]=(cuenta[x.al]||0)+1});
   return base.map((x,i)=>({id:i,key:x.p.id,code:x.p.id,n:x.p.n,c:x.c,p:x.p.p,
     w:x.pf?x.pf.w/cuenta[x.al]:PESO_DEF[x.c],
-    r:x.pf&&x.pf.r.length?x.pf.r:insumosDef(x.p,x.c,x.d),
+    rec:recDe(x.p.id),costo:costoDe(x.p.id),
     v:x.pf?x.pf.v:/vegan/i.test(x.p.n),local:!!(x.p.loc||CATS[x.c].local),d:x.d}));
 }
 let MENU=[],SINPRECIO=0;
@@ -978,23 +1040,28 @@ const ACTOR={name:"Prueba"};
 let S;
 function newState(stock){
   const st={t:OPEN,sales:Array(24).fill(0),cum:[],area:{barra:0,horno:0,cocina:0},tickets:0,revenue:0,tx:[],sold:{},log:[],queue:[],deliv:[],llevar:[],stock:{},
-    oven:null,ovenDone:null,seq:101,pulses:[],methods:{},records:0,used:{},orders:[],batches:[],abandon:0,lostFull:0,outMin:{},
+    ovenDone:null,seq:101,pulses:[],methods:{},records:0,used:{},orders:[],batches:[],abandon:0,lostFull:0,vit:{},horno:[],compras:[],costoVentas:0,costoProd:0,
     kinds:{mesa:{n:0,v:0},llevar:{n:0,v:0},fila:{n:0,v:0},deliv:{n:0,v:0}},espEmp:[],eseq:0,abandonEmp:0,manual:[]};
-  for(const k in INS0)st.stock[k]=stock&&stock[k]!==undefined?stock[k]:INS0[k].s;
+  const s0=stock||stockInicial().s;for(const k in INS)st.stock[k]=s0[k]!==undefined?s0[k]:0;
+  /* La vitrina parte con unas 30 empanadas repartidas según lo que más se pide. */
+  const emps=MENU.filter(it=>it.c==="emp"),sw=emps.reduce((a,it)=>a+it.w,0)||1;emps.forEach(it=>{st.vit[it.key]=Math.max(1,Math.round(30*it.w/sw))});
   st.tables=Array.from({length:15},(_,i)=>({n:i+1,salon:i<7?1:i<14?2:15,state:"libre",since:0,dur:0,items:[],pax:0,total:0}));
   return st;
 }
 const hourOf=t=>Math.floor(t/60);
-const avail=it=>it.r.every(c=>S.stock[REC[c][0]]>=REC[c][1]-1e-9);
+/* Hay producto si alcanzan los insumos de su ficha; las empanadas, si quedan en la vitrina. */
+const avail=it=>it.c==="emp"?(S.vit[it.key]||0)>=1:it.rec.every(([k,q])=>S.stock[k]>=q-1e-9);
 function hourMult(it,h){const c=it.c;if(c==="cf"||c==="bf")return h<11?.5:h<18?1.5:.8;if(c==="cc"||c==="tc")return h<11?1.5:h<17?.75:1.25;if(c==="emp")return h<11?.4:1.3;return 1}
 function okTime(it,t){const c=CATS[it.c];if(c.to&&t>=c.to)return false;if(c.from&&t<c.from)return false;return true}
 function pick(kind,opt){const h=hourOf(S.t);const pool=MENU.filter(it=>CATS[it.c].k===kind&&it.w>0&&okTime(it,S.t)&&!(opt.away&&it.local)&&(!opt.cats||opt.cats.includes(it.c))&&avail(it));
   return wpick(pool,it=>it.w*hourMult(it,h)*(opt.deliv&&it.c==="emp"?2.2:1)*(opt.deliv&&it.c==="san"?1.6:1)*(opt.away&&it.c==="emp"?1.8:1))}
-function consume(it){for(const c of it.r){const[k,q]=REC[c];S.stock[k]=Math.max(0,+(S.stock[k]-q).toFixed(4));S.used[k]=(S.used[k]||0)+q}}
+function consume(it){S.costoVentas+=it.costo||0;
+  if(it.c==="emp"){S.vit[it.key]=Math.max(0,(S.vit[it.key]||0)-1);return}
+  for(const [k,q] of it.rec){S.stock[k]=Math.max(0,S.stock[k]-q);S.used[k]=(S.used[k]||0)+q}}
 function anotar(list,it){S.sold[it.id]=(S.sold[it.id]||0)+1;const a=CATS[it.c].a;list.push({id:it.id,n:it.n,p:it.p,a});S.log.push({t:S.t,a,p:it.p,id:it.id});S.pulses.push(a)}
 function addItem(list,it,extra){consume(it);anotar(list,it);if(extra)addItem(list,extra)}
 /* Leche vegetal: cambia el insumo; el extra se cobra en la Caja real, aquí no se suma */
-function veg(it){if(it.r.includes("m")&&rnd()<.15&&S.stock.lveg>=.2){S.stock.leche+=.2;S.used.leche=(S.used.leche||0)-.2;S.stock.lveg-=.2;S.used.lveg=(S.used.lveg||0)+.2}return null}
+function veg(it){const l=it.rec.find(x=>x[0]==="leche");if(l&&rnd()<.15&&S.stock.lveg>=l[1]){const q=l[1];S.stock.leche+=q;S.used.leche=(S.used.leche||0)-q;S.stock.lveg-=q;S.used.lveg=(S.used.lveg||0)+q;S.costoVentas+=q*(cuIns("lveg")-cuIns("leche"))}return null}
 /* Carta de la fila: lo que se puede pedir de pie mientras se espera mesa o la tanda de empanadas. */
 const FILA_CATS=["cc","tc","cf","bf","pas","emp"];
 function buildOrder(kind,pax){const items=[];
@@ -1020,12 +1087,44 @@ function ventaFila(g,tipo,items,by){g.compro=true;items=items||buildOrder("fila"
    El que ya pagó solo las retira; el que no, paga al recibirlas. Pasados 18 minutos
    sin tanda, quien no pagó se va. */
 function servirEspera(){const t=S.t;
-  while(S.espEmp.length&&S.stock.emp>=S.espEmp[0].n&&(!S.espEmp[0].tanda||(S.ovenDone!=null&&S.ovenDone>S.espEmp[0].t))){const e=S.espEmp.shift();
-    if(e.pagado){S.stock.emp-=e.n;S.used.emp=(S.used.emp||0)+e.n}
-    else{const items=[];for(let i=0;i<e.n;i++){const f=pick("food",{away:true,cats:["emp"]});if(f)addItem(items,f)}
-      if(items.length){order("Mostrador · esperó la tanda","llevar",items);pay("Mostrador · esperó la tanda","llevar",items,"Simulación")}}}
+  while(S.espEmp.length){const e=S.espEmp[0];if(e.tanda&&!(S.ovenDone!=null&&S.ovenDone>e.t))break;
+    if(e.tipos){const cuenta={};e.tipos.forEach(k=>cuenta[k]=(cuenta[k]||0)+1);if(!Object.keys(cuenta).every(k=>(S.vit[k]||0)>=cuenta[k]))break;
+      S.espEmp.shift();e.tipos.forEach(k=>{S.vit[k]--;const it=MENU.find(m=>m.key===k);S.costoVentas+=it&&it.costo||0});continue}
+    if(totalVit()<e.n)break;S.espEmp.shift();
+    const items=[];for(let i=0;i<e.n;i++){const f=pick("food",{away:true,cats:["emp"]});if(f)addItem(items,f)}
+    if(items.length){order("Mostrador · esperó la tanda","llevar",items);pay("Mostrador · esperó la tanda","llevar",items,"Simulación")}}
   const n0=S.espEmp.length;S.espEmp=S.espEmp.filter(e=>e.pagado||e.tanda||t-e.t<18);S.abandonEmp+=n0-S.espEmp.length}
-function bake(by){if(S.oven)return false;S.oven={start:S.t,end:S.t+5};S.batches.push({start:S.t,end:S.t+5,by:by||ACTOR.name});return true}
+/* =============== HORNO EN VIVO ===============
+   Como el horno del Control de Salón: una hornada lleva varias variedades,
+   unidades por variedad (la lata trae 15) y su propio reloj. Al entrar gasta
+   los insumos de las fichas; al salir, las unidades pasan a la vitrina. */
+const LATA=15,EMP_MIN=12,HORNO_CAP=4*LATA;
+const totalVit=()=>Object.values(S.vit).reduce((a,b)=>a+b,0);
+const enHorno=()=>S.horno.reduce((a,h)=>a+h.total,0);
+const empMenu=()=>MENU.filter(it=>it.c==="emp");
+function faltaParaHornear(items){const need={};
+  for(const key in items)for(const [k,q] of recDe(key))need[k]=(need[k]||0)+q*items[key];
+  for(const k in need)if(S.stock[k]<need[k]-1e-9)return k;return null}
+function hornear(items,min,by){const total=Object.values(items).reduce((a,b)=>a+b,0);
+  if(!total)return{error:"vacia"};if(enHorno()+total>HORNO_CAP)return{error:"capacidad"};
+  const f=faltaParaHornear(items);if(f)return{error:"insumo",ins:f};
+  let costo=0;for(const key in items)for(const [k,q] of recDe(key)){const g=q*items[key];S.stock[k]=Math.max(0,S.stock[k]-g);S.used[k]=(S.used[k]||0)+g;costo+=g*cuIns(k)}
+  const h={id:++S.eseq,items:Object.assign({},items),total,start:S.t,end:S.t+Math.max(1,min),by:by||ACTOR.name,costo:Math.round(costo)};
+  S.horno.push(h);S.batches.push(h);S.costoProd+=h.costo;return{ok:true,h}}
+/* El horno automático, como lo haría cocina: entra cuando la vitrina baja del
+   mínimo, o se agotan tres variedades con la vitrina bajo 24. Primero lo que espera gente que ya pagó;
+   después hasta tres variedades de las que más faltan, con unidades según lo
+   que se pide de cada una (de 5 a 15). Deja de hornear 45 minutos antes del cierre. */
+function hornoAutomatico(){
+  if(S.horno.length)return;const tot=totalVit(),emps=empMenu(),ceros=emps.filter(it=>!(S.vit[it.key]>0)).length;
+  if(!S.espEmp.length&&((tot>=EMP_MIN&&!(ceros>=3&&tot<EMP_MIN*2))||S.t>=CLOSE-45))return;
+  const pide={};S.espEmp.forEach(e=>(e.tipos||[]).forEach(k=>pide[k]=(pide[k]||0)+1));
+  const sw=emps.reduce((a,it)=>a+it.w,0)||1;
+  const orden=emps.map(it=>({it,p:(pide[it.key]&&pide[it.key]>(S.vit[it.key]||0)?100:0)+it.w/((S.vit[it.key]||0)+1)})).sort((a,b)=>b.p-a.p);
+  const items={};let n=0,total=0;
+  for(const v of orden){if(n>=3)break;const k=v.it.key,u=Math.max(5,Math.max(pide[k]||0,Math.min(LATA,Math.round(v.it.w/sw*45/5)*5)));
+    if(total+u>HORNO_CAP)continue;const prueba=Object.assign({},items,{[k]:u});if(faltaParaHornear(prueba))continue;items[k]=u;total+=u;n++}
+  if(n)hornear(items,5,"Automático")}
 const inColacion=t=>(t>=690&&t<735)||(t>=960&&t<1000);
 function step(){
   const t=S.t;const m15=S.tables[14];
@@ -1039,20 +1138,32 @@ function step(){
   /* Se sienta al primero de la fila que ya puede pasar (los ingresados a mano esperan que se prepare su mesa). */
   for(const tb of S.tables){if(tb.state!=="libre")continue;const i=S.queue.findIndex(g=>!(g.hasta>t));if(i<0)break;seat(tb,S.queue.splice(i,1)[0].pax)}
   S.deliv=S.deliv.filter(d=>t<d.t+d.eta);S.llevar=S.llevar.filter(x=>t-x<6);
-  if(S.oven&&t>=S.oven.end){S.stock.emp+=15;S.oven=null;S.ovenDone=t}
+  for(const h of S.horno.slice())if(t>=h.end){for(const k in h.items)S.vit[k]=(S.vit[k]||0)+h.items[k];S.horno=S.horno.filter(x=>x!==h);S.ovenDone=t}
   servirEspera();
-  if(!S.oven&&((S.stock.emp<INS0.emp.min&&t<CLOSE-30)||S.espEmp.length))bake("Automático");
-  for(const k in MINQ){if(S.stock[k]<MINQ[k]-1e-9)S.outMin[k]=(S.outMin[k]||0)+1}
+  hornoAutomatico();
   if(t<CLOSE-15){const k=poisson(.2*DEMAND*(PROFILE[hourOf(t)]||0));
     for(let i=0;i<k;i++){const r=rnd();
       if(r<.55){const pax=wpick([1,2,3,4],p=>[.25,.4,.2,.15][p-1]);const free=S.tables.filter(x=>x.state==="libre");
         if(free.length)seat(free[Math.floor(rnd()*free.length)],pax);else if(S.queue.length<5)S.queue.push({t,pax,id:++S.eseq});else S.lostFull++}
-      else if(r<.82){if(S.stock.emp<3&&rnd()<.6){S.espEmp.push({t,n:ri(1,3),pax:1,id:++S.eseq});if(!S.oven)bake("Automático")}
+      else if(r<.82){if(totalVit()<3&&rnd()<.6){S.espEmp.push({t,n:ri(1,3),pax:1,id:++S.eseq});hornoAutomatico()}
         else{const items=buildOrder("llevar");S.llevar.push(t);order("Mostrador","llevar",items);pay("Mostrador","llevar",items,"Simulación")}}
       else{const items=buildOrder("deliv");if(items.length){const lb="DesertGo #"+(4100+S.seq);order(lb,"deliv",items);pay(lb,"deliv",items,"Simulación");S.deliv.push({t,eta:ri(22,40),label:lb,amt:sum(items)})}}}}
   S.t++;S.cum[S.t]=S.revenue;
   if(S.log.length>1500)S.log=S.log.filter(x=>S.t-x.t<=60);
 }
+/* Stock estándar de la prueba: el mayor consumo de tres viernes de temporada
+   alta con estas fichas, por 1,6, redondeado al formato de compra. Se pide al
+   bajar del 35 % de ese consumo. Se recalcula cuando cambian la carta o las fichas. */
+let STOCK0=null;
+function stockInicial(){
+  if(STOCK0&&STOCK0.v===menuV)return STOCK0;
+  const inf={};for(const k in INS)inf[k]=Infinity;
+  const g={DEMAND,seed,S,on:NET.online,q:NET.queue};
+  const uso={};for(const sem of [20261009,20261016,20261023]){DEMAND=SEASONS.alta*DOW_F[5];seed=sem;S=newState(inf);while(S.t<CLOSE)step();
+    for(const k in S.used)uso[k]=Math.max(uso[k]||0,S.used[k])}
+  DEMAND=g.DEMAND;seed=g.seed;S=g.S;NET.online=g.on;NET.queue=g.q;
+  const st={},min={};for(const k in INS){const u=Math.max(0,uso[k]||0),f=INS[k].fmt;st[k]=u>0?Math.max(f,Math.ceil(u*1.6/f)*f):0;min[k]=u*.35}
+  STOCK0={v:menuV,s:st,min,uso};return STOCK0}
 /*ENGINE-END*/
 
 /* =============== RESORTES =============== */
@@ -1104,6 +1215,7 @@ const ICONS={
  carta:'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>',
  contexto:'<rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/><path d="M7.5 13.5h2M11 13.5h2M14.5 13.5h2M7.5 17h2M11 17h2"/>',
  pedido:'<path d="M8 3h8l1 2h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2z"/><path d="M8 10h8M8 14h8M8 18h5"/>',
+ fichas:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
  datos:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>'
 };
 const VIEWS={
@@ -1119,6 +1231,7 @@ const VIEWS={
  clientes:{t:"Clientes",g:"Simulación",c:"#FF7F50",d:"Canales, filas y delivery"},
  reportes:{t:"Reportes",g:"Simulación",c:"#D9A93A",d:"Ventas por hora, áreas y proyección"},
  carta:{t:"Catálogo",g:"Configuración",c:"#1AA89B",d:"La carta única con los precios de la prueba"},
+ fichas:{t:"Fichas y escandallos",g:"Configuración",c:"#E8674A",d:"Recetas, costos y food cost con datos estándar"},
  cambios:{t:"Cambios y aplicación",g:"Configuración",c:"#FFB547",d:"Precios, carta y metas; comparar y aplicar al sistema general"},
  datos:{t:"Conexión simulada",g:"Configuración",c:"#40E0D0",d:"Qué pasa si se corta internet"}
 };
@@ -1190,10 +1303,10 @@ function renderHub(){
   set("contexto",`${HORIZ[CTX.h]} · ${fechaCorta(CTX.fecha)}`,`Temporada ${CTX.temporada} · ${EVENTOS[eventoDe(CTX.fecha)].n.toLowerCase()}`);
   set("pedido",`${S.manual.length} a mano`,`${S.queue.length+S.espEmp.length} esperando en fila · ${S.kinds.fila.n} ventas en fila`);
   const act=cocinaActivas().length;set("cocina",`${act} comandas`,`≈ ${Math.round(NN.pred[2])} platos la próxima hora`);
-  set("horno",`${S.stock.emp} en vitrina`,S.oven?`Tanda sale en ${Math.max(0,S.oven.end-S.t)} min`:`${S.batches.length} tandas hoy`);
+  set("horno",`${totalVit()} en vitrina`,S.horno.length?`${enHorno()} en el horno · sale en ${Math.max(0,Math.min(...S.horno.map(h=>h.end))-S.t)} min`:`${S.batches.length} ${S.batches.length===1?"hornada":"hornadas"} hoy`);
   const beb=MENU.filter(it=>CATS[it.c].a==="barra"&&it.c!=="ext").reduce((a,it)=>a+(S.sold[it.id]||0),0);
-  set("barra",`${beb} bebidas`,`${fmtQ(S.used.cafe||0,"kg")} kg de café hoy`);
-  const crit=Object.keys(INS0).filter(k=>sev(k)==="crit").length,warn=Object.keys(INS0).filter(k=>sev(k)==="warn").length;
+  set("barra",`${beb} bebidas`,`${fmtQ((S.used.cafe||0)/1000,"kg")} kg de café hoy`);
+  const enUso=Object.keys(INS).filter(k=>stockInicial().min[k]>0),crit=enUso.filter(k=>sev(k)==="crit").length,warn=enUso.filter(k=>sev(k)==="warn").length;
   set("inventario",`${crit} críticos`,`${warn} en advertencia `,crit?`<span class="badge crit">Revisar</span>`:`<span class="badge ok">OK</span>`);
   set("caja",clp(S.revenue),`${S.tx.length} movimientos${NET.queue?` · ${NET.queue} en cola`:""}`);
   set("clientes",`${S.kinds.mesa.n+S.kinds.llevar.n+S.kinds.fila.n+S.kinds.deliv.n} tickets`,`Mesa ${S.kinds.mesa.n} · Llevar ${S.kinds.llevar.n} · Fila ${S.kinds.fila.n} · Delivery ${S.kinds.deliv.n}`);
@@ -1201,6 +1314,8 @@ function renderHub(){
   set("reportes",top?esc(top.it.n):"—",top?`Más vendido hoy · ${top.u} u.`:"Sin ventas aún");
 
   set("carta",`${MENU.length} productos`,`${Object.keys(CATS).length} categorías · precios de la prueba`);
+  const conP=EAPOS.base.filter(x=>EAPOS.precioEn(EAPOS.prueba(),x.id)!=null&&costoDe(x.id)!=null);
+  set("fichas",`${EAPOS.base.filter(x=>fichaDe(x.id)).length} fichas`,conP.length?`Food cost promedio ${pct(conP.reduce((a,x)=>a+costoDe(x.id)/(EAPOS.precioEn(EAPOS.prueba(),x.id)/1.19),0)/conP.length)} · estimado`:"Sin precios");
   const pc=EAPOS.pendientes().length;set("cambios",pc?`${pc} cambios`:"Sin cambios",pc?`Borrador sobre la versión ${EAPOS.general().v} del sistema general `:`Igual a la versión ${EAPOS.general().v} del sistema general `,pc?`<span class="badge warn">Por aplicar</span>`:`<span class="badge ok">Al día</span>`);
   set("datos",NET.online?(NET.syncing?"Sincronizando":"Online"):"Offline",NET.queue?`${NET.queue} registros en cola`:"Todo respaldado ",NET.online?"":`<span class="badge warn">Sin internet</span>`);
 }
@@ -1266,42 +1381,86 @@ function renderCocina(){
   const top=it.map(m=>({m,u:S.sold[m.id]||0})).sort((a,b)=>b.u-a.u)[0];$("cxTop").textContent=top&&top.u?top.m.n:"—";
   $("comandas").hx=act.slice().reverse().map(o=>{const el=S.t-o.t,ready=el>=12;return `<li style="--c:${ready?"#3DDC84":"#9A80D6"}"><div class="h"><span>${esc(o.label)}</span><span class="num">${el} min</span></div><span class="lbl" style="color:${ready?"#3DDC84":"#C9B8F2"}">${ready?"Listo para salir":"En preparación"}</span><ul>${o.items.filter(i=>i.a==="cocina").map(i=>`<li>${esc(i.n)}</li>`).join("")}</ul></li>`}).join("")||`<li style="--c:#98ABA8"><span class="empty-s">Sin comandas en los últimos 20 minutos</span></li>`;
 }
-const ovSp={};
+const HN={sel:{},n:LATA,min:5};
+function hornadaSel(){const it={};Object.keys(HN.sel).filter(k=>HN.sel[k]).forEach(k=>it[k]=HN.n);return it}
+const nombreEmp=k=>{const it=MENU.find(m=>m.key===k);return it?it.n:k};
 function renderHorno(){
-  const n=S.stock.emp;springNum("ovN",n,x=>Math.round(x));
-  if(!ovSp.r)ovSp.r=tween(new Spring(0,120,20),x=>$("ovRing").setAttribute("stroke-dashoffset",(213.6*(1-Math.max(0,Math.min(1,x/30)))).toFixed(1)));ovSp.r.set(Math.min(30,n));
-  if(!ovSp.b)ovSp.b=tween(new Spring(0,120,22),x=>$("ovBar").style.width=Math.max(0,Math.min(100,x))+"%");
-  if(S.oven){ovSp.b.set((S.t-S.oven.start)/5*100);$("ovTxt").textContent=`Tanda en el horno · sale en ${Math.max(0,S.oven.end-S.t)} min`}
-  else{ovSp.b.set(0);$("ovTxt").textContent=S.ovenDone!=null?`Última tanda salió a las ${hhmm(S.ovenDone)}`:"Sin tanda en curso"}
-  const latas=Math.floor(n/15);$("ovNext").textContent=n<INS0.emp.min?"Bajo el mínimo: se hornea automáticamente":`${latas} lata${latas===1?"":"s"} completa${latas===1?"":"s"} en vitrina`;
-  $("ovBtn").disabled=!!S.oven;
-  const emps=MENU.filter(m=>m.c==="emp").map(m=>({m,u:S.sold[m.id]||0})).sort((a,b)=>b.u-a.u),tot=emps.reduce((a,x)=>a+x.u,0),mx=Math.max(1,...emps.map(x=>x.u));
-  $("empTot").textContent=tot;
-  $("empTipos").hx=emps.map((x,i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(x.m.n)}</span><span class="hbar"><i style="width:${x.u/mx*100}%;background:#E8674A"></i></span></span><b class="num">${x.u}</b></li>`).join("");
-  $("tandaSub").textContent=`${S.batches.length} tandas · ${S.batches.length*15} empanadas horneadas · al cierre quedan en vitrina las que no se vendan`;
-  $("tandas").hx=S.batches.slice().reverse().map((b,i)=>`<tr><td class="num">${S.batches.length-i}</td><td class="num">${hhmm(b.start)}</td><td class="num">${hhmm(b.end)}</td><td class="r num">15</td><td>${S.t<b.end?`<span class="fcp warn">En el horno</span>`:`<span class="fcp ok">En vitrina</span>`}</td><td>${esc(b.by)}</td></tr>`).join("")||`<tr><td colspan="6" class="empty-s">Sin tandas todavía</td></tr>`;
+  const emps=empMenu(),tot=totalVit();springNum("ovN",tot,x=>Math.round(x));$("ovIn").textContent=enHorno();$("ovCosto").textContent=clp(S.costoProd);
+  $("vtSub").textContent=tot<EMP_MIN?`Bajo el mínimo de ${EMP_MIN}: el horno automático carga la variedad que más falta`:`${Math.floor(tot/LATA)} ${Math.floor(tot/LATA)===1?"lata completa":"latas completas"} · mínimo ${EMP_MIN} en vitrina`;
+  $("vitrina").hx=emps.map(it=>{const v=S.vit[it.key]||0,h=S.horno.reduce((a,x)=>a+(x.items[it.key]||0),0);
+    return `<li class="${v?"":"cero"}"><span>${esc(it.n)}</span><b>${v}</b><small>${h?h+" en el horno · ":""}costo ${clp(it.costo)} c/u</small></li>`}).join("");
+  /* cargar hornada */
+  emps.forEach(it=>{if(HN.sel[it.key]===undefined)HN.sel[it.key]=false});
+  $("hnSel").hx=emps.map(it=>`<button type="button" class="fchip" data-hs="${it.key}" aria-pressed="${!!HN.sel[it.key]}">${esc(it.n)}</button>`).join("");
+  $("hnLatas").hx=[1,2,3].map(l=>`<button type="button" class="fchip" data-hl="${l}" aria-pressed="${HN.n===l*LATA}">${l} ${l===1?"lata":"latas"}</button>`).join("");
+  $("hnMins").hx=[5,10,15].map(m=>`<button type="button" class="fchip" data-hmin="${m}" aria-pressed="${HN.min===m}">${m} min</button>`).join("");
+  $("hnN").textContent=HN.n;$("hnM").textContent=HN.min;
+  const items=hornadaSel(),nv=Object.keys(items).length,total=nv*HN.n,libre=HORNO_CAP-enHorno(),falta=nv?faltaParaHornear(items):null;
+  let costo=0;for(const k in items)costo+=(costoDe(k)||0)*items[k];
+  const cerrado=S.t>=CLOSE;
+  $("hnInfo").innerHTML=nv?`${nv} ${nv===1?"variedad":"variedades"} × ${HN.n} u. = <b>${total}</b> empanadas · salen a las ${hhmm(S.t+HN.min)} · costo de la hornada <b>${clp(costo)}</b>`+
+    (total>libre?` · <span style="color:var(--crit)">no caben: quedan ${libre} lugares en el horno</span>`:"")+(falta?` · <span style="color:var(--crit)">falta ${esc(INS[falta].n.toLowerCase())}</span>`:"")
+    :`Capacidad del horno: ${HORNO_CAP} u. (${HORNO_CAP/LATA} latas) · ${libre} lugares libres ahora.`;
+  const b=$("hnBtn");b.disabled=cerrado||!nv||total>libre||!!falta;
+  b.textContent=cerrado?"Local cerrado":nv?`Al horno · ${nv} ${nv===1?"variedad":"variedades"} × ${HN.n} u.`:"Elige cuáles entran";
+  $("hnDentro").hx=S.horno.map(h=>{const dur=h.end-h.start,pasa=Math.min(1,(S.t-h.start)/dur);
+    return `<li><div class="r"><b>${Object.keys(h.items).map(k=>esc(nombreEmp(k))+" ×"+h.items[k]).join(" · ")}</b><span class="num">${Math.max(0,h.end-S.t)} min</span></div><div class="bar"><i style="width:${pasa*100}%;background:#E8674A"></i></div><small style="color:var(--muted)">${esc(h.by)} · ${h.total} u. · ${clp(h.costo)}</small></li>`}).join("")||`<li><span class="empty-s">No hay nada en el horno.</span></li>`;
+  /* vendidas y hornadas */
+  const vend=emps.map(m=>({m,u:S.sold[m.id]||0})).sort((a,b)=>b.u-a.u),vt=vend.reduce((a,x)=>a+x.u,0),mx=Math.max(1,...vend.map(x=>x.u));
+  $("empTot").textContent=vt;
+  $("empTipos").hx=vend.map((x,i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(x.m.n)}</span><span class="hbar"><i style="width:${x.u/mx*100}%;background:#E8674A"></i></span></span><b class="num">${x.u}</b></li>`).join("");
+  const hornT=S.batches.reduce((a,h)=>a+h.total,0);
+  $("tandaSub").textContent=`${S.batches.length} ${S.batches.length===1?"hornada":"hornadas"} · ${hornT} empanadas · ${clp(S.costoProd)} en insumos · al cierre quedan en vitrina las que no se vendan`;
+  $("tandas").hx=S.batches.slice().reverse().map(h=>`<tr><td class="num">${hhmm(h.start)}</td><td class="num">${hhmm(h.end)}</td><td>${Object.keys(h.items).map(k=>esc(nombreEmp(k))).join(", ")}</td><td class="r num">${h.total}</td><td class="r num">${clp(h.costo)}</td><td>${S.t<h.end?`<span class="fcp warn">En el horno</span>`:`<span class="fcp ok">En vitrina</span>`}</td><td>${esc(h.by)}</td></tr>`).join("")||`<tr><td colspan="7" class="empty-s">Sin hornadas todavía</td></tr>`;
 }
+$("hnSel").addEventListener("click",e=>{const b=e.target.closest("[data-hs]");if(!b)return;HN.sel[b.dataset.hs]=!HN.sel[b.dataset.hs];renderHorno()});
+$("hnLatas").addEventListener("click",e=>{const b=e.target.closest("[data-hl]");if(!b)return;HN.n=+b.dataset.hl*LATA;renderHorno()});
+$("hnMins").addEventListener("click",e=>{const b=e.target.closest("[data-hmin]");if(!b)return;HN.min=+b.dataset.hmin;renderHorno()});
+document.querySelector('.view[data-view="horno"]').addEventListener("click",e=>{
+  const n=e.target.closest("[data-hn]");if(n){HN.n=Math.min(HORNO_CAP,Math.max(1,HN.n+ +n.dataset.hn));renderHorno();return}
+  const m=e.target.closest("[data-hm]");if(m){HN.min=Math.min(60,Math.max(1,HN.min+ +m.dataset.hm));renderHorno()}});
+$("hnBtn").addEventListener("click",()=>{const items=hornadaSel(),r=hornear(items,HN.min,ACTOR.name);
+  if(!r.ok){toast(r.error==="capacidad"?"No cabe en el horno: espera que salga una hornada":r.error==="insumo"?`Falta ${INS[r.ins].n.toLowerCase()} para esa hornada`:"Elige cuáles entran");return}
+  S.records++;if(!NET.online)NET.queue++;Object.keys(HN.sel).forEach(k=>HN.sel[k]=false);
+  toast(`Al horno: ${r.h.total} empanadas · salen en ${HN.min} min`);renderAll()});
+
 function renderBarra(){
   const beb=MENU.filter(it=>CATS[it.c].a==="barra"&&it.c!=="ext");const tot=beb.reduce((a,it)=>a+(S.sold[it.id]||0),0);
-  $("brBeb").textContent=tot;$("brCafe").textContent=fmtQ(S.used.cafe||0,"kg")+" kg";$("brLeche").textContent=fmtQ(S.used.leche||0,"L")+" L";$("brCola").textContent=S.log.filter(x=>x.a==="barra"&&S.t-x.t<4).length;
+  $("brBeb").textContent=tot;$("brCafe").textContent=fmtQ((S.used.cafe||0)/1000,"kg")+" kg";$("brLeche").textContent=fmtQ((S.used.leche||0)/1000,"L")+" L";$("brCola").textContent=S.log.filter(x=>x.a==="barra"&&S.t-x.t<4).length;
   const cats=["cc","cf","tc","bf"].map(c=>({c,u:beb.filter(it=>it.c===c).reduce((a,it)=>a+(S.sold[it.id]||0),0)})),mc=Math.max(1,...cats.map(x=>x.u));
   $("brCats").hx=cats.map((x,i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${CATS[x.c].n}</span><span class="hbar"><i style="width:${x.u/mc*100}%;background:#1AA89B"></i></span></span><b class="num">${x.u}</b></li>`).join("");
   const top=beb.map(it=>({it,u:S.sold[it.id]||0})).filter(x=>x.u).sort((a,b)=>b.u-a.u).slice(0,8),mt=Math.max(1,...top.map(x=>x.u));
   $("brTop").hx=top.map((x,i)=>`<li><span class="rk">${i+1}</span><span style="min-width:0"><span class="nm" style="display:block">${esc(x.it.n)}</span><span class="hbar"><i style="width:${x.u/mt*100}%;background:#40E0D0"></i></span></span><b class="num">${x.u}</b></li>`).join("")||`<li class="empty-s">Sin bebidas vendidas aún</li>`;
 }
 let invAll=false;
-function sev(k){const s=S.stock[k],m=INS0[k].min;return s<=m?"crit":s<=m*1.35?"warn":"ok"}
+/* Cantidades legibles: gramos a kilos y mililitros a litros cuando corresponde. */
+function fmtU(v,u){if(u==="g")return v>=1000?fmtQ(v/1000,"kg")+" kg":Math.round(v).toLocaleString("es-CL")+" g";
+  if(u==="ml")return v>=1000?fmtQ(v/1000,"L")+" L":Math.round(v).toLocaleString("es-CL")+" ml";
+  return (Math.round(v*10)/10).toLocaleString("es-CL")+" u."}
+const AREA_N={horno:"Horno",cocina:"Cocina",barra:"Barra",pasteleria:"Pastelería"};
+function sev(k){const m=stockInicial().min[k];if(!m)return"ok";const s=S.stock[k];return s<=m?"crit":s<=m*1.6?"warn":"ok"}
+function ingresar(k,n,precio,by){const I=INS[k];n=Math.max(0,+n||0);if(!I||!n)return null;
+  const q=n*I.fmt,total=Math.round(n*precio);S.stock[k]+=q;S.compras.push({t:S.t,k,n,q,precio,total,by:by||ACTOR.name});
+  S.records++;if(!NET.online)NET.queue++;return{q,total}}
 function renderInv(){
-  const order={crit:0,warn:1,ok:2},col={crit:"#FF6161",warn:"#FFB547",ok:"#3DDC84"},lbl={crit:"Crítico",warn:"Advertencia",ok:"Óptimo"};
-  let list=Object.keys(INS0).map(k=>({k,s:sev(k)})).sort((a,b)=>order[a.s]-order[b.s]||S.stock[a.k]/INS0[a.k].min-S.stock[b.k]/INS0[b.k].min);
+  const order={crit:0,warn:1,ok:2},col={crit:"#FF6161",warn:"#FFB547",ok:"#3DDC84"},lbl={crit:"Crítico",warn:"Advertencia",ok:"Óptimo"},S0=stockInicial();
+  const enUso=Object.keys(INS).filter(k=>S0.min[k]>0);
+  let list=enUso.map(k=>({k,s:sev(k)})).sort((a,b)=>order[a.s]-order[b.s]||S.stock[a.k]/S0.min[a.k]-S.stock[b.k]/S0.min[b.k]);
   if(!invAll)list=list.filter(x=>x.s!=="ok");
-  $("inv").hx=list.map(({k,s})=>{const I=INS0[k],v=S.stock[k];return `<li style="--sev:${col[s]}"><div><div class="nm">${I.n}<span class="sev">${lbl[s]}</span></div><div class="meta num">${fmtQ(v,I.u)} ${I.u} · pedir en ${fmtQ(I.min,I.u)} ${I.u}${I.hint?" · "+I.hint:""}</div><div class="lvl"><i style="width:${Math.min(100,v/(I.min*2.5)*100)}%"></i></div></div><button class="btn sm" type="button" data-rep="${k}">${I.act}</button></li>`}).join("")
-   ||`<li style="--sev:#3DDC84"><div><div class="nm">Todo sobre el punto de pedido</div><div class="meta">Ningún insumo requiere reposición ahora</div></div></li>`;
-  const ks=Object.keys(INS0),crit=ks.filter(k=>sev(k)==="crit").length,warn=ks.filter(k=>sev(k)==="warn").length;
-  $("invNote").textContent=`${crit} en estado crítico · ${warn} en advertencia`;
+  $("inv").hx=list.map(({k,s})=>{const I=INS[k],v=S.stock[k],m=S0.min[k];return `<li style="--sev:${col[s]}"><div><div class="nm">${esc(I.n)}<span class="sev">${lbl[s]}</span></div><div class="meta num">${fmtU(v,I.u)} · pedir en ${fmtU(m,I.u)} · ${esc(I.fmtN)} a ${clp(insPrecio(k))}</div><div class="lvl"><i style="width:${Math.min(100,v/(m*3)*100)}%"></i></div></div><button class="btn sm" type="button" data-rep="${k}">+1 ${esc(I.fmtN)}</button></li>`}).join("")
+   ||`<li style="--sev:#3DDC84"><div><div class="nm">Todo sobre el punto de pedido</div><div class="meta">Ningún insumo de las fichas requiere reposición ahora</div></div></li>`;
+  const crit=enUso.filter(k=>sev(k)==="crit").length,warn=enUso.filter(k=>sev(k)==="warn").length,valor=Object.keys(INS).reduce((a,k)=>a+S.stock[k]*cuIns(k),0);
+  $("invNote").textContent=`${enUso.length} insumos en uso según las fichas · ${crit} críticos · ${warn} en advertencia · stock valorizado ${clp(valor)}`;
+  /* ingreso de mercadería */
+  const sel=$("igIns");if(!sel.options.length){sel.innerHTML=Object.keys(INS).sort((a,b)=>INS[a].n.localeCompare(INS[b].n,"es")).map(k=>`<option value="${k}">${esc(INS[k].n)} · ${esc(INS[k].fmtN)}</option>`).join("");sel.value="harina";$("igP").value=insPrecio("harina")}
+  const k=sel.value,n=+$("igN").value||0,pr=+$("igP").value||0;
+  $("igInfo").textContent=INS[k]?`Entran ${fmtU(n*INS[k].fmt,INS[k].u)} · ${clp(n*pr)} neto · estándar ${clp(INS[k].precio)} por ${INS[k].fmtN}`:"";
+  const tc=S.compras.reduce((a,c)=>a+c.total,0);
+  $("igLog").hx=S.compras.slice(-8).reverse().map(c=>`<li><b>${hhmm(c.t)}</b>${esc(INS[c.k].n)} · ${fmtU(c.q,INS[c.k].u)} · ${clp(c.total)} · ${esc(c.by)}</li>`).join("")+(S.compras.length?`<li><b>Total</b>${S.compras.length} ingresos · ${clp(tc)} neto</li>`:"")||`<li>Sin ingresos todavía</li>`;
+  /* consumo */
   const hrs=Math.max(.5,(S.t-OPEN)/60);
-  $("invTable").hx=ks.filter(k=>k!=="emp").map(k=>{const I=INS0[k],u=S.used[k]||0,rate=u/hrs,cov=rate>0?S.stock[k]/rate:Infinity;
-    return `<tr><td>${I.n}</td><td class="r num">${fmtQ(u,I.u)} ${I.u}</td><td class="r num">${fmtQ(S.stock[k],I.u)} ${I.u}</td><td class="r">${cov===Infinity?`<span class="fcp na">Sin uso</span>`:`<span class="fcp ${cov<6?"crit":cov<15?"warn":"ok"}">${cov<48?Math.round(cov)+" h":Math.round(cov/15)+" días"}</span>`}</td></tr>`}).join("");
+  $("invTable").hx=enUso.sort((a,b)=>(S.used[b]||0)*cuIns(b)-(S.used[a]||0)*cuIns(a)).map(k=>{const I=INS[k],u=S.used[k]||0,rate=u/hrs,cov=rate>0?S.stock[k]/rate:Infinity;
+    return `<tr><td>${esc(I.n)}</td><td>${AREA_N[I.area]||I.area}</td><td class="r num">${fmtU(u,I.u)}</td><td class="r num">${fmtU(S.stock[k],I.u)}</td><td class="r num">${clp(S.stock[k]*cuIns(k))}</td><td class="r">${cov===Infinity?`<span class="fcp na">Sin uso hoy</span>`:`<span class="fcp ${cov<6?"crit":cov<15?"warn":"ok"}">${cov<48?Math.round(cov)+" h":Math.round(cov/15)+" días"}</span>`}</td></tr>`}).join("");
 }
 let txF="Todos",lastTxId=0;
 function renderCaja(){
@@ -1338,7 +1497,7 @@ function correrDia(menu,dem,semilla){
   const g={MENU,DEMAND,seed,S,on:NET.online,q:NET.queue};
   MENU=menu;DEMAND=dem;seed=semilla;NET.online=true;S=newState();
   while(S.t<CLOSE)step();
-  const r={rev:S.revenue,tk:S.tickets,sold:Object.assign({},S.sold),emp:S.stock.emp,cafe:S.used.cafe||0,abandon:S.abandon+S.lostFull+S.abandonEmp,
+  const r={rev:S.revenue,tk:S.tickets,sold:Object.assign({},S.sold),emp:totalVit(),cafe:(S.used.cafe||0)/1000,abandon:S.abandon+S.lostFull+S.abandonEmp,costo:S.costoVentas,
     kinds:JSON.parse(JSON.stringify(S.kinds)),tandas:S.batches.length,menu};
   MENU=g.MENU;DEMAND=g.DEMAND;seed=g.seed;S=g.S;NET.online=g.on;NET.queue=g.q;
   return r;
@@ -1371,9 +1530,8 @@ addEventListener("online",()=>{if(!NET.forced)setOnline(true)});
 
 /* =============== CARTA =============== */
 let fCat="all",fQ="";
-/* Costos reales de la Caja (Gestión → Costos), para ver el food cost con los precios de la prueba. */
-function costoCaja(key){try{const p=JSON.parse(localStorage.getItem("ea_pos"));const c=p&&p.costos&&p.costos[key];return typeof c==="number"?c:null}catch(e){return null}}
-function fcPill(it){const c=costoCaja(it.key);if(c==null||!it.p)return `<span class="fcp na">—</span>`;const fc=c/(it.p/1.19),meta=(EAPOS.prueba().metas.food||32)/100;return `<span class="fcp ${fc<=meta?"ok":fc<=meta+.08?"warn":"crit"}">${pct(fc)}</span>`}
+/* Food cost con el costo de la ficha de prueba (estimado) y el precio de la prueba. */
+function fcPill(it){const c=costoDe(it.key);if(c==null||!it.p)return `<span class="fcp na">—</span>`;const fc=c/(it.p/1.19),meta=(EAPOS.prueba().metas.food||32)/100;return `<span class="fcp ${fc<=meta?"ok":fc<=meta+.08?"warn":"crit"}">${pct(fc)}</span>`}
 function renderPhotos(){
   $("fchips").hx=`<button class="fchip" type="button" data-c="all" aria-pressed="true">Todo</button>`+Object.keys(CATS).map(c=>`<button class="fchip" type="button" data-c="${c}" aria-pressed="false">${CATS[c].n}</button>`).join("");
   $("dbSub").textContent=`${MENU.length} productos con precio en la prueba · ${SINPRECIO} sin precio quedan fuera de la simulación`;
@@ -1381,7 +1539,7 @@ function renderPhotos(){
 function renderDB(){
   const q=fQ.trim().toLowerCase();
   const rows=MENU.filter(it=>(fCat==="all"||it.c===fCat)&&(!q||(it.n+" "+it.d+" "+CATS[it.c].n+" "+it.code).toLowerCase().includes(q)));
-  $("dbBody").hx=rows.map(it=>{const C=CATS[it.c],out=!avail(it),c=costoCaja(it.key);
+  $("dbBody").hx=rows.map(it=>{const C=CATS[it.c],out=!avail(it),c=costoDe(it.key);
     return `<tr><td class="num" style="color:var(--muted);font-size:12px">${it.code}</td><td><b>${esc(it.n)}</b>${it.v?LEAF:""}${it.local?`<span class="flag">Solo local</span>`:""}${C.note?`<span class="flag">${C.note}</span>`:""}${out?`<span class="flag out">Sin insumo</span>`:""}${it.d?`<div class="desc">${esc(it.d)}</div>`:""}</td><td>${C.n}</td><td><i class="adot" style="background:${AREAS[C.a].col}"></i>${AREAS[C.a].n}</td><td class="r"><span class="price">${clp(it.p)}</span></td><td class="r num">${c!=null?clp(c):"—"}</td><td class="r">${fcPill(it)}</td><td class="r num">${S.sold[it.id]||0}</td></tr>`}).join("")
    ||`<tr><td colspan="8" class="empty-s">Sin resultados para “${esc(fQ)}”</td></tr>`;
 }
@@ -1449,7 +1607,7 @@ function renderClock(){if(!S)return;const t=S.t,closed=t>=CLOSE;
   $("vSub").textContent=cur==="inicio"?`${cap(fechaLarga(CTX.fecha))} · ${fr} · temporada ${CTX.temporada}`:VIEWS[cur].d+" · "+fechaCorta(CTX.fecha)+" · "+fr;
   $("modeTxt").textContent=closed?"Día terminado":playing?"Simulación en vivo":"En pausa";$("liveDot").className="dot"+(playing&&!closed?" live":" idle")}
 function renderView(){if(!USER||!S)return;
-  ({inicio:renderDash,contexto:renderContexto,pedido:renderPedido,salon:renderSalon,cocina:renderCocina,horno:renderHorno,barra:renderBarra,inventario:renderInv,caja:renderCaja,clientes:renderClientes,reportes:renderReportes,carta:renderDB,cambios:renderCambios,datos:renderDatos})[cur]()}
+  ({inicio:renderDash,contexto:renderContexto,pedido:renderPedido,salon:renderSalon,cocina:renderCocina,horno:renderHorno,barra:renderBarra,inventario:renderInv,caja:renderCaja,clientes:renderClientes,reportes:renderReportes,carta:renderDB,fichas:renderFichas,cambios:renderCambios,datos:renderDatos})[cur]()}
 function renderAll(){computeNN();if(NET.online&&!NET.syncing)NET.last=S.t;renderView();renderHdrSync();renderClock();spawnPulses()}
 function tick(){const now=performance.now(),dt=(now-lastTick)/1000;lastTick=now;if(!booted)return;
   if(playing&&S.t<CLOSE){acc+=dt*speed/60;secs=(secs+dt*speed)%60;let n=0;while(acc>=1&&n<30){step();acc-=1;n++}
@@ -1483,7 +1641,6 @@ $("play").addEventListener("click",()=>{if(S.t>=CLOSE)return;playing=!playing;se
 document.querySelectorAll("[data-speed]").forEach(b=>b.addEventListener("click",()=>{speed=+b.dataset.speed;document.querySelectorAll("[data-speed]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));spdSl.to(b);renderClock()}));
 $("reset").addEventListener("click",()=>{boot(false);playing=true;setPlay();toast("Día reiniciado desde las "+hhmm(START))});
 $("netBtn").addEventListener("click",()=>{if(NET.syncing)return;NET.forced=NET.online;setOnline(!NET.online)});
-$("ovBtn").addEventListener("click",()=>{if(bake(ACTOR.name)){S.records++;if(!NET.online)NET.queue++;toast("Lata al horno · sale en 5 min");renderView()}});
 $("tables").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(!b)return;selTable=selTable===+b.dataset.t?null:+b.dataset.t;renderSalon()});
 $("detail").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const tb=S.tables.find(x=>x.n===selTable);if(!tb)return;
   if(b.dataset.act==="cobrar"){const amt=tb.total;closeTable(tb,ACTOR.name);toast(`Mesa ${tb.n} cobrada · ${clp(amt)}`)}
@@ -1491,9 +1648,16 @@ $("detail").addEventListener("click",e=>{const b=e.target.closest("[data-act]");
   if(b.dataset.act==="pedido"){PD.dest="mesa";PD.mesa=tb.n;go("pedido");return}
   renderAll()});
 $("inv").addEventListener("click",e=>{const b=e.target.closest("[data-rep]");if(!b)return;const k=b.dataset.rep;
-  if(k==="emp"){if(bake(ACTOR.name))toast("Lata al horno · sale en 5 min");else toast("Ya hay una tanda en el horno")}
-  else{S.stock[k]+=INS0[k].rep;toast(INS0[k].n+": "+INS0[k].act.toLowerCase())}
-  S.records++;if(!NET.online)NET.queue++;renderView();renderHdrSync()});
+  const r=ingresar(k,1,insPrecio(k));if(r)toast(`${INS[k].n}: +${fmtU(r.q,INS[k].u)} · ${clp(r.total)}`);renderView();renderHdrSync()});
+$("invStd").addEventListener("click",()=>{const s0=stockInicial().s;let n=0;for(const k in INS)if(S.stock[k]<s0[k]){S.stock[k]=s0[k];n++}
+  toast(n?`${n} insumos rellenados al stock estándar de las fichas`:"Todo está sobre el stock estándar");renderView()});
+$("igIns").addEventListener("change",e=>{$("igP").value=insPrecio(e.target.value);renderInv()});
+["igN","igP"].forEach(id=>$(id).addEventListener("input",()=>renderInv()));
+$("igBtn").addEventListener("click",()=>{const k=$("igIns").value,n=+$("igN").value,pr=Math.round(+$("igP").value);
+  if(!(n>0)||!(pr>=0)){toast("Indica la cantidad y el precio");return}
+  const r=ingresar(k,n,pr);if(!r)return;
+  if($("igAct").checked&&pr!==INS[k].precio){FXE.precios[k]=pr;guardarFx();actualizarCostos()}
+  toast(`Ingreso: ${INS[k].n} +${fmtU(r.q,INS[k].u)} · ${clp(r.total)}`);renderView();renderHdrSync()});
 $("invAll").addEventListener("click",()=>{invAll=!invAll;$("invAll").textContent=invAll?"Solo alertas":"Ver todo";$("invAll").setAttribute("aria-pressed",String(invAll));renderInv()});
 $("txFilter").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;txF=b.dataset.f;$("txFilter").querySelectorAll("[data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderCaja()});
 $("q").addEventListener("input",e=>{fQ=e.target.value;renderDB()});
@@ -1568,7 +1732,9 @@ function renderPeriodo(){
       <div class="stat"><b class="num">${Math.round(tot/mPer*100)}%</b><span>De la meta ${CTX.h==="mes"&&cfg.metas.mes?"del mes":"del período"} (${clp(mPer)})</span></div>
       <div class="stat"><b class="num">${ok} de ${n}</b><span>Días sobre la meta diaria</span></div>
       <div class="stat"><b class="num">${clp(tk?tot/tk:0)}</b><span>Ticket promedio</span></div>
-      <div class="stat"><b class="num">${D.reduce((a,x)=>a+x.abandon,0)}</b><span>Se fueron sin ser atendidos</span></div></div>
+      <div class="stat"><b class="num">${D.reduce((a,x)=>a+x.abandon,0)}</b><span>Se fueron sin ser atendidos</span></div>
+      <div class="stat"><b class="num">${clp(D.reduce((a,x)=>a+x.costo,0))}</b><span>Costo de lo vendido (fichas)</span></div>
+      <div class="stat"><b class="num">${tot?pct(D.reduce((a,x)=>a+x.costo,0)/(tot/1.19)):"—"}</b><span>Food cost del período · meta ${cfg.metas.food||32}%</span></div></div>
     <div class="tbl-wrap"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:520px;height:auto;display:block" role="img" aria-label="Venta simulada por día">${g}</svg></div>
     <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:#1AA89B"></i>Sobre la meta diaria</span><span><i class="sw" style="background:#5C6F6C"></i>Bajo la meta</span><span><i class="sw" style="background:#FF7F50;border-radius:50%"></i>Día con evento</span><span>Mejor: ${esc(fechaCorta(mejor.iso))} ${clp(mejor.rev)} · Más bajo: ${esc(fechaCorta(peor.iso))} ${clp(peor.rev)}</span></div>
     ${det}${semanas}
@@ -1597,10 +1763,9 @@ $("repCtx").addEventListener("click",()=>go("contexto"));
 const PD={dest:"mesa",mesa:null,pax:2,fila:null,lineas:{},cat:"all",q:""};
 const pdItems=()=>Object.entries(PD.lineas).filter(([id,q])=>q>0&&MENU[id]).flatMap(([id,q])=>Array(q).fill(MENU[id]));
 /* ¿Alcanzan los insumos? Para llevar, las empanadas que falten se esperan del horno. */
-function revisarInsumos(its,esperaEmp){const st=Object.assign({},S.stock);let falta=0;
-  for(const it of its)for(const c of it.r){const[k,q]=REC[c];
-    if(k==="emp"&&esperaEmp&&st.emp<q){falta+=q;continue}
-    if(st[k]<q-1e-9)return{ins:k};st[k]-=q}
+function revisarInsumos(its,esperaEmp){const st=Object.assign({},S.stock),vit=Object.assign({},S.vit);let falta=0;
+  for(const it of its){if(it.c==="emp"){if((vit[it.key]||0)>=1)vit[it.key]--;else if(esperaEmp)falta++;else return{emp:it.n};continue}
+    for(const [k,q] of it.rec){if(st[k]<q-1e-9)return{ins:k};st[k]-=q}}
   return{falta}}
 function filaEsperando(){return[...S.queue.map(g=>({k:"m:"+g.id,g,tipo:"mesa",txt:`Espera de mesa · ${g.pax} pers.`,min:S.t-g.t})),
   ...S.espEmp.map(e=>({k:"e:"+e.id,g:e,tipo:"emp",txt:`Espera de empanadas · ${e.n} u.${e.pagado?" pagadas":""}`,min:S.t-e.t}))]}
@@ -1610,7 +1775,7 @@ function renderPedido(){
   $("pdCats").hx=`<button class="fchip" type="button" data-pc="all" aria-pressed="${PD.cat==="all"}">Todo</button>`+cats.map(c=>`<button class="fchip" type="button" data-pc="${c}" aria-pressed="${PD.cat===c}">${CATS[c].n}</button>`).join("");
   const q=norm(PD.q),cerrado=S.t>=CLOSE;
   const rows=MENU.filter(it=>cats.includes(it.c)&&(PD.cat==="all"||it.c===PD.cat)&&(!q||norm(it.n+" "+it.d).includes(q)));
-  $("pdCarta").hx=rows.map(it=>{const tw=!okTime(it,S.t),loc=PD.dest!=="mesa"&&it.local,espera=it.c==="emp"&&S.stock.emp<1,out=!avail(it)&&!(espera&&PD.dest==="llevar");
+  $("pdCarta").hx=rows.map(it=>{const tw=!okTime(it,S.t),loc=PD.dest!=="mesa"&&it.local,espera=it.c==="emp"&&(S.vit[it.key]||0)<1,out=!avail(it)&&!(espera&&PD.dest==="llevar");
     const dis=cerrado||tw||loc||out,why=tw?CATS[it.c].note:loc?"Solo en el local":out?"Sin insumo":espera?"Espera la tanda":"",qn=PD.lineas[it.id]||0;
     return `<button type="button" class="pprod${qn?" on":""}" data-add="${it.id}" ${dis?"disabled":""}><span class="nm">${esc(it.n)}${it.v?LEAF:""}</span><span class="pr">${clp(it.p)}</span>${why?`<span class="why">${esc(why)}</span>`:""}${qn?`<span class="qn">${qn}</span>`:""}</button>`}).join("")||`<p class="empty-s">Sin productos para este filtro.</p>`;
   let dh="";const pax=`<div class="pdpax"><span class="lbl">Personas</span><button type="button" class="btn sm" data-pax="-1" aria-label="Una persona menos">−</button><b class="num" id="pdPax">${PD.pax}</b><button type="button" class="btn sm" data-pax="1" aria-label="Una persona más">+</button></div>`;
@@ -1619,7 +1784,7 @@ function renderPedido(){
     dh=`<span class="lbl">Mesa libre</span><div class="pdmesas">${libres.map(x=>`<button type="button" class="fchip" data-mesa="${x.n}" aria-pressed="${PD.mesa===x.n}">Mesa ${x.n}</button>`).join("")||`<span class="empty-s">No hay mesas libres. El grupo puede esperar en la fila y pedir desde ahí.</span>`}</div>${pax}
       ${libres.length?"":`<button type="button" class="btn sm" data-afila="mesa">Grupo de ${PD.pax} espera mesa en la fila</button>`}`}
   else if(PD.dest==="llevar"){$("pdTit").textContent="Para llevar";$("pdTxt").textContent="Se cobra en el mostrador.";
-    dh=`<p class="note" style="margin-top:0">Vitrina: <b class="num">${S.stock.emp}</b> empanadas${S.oven?` · tanda sale en ${Math.max(0,S.oven.end-S.t)} min`:""}. Si no alcanza, el cliente paga y espera la tanda en la fila.</p>`}
+    dh=`<p class="note" style="margin-top:0">Vitrina: <b class="num">${totalVit()}</b> empanadas${S.horno.length?` · ${enHorno()} en el horno, salen en ${Math.max(0,Math.min(...S.horno.map(h=>h.end))-S.t)} min`:""}. Si no alcanza, el cliente paga y espera la tanda en la fila.</p>`}
   else{const L=filaEsperando();if(PD.fila&&!L.some(x=>x.k===PD.fila))PD.fila=null;if(!PD.fila&&L.length)PD.fila=L[0].k;
     $("pdTit").textContent="Venta en la fila";$("pdTxt").textContent="Para quien espera mesa o la salida de empanadas: se cobra ahí mismo.";
     dh=`<span class="lbl">Quién pide</span><div class="pdfila">${L.map(x=>`<button type="button" class="pfila" data-fila="${x.k}" aria-pressed="${PD.fila===x.k}"><span>${x.txt}</span><span class="num">${x.min} min${x.g.compro?" · ya pidió":""}</span></button>`).join("")||`<span class="empty-s">Nadie espera ahora. Forma la fila con los botones de abajo.</span>`}</div>${pax}
@@ -1636,15 +1801,15 @@ function renderPedido(){
 }
 function enviarPedido(){
   const its=pdItems();if(!its.length||S.t>=CLOSE)return;
-  const r=revisarInsumos(its,PD.dest==="llevar");if(r.ins){toast(`No alcanza ${INS0[r.ins].n.toLowerCase()} para todo el pedido`);return}
+  const r=revisarInsumos(its,PD.dest==="llevar");if(r.ins){toast(`No alcanza ${INS[r.ins].n.toLowerCase()} para todo el pedido`);return}if(r.emp){toast(`No quedan empanadas ${r.emp} en la vitrina`);return}
   let txt="",amt=0;
   if(PD.dest==="mesa"){const tb=S.tables.find(x=>x.n===PD.mesa&&x.state==="libre");if(!tb){toast("Esa mesa ya no está libre");return}
     tb.state="ocupada";tb.since=S.t;tb.pax=PD.pax;tb.items=[];its.forEach(it=>addItem(tb.items,it));tb.total=amt=sum(tb.items);tb.dur=ri(22,38)+PD.pax*ri(5,9);tb.flash=true;
     order("Mesa "+tb.n,"mesa",tb.items);txt=`Mesa ${tb.n} · ${PD.pax} pers. · ${its.length} productos`;PD.mesa=null;toast(`Mesa ${tb.n}: pedido enviado · ${clp(amt)}`)}
   else if(PD.dest==="llevar"){const items=[];let falta=0;
-    for(const it of its){if(it.c==="emp"&&S.stock.emp<1){anotar(items,it);falta++}else addItem(items,it)}
+    const tipos=[];for(const it of its){if(it.c==="emp"&&(S.vit[it.key]||0)<1){anotar(items,it);tipos.push(it.key);falta++}else addItem(items,it)}
     order("Mostrador","llevar",items);pay("Mostrador","llevar",items,ACTOR.name);amt=sum(items);
-    if(falta){S.espEmp.push({t:S.t,n:falta,pax:1,id:++S.eseq,pagado:true});if(!S.oven)bake(ACTOR.name);txt=`Para llevar · ${falta} empanadas esperan la tanda`;toast(`Cobrado ${clp(amt)} · espera ${falta} empanadas de la próxima tanda`)}
+    if(falta){S.espEmp.push({t:S.t,n:falta,pax:1,id:++S.eseq,pagado:true,tipos});hornoAutomatico();txt=`Para llevar · ${falta} empanadas esperan la tanda`;toast(`Cobrado ${clp(amt)} · espera ${falta} empanadas de la próxima tanda`)}
     else{S.llevar.push(S.t);txt=`Para llevar · ${its.length} productos`;toast(`Para llevar cobrado · ${clp(amt)}`)}}
   else{const x=filaEsperando().find(y=>y.k===PD.fila);if(!x){toast("Esa persona ya no está en la fila");return}
     const items=[];its.forEach(it=>addItem(items,it));amt=ventaFila(x.g,x.tipo,items,ACTOR.name);txt=`Fila · ${x.tipo==="mesa"?"espera de mesa":"espera de empanadas"}`;toast(`Venta en la fila · ${clp(amt)}`)}
@@ -1661,12 +1826,89 @@ $("pdDestino").addEventListener("click",e=>{const t=e.target;
   const f=t.closest("[data-fila]");if(f){PD.fila=f.dataset.fila;renderPedido();return}
   const af=t.closest("[data-afila]");if(af){if(S.t>=CLOSE)return;
     if(af.dataset.afila==="mesa"){const g={t:S.t,pax:PD.pax,id:++S.eseq,hasta:S.t+5};S.queue.push(g);PD.fila="m:"+g.id;toast(`Grupo de ${g.pax} en la fila: puede pedir mientras se prepara su mesa`)}
-    else{const e={t:S.t,n:PD.pax,pax:1,id:++S.eseq,tanda:true};S.espEmp.push(e);if(!S.oven)bake(ACTOR.name);PD.fila="e:"+e.id;toast(`Cliente espera ${e.n} empanadas de la próxima tanda`)}
+    else{const e={t:S.t,n:PD.pax,pax:1,id:++S.eseq,tanda:true};S.espEmp.push(e);hornoAutomatico();PD.fila="e:"+e.id;toast(`Cliente espera ${e.n} empanadas de la próxima tanda`)}
     PD.dest="fila";renderAll()}});
 $("pdEnviar").addEventListener("click",enviarPedido);
 $("pdVaciar").addEventListener("click",()=>{PD.lineas={};renderPedido()});
 $("pdBarBtn").addEventListener("click",()=>{document.querySelector('.view[data-view="pedido"] .s4').scrollIntoView({behavior:REDUCE?"auto":"smooth",block:"start"})});
 $("qFila").addEventListener("click",()=>{PD.dest="fila";go("pedido")});
+
+/* =============== FICHAS Y ESCANDALLOS (vista) =============== */
+const FX={sel:"Ee-pino",g:"all",q:"",iq:""};let fxArm=0;
+const FX_G={all:"Todo",emp:"Empanadas",coc:"Cocina",bar:"Barra",past:"Pastelería",sobre:"Sobre la meta",sinprecio:"Sin precio"};
+const metaFC=()=>(EAPOS.prueba().metas.food||32);
+const precioP=id=>EAPOS.precioEn(EAPOS.prueba(),id);
+const sugerido=c=>c?Math.ceil(c/(metaFC()/100)*1.19/100)*100:null;
+const CAMPOS_FX=[["vaj","Vajilla y montaje"],["ute","Utensilios clave"],["prep","1 · Preparación"],["coc","2 · Cocción (temperaturas y tiempos)"],["mont","3 · Emplatado y montaje"],["crit","Puntos críticos"]];
+/* Tras editar una ficha o un precio: costos y consumo de la carta al día, y el stock estándar se recalcula. */
+function actualizarCostos(){MENU.forEach(it=>{it.rec=recDe(it.key);it.costo=costoDe(it.key)});menuV++;renderHub()}
+function fichaEditable(id){const f=fichaDe(id);FXE.fichas[id]={ing:f.ing.map(x=>[x[0],x[1]]),merma:+f.merma||0,rinde:+f.rinde||1};return FXE.fichas[id]}
+function fcClase(fc){return fc==null?"na":fc<=metaFC()/100?"ok":fc<=metaFC()/100+.08?"warn":"crit"}
+function filaProducto(x){const c=costoDe(x.id),p=precioP(x.id),fc=c!=null&&p?c/(p/1.19):null;return{x,c,p,fc,mg:p&&c!=null?p/1.19-c:null,sg:sugerido(c)}}
+function renderFichas(){
+  const filas=EAPOS.base.map(filaProducto),conP=filas.filter(r=>r.fc!=null);
+  const prom=conP.length?conP.reduce((a,r)=>a+r.fc,0)/conP.length:0,sobre=conP.filter(r=>r.fc>metaFC()/100).length,editadas=Object.keys(FXE.fichas).length+Object.keys(FXE.precios).length;
+  $("fxSub").textContent=`${filas.filter(r=>r.c!=null).length} de ${filas.length} productos con ficha · datos estándar de ${STD.fecha||"referencia"}${editadas?` · ${editadas} ajustes propios`:""}`;
+  $("fxKpis").hx=`<div class="stat"><b class="num">${pct(prom)}</b><span>Food cost promedio de la carta</span></div>
+    <div class="stat"><b class="num">${sobre}</b><span>Productos sobre la meta</span></div>
+    <div class="stat"><b class="num">${filas.filter(r=>r.p==null).length}</b><span>Sin precio (con precio sugerido)</span></div>
+    <div class="stat"><b class="num">${Object.keys(INS).length}</b><span>Insumos estándar</span></div>`;
+  const fl=$("fxFlete");if(document.activeElement!==fl)fl.value=FXE.flete;$("fxMeta").textContent=metaFC()+"% (meta de la prueba)";
+  $("fxNota").textContent=(STD.nota||"")+" Fuentes: "+(STD.fuentes||[]).join(" · ")+".";
+  if(!$("fxGrupos").children.length)$("fxGrupos").hx=Object.keys(FX_G).map(k=>`<button class="fchip" type="button" data-fg="${k}" aria-pressed="${k===FX.g}">${FX_G[k]}</button>`).join("");
+  const q=norm(FX.q);
+  const vis=filas.filter(r=>(FX.g==="all"||(FX.g==="sobre"?r.fc!=null&&r.fc>metaFC()/100:FX.g==="sinprecio"?r.p==null:r.x.g===FX.g))&&(!q||norm(r.x.n).includes(q)));
+  $("fxBody").hx=vis.map(r=>`<tr data-fx="${r.x.id}" class="${r.x.id===FX.sel?"sel":""}"><td><b>${esc(r.x.n)}</b>${FXE.fichas[r.x.id]?`<span class="fxtag" style="color:var(--accent);border-color:rgba(64,224,208,.45)">Ajustada</span>`:""}</td><td class="r num">${r.c!=null?clp(r.c):"—"}</td><td class="r num">${r.p!=null?clp(r.p):"—"}</td><td class="r"><span class="fcp ${fcClase(r.fc)}">${r.fc!=null?pct(r.fc):"—"}</span></td><td class="r num">${r.mg!=null?clp(r.mg):"—"}</td><td class="r num">${r.sg?clp(r.sg):"—"}</td></tr>`).join("")||`<tr><td colspan="6" class="empty-s">Sin productos para este filtro</td></tr>`;
+  /* detalle: no se rehace mientras se escribe en él, para no perder el foco */
+  if(!$("fxFicha").contains(document.activeElement)||$("fxFicha").dataset.id!==FX.sel)renderFicha();else totalesFicha();
+  /* insumos */
+  if(!$("fxIns").contains(document.activeElement)){const iq=norm(FX.iq),usos={};Object.keys(STD.FICHAS).forEach(id=>{const f=fichaDe(id);f&&f.ing.forEach(([k])=>usos[k]=(usos[k]||0)+1)});
+    $("fxIns").hx=Object.keys(INS).filter(k=>!iq||norm(INS[k].n).includes(iq)).sort((a,b)=>INS[a].area.localeCompare(INS[b].area)||INS[a].n.localeCompare(INS[b].n,"es")).map(k=>{const I=INS[k],cam=FXE.precios[k]!=null;
+      return `<tr class="${cam?"cambia":""}"><td><b>${esc(I.n)}</b></td><td>${AREA_N[I.area]||I.area}</td><td>${esc(I.fmtN)}</td><td class="r"><input class="fin num" type="number" min="0" step="10" data-ip="${k}" value="${insPrecio(k)}" aria-label="Precio neto de ${esc(I.n)}"></td><td class="r num">${clp(cuIns(k)*(I.u==="u"?1:1000))}${I.u==="g"?"/kg":I.u==="ml"?"/L":"/u"}</td><td class="r num">${usos[k]||0}</td><td class="desc">${esc(I.ref)}</td></tr>`}).join("")}
+}
+function renderFicha(){
+  const el=$("fxFicha"),id=FX.sel,x=EAPOS.producto(id),f=fichaDe(id);el.dataset.id=id;
+  if(!x||!f){el.innerHTML=`<p class="empty-s">Elige un producto de la lista.</p>`;return}
+  const filasIng=f.ing.map(([k,q],i)=>{const I=INS[k];return `<tr><td>${esc(I.n)}</td><td class="r"><input class="fin num" type="number" min="0" step="any" data-fq="${i}" value="${+q.toFixed(3)}" aria-label="Cantidad de ${esc(I.n)}"> ${I.u}</td><td class="r num" data-fs="${i}">${clp(q*cuIns(k))}</td></tr>`}).join("");
+  const op=CAMPOS_FX.map(([k,n])=>{const v=(f[k]||"").trim();if(!v)return"";return `<div><b>${n}</b>${k==="crit"?`<ul>${v.split("\n").filter(Boolean).map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`:esc(v)}</div>`}).join("");
+  el.innerHTML=`<div class="hd"><div><h2>${esc(x.n)}</h2><p>Ficha técnica estándar${FXE.fichas[id]?" · ajustada en la prueba":""} · ${x.g==="emp"?"por unidad; la lata trae 15":"por porción"}</p></div></div>
+    <div class="kv" id="fxTot"></div>
+    <table class="fxing"><thead><tr><th>Ingrediente</th><th class="r">Cantidad</th><th class="r">Costo</th></tr></thead><tbody>${filasIng}</tbody></table>
+    <div class="cxform" style="margin-top:10px"><label class="campo">Merma (%)<input class="fin num" type="number" min="0" max="80" step="1" id="fxMerma" value="${+f.merma||0}"></label><label class="campo">Rinde (porciones)<input class="fin num" type="number" min="1" step="1" id="fxRinde" value="${+f.rinde||1}"></label></div>
+    <div class="fxacc" id="fxAcc"></div>
+    <h2 class="sec-t" style="margin-top:16px">Estandarización operativa</h2><div class="fxop">${op}</div>`;
+  totalesFicha()}
+function totalesFicha(){const id=FX.sel,f=fichaDe(id);if(!f||!$("fxTot"))return;const c=costoDe(id),p=precioP(id),fc=p&&c!=null?c/(p/1.19):null,sg=sugerido(c);
+  $("fxTot").innerHTML=`<div class="stat"><b class="num">${clp(c)}</b><span>Costo por ${f.rinde>1?"porción":"unidad"}</span></div><div class="stat"><b class="num">${p!=null?clp(p):"—"}</b><span>Precio de prueba</span></div><div class="stat"><b class="num"><span class="fcp ${fcClase(fc)}">${fc!=null?pct(fc):"—"}</span></b><span>Food cost · meta ${metaFC()}%</span></div><div class="stat"><b class="num">${sg?clp(sg):"—"}</b><span>Precio sugerido</span></div>`;
+  f.ing.forEach(([k,q],i)=>{const td=document.querySelector(`#fxFicha [data-fs="${i}"]`);if(td)td.textContent=clp(q*cuIns(k)*(1+(+f.merma||0)/100)/(+f.rinde||1))});
+  $("fxAcc").innerHTML=(sg&&sg!==p?`<button class="btn sm pri" type="button" data-fa="usar">Usar ${clp(sg)} como precio de prueba</button>`:"")+
+    `<button class="btn sm" type="button" data-fa="md">Copiar en Markdown</button>`+(FXE.fichas[id]?`<button class="btn sm" type="button" data-fa="std">Volver al estándar</button>`:"")}
+function fichaMarkdown(id){const x=EAPOS.producto(id),f=fichaDe(id),c=costoDe(id),p=precioP(id);
+  const L=["# Ficha técnica: "+x.n,"","**Rendimiento:** "+f.rinde+(+f.rinde===1?" porción":" porciones")+" · **Merma:** "+f.merma+"% · _datos estándar estimados (Prueba)_","","## Escandallo","","| Ingrediente | Cantidad | Costo por unidad | Costo |","| :--- | ---: | ---: | ---: |"];
+  f.ing.forEach(([k,q])=>{const I=INS[k];L.push(`| ${I.n} | ${+q.toFixed(3)} ${I.u} | ${clp(cuIns(k)*(I.u==="u"?1:1000))}${I.u==="u"?"":I.u==="g"?"/kg":"/L"} | ${clp(q*cuIns(k))} |`)});
+  L.push("","- **Costo por porción:** "+clp(c));if(p)L.push("- **Precio de prueba:** "+clp(p)+" (neto "+clp(p/1.19)+") · **food cost:** "+pct(c/(p/1.19)));
+  L.push("","## Estandarización operativa","");CAMPOS_FX.forEach(([k,n])=>{const v=(f[k]||"").trim();if(!v)return;if(k==="crit"){L.push("**"+n+":**");v.split("\n").forEach(l=>l.trim()&&L.push("- "+l.trim()))}else L.push("**"+n+":** "+v)});
+  return L.join("\n")}
+$("fxGrupos").addEventListener("click",e=>{const b=e.target.closest("[data-fg]");if(!b)return;FX.g=b.dataset.fg;$("fxGrupos").querySelectorAll("[data-fg]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderFichas()});
+$("fxQ").addEventListener("input",e=>{FX.q=e.target.value;renderFichas()});
+$("fxIq").addEventListener("input",e=>{FX.iq=e.target.value;renderFichas()});
+$("fxBody").addEventListener("click",e=>{const r=e.target.closest("[data-fx]");if(!r)return;FX.sel=r.dataset.fx;renderFichas();if(innerWidth<1280)$("fxFicha").scrollIntoView({behavior:REDUCE?"auto":"smooth",block:"start"})});
+$("fxFicha").addEventListener("change",e=>{const t=e.target,id=FX.sel;
+  if(t.dataset.fq!=null){const v=+t.value;if(!(v>=0))return;const f=fichaEditable(id);f.ing[+t.dataset.fq][1]=v}
+  else if(t.id==="fxMerma"){const f=fichaEditable(id);f.merma=Math.max(0,Math.min(80,+t.value||0))}
+  else if(t.id==="fxRinde"){const f=fichaEditable(id);f.rinde=Math.max(1,+t.value||1)}else return;
+  guardarFx();actualizarCostos();totalesFicha();renderFichas()});
+$("fxFicha").addEventListener("click",e=>{const b=e.target.closest("[data-fa]");if(!b)return;const id=FX.sel,a=b.dataset.fa;
+  if(a==="usar"){const v=sugerido(costoDe(id));editarPrueba(c=>{c.precios[id]=v});toast(`${EAPOS.producto(id).n}: precio de prueba ${clp(v)} en el borrador${EAPOS.producto(id).p==null?" · entra a la simulación al reiniciar el día":""}`);renderFichas()}
+  if(a==="std"){delete FXE.fichas[id];guardarFx();actualizarCostos();renderFicha();renderFichas();toast("Ficha de vuelta al estándar")}
+  if(a==="md"){const t=fichaMarkdown(id);try{navigator.clipboard.writeText(t).then(()=>toast("Ficha copiada en Markdown"),()=>toast("No se pudo copiar"))}catch(err){toast("No se pudo copiar")}}});
+$("fxIns").addEventListener("change",e=>{const i=e.target.closest("[data-ip]");if(!i)return;const k=i.dataset.ip,v=Math.round(+i.value);
+  if(!(v>=0))return;if(v===INS[k].precio)delete FXE.precios[k];else FXE.precios[k]=v;guardarFx();actualizarCostos();i.blur();renderFichas();toast(`${INS[k].n}: ${clp(v)} por ${INS[k].fmtN}`)});
+$("fxFlete").addEventListener("change",e=>{const v=Math.max(0,Math.min(50,+e.target.value||0));FXE.flete=v;guardarFx();actualizarCostos();e.target.blur();renderFichas();toast(`Flete ${v}%: costos recalculados`)});
+$("fxRellenar").addEventListener("click",()=>{const now=Date.now();
+  if(now-fxArm>2500){fxArm=now;toast("Toca otra vez: fichas, precios y stock vuelven al estándar");return}
+  fxArm=0;FXE={precios:{},fichas:{},flete:8};guardarFx();actualizarCostos();const s0=stockInicial().s;for(const k in INS)S.stock[k]=s0[k];
+  renderFicha();renderFichas();renderHub();toast("Fichas, precios y stock de la prueba rellenados con el estándar")});
 
 /* =============== CAMBIOS: borrador, comparación y aplicación =============== */
 let cbGrupo="all",cbQ="",descArm=0,simVieja=false;
@@ -1719,12 +1961,12 @@ $("cbComparar").addEventListener("click",()=>{
     const gC=EAPOS.general(),pC=EAPOS.prueba(),mG=construirMenu(gC),mP=construirMenu(pC);
     const dG=correrPeriodo(mG,dias),dP=correrPeriodo(mP,dias);
     const res=(d,cfg)=>{const rev=d.reduce((a,x)=>a+x.rev,0)/d.length,tk=d.reduce((a,x)=>a+x.tk,0)/d.length,meta=cfg.metas.dia||1800000;
-      return{rev,tk,tic:tk?rev/tk:0,ok:d.filter(x=>x.rev>=meta).length,meta,ref:!cfg.metas.dia,abandon:d.reduce((a,x)=>a+x.abandon,0)/d.length}};
+      return{rev,tk,tic:tk?rev/tk:0,ok:d.filter(x=>x.rev>=meta).length,meta,ref:!cfg.metas.dia,abandon:d.reduce((a,x)=>a+x.abandon,0)/d.length,fc:d.reduce((a,x)=>a+x.costo,0)/(d.reduce((a,x)=>a+x.rev,0)/1.19||1)}};
     const a=res(dG,gC),b=res(dP,pC);
     const top=(()=>{const u={};dP.forEach(x=>{for(const id in x.sold){const it=x.menu[id];if(it)u[it.n]=(u[it.n]||0)+x.sold[id]}});return Object.entries(u).sort((x,y)=>y[1]-x[1]).slice(0,5)})();
     const dif=(x,y)=>{if(!x)return`<span class="dif eq">—</span>`;const d=(y/x-1)*100;return`<span class="dif ${Math.abs(d)<.5?"eq":d>0?"up":"dn"}">${d>0?"+":""}${d.toFixed(1)}%</span>`};
     const lado=(t,r,ref)=>`<div class="lado"><h3>${t}</h3><span class="big2">${clp(r.rev)}</span><span class="desc">venta promedio por día ${ref?dif(ref.rev,r.rev):""}</span>
-      <div class="r"><span>Tickets por día</span><b>${r.tk.toFixed(0)}</b></div><div class="r"><span>Ticket promedio</span><b>${clp(r.tic)} ${ref?dif(ref.tic,r.tic):""}</b></div>
+      <div class="r"><span>Tickets por día</span><b>${r.tk.toFixed(0)}</b></div><div class="r"><span>Ticket promedio</span><b>${clp(r.tic)} ${ref?dif(ref.tic,r.tic):""}</b></div><div class="r"><span>Food cost (fichas de prueba)</span><b>${pct(r.fc)}</b></div>
       <div class="r"><span>Días sobre ${r.ref?"el objetivo de referencia":"la meta"} (${clp(r.meta)})</span><b>${r.ok} de ${n}</b></div></div>`;
     $("cbVs").innerHTML=`<div class="vs">${lado("Sistema general · v"+gC.v,a)}${lado("Prueba (borrador)",b,a)}</div>
       <p class="note">Más pedidos en la prueba: ${top.map(([n,u])=>esc(n)+" ("+u+")").join(" · ")||"—"}. ${n} días desde el ${fechaLarga(dias[0])} (${CTX.h==="mes"?"el mes del contexto":"una semana"}), temporada ${CTX.temporada}, con los eventos marcados y la misma semilla por día para los dos lados. El motor no cambia la demanda según el precio: muestra el efecto directo del precio, de la carta y de las metas.</p>`;

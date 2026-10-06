@@ -1,11 +1,12 @@
-// Agente de verificación de EmporioAndinoPOS 2.2.
+// Agente de verificación de EmporioAndinoPOS 2.3.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
 //   ingreso con PIN → venta en la Caja → comanda en Comandas,
 //   borrador en la Prueba → aplicar → precio nuevo en la Caja,
 //   contexto de la Prueba por día, semana y mes; pedidos a mano en mesa,
-//   para llevar y en la fila,
+//   para llevar y en la fila; fichas y escandallos estándar, horno en vivo
+//   e ingresos de mercadería (solo en la Prueba),
 //   cargo de garzón → la Caja muestra solo cobro y stock.
 // Falla si aparece un error de JavaScript, un recurso propio que no carga o
 // desborde horizontal. Uso, desde EmporioAndinoPOS/:
@@ -166,7 +167,7 @@ async function probarPruebaAplicar(vista) {
   anota(M, "franja de prueba visible", await pr.locator(".franja").isVisible());
   anota(M, "diseño Emporio System 1.1", await disenoEmporio(pr));
   const nav = await pr.locator("#nav a").evaluateAll(a => a.map(x => x.dataset.v));
-  anota(M, "catorce vistas", nav.length === 14, nav.join(","));
+  anota(M, "quince vistas", nav.length === 15, nav.join(","));
   for (const v of nav) { const a = pr.locator(`#nav a[data-v="${v}"]`); if (await a.isVisible()) await a.click(); else await a.evaluate(el => el.click()); await pr.waitForTimeout(250); }
   await pr.evaluate(() => go("cambios")); await pr.waitForTimeout(300);
   await pr.locator('#cbGrupos [data-cg="emp"]').click();
@@ -204,7 +205,7 @@ async function probarPruebaContexto(vista) {
   anota(M, "semana: siete días simulados", (await pr.locator("#perOut .pbar").count()) === 7);
   await pr.locator('#cxHor [data-hor="mes"]').click(); await pr.waitForTimeout(900);
   const mes = await pr.evaluate(() => ({ barras: document.querySelectorAll("#perOut .pbar").length, stats: document.querySelectorAll("#perOut > .kv .stat").length }));
-  anota(M, "mes: el mes calendario completo", mes.barras === 31 && mes.stats === 6, JSON.stringify(mes));
+  anota(M, "mes: el mes calendario completo, con costo y food cost", mes.barras === 31 && mes.stats === 8, JSON.stringify(mes));
   const antes = await pr.evaluate(() => PER.dias.find(d => d.iso === "2026-10-16").rev);
   await pr.locator('#perOut .pbar[data-dia="2026-10-16"]').dispatchEvent("click"); await pr.waitForTimeout(150);
   await pr.locator('#perDia [data-ev="evento"]').click(); await pr.waitForTimeout(900);
@@ -222,12 +223,12 @@ async function probarPruebaContexto(vista) {
   anota(M, "pedido a mano en una mesa", await pr.evaluate(n => { const t = S.tables.find(x => x.n === +n); return t.state === "ocupada" && t.items.length === 2; }, mesa));
   // Para llevar con la vitrina vacía: paga y espera la tanda
   await pr.locator('#pdDest [data-dest="llevar"]').click();
-  await pr.evaluate(() => { S.stock.emp = 0; S.oven = null; renderPedido(); });
+  await pr.evaluate(() => { playing = false; setPlay(); Object.keys(S.vit).forEach(k => S.vit[k] = 0); S.horno = []; renderPedido(); });
   await pr.locator('#pdCats [data-pc="emp"]').click();
   await pr.locator("#pdCarta [data-add]:not([disabled])").first().click(); await pr.locator("#pdCarta [data-add]:not([disabled])").first().click();
   const kAntes = await pr.evaluate(() => S.kinds.llevar.n);
   await pr.locator("#pdEnviar").click(); await pr.waitForTimeout(200);
-  const ll = await pr.evaluate(() => ({ esp: S.espEmp.filter(e => e.pagado).map(e => e.n), horno: !!S.oven, n: S.kinds.llevar.n }));
+  const ll = await pr.evaluate(() => ({ esp: S.espEmp.filter(e => e.pagado).map(e => e.n), horno: S.horno.length > 0, n: S.kinds.llevar.n }));
   anota(M, "para llevar sin vitrina: cobra y espera la tanda", ll.esp.includes(2) && ll.horno && ll.n === kAntes + 1, JSON.stringify(ll));
   // Fila: un grupo espera mesa y compra mientras espera
   await pr.locator('#pdDest [data-dest="fila"]').click(); await pr.waitForTimeout(100);
@@ -239,6 +240,45 @@ async function probarPruebaContexto(vista) {
   anota(M, "venta en la fila a quien espera mesa", fila.n >= 1 && fila.manual === 3, JSON.stringify(fila));
   await pr.evaluate(() => go("clientes")); await pr.waitForTimeout(300);
   anota(M, "la fila aparece como canal en Clientes", /Fila \(mientras espera\)/.test(await pr.locator("#clCanales").innerText()));
+  await cierre(M, pr, errores, caidos);
+  await ctx.close();
+}
+
+// ---------- Prueba: fichas estándar, horno en vivo e ingresos ----------
+async function probarPruebaFichas(vista) {
+  const M = `Prueba · fichas, horno e ingresos · ${vista}`;
+  const { ctx, errores, caidos } = await contexto(vista);
+  const pr = await ctx.newPage();
+  await pr.goto(BASE + "prueba/index.html#fichas"); await pr.waitForTimeout(1500);
+  const base = await pr.evaluate(() => ({ fichas: EAPOS.base.filter(x => fichaDe(x.id)).length, total: EAPOS.base.length, pino: costoDe("Ee-pino"), insumos: Object.keys(INS).length, filas: document.querySelectorAll("#fxBody tr").length }));
+  anota(M, "todos los productos con ficha y escandallo estándar", base.fichas === base.total && base.filas === base.total && base.pino > 300 && base.pino < 1500, JSON.stringify(base));
+  const stock = await pr.evaluate(() => { const g = S; DEMAND = SEASONS.alta * DOW_F[5]; seed = 7; S = newState(); while (S.t < CLOSE) step(); const sin = MENU.filter(it => it.c !== "emp" && !avail(it)).length, fc = S.costoVentas / (S.revenue / 1.19); S = g; return { sin, fc }; });
+  anota(M, "el stock estándar alcanza un día de temporada alta", stock.sin === 0 && stock.fc > 0.15 && stock.fc < 0.4, JSON.stringify(stock));
+  // Editar una cantidad cambia el costo y queda solo en la prueba
+  await pr.locator('#fxBody tr[data-fx="Ee-pino"]').click();
+  const antes = await pr.evaluate(() => costoDe("Ee-pino"));
+  const q = pr.locator('#fxFicha [data-fq="4"]'); await q.fill("60"); await q.press("Tab"); await pr.waitForTimeout(200);
+  const ed = await pr.evaluate(() => ({ costo: costoDe("Ee-pino"), menu: MENU.find(m => m.key === "Ee-pino").costo, guardado: !!(JSON.parse(localStorage.getItem("eapos_prueba_fichas")) || { fichas: {} }).fichas["Ee-pino"] }));
+  anota(M, "editar el escandallo recalcula el costo", ed.costo > antes && ed.menu === ed.costo && ed.guardado, JSON.stringify({ antes, ...ed }));
+  // Horno en vivo: hornada personalizada
+  await pr.evaluate(() => go("horno")); await pr.waitForTimeout(300);
+  await pr.evaluate(() => { playing = false; setPlay(); S.horno = []; renderHorno(); });
+  await pr.locator('#hnSel [data-hs="Ee-pollo"]').click(); await pr.locator('#hnSel [data-hs="Ee-caprese"]').click();
+  await pr.locator('#hnMins [data-hmin="10"]').click();
+  const h0 = await pr.evaluate(() => ({ pollo: S.stock.pollo, vit: S.vit["Ee-pollo"] || 0 }));
+  await pr.locator("#hnBtn").click(); await pr.waitForTimeout(150);
+  const h1 = await pr.evaluate(() => { const h = S.horno.find(x => x.by !== "Automático"); return { total: h && h.total, fin: h && h.end - h.start, pollo: S.stock.pollo }; });
+  anota(M, "hornada personalizada gasta los insumos de las fichas", h1.total === 30 && h1.fin === 10 && h1.pollo < h0.pollo, JSON.stringify({ h0, h1 }));
+  const h2 = await pr.evaluate(() => { const fin = S.horno.find(x => x.by !== "Automático").end; while (S.t <= fin) step(); return { vit: S.vit["Ee-pollo"], horno: S.horno.filter(h => h.by !== "Automático").length }; });
+  anota(M, "al salir del horno las unidades pasan a la vitrina", h2.vit >= h0.vit + 15 - 5 && h2.horno === 0, JSON.stringify(h2));
+  // Ingreso de mercadería
+  await pr.evaluate(() => go("inventario")); await pr.waitForTimeout(300);
+  await pr.locator("#igIns").selectOption("palta"); await pr.locator("#igN").fill("2"); await pr.locator("#igP").fill("5000");
+  const p0 = await pr.evaluate(() => S.stock.palta);
+  await pr.locator("#igBtn").click(); await pr.waitForTimeout(150);
+  const ig = await pr.evaluate(p => ({ sube: Math.round(S.stock.palta - p), compras: S.compras.length, total: S.compras[0] && S.compras[0].total }), p0);
+  anota(M, "ingreso de mercadería personalizado", ig.sube === 2000 && ig.compras === 1 && ig.total === 10000, JSON.stringify(ig));
+  anota(M, "nada de esto toca la Caja", await pr.evaluate(() => localStorage.getItem("ea_pos") === null));
   await cierre(M, pr, errores, caidos);
   await ctx.close();
 }
@@ -290,13 +330,14 @@ for (const v of Object.keys(VISTAS)) {
   await probarCajaYComandas(v);
   await probarPruebaAplicar(v);
   await probarPruebaContexto(v);
+  await probarPruebaFichas(v);
   await probarCarta(v);
   await probarSalon(v);
 }
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.2", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.3", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);

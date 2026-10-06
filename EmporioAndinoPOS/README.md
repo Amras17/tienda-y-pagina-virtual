@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.2
+# EmporioAndinoPOS v2.3
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -12,9 +12,10 @@ Sistema general (index.html) ── capa superior: ingreso con PIN, cargos, vers
 ├── Control de Salón carta/salon.html    disponibilidad de la carta, horno y estudio de la carta
 ├── Comandas        cocina/index.html    ventas de la Caja repartidas por estación (cocina, barra, horno)
 ├── Carta Interactiva carta/index.html   la carta que usa el cliente en la mesa
-└── Prueba          prueba/index.html    simulación por día, semana o mes, pedidos a mano y borrador de
-                                          cambios; "Aplicar al sistema general" es el único camino para
-                                          cambiar precios, carta y metas
+└── Prueba          prueba/index.html    simulación por día, semana o mes, pedidos a mano, horno en vivo,
+                                          fichas y escandallos estándar y borrador de cambios; "Aplicar al
+                                          sistema general" es el único camino para cambiar precios, carta y metas
+    prueba/estandar.js  insumos, precios de compra y fichas técnicas estándar (solo para la Prueba)
 nucleo/datos.js   la carta única (130 productos, 10 idiomas)
 nucleo/nucleo.js  catálogo, configuración general y de prueba, versiones, equipo, cargos, PIN y sesión
 nucleo/emporio.css  sistema de diseño de Emporio System 1.1, común a todas las capas
@@ -29,6 +30,39 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Prueba: fichas estándar, horno en vivo e ingresos (v2.3)
+
+Todo esto vive solo en la Prueba: se guarda en `eapos_prueba_fichas` y en el estado del día simulado,
+y no toca la Caja (`ea_pos`) ni el sistema general.
+
+**Fichas técnicas y escandallos estándar** (`prueba/estandar.js`). Los 130 productos de la carta tienen
+ficha con el mismo formato de la ficha de la Caja: ingredientes con cantidad por porción, merma,
+rendimiento y estandarización operativa (vajilla, utensilios, preparación, cocción, montaje y puntos
+críticos). Los 102 insumos tienen formato de compra y precio neto **estimado** para octubre de 2026 con
+referencias públicas: boletines mayoristas de ODEPA (palta Hass $3.000–4.000/kg en Lo Valledor), precios de
+góndola de Líder y Jumbo (queso de cabra, huevos, lácteos), el estudio de la USS sobre el costo de la
+empanada de pino de 2026 y estándares de barra (espresso doble 18 g; la casa usa 12 g en el simple y 28 g
+en el V60). Se suma un flete a San Pedro de Atacama (8 % por defecto). La pastelería, que no tiene
+precio en la carta, trae su precio sugerido.
+
+**Fichas y escandallos (vista nueva).** Costo por porción, precio de prueba, food cost, margen y precio
+sugerido según la meta de food cost. Se editan cantidades, merma, rendimiento y precios de compra; todo
+se recalcula. Un precio sugerido se puede pasar al borrador de Cambios. "Rellenar con el estándar"
+devuelve fichas, precios y stock a los valores estándar.
+
+**Inventario desde las fichas.** Cada venta saca del stock los insumos de su ficha (con merma); las
+empanadas salen de la vitrina y sus insumos se gastan al hornear. El stock inicial se estima con el
+mayor consumo de tres viernes de temporada alta, por 1,6, redondeado al formato de compra; el punto de
+pedido es el 35 % de ese consumo. Cada día del período parte con ese stock.
+
+**Horno en vivo** (como el del Control de Salón). Vitrina por variedad y hornadas con varias variedades,
+unidades por variedad (la lata trae 15), tiempo propio y capacidad de 4 latas. El horno automático entra
+cuando la vitrina baja de 12 o se agotan tres variedades, y deja de hornear 45 minutos antes del cierre.
+Quien paga empanadas que no hay espera la hornada de esa variedad.
+
+**Ingresos personalizados.** Hornadas a mano y compras de mercadería con la cantidad y el precio que se
+indiquen (opcionalmente, ese precio pasa a las fichas). El período suma costo de lo vendido y food cost.
 
 ## Prueba: contextos y pedidos a mano (v2.2)
 
@@ -123,7 +157,9 @@ Caja → comanda en Comandas; borrador en la Prueba → aplicar → precio nuevo
 en la Carta; garzón → Caja con solo cobro y stock; la Carta en cada idioma directo sin textos
 indefinidos; y en cada capa, que cargue el diseño de Emporio System 1.1. Resultado en
 `verificacion/informe.json`. En la Prueba revisa además la semana y el mes del contexto, un evento que
-sube la demanda de un día, abrir ese día en vivo y los pedidos a mano en mesa, para llevar y en la fila.
+sube la demanda de un día, abrir ese día en vivo, los pedidos a mano en mesa, para llevar y en la fila, las
+fichas estándar de todos los productos, que el stock estándar alcance un día de temporada alta, editar un
+escandallo, una hornada personalizada, un ingreso de mercadería y que nada de eso toque la Caja.
 
 El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
 para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre

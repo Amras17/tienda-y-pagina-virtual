@@ -1,7 +1,7 @@
 {
-  "version": "2.2",
-  "fecha": "2026-10-06T11:46:45.736Z",
-  "total": 146,
+  "version": "2.3",
+  "fecha": "2026-10-06T17:45:49.758Z",
+  "total": 166,
   "fallas": 0,
   "resultados": [
     {
@@ -222,9 +222,9 @@
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
-      "prueba": "catorce vistas",
+      "prueba": "quince vistas",
       "ok": true,
-      "detalle": "inicio,contexto,salon,pedido,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
+      "detalle": "inicio,contexto,salon,pedido,cocina,horno,barra,inventario,caja,clientes,reportes,carta,fichas,cambios,datos"
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
@@ -288,15 +288,15 @@
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
-      "prueba": "mes: el mes calendario completo",
+      "prueba": "mes: el mes calendario completo, con costo y food cost",
       "ok": true,
-      "detalle": "{\"barras\":31,\"stats\":6}"
+      "detalle": "{\"barras\":31,\"stats\":8}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "un evento en un día sube su demanda",
       "ok": true,
-      "detalle": "{\"antes\":1262500,\"ev\":\"evento\",\"rev\":1620100}"
+      "detalle": "{\"antes\":1295700,\"ev\":\"evento\",\"rev\":1780400}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
@@ -314,7 +314,7 @@
       "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "para llevar sin vitrina: cobra y espera la tanda",
       "ok": true,
-      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":18}"
+      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":17}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
@@ -342,6 +342,66 @@
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "todos los productos con ficha y escandallo estándar",
+      "ok": true,
+      "detalle": "{\"fichas\":130,\"total\":130,\"pino\":690,\"insumos\":102,\"filas\":130}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "el stock estándar alcanza un día de temporada alta",
+      "ok": true,
+      "detalle": "{\"sin\":0,\"fc\":0.2537874558620399}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "editar el escandallo recalcula el costo",
+      "ok": true,
+      "detalle": "{\"antes\":690,\"costo\":844,\"menu\":844,\"guardado\":true}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "hornada personalizada gasta los insumos de las fichas",
+      "ok": true,
+      "detalle": "{\"h0\":{\"pollo\":3794,\"vit\":2},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":3098.75}}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "al salir del horno las unidades pasan a la vitrina",
+      "ok": true,
+      "detalle": "{\"vit\":17,\"horno\":0}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "ingreso de mercadería personalizado",
+      "ok": true,
+      "detalle": "{\"sube\":2000,\"compras\":1,\"total\":10000}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "nada de esto toca la Caja",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -660,9 +720,9 @@
     },
     {
       "modulo": "Prueba y aplicación · telefono",
-      "prueba": "catorce vistas",
+      "prueba": "quince vistas",
       "ok": true,
-      "detalle": "inicio,contexto,salon,pedido,cocina,horno,barra,inventario,caja,clientes,reportes,carta,cambios,datos"
+      "detalle": "inicio,contexto,salon,pedido,cocina,horno,barra,inventario,caja,clientes,reportes,carta,fichas,cambios,datos"
     },
     {
       "modulo": "Prueba y aplicación · telefono",
@@ -726,15 +786,15 @@
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
-      "prueba": "mes: el mes calendario completo",
+      "prueba": "mes: el mes calendario completo, con costo y food cost",
       "ok": true,
-      "detalle": "{\"barras\":31,\"stats\":6}"
+      "detalle": "{\"barras\":31,\"stats\":8}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "un evento en un día sube su demanda",
       "ok": true,
-      "detalle": "{\"antes\":1262500,\"ev\":\"evento\",\"rev\":1620100}"
+      "detalle": "{\"antes\":1295700,\"ev\":\"evento\",\"rev\":1780400}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
@@ -752,7 +812,7 @@
       "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "para llevar sin vitrina: cobra y espera la tanda",
       "ok": true,
-      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":18}"
+      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":17}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
@@ -780,6 +840,66 @@
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "todos los productos con ficha y escandallo estándar",
+      "ok": true,
+      "detalle": "{\"fichas\":130,\"total\":130,\"pino\":690,\"insumos\":102,\"filas\":130}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "el stock estándar alcanza un día de temporada alta",
+      "ok": true,
+      "detalle": "{\"sin\":0,\"fc\":0.2537874558620399}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "editar el escandallo recalcula el costo",
+      "ok": true,
+      "detalle": "{\"antes\":690,\"costo\":844,\"menu\":844,\"guardado\":true}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "hornada personalizada gasta los insumos de las fichas",
+      "ok": true,
+      "detalle": "{\"h0\":{\"pollo\":3794,\"vit\":2},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":3098.75}}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "al salir del horno las unidades pasan a la vitrina",
+      "ok": true,
+      "detalle": "{\"vit\":17,\"horno\":0}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "ingreso de mercadería personalizado",
+      "ok": true,
+      "detalle": "{\"sube\":2000,\"compras\":1,\"total\":10000}"
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "nada de esto toca la Caja",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
