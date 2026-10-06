@@ -2,6 +2,7 @@
 <title>Prueba · EmporioAndinoPOS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../nucleo/emporio.css">
 <style>
 /* Layout: bento de vidrio sobre noche volcánica, con una franja de advertencia fija arriba:
    esta página es la PRUEBA. Simula el día completo y edita el borrador de cambios
@@ -424,6 +425,7 @@ select.search,.fin,.fta{border:1px solid var(--stroke-2);background:rgba(10,16,1
 .metas4{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
 .metas4 label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--fg-2)}
 @media (max-width:900px){.top{top:auto}.side{top:auto;height:auto}}
+html.incrustado .franja{position:relative}
 @media (max-width:640px){.vs{grid-template-columns:minmax(0,1fr)}.aplicar{grid-template-columns:minmax(0,1fr)}.aplicar label{grid-column:auto!important}.franja{font-size:11.5px;padding-block:6px}}
 
 /* responsivo */
@@ -725,6 +727,7 @@ select.search,.fin,.fta{border:1px solid var(--stroke-2);background:rgba(10,16,1
 
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/emporio.js"></script>
 <script>
 /*ENGINE-START*/
 /* Categorías de la simulación: a qué área sale cada producto, si es comida o

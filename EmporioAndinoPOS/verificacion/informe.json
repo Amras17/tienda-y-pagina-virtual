@@ -1,7 +1,7 @@
 {
-  "version": "2.0",
-  "fecha": "2026-10-06T06:01:40.580Z",
-  "total": 108,
+  "version": "2.1",
+  "fecha": "2026-10-06T10:33:26.540Z",
+  "total": 124,
   "fallas": 0,
   "resultados": [
     {
@@ -18,49 +18,67 @@
     },
     {
       "modulo": "Sistema general · escritorio",
+      "prueba": "diseño Emporio System 1.1",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · escritorio",
       "prueba": "ingreso con PIN nuevo (crear y confirmar)",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
-      "prueba": "dirección ve los cinco módulos",
+      "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "caja,salon,cocina,carta,prueba"
+      "detalle": "inicio,caja,salon,cocina,carta,prueba,verificacion,versiones,retro"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "dashboard con áreas del local",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
       "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": "12/12 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
+      "detalle": "13/13 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
       "modulo": "Sistema general · escritorio",
-      "prueba": "abre caja dentro del sistema",
+      "prueba": "abre caja como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
-      "prueba": "abre salon dentro del sistema",
+      "prueba": "abre salon como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
-      "prueba": "abre cocina dentro del sistema",
+      "prueba": "abre cocina como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
-      "prueba": "abre carta dentro del sistema",
+      "prueba": "abre carta como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
-      "prueba": "abre prueba dentro del sistema",
+      "prueba": "abre prueba como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "versiones y accesos",
       "ok": true,
       "detalle": ""
     },
@@ -150,9 +168,21 @@
     },
     {
       "modulo": "Caja y Comandas · escritorio",
-      "prueba": "garzón no ve la Prueba",
+      "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "caja,salon,cocina,carta"
+      "detalle": "inicio,caja,salon,cocina,carta,retro"
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "la Caja tiene el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "Comandas tiene el diseño Emporio",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Caja y Comandas · escritorio",
@@ -175,6 +205,12 @@
     {
       "modulo": "Prueba y aplicación · escritorio",
       "prueba": "franja de prueba visible",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · escritorio",
+      "prueba": "diseño Emporio System 1.1",
       "ok": true,
       "detalle": ""
     },
@@ -252,6 +288,12 @@
     },
     {
       "modulo": "Carta · escritorio",
+      "prueba": "diseño Emporio System 1.1",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · escritorio",
       "prueba": "selector de idioma",
       "ok": true,
       "detalle": "7 idiomas directos"
@@ -301,6 +343,12 @@
     {
       "modulo": "Salón · escritorio",
       "prueba": "dibuja contenido",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · escritorio",
+      "prueba": "diseño Emporio System 1.1",
       "ok": true,
       "detalle": ""
     },
@@ -342,49 +390,67 @@
     },
     {
       "modulo": "Sistema general · telefono",
+      "prueba": "diseño Emporio System 1.1",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · telefono",
       "prueba": "ingreso con PIN nuevo (crear y confirmar)",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
-      "prueba": "dirección ve los cinco módulos",
+      "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "caja,salon,cocina,carta,prueba"
+      "detalle": "inicio,caja,salon,cocina,carta,prueba,verificacion,versiones,retro"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "dashboard con áreas del local",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
       "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": "12/12 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
+      "detalle": "13/13 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
       "modulo": "Sistema general · telefono",
-      "prueba": "abre caja dentro del sistema",
+      "prueba": "abre caja como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
-      "prueba": "abre salon dentro del sistema",
+      "prueba": "abre salon como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
-      "prueba": "abre cocina dentro del sistema",
+      "prueba": "abre cocina como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
-      "prueba": "abre carta dentro del sistema",
+      "prueba": "abre carta como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
-      "prueba": "abre prueba dentro del sistema",
+      "prueba": "abre prueba como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "versiones y accesos",
       "ok": true,
       "detalle": ""
     },
@@ -474,9 +540,21 @@
     },
     {
       "modulo": "Caja y Comandas · telefono",
-      "prueba": "garzón no ve la Prueba",
+      "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "caja,salon,cocina,carta"
+      "detalle": "inicio,caja,salon,cocina,carta,retro"
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "la Caja tiene el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "Comandas tiene el diseño Emporio",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Caja y Comandas · telefono",
@@ -499,6 +577,12 @@
     {
       "modulo": "Prueba y aplicación · telefono",
       "prueba": "franja de prueba visible",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Prueba y aplicación · telefono",
+      "prueba": "diseño Emporio System 1.1",
       "ok": true,
       "detalle": ""
     },
@@ -576,6 +660,12 @@
     },
     {
       "modulo": "Carta · telefono",
+      "prueba": "diseño Emporio System 1.1",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Carta · telefono",
       "prueba": "selector de idioma",
       "ok": true,
       "detalle": "7 idiomas directos"
@@ -625,6 +715,12 @@
     {
       "modulo": "Salón · telefono",
       "prueba": "dibuja contenido",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Salón · telefono",
+      "prueba": "diseño Emporio System 1.1",
       "ok": true,
       "detalle": ""
     },

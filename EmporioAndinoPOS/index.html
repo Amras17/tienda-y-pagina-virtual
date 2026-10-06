@@ -2,205 +2,75 @@
 <title>EmporioAndinoPOS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="nucleo/emporio.css">
 <style>
-/* Layout: el sistema general es la capa superior. Arriba la marca, quién está en
-   sesión y la versión de configuración vigente; después los módulos que su
-   cargo puede abrir; para dirección, el estado del sistema (verificación,
-   versiones, accesos) y para todos el libro de retroalimentación.
-   Look único y oscuro, el mismo de la Prueba y las Comandas. */
-:root{
-  color-scheme:dark;
-  --bg:#0A1012; --bg-2:#0F1A1D; --panel:#121D20; --panel-2:#17252A;
-  --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.18);
-  --fg:#F2F7F6; --fg-2:#C9D6D4; --muted:#93A6A3;
-  --turquesa:#40E0D0; --turquesa-ink:#04211E; --coral:#FF7F50; --dorado:#D9A93A; --violeta:#9A80D6; --ambar:#FFB547; --madera:#C19A6B;
-  --ok:#3DDC84; --aviso:#FFB547; --falla:#FF6161;
-  --f-logo:"Caveat Brush","Comic Sans MS",cursive;
-  --f-num:"Sora",ui-rounded,"Segoe UI",system-ui,sans-serif;
-  --f-ui:"Plus Jakarta Sans",ui-sans-serif,"Segoe UI",system-ui,sans-serif;
-  --r:20px; --r-in:12px;
-}
-*{box-sizing:border-box}
-html,body{min-height:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;
-  background-image:radial-gradient(90% 50% at 85% -10%,rgba(255,127,80,.16),transparent 70%),radial-gradient(80% 50% at 0% 0%,rgba(64,224,208,.14),transparent 70%);background-attachment:fixed}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
-button:disabled{opacity:.5;cursor:not-allowed}
-:focus-visible{outline:2px solid var(--turquesa);outline-offset:2px}
-.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
-.wrap{max-width:1120px;margin:0 auto;padding-block:20px 56px;padding-inline:16px;display:flex;flex-direction:column;gap:22px}
-
-/* cabecera */
-.cab{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center}
-.cab img{width:58px;height:58px;border-radius:50%;display:block;border:2px solid rgba(242,247,246,.85)}
-.cab h1{margin:0;font-family:var(--f-logo);font-weight:400;font-size:clamp(34px,6vw,46px);line-height:.95;letter-spacing:.01em}
-.cab h1 .pos{color:var(--turquesa)}
-.cab p{margin:4px 0 0;color:var(--fg-2);font-size:13px}
-.ver{display:inline-flex;align-items:center;background:var(--turquesa);color:var(--turquesa-ink);font-family:var(--f-num);font-weight:800;font-size:12px;padding:3px 10px;border-radius:99px;vertical-align:10px;margin-left:6px}
-.quien{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:7px 8px 7px 10px}
-.quien div b{display:block;font-size:13px}
-.quien div span{display:block;font-size:11.5px;color:var(--muted)}
-.av{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-family:var(--f-num);font-weight:800;font-size:13px;color:#0A1012;flex:none}
-.zigzag{height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='14'%3E%3Cpath d='M0 3 L6 11 L12 3 L18 11 L24 3' fill='none' stroke='%2340E0D0' stroke-width='2'/%3E%3C/svg%3E") repeat-x;opacity:.55}
-
-.btn{border:1px solid var(--line-2);background:var(--panel-2);border-radius:12px;padding:8px 14px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none}
-.btn:hover:not(:disabled){border-color:var(--turquesa)}
-.btn.pri{background:var(--turquesa);border-color:var(--turquesa);color:var(--turquesa-ink)}
-.btn.sm{padding:4px 10px;font-size:12px;border-radius:9px}
-.fila{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.sec-h h2{margin:0;font-family:var(--f-num);font-size:18px;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
-.sec-h p{margin:0;color:var(--muted);font-size:12.5px}
-.panel{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:18px;min-width:0;display:flex;flex-direction:column;gap:14px}
-.estado{font-size:12.5px;color:var(--fg-2);margin:0}
-.donde{font-size:12px;color:var(--muted)}
-
-/* ingreso */
-.ingreso{border:1px solid var(--line);background:var(--panel);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px}
-.ingreso h2{margin:0;font-family:var(--f-num);font-size:22px;letter-spacing:-.01em}
-.ingreso .lead{margin:0;color:var(--fg-2)}
-.grp-t{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted);margin:6px 0 0}
-.personas{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
-.persona{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--panel-2);border-radius:14px;padding:9px 11px;min-width:0}
-.persona:hover{border-color:rgba(64,224,208,.5)}
-.persona .pn{display:block;font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.persona .pc{display:block;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.persona>span:last-child{min-width:0}
-.pin{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start}
-.pin-dots{display:flex;gap:12px;margin:14px 0 6px}
-.pin-dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line-2)}
-.pin-dots i.on{background:var(--turquesa);border-color:var(--turquesa)}
-.pin-dots.shake{animation:shake .45s}
-@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-.pin-msg{min-height:20px;font-size:13px;color:var(--fg-2)}
-.pin-msg.err{color:var(--falla)}
-.pad{display:grid;grid-template-columns:repeat(3,64px);gap:10px}
-.pad button{height:56px;border-radius:16px;border:1px solid var(--line-2);background:var(--panel-2);font-family:var(--f-num);font-size:20px;font-weight:700}
-.pad button.fn{font-family:var(--f-ui);font-size:12px}
-
-/* versión vigente */
-.vigente{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;border:1px solid var(--line);background:var(--panel);border-radius:var(--r);padding:14px 16px}
-.vigente .vn{font-family:var(--f-num);font-weight:800;font-size:24px;color:var(--turquesa)}
-.vigente b{display:block;font-size:14px}
-.vigente span{display:block;font-size:12.5px;color:var(--fg-2)}
-.vigente.borrador{border-color:rgba(255,181,71,.5)}
-
-/* módulos */
-.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-.mod{--c:var(--turquesa);position:relative;display:flex;flex-direction:column;gap:9px;text-align:left;border:1px solid var(--line);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 10%,transparent),transparent 60%),var(--panel);border-radius:var(--r);padding:18px;min-width:0;transition:transform .25s cubic-bezier(.34,1.56,.64,1),border-color .2s}
-.mod:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 60%,transparent)}
-.mod:active{transform:scale(.98)}
-.mod .capa{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--c)}
-.mod h3{margin:0;font-family:var(--f-num);font-size:19px;font-weight:700;letter-spacing:-.01em}
-.mod p{margin:0;color:var(--fg-2);font-size:13px}
-.mod .abrir{margin-top:auto;padding-top:6px;font-weight:800;font-size:13px;color:var(--c)}
-.mod.caja{--c:var(--madera)} .mod.salon{--c:var(--violeta)} .mod.cocina{--c:var(--coral)} .mod.carta{--c:var(--turquesa)}
-.mod.prueba{--c:var(--ambar);border-style:dashed}
-.mod.prueba .capa::after{content:" · no afecta las ventas";color:var(--muted);letter-spacing:.06em}
-
-.dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
-.resumen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.resumen div{border:1px solid var(--line);border-radius:var(--r-in);padding:9px 11px;background:rgba(255,255,255,.025)}
-.resumen b{display:block;font-family:var(--f-num);font-size:22px;line-height:1.1}
-.resumen span{font-size:11.5px;color:var(--fg-2)}
-.resumen .ok b{color:var(--ok)}.resumen .aviso b{color:var(--aviso)}.resumen .falla b{color:var(--falla)}
+/* Layout: el de Emporio System 1.1, ahora como capa superior de todo el sistema.
+   Ingreso de personas con PIN, menú lateral por grupos, dashboard como inicio
+   (con ventas reales de la Caja) y una pantalla por área: cada módulo se abre
+   dentro de la misma app como una subcapa del mismo vidrio. */
+.dash{grid-template-areas:
+  "hero hero hero hero hero cmd cmd cmd stock stock ticket ticket"
+  "hero hero hero hero hero chart chart chart chart chart chart chart"}
+.dash.nov{grid-template-areas:"cmd cmd cmd cmd cmd cmd stock stock stock stock stock stock"}
+.a-cmd{grid-area:cmd}.a-stock{grid-area:stock}
+@media (max-width:1280px){.dash{grid-template-areas:"hero hero hero hero hero hero" "cmd cmd stock stock ticket ticket" "chart chart chart chart chart chart"}.dash.nov{grid-template-areas:"cmd cmd cmd stock stock stock"}}
+@media (max-width:640px){.dash{grid-template-areas:"hero" "cmd" "stock" "ticket" "chart"}.dash.nov{grid-template-areas:"cmd" "stock"}}
+.acard.prueba{border-style:dashed}
+.resumen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .diag{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-.diag li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid var(--line);font-size:13px}
+.diag li{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 10px;border-radius:12px;background:var(--glass-2);border:1px solid var(--stroke);font-size:13px}
 .diag li small{display:block;color:var(--muted);font-size:11.5px;overflow-wrap:anywhere}
 .diag li .ms{font-size:11px;color:var(--muted);font-family:var(--f-num)}
-.pt{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none;margin-top:5px}
-.diag li.ok .pt{background:var(--ok)}.diag li.aviso .pt{background:var(--aviso)}.diag li.falla .pt{background:var(--falla)}
-.diag li.corre .pt{background:var(--turquesa);animation:lat 1s infinite}
-@keyframes lat{50%{opacity:.25}}
-.diag li.grupo{display:block;background:none;border:0;padding:8px 2px 0;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--muted)}
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
-td.r,th.r{text-align:right}
-.tag{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:99px;border:1px solid var(--line-2);color:var(--fg-2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
-.tag.ok{color:var(--ok);border-color:rgba(61,220,132,.5)} .tag.na{color:var(--muted)}
-.vers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
-.vers li{border:1px solid var(--line);border-radius:var(--r-in);padding:9px 12px;background:rgba(255,255,255,.025)}
+.diag .pt{width:9px;height:9px;border-radius:50%;background:var(--muted);margin-top:5px}
+.diag li.ok .pt{background:var(--ok)}.diag li.aviso .pt{background:var(--warn)}.diag li.falla .pt{background:var(--crit)}
+.diag li.corre .pt{background:var(--accent);animation:pulse 1.6s infinite}
+.diag li.grupo{display:block;background:none;border:0;padding:8px 2px 0}
+.stat.ok b{color:var(--ok)}.stat.aviso b{color:var(--warn)}.stat.falla b{color:var(--crit)}
+.vers{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto}
+.vers li{border:1px solid var(--stroke);border-radius:var(--r-in);padding:9px 12px;background:var(--glass-2)}
 .vers li b{font-family:var(--f-num)}
-.vers li .m{font-size:12px;color:var(--muted)}
 .vers li ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--fg-2)}
-
-/* retroalimentación */
-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:800;color:var(--fg-2);min-width:0}
-label.ancho{grid-column:1/-1}
-select,input,textarea{border:1px solid var(--line-2);background:var(--bg-2);border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:500;min-width:0;width:100%}
-textarea{min-height:76px;resize:vertical;line-height:1.45}
-select:focus,input:focus,textarea:focus{outline:none;border-color:var(--turquesa);box-shadow:0 0 0 3px rgba(64,224,208,.15)}
-form .acciones{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.filtros{display:flex;gap:6px;flex-wrap:wrap}
-.filtros button{border:1px solid var(--line);background:transparent;border-radius:99px;padding:4px 11px;font-size:12px;font-weight:800;color:var(--fg-2)}
-.filtros button[aria-pressed="true"]{background:var(--turquesa);border-color:var(--turquesa);color:var(--turquesa-ink)}
-.retro{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:520px;overflow:auto}
-.retro li{--s:var(--muted);border:1px solid var(--line);border-left:3px solid var(--s);border-radius:var(--r-in);padding:10px 12px;background:rgba(255,255,255,.025);display:flex;flex-direction:column;gap:6px}
-.retro li.alta{--s:var(--falla)}.retro li.media{--s:var(--aviso)}.retro li.baja{--s:var(--turquesa)}
+.tag{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:99px;border:1px solid var(--stroke-2);color:var(--fg-2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.tag.ok{color:var(--ok);border-color:rgba(61,220,132,.5)}.tag.na{color:var(--muted)}
+.tag.st-abierto{color:var(--warn);border-color:rgba(255,181,71,.5)}.tag.st-revision{color:var(--accent);border-color:rgba(64,224,208,.5)}.tag.st-resuelto{color:var(--ok);border-color:rgba(61,220,132,.5)}
+.fform{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fform label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;color:var(--fg-2);min-width:0}
+.fform label.ancho{grid-column:1/-1}
+.fform .acciones{grid-column:1/-1}
+.fform select,.fform textarea{width:100%}
+.retro{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:520px;overflow:auto}
+.retro li{--s:var(--muted);border:1px solid var(--stroke);border-left:3px solid var(--s);border-radius:var(--r-in);padding:10px 12px;background:var(--glass-2);display:flex;flex-direction:column;gap:6px}
+.retro li.alta{--s:var(--crit)}.retro li.media{--s:var(--warn)}.retro li.baja{--s:var(--accent)}
 .retro .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--muted)}
-.tag.st-abierto{color:var(--aviso);border-color:rgba(255,181,71,.5)}.tag.st-revision{color:var(--turquesa);border-color:rgba(64,224,208,.5)}.tag.st-resuelto{color:var(--ok);border-color:rgba(61,220,132,.5)}
 .retro p{margin:0;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
 .retro .acc{display:flex;gap:6px;flex-wrap:wrap}
-.retro li.vacio{border:1px dashed var(--line-2);color:var(--muted);font-size:13px;padding:14px}
-
 .notas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.notas h3{margin:0 0 6px;font-family:var(--f-num);font-size:14px;color:var(--turquesa)}
+.notas h3{margin:0 0 6px;font-family:var(--f-num);font-size:14px;color:var(--accent)}
 .notas ul{margin:0;padding-left:18px;color:var(--fg-2);font-size:13px;display:flex;flex-direction:column;gap:4px}
-footer{color:var(--muted);font-size:12px;text-align:center}
-
-/* visor de módulo */
-#visor{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column}
-.vbar{display:flex;align-items:center;gap:10px;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--panel)}
-.vbar b{font-family:var(--f-num);font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#visorMarco{flex:1;width:100%;border:0;display:block;background:var(--bg)}
-body.con-visor{overflow:hidden}
-.toast{position:fixed;z-index:60;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:calc(100% - 32px);background:var(--panel-2);border:1px solid rgba(64,224,208,.45);padding:10px 16px;border-radius:12px;font-weight:700;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.45)}
 #banco{position:fixed;left:-9999px;top:0;width:1024px;height:720px;visibility:hidden}
 #banco iframe{width:1024px;height:720px;border:0}
-
-@media (max-width:900px){
-  .dos,.notas{grid-template-columns:minmax(0,1fr)}
-  .cab{grid-template-columns:auto minmax(0,1fr)}
-  .cab .quien{grid-column:1/-1;justify-self:start}
-  .pin{grid-template-columns:minmax(0,1fr)}
-  .vigente{grid-template-columns:auto minmax(0,1fr)}
-  .vigente .btn{grid-column:1/-1;justify-self:start}
-}
-@media (max-width:560px){form{grid-template-columns:minmax(0,1fr)}.resumen b{font-size:18px}.pad{grid-template-columns:repeat(3,56px)}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:900px){.notas{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.fform{grid-template-columns:minmax(0,1fr)}.resumen b{font-size:18px}}
 </style>
 
-<div class="wrap">
-  <header class="cab">
-    <img src="carta/brand/mark.webp" alt="Sello de Emporio Andino">
-    <div>
-      <h1>EmporioAndino<span class="pos">POS</span><span class="ver">v2.0</span></h1>
-      <p>Sistema general · sistema gastronómico y punto de venta de Emporio Andino, San Pedro de Atacama</p>
+<!-- ================= INGRESO ================= -->
+<section class="login" id="login" aria-label="Seleccionar usuario">
+  <div class="login-card glass">
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.1</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div id="whoStep">
+      <h1>¿Quién usa el sistema?</h1>
+      <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
+      <div id="peopleList"></div>
     </div>
-    <div class="quien" id="quien" hidden><span class="av" id="qAv"></span><div><b id="qNom"></b><span id="qCar"></span></div><button class="btn sm" type="button" id="salir">Cerrar sesión</button></div>
-  </header>
-  <div class="zigzag" aria-hidden="true"></div>
-
-  <!-- ===== ingreso ===== -->
-  <section class="ingreso" id="ingreso" aria-labelledby="hIng">
-    <div id="paso1">
-      <h2 id="hIng">¿Quién entra?</h2>
-      <p class="lead">Elige tu nombre. Cada cargo abre los módulos que le corresponden.</p>
-      <div id="personas"></div>
-    </div>
-    <div id="paso2" hidden>
-      <div class="pin">
+    <div id="pinStep" hidden>
+      <div class="pin-wrap">
         <div>
-          <button class="btn sm" type="button" id="pinVolver">← Cambiar persona</button>
-          <div class="fila" style="justify-content:flex-start;margin-top:16px"><span class="av" id="pAv" style="width:52px;height:52px;font-size:18px;border-radius:16px"></span><div><h2 id="pNom" style="margin:0"></h2><span class="donde" id="pCar"></span></div></div>
-          <div class="pin-dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <button class="btn sm" type="button" id="pinBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Cambiar persona</button>
+          <div class="pin-who" style="margin-top:18px"><span class="av" id="pinAv"></span><div><h1 style="margin:0" id="pinName"></h1><span style="color:var(--muted)" id="pinRole"></span></div></div>
+          <div class="pin-dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
           <div class="pin-msg" id="pinMsg" role="status"></div>
-          <p class="donde">El PIN se guarda cifrado solo en este equipo. Es un acceso operativo, no reemplaza una cuenta con servidor.</p>
+          <p class="note">El PIN se guarda cifrado solo en este equipo. Es un acceso operativo, no reemplaza una cuenta con servidor.</p>
         </div>
         <div class="pad" id="pad" aria-label="Teclado del PIN">
           <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
@@ -210,215 +80,409 @@ body.con-visor{overflow:hidden}
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ===== sistema ===== -->
-  <div id="sistema" hidden style="display:flex;flex-direction:column;gap:22px">
-    <div class="vigente" id="vigente"></div>
+<!-- ================= APP ================= -->
+<div class="app" id="app" hidden>
+  <aside class="side" aria-label="Navegación">
+    <div class="side-in glass">
+      <svg class="band" viewBox="0 0 240 22" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
+        <rect width="240" height="22" fill="url(#zz)"/>
+      </svg>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.1</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
+        <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
+      <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
+      <div class="side-foot">
+        <svg class="mnt" viewBox="0 0 240 60" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M110 60 L150 16 L172 30 L188 12 L240 50 L240 60Z" fill="#FF7F50" opacity=".35"/>
+          <path d="M70 60 L118 20 L138 34 L152 24 L206 60Z" fill="#E8674A" opacity=".55"/>
+          <path d="M0 60 L50 24 L78 42 L96 34 L150 60Z" fill="#1AA89B" opacity=".7"/>
+          <path d="M0 60 L0 46 L30 30 L64 60Z" fill="#0B2E30"/>
+        </svg>
+      </div>
+    </div>
+  </aside>
 
-    <section aria-labelledby="hMods" style="display:flex;flex-direction:column;gap:12px">
-      <div class="sec-h"><h2 id="hMods">Módulos</h2><p>Comparten la carta, el stock y las ventas en este equipo.</p></div>
-      <div class="mods" id="mods"></div>
+  <main class="main">
+    <header class="top glass">
+      <div class="ttl">
+        <button class="btn icon" type="button" id="backBtn" aria-label="Volver al Dashboard" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div><h1 id="vTitle" tabindex="-1">Dashboard</h1><p id="vSub"></p></div>
+      </div>
+      <div class="ctl">
+        <span class="clock num" id="clock">--:--</span>
+        <span class="chip" id="cfgChip"><span class="dot"></span><span id="cfgTxt">Configuración</span></span>
+        <span class="chip" id="netChip"><span class="dot live" id="netDot"></span><span id="netTxt">En línea</span></span>
+        <button class="btn warn sm" type="button" id="borradorBtn" data-go="prueba" hidden></button>
+      </div>
+    </header>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="view" data-view="inicio">
+      <div class="dash" id="dash">
+        <article class="tile glass a-hero lift golink" data-go="caja">
+          <div class="tc">
+            <div class="hero-grid">
+              <div><span class="lbl">Ventas del día</span><div class="big num" id="kVentas" style="margin-top:10px">$0</div>
+                <div class="sub"><span class="pill up" id="kDelta"></span><span id="kVentasS"></span></div></div>
+              <svg class="ring" viewBox="0 0 132 132" role="img" aria-label="Avance hacia la meta del día">
+                <circle cx="66" cy="66" r="54" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/>
+                <circle id="ringArc" cx="66" cy="66" r="54" fill="none" stroke="#40E0D0" stroke-width="12" stroke-linecap="round" transform="rotate(-90 66 66)" stroke-dasharray="339.3" stroke-dashoffset="339.3"/>
+                <line id="ringMark" x1="66" y1="6" x2="66" y2="20" stroke="#FF7F50" stroke-width="3" stroke-linecap="round"/>
+                <text x="66" y="68" text-anchor="middle" font-size="26" font-weight="800" fill="#F2F7F6" id="ringPct">0%</text>
+                <text x="66" y="88" text-anchor="middle" font-size="11" fill="#98ABA8" id="ringLbl">de la meta</text>
+              </svg>
+            </div>
+            <div class="spark" id="spark"></div>
+            <div class="legend" style="margin-top:6px"><span><i class="sw" style="background:#40E0D0"></i>Acumulado hoy</span><span><i class="sw dash"></i>Ritmo esperado</span><span><i class="sw" style="background:#FF7F50"></i>Esperado a esta hora</span></div>
+          </div>
+        </article>
+        <article class="tile glass a-cmd kpi tilt golink" data-go="cocina">
+          <div class="tc"><span class="lbl">Comandas pendientes</span><div class="v num" id="kCmd">0</div><div class="s" id="kCmdS"></div></div></article>
+        <article class="tile glass a-stock kpi tilt golink" data-go="salon">
+          <div class="tc"><span class="lbl">Stock por mirar</span><div class="v num" id="kStock">0</div><div class="s" id="kStockS"></div></div></article>
+        <article class="tile glass a-ticket kpi tilt golink" data-go="caja">
+          <div class="tc"><span class="lbl">Ticket promedio</span><div class="v num" id="kTicket">$0</div><div class="s" id="kTicketS"></div></div></article>
+        <article class="tile glass a-chart golink" data-go="caja">
+          <div class="tc"><div class="hd" style="margin-bottom:8px"><div><h2>Ventas por hora</h2><p>Cobrado hoy en la Caja · toca para abrirla</p></div>
+            <div class="legend"><span><i class="sw" style="background:#1AA89B"></i>Cobrado</span><span><i class="sw" style="background:#FF7F50"></i>Hora en curso</span><span><i class="sw dash"></i>Esperado</span></div></div>
+            <div class="chart" id="chartMini"></div></div></article>
+      </div>
+      <h2 class="sec-t">Áreas del local</h2>
+      <div class="hub" id="hub"></div>
     </section>
 
-    <div class="dos" id="direccion">
-      <section class="panel" aria-labelledby="hDiag">
-        <div class="fila">
-          <div><div class="sec-h"><h2 id="hDiag">Verificación del sistema</h2></div><p class="estado" id="diagEstado">Revisa que los cinco módulos abran sin errores, que la carta única y la configuración se lean, que las fotos carguen y que el almacenamiento funcione en este equipo.</p></div>
-          <button class="btn pri" type="button" id="btnVerificar">Ejecutar verificación</button>
-        </div>
-        <div class="resumen" aria-live="polite">
-          <div class="ok"><b class="num" id="rOk">—</b><span>Correctas</span></div>
-          <div class="aviso"><b class="num" id="rAviso">—</b><span>Con aviso</span></div>
-          <div class="falla"><b class="num" id="rFalla">—</b><span>Fallidas</span></div>
-        </div>
-        <ul class="diag" id="diagLista"></ul>
-      </section>
-      <section class="panel" aria-labelledby="hVer">
-        <div class="sec-h"><h2 id="hVer">Versiones aplicadas</h2><p>Cada cambio llega desde la Prueba</p></div>
-        <ul class="vers" id="vers"></ul>
-        <div class="sec-h" style="margin-top:6px"><h2 id="hAcc">Accesos del equipo</h2><p id="accSub"></p></div>
-        <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>Cargo</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div>
-      </section>
-    </div>
+    <!-- ===== MÓDULOS: cada uno es una subcapa dentro de la app ===== -->
+    <section class="view" data-view="caja" hidden><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
+    <section class="view" data-view="salon" hidden><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
+    <section class="view" data-view="cocina" hidden><article class="tile glass marco"><iframe title="Comandas" data-src="cocina/index.html"></iframe></article></section>
+    <section class="view" data-view="carta" hidden><article class="tile glass marco"><iframe title="Carta Interactiva" data-src="carta/index.html"></iframe></article></section>
+    <section class="view" data-view="prueba" hidden><article class="tile glass marco"><iframe title="Prueba y simulación" data-src="prueba/index.html"></iframe></article></section>
 
-    <section class="panel" aria-labelledby="hRetro">
-      <div class="sec-h"><h2 id="hRetro">Retroalimentación y mantención</h2><p id="retroDonde" class="donde">Conectando…</p></div>
-      <form id="formRetro" autocomplete="off">
-        <label>Módulo<select id="fModulo"><option value="caja">Caja</option><option value="salon">Control de Salón</option><option value="cocina">Comandas</option><option value="carta">Carta Interactiva</option><option value="prueba">Prueba</option><option value="general">Sistema general</option></select></label>
-        <label>Tipo<select id="fTipo"><option value="error">Algo falla</option><option value="mejora">Mejora</option><option value="dato">Dato o precio</option><option value="comentario">Comentario</option></select></label>
-        <label>Prioridad<select id="fPrioridad"><option value="media">Media</option><option value="alta">Alta · afecta el servicio</option><option value="baja">Baja</option></select></label>
-        <label class="ancho">Qué pasó o qué cambiarías<textarea id="fTexto" required maxlength="1200" placeholder="Ej.: En Caja, el cierre no suma las propinas en efectivo."></textarea></label>
-        <div class="acciones"><span class="donde" id="fAyuda">Se guarda con tu nombre y la fecha, y queda abierto hasta que se resuelva.</span><button class="btn pri" type="submit" id="fEnviar">Guardar reporte</button></div>
-      </form>
-      <div class="fila"><div class="filtros" role="group" aria-label="Filtrar por estado" id="filtros">
-        <button type="button" data-f="activos" aria-pressed="true">Activos</button><button type="button" data-f="abierto" aria-pressed="false">Abiertos</button><button type="button" data-f="revision" aria-pressed="false">En revisión</button><button type="button" data-f="resuelto" aria-pressed="false">Resueltos</button><button type="button" data-f="todos" aria-pressed="false">Todos</button></div>
-        <span class="donde num" id="retroCuenta"></span></div>
-      <ul class="retro" id="retroLista"></ul>
+    <!-- ===== VERIFICACIÓN ===== -->
+    <section class="view" data-view="verificacion" hidden>
+      <div class="grid">
+        <article class="tile glass s12"><div class="tc">
+          <div class="hd"><div><h2>Verificación del sistema</h2><p id="diagEstado">Revisa que los cinco módulos abran sin errores, que la carta única y la configuración se lean, que las fotos carguen y que el almacenamiento funcione en este equipo.</p></div>
+            <button class="btn pri" type="button" id="btnVerificar">Ejecutar verificación</button></div>
+          <div class="kv resumen" aria-live="polite">
+            <div class="stat ok"><b class="num" id="rOk">—</b><span>Correctas</span></div>
+            <div class="stat aviso"><b class="num" id="rAviso">—</b><span>Con aviso</span></div>
+            <div class="stat falla"><b class="num" id="rFalla">—</b><span>Fallidas</span></div>
+          </div>
+          <ul class="diag" id="diagLista"></ul>
+        </div></article>
+      </div>
     </section>
-  </div>
 
-  <section class="panel" aria-labelledby="hNotas">
-    <div class="sec-h"><h2 id="hNotas">Notas de la versión 2.0</h2><p>Sistema unificado</p></div>
-    <div class="notas">
-      <div><h3>Un solo sistema</h3><ul>
-        <li>Una sola carta (130 productos) para la Caja, la Carta, el Control de Salón, las Comandas y la Prueba. Antes había tres copias con 31 precios distintos.</li>
-        <li>La Caja es el punto de venta: cobro, boleta, stock, costos, compras, mermas e informes.</li>
-        <li>Ingreso con PIN y cargos en esta capa superior; cada módulo sabe quién atiende.</li>
-      </ul></div>
-      <div><h3>Prueba aparte</h3><ul>
-        <li>La simulación del día de Emporio System pasó a la página Prueba, marcada como tal.</li>
-        <li>Precios, carta y metas se cambian solo en la Prueba. Ahí se comparan con el sistema general y se aplican como una versión nueva.</li>
-      </ul></div>
-      <div><h3>Fuera y nuevo</h3><ul>
-        <li>Fuera: servicios del pueblo, emergencias, reseñas, Instagram, galería y avisos de altura en la Carta, más el traspaso manual entre Caja y Salón y el escandallo duplicado.</li>
-        <li>Nuevo: Comandas por estación, alimentadas por las ventas reales de la Caja.</li>
-        <li>La ficha técnica completa (costo y paso a paso) quedó en la Caja.</li>
-      </ul></div>
-    </div>
-  </section>
-  <footer>EmporioAndinoPOS v2.0 · Las ventas, el stock y los PIN se guardan en el equipo donde se usan.</footer>
-</div>
+    <!-- ===== VERSIONES Y ACCESOS ===== -->
+    <section class="view" data-view="versiones" hidden>
+      <div class="grid">
+        <article class="tile glass s7"><div class="tc">
+          <div class="hd"><div><h2>Versiones aplicadas</h2><p>Cada cambio de precios, carta o metas llega desde la Prueba</p></div><button class="btn sm" type="button" data-go="prueba">Abrir Prueba</button></div>
+          <ul class="vers" id="vers"></ul></div></article>
+        <article class="tile glass s5"><div class="tc">
+          <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
+        <article class="tile glass s12"><div class="tc">
+          <div class="hd"><div><h2>Notas de la versión 2.1</h2><p>Emporio System 1.1 como base de todas las capas</p></div></div>
+          <div class="notas">
+            <div><h3>Un mismo diseño</h3><ul>
+              <li>El diseño y los comportamientos de Emporio System 1.1 son ahora la base de todo: noche volcánica con vidrio, Sora y Plus Jakarta Sans, resortes, indicadores que se deslizan y mosaicos con brillo.</li>
+              <li>Viven en <span class="num">nucleo/emporio.css</span> y <span class="num">nucleo/emporio.js</span>; cada módulo los carga.</li>
+            </ul></div>
+            <div><h3>Una sola app</h3><ul>
+              <li>El sistema general tiene la forma de 1.1: ingreso con PIN, menú lateral, dashboard y una pantalla por área.</li>
+              <li>Caja, Salón, Comandas, Carta y Prueba se abren dentro de la misma app y comparten su atmósfera.</li>
+            </ul></div>
+            <div><h3>Datos reales</h3><ul>
+              <li>El dashboard muestra ventas, ticket, comandas y stock reales de la Caja y el Salón.</li>
+              <li>La simulación del día sigue en la Prueba, separada de lo real.</li>
+            </ul></div>
+          </div></div></article>
+      </div>
+    </section>
 
-<div id="visor" hidden>
-  <div class="vbar">
-    <button class="btn sm" type="button" id="visorVolver">← Sistema general</button>
-    <b id="visorTitulo"></b>
-    <button class="btn sm" type="button" id="visorReportar">Reportar algo</button>
-  </div>
-  <iframe id="visorMarco" title="Módulo" src="about:blank"></iframe>
+    <!-- ===== RETROALIMENTACIÓN ===== -->
+    <section class="view" data-view="retro" hidden>
+      <div class="grid">
+        <article class="tile glass s12"><div class="tc">
+          <div class="hd"><div><h2>Retroalimentación y mantención</h2><p id="retroDonde">Conectando…</p></div><span class="chip num" id="retroCuenta"></span></div>
+          <form id="formRetro" class="fform" autocomplete="off">
+            <label>Módulo<select class="search" id="fModulo"><option value="caja">Caja</option><option value="salon">Control de Salón</option><option value="cocina">Comandas</option><option value="carta">Carta Interactiva</option><option value="prueba">Prueba</option><option value="general">Sistema general</option></select></label>
+            <label>Tipo<select class="search" id="fTipo"><option value="error">Algo falla</option><option value="mejora">Mejora</option><option value="dato">Dato o precio</option><option value="comentario">Comentario</option></select></label>
+            <label>Prioridad<select class="search" id="fPrioridad"><option value="media">Media</option><option value="alta">Alta · afecta el servicio</option><option value="baja">Baja</option></select></label>
+            <label class="ancho">Qué pasó o qué cambiarías<textarea class="fta" id="fTexto" required maxlength="1200" placeholder="Ej.: En Caja, el cierre no suma las propinas en efectivo."></textarea></label>
+            <div class="acciones row-end" style="margin-top:0"><small>Se guarda con tu nombre y la fecha, y queda abierto hasta que se resuelva.</small><button class="btn pri" type="submit" id="fEnviar">Guardar reporte</button></div>
+          </form>
+          <div class="row-end"><div class="fchips" role="group" aria-label="Filtrar por estado" id="filtros">
+            <button class="fchip" type="button" data-f="activos" aria-pressed="true">Activos</button><button class="fchip" type="button" data-f="abierto" aria-pressed="false">Abiertos</button><button class="fchip" type="button" data-f="revision" aria-pressed="false">En revisión</button><button class="fchip" type="button" data-f="resuelto" aria-pressed="false">Resueltos</button><button class="fchip" type="button" data-f="todos" aria-pressed="false">Todos</button></div></div>
+          <ul class="retro" id="retroLista"></ul>
+        </div></article>
+      </div>
+    </section>
+  </main>
 </div>
 <div id="banco" aria-hidden="true"></div>
 
 <script src="nucleo/datos.js"></script>
 <script src="nucleo/nucleo.js"></script>
+<script src="nucleo/emporio.js"></script>
 <script>
 (function(){
 var $=function(id){ return document.getElementById(id); };
-var E=EAPOS;
-var GRUPOS=[["Dirección",["dueno","jefe"]],["Caja y salón",["encargado"]],["Garzones",["garzon"]],["Barra",["barista_enc","barista"]],["Cocina y horno",["cocina"]]];
-var CAPA={caja:"Punto de venta",salon:"Equipo de salón",cocina:"Cocina, barra y horno",carta:"Clientes en la mesa",prueba:"Prueba"};
+var E=EAPOS, U=EA_UI;
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 function ini(n){ return n.split(" ").filter(Boolean).slice(0,2).map(function(w){ return w[0]; }).join("").toUpperCase(); }
-function toast(t){ var el=document.createElement("div"); el.className="toast"; el.setAttribute("role","status"); el.textContent=t; document.body.appendChild(el); setTimeout(function(){ el.remove(); },2800); }
+function clp(n){ return "$"+Math.round(n||0).toLocaleString("es-CL"); }
 function fecha(iso){ try{ return new Date(iso).toLocaleString("es-CL",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}); }catch(e){ return iso; } }
-function guardaLocal(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 function leeLocal(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+function guardaLocal(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function hoyISO(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 
-/* ==================== INGRESO CON PIN ==================== */
-var objetivo=null, buf="", primero=null, fallos=0;
-function pintarPersonas(){
-  $("personas").innerHTML=GRUPOS.map(function(g){
-    return '<p class="grp-t">'+g[0]+'</p><div class="personas">'+E.EQUIPO.filter(function(p){ return g[1].indexOf(p.r)>=0; }).map(function(p){
-      return '<button type="button" class="persona" data-p="'+p.i+'"><span class="av" style="background:'+E.COLOR_ROL[p.r]+'">'+ini(p.n)+'</span><span><span class="pn">'+esc(p.n)+'</span><span class="pc">'+esc(p.c)+'</span></span></button>';
+/* ==================== ÁREAS ==================== */
+var VIEWS={
+  inicio:{t:"Dashboard",g:"Inicio",c:"#40E0D0"},
+  caja:{t:"Caja",g:"Operación",c:"#C19A6B",d:"Cobro, boleta, stock, costos, compras, mermas e informes"},
+  salon:{t:"Control de Salón",g:"Operación",c:"#9A80D6",d:"Disponibilidad de la carta, horno y estudio de la carta"},
+  cocina:{t:"Comandas",g:"Operación",c:"#FF7F50",d:"Lo cobrado en la Caja, por estación: cocina, barra y horno"},
+  carta:{t:"Carta Interactiva",g:"Operación",c:"#1AA89B",d:"La carta que usa el cliente en la mesa"},
+  prueba:{t:"Prueba y simulación",g:"Gestión",c:"#FFB547",d:"Cambios de precios, carta y metas, con un día simulado antes de aplicarlos"},
+  verificacion:{t:"Verificación",g:"Sistema",c:"#3DDC84",d:"Que cada módulo abra y funcione en este equipo"},
+  versiones:{t:"Versiones y accesos",g:"Sistema",c:"#40E0D0",d:"Historial de configuración y PIN del equipo"},
+  retro:{t:"Retroalimentación",g:"Sistema",c:"#D9A93A",d:"Lo que falla y lo que se puede mejorar"}
+};
+var ALLV=Object.keys(VIEWS);
+var GRUPOS=[["Dirección",["dueno","jefe"]],["Caja y salón",["encargado"]],["Garzones",["garzon"]],["Barra",["barista_enc","barista"]],["Cocina y horno",["cocina"]]];
+var USER=null;
+function puedeVer(v){ if(!USER) return false; var rol=E.ROLES[USER.r];
+  if(v==="inicio"||v==="retro") return true;
+  if(v==="verificacion"||v==="versiones") return !!rol.sistema;
+  return rol.m.indexOf(v)>=0; }
+function verVentas(){ return USER && E.ROLES[USER.r].caja==="todo"; }
+
+/* ==================== INGRESO ==================== */
+var pinTarget=null, pinBuf="", pinFirst=null, pinFails=0;
+function renderPeople(){
+  $("peopleList").innerHTML=GRUPOS.map(function(g){
+    return '<div class="lbl who-grp">'+g[0]+'</div><div class="people">'+E.EQUIPO.filter(function(p){ return g[1].indexOf(p.r)>=0; }).map(function(p){
+      return '<button type="button" class="person" data-p="'+p.i+'"><span class="av" style="background:'+E.COLOR_ROL[p.r]+'">'+ini(p.n)+'</span><span style="min-width:0"><span class="pn">'+esc(p.n)+'</span><span class="pc">'+esc(p.c)+'</span></span></button>';
     }).join("")+"</div>";
   }).join("");
 }
-function abrirPin(p){
-  objetivo=p; buf=""; primero=null; fallos=0;
-  $("paso1").hidden=true; $("paso2").hidden=false;
-  $("pAv").textContent=ini(p.n); $("pAv").style.background=E.COLOR_ROL[p.r]; $("pNom").textContent=p.n; $("pCar").textContent=p.c;
+function openPin(p){
+  pinTarget=p; pinBuf=""; pinFirst=null; pinFails=0; $("whoStep").hidden=true; $("pinStep").hidden=false;
+  $("pinAv").textContent=ini(p.n); $("pinAv").style.background=E.COLOR_ROL[p.r]; $("pinName").textContent=p.n; $("pinRole").textContent=p.c;
   $("pinMsg").className="pin-msg"; $("pinMsg").textContent=E.pins()[p.n]?"Ingresa tu PIN de 4 dígitos":"Primera vez en este equipo: crea tu PIN de 4 dígitos";
-  puntos();
+  drawDots();
 }
-function puntos(){ [].forEach.call($("dots").children,function(d,i){ d.classList.toggle("on",i<buf.length); }); }
-function errorPin(t){ var d=$("dots"); d.classList.remove("shake"); void d.offsetWidth; d.classList.add("shake"); $("pinMsg").className="pin-msg err"; $("pinMsg").textContent=t; buf=""; setTimeout(puntos,250); }
-/* El código se toma al completar los 4 dígitos y el buffer queda libre al
-   instante: lo que se teclea mientras se valida no se pierde. */
-function completo(codigo){
-  var p=objetivo; if(!p) return;
-  E.hashPin(p.n,codigo).then(function(h){
-    var guardado=E.pins()[p.n];
-    if(guardado){ if(h===guardado) return entrar(p); fallos++; return errorPin(fallos>=3?"PIN incorrecto. Si lo olvidaste, dirección puede restablecerlo en Accesos del equipo.":"PIN incorrecto, intenta de nuevo"); }
-    if(!primero){ primero=h; puntos(); $("pinMsg").className="pin-msg"; $("pinMsg").textContent="Repite el PIN para confirmarlo"; return; }
-    if(primero!==h){ primero=null; return errorPin("Los PIN no coinciden. Créalo otra vez"); }
-    E.guardarPin(p.n,h); entrar(p);
+function drawDots(){ [].forEach.call($("pinDots").children,function(d,i){ d.classList.toggle("on",i<pinBuf.length); }); }
+function pinErr(msg){ var d=$("pinDots"); d.classList.remove("shake"); void d.offsetWidth; d.classList.add("shake"); $("pinMsg").className="pin-msg err"; $("pinMsg").textContent=msg; pinBuf=""; setTimeout(drawDots,250); }
+/* El código se toma al completar los 4 dígitos y el buffer queda libre al instante. */
+function pinComplete(code){
+  var p=pinTarget; if(!p) return;
+  E.hashPin(p.n,code).then(function(h){
+    var g=E.pins()[p.n];
+    if(g){ if(h===g) return login(p); pinFails++; return pinErr(pinFails>=3?"PIN incorrecto. Si lo olvidaste, dirección puede restablecerlo en Versiones y accesos.":"PIN incorrecto, intenta de nuevo"); }
+    if(!pinFirst){ pinFirst=h; drawDots(); $("pinMsg").className="pin-msg"; $("pinMsg").textContent="Repite el PIN para confirmarlo"; return; }
+    if(pinFirst!==h){ pinFirst=null; return pinErr("Los PIN no coinciden. Créalo otra vez"); }
+    E.guardarPin(p.n,h); login(p);
   });
 }
-function tecla(k){
-  if(!objetivo) return;
-  if(k==="del") buf=buf.slice(0,-1); else if(k==="clr") buf=""; else if(/^\d$/.test(k)&&buf.length<4) buf+=k;
-  puntos();
-  if(buf.length===4){ var c=buf; buf=""; setTimeout(function(){ completo(c); },120); }
-}
-function entrar(p){ E.abrirSesion(p); objetivo=null; $("paso2").hidden=true; $("paso1").hidden=false; pintarTodo(); toast("Hola, "+p.n.split(" ")[0]); }
-$("personas").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) abrirPin(E.EQUIPO[+b.dataset.p]); });
-$("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) tecla(b.dataset.k); });
-$("pinVolver").addEventListener("click",function(){ objetivo=null; $("paso2").hidden=true; $("paso1").hidden=false; });
+function pinKey(k){ if(!pinTarget) return;
+  if(k==="del") pinBuf=pinBuf.slice(0,-1); else if(k==="clr") pinBuf=""; else if(/^\d$/.test(k)&&pinBuf.length<4) pinBuf+=k;
+  drawDots(); if(pinBuf.length===4){ var c=pinBuf; pinBuf=""; setTimeout(function(){ pinComplete(c); },120); } }
+function login(p){ E.abrirSesion(p); pinTarget=null; arrancarApp(true); U.aviso("Hola, "+p.n.split(" ")[0]+". Tienes acceso a "+(ALLV.filter(puedeVer).length-1)+" áreas"); }
+function logout(msg){ E.cerrarSesion(); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
+$("peopleList").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) openPin(E.EQUIPO[+b.dataset.p]); });
+$("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) pinKey(b.dataset.k); });
+$("pinBack").addEventListener("click",function(){ pinTarget=null; $("pinStep").hidden=true; $("whoStep").hidden=false; });
 document.addEventListener("keydown",function(e){
-  if(!$("paso2").hidden && !$("ingreso").hidden){ if(/^\d$/.test(e.key)) tecla(e.key); else if(e.key==="Backspace") tecla("del"); }
-  if(e.key==="Escape" && !$("visor").hidden) cerrarVisor();
+  if(!$("pinStep").hidden&&!$("login").hidden){ if(/^\d$/.test(e.key)) pinKey(e.key); else if(e.key==="Backspace") pinKey("del"); }
+  if(e.key==="Escape"&&USER&&cur!=="inicio") go("inicio");
 });
-var salirArm=0;
-$("salir").addEventListener("click",function(){ var t=Date.now(); if(t-salirArm<2500){ salirArm=0; cerrarVisor(); E.cerrarSesion(); pintarTodo(); toast("Sesión cerrada"); } else { salirArm=t; toast("Toca otra vez para cerrar sesión"); } });
+var logoutArmed=0;
+$("logoutBtn").addEventListener("click",function(){ var t=Date.now(); if(t-logoutArmed<2500){ logoutArmed=0; logout("Sesión cerrada"); } else { logoutArmed=t; U.aviso("Toca otra vez para cerrar sesión"); } });
 
-/* ==================== SISTEMA GENERAL ==================== */
-function pintarTodo(){
-  var s=E.sesion();
-  $("ingreso").hidden=!!s; $("sistema").hidden=!s; $("quien").hidden=!s;
-  if(!s){ pintarPersonas(); return; }
-  $("qAv").textContent=ini(s.n); $("qAv").style.background=E.COLOR_ROL[s.r]; $("qNom").textContent=s.n; $("qCar").textContent=s.c;
-  var rol=E.ROLES[s.r];
-  pintarVigente(s);
-  $("mods").innerHTML=rol.m.map(function(id){
-    var m=E.MODULOS[id];
-    return '<button type="button" class="mod '+id+'" data-modulo="'+id+'"><span class="capa">'+esc(CAPA[id])+'</span><h3>'+esc(m.n)+'</h3><p>'+esc(m.d)+'</p><span class="abrir">Abrir</span></button>';
+/* ==================== NAVEGACIÓN ==================== */
+var cur="inicio", navSl=null;
+function buildNav(){
+  var groups={}; ALLV.filter(puedeVer).forEach(function(v){ (groups[VIEWS[v].g]=groups[VIEWS[v].g]||[]).push(v); });
+  $("nav").innerHTML='<span class="ind" id="navInd"></span>'+Object.keys(groups).map(function(g){
+    return '<div class="grp">'+g+'</div>'+groups[g].map(function(v){ return '<a href="#'+v+'" data-v="'+v+'">'+U.icono(v)+(v==="inicio"?"Dashboard":VIEWS[v].t)+'</a>'; }).join("");
   }).join("");
-  $("direccion").hidden=!rol.sistema;
-  if(rol.sistema){ pintarVersiones(); pintarAccesos(s); }
-  pintarRetro();
+  navSl=U.deslizador($("navInd"));
 }
-function pintarVigente(s){
-  var g=E.general(), pend=E.pendientes(), dir=E.ROLES[s.r].sistema;
-  var el=$("vigente"); el.className="vigente"+(pend.length&&dir?" borrador":"");
-  el.innerHTML='<span class="vn">v'+g.v+'</span><div><b>Configuración vigente del sistema general</b><span>'+
-    (g.ts?"Aplicada el "+esc(fecha(g.ts))+(g.por?" por "+esc(g.por):"")+(g.nota?" · "+esc(g.nota):""):"")+
-    (dir? (pend.length? " · En la Prueba hay un borrador con "+pend.length+(pend.length===1?" cambio":" cambios")+" sin aplicar.":" · La Prueba está igual al sistema general.") : "")+
-    '</span></div>'+(dir?'<button class="btn" type="button" data-modulo="prueba">'+(pend.length?"Revisar borrador":"Abrir Prueba")+'</button>':"");
+function buildHub(){
+  $("hub").innerHTML=ALLV.filter(function(v){ return v!=="inicio"&&puedeVer(v); }).map(function(v){
+    return '<button type="button" class="tile glass acard lift'+(v==="prueba"?" prueba":"")+'" data-go="'+v+'" id="ac-'+v+'" style="--c:'+VIEWS[v].c+'">'+
+      '<span class="top-row"><span class="ic">'+U.icono(v)+'</span><span class="go">Abrir →</span></span>'+
+      '<h3>'+VIEWS[v].t+'</h3><span class="st num" data-st></span><span class="ss" data-ss>'+VIEWS[v].d+'</span></button>';
+  }).join("");
+  U.mosaicos($("hub"));
 }
+function vaciarMarcos(){ document.querySelectorAll(".marco iframe").forEach(function(f){ f.removeAttribute("src"); f._cargado=false; }); }
+function show(v,silent){
+  if(!puedeVer(v)) v="inicio"; cur=v;
+  document.querySelectorAll(".view").forEach(function(el){ el.hidden=el.dataset.view!==v; });
+  var fr=document.querySelector('.view[data-view="'+v+'"] .marco iframe');
+  if(fr&&!fr._cargado){ fr.src=fr.dataset.src; fr._cargado=true; }
+  $("vTitle").textContent=VIEWS[v].t; $("backBtn").hidden=v==="inicio";
+  document.querySelectorAll("#nav a").forEach(function(a){ var on=a.dataset.v===v; a.classList.toggle("on",on); a.toggleAttribute("aria-current",on); });
+  navSl&&navSl.to(document.querySelector("#nav a.on"),silent);
+  renderView(); U.revelar(document.querySelector('.view[data-view="'+v+'"]'));
+  if(!silent){ window.scrollTo(0,0); $("vTitle").focus({preventScroll:true}); }
+  subtitulo();
+}
+var histOK=true;
+function hist(fn,st,h){ if(!histOK) return; try{ history[fn](st,"",h); }catch(e){ histOK=false; } }
+function go(v){
+  if(v===cur) return;
+  if(!puedeVer(v)){ U.aviso("Tu cargo no tiene acceso a "+((E.MODULOS[v]||VIEWS[v]||{n:v}).n||VIEWS[v].t)); return; }
+  hist(cur==="inicio"?"pushState":"replaceState",{ea:"view",v:v},"#"+v); show(v);
+}
+addEventListener("popstate",function(e){ if(!USER) return; var st=e.state||{}; show(st.ea==="view"?st.v:"inicio"); });
+$("nav").addEventListener("click",function(e){ var a=e.target.closest("[data-v]"); if(!a) return; e.preventDefault(); if(a.dataset.v==="inicio"){ if(cur!=="inicio"){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); } } else go(a.dataset.v); });
+document.addEventListener("click",function(e){ var t=e.target.closest("[data-go]"); if(!t||!USER) return; if(e.target.closest("a,input")&&!t.matches("button")) return; go(t.dataset.go); });
+$("backBtn").addEventListener("click",function(){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); });
+/* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
+window.EAPOS_SISTEMA={abrir:function(id){ go(id); }};
+new ResizeObserver(function(){ if(USER){ navSl&&navSl.to(document.querySelector("#nav a.on"),true); if(cur==="inicio") renderDash(); } }).observe(document.body);
+
+/* ==================== DATOS REALES ==================== */
+var PROFILE={7:.35,8:.6,9:.85,10:.95,11:.9,12:1.15,13:1.35,14:1.15,15:.85,16:.95,17:1.05,18:.95,19:.75,20:.6,21:.4,22:.25};
+var PROF_SUM=Object.keys(PROFILE).reduce(function(a,h){ return a+PROFILE[h]; },0);
+function metaDia(){ var m=E.general().metas.dia; return {v:m||1800000, ref:!m}; }
+function esperadoA(min,meta){ return Object.keys(PROFILE).reduce(function(a,h){ h=+h; var f=Math.min(1,Math.max(0,(min-h*60)/60)); return a+PROFILE[h]*f; },0)/PROF_SUM*meta; }
+function ventasHoy(){ var pos=leeLocal("ea_pos")||{}, hoy=hoyISO(); return (pos.ventas||[]).filter(function(v){ return !v.anulada&&hoyISO(new Date(v.ts))===hoy; }); }
+function sinFolio(){ var pos=leeLocal("ea_pos")||{}; return (pos.ventas||[]).filter(function(v){ return !v.anulada&&(!v.doc||!v.doc.folio); }).length; }
+function comandasPend(){
+  var m=leeLocal("eapos_comandas"); if(!m||m.fecha!==hoyISO()) m={listo:{}};
+  var por={cocina:0,barra:0,horno:0};
+  ventasHoy().forEach(function(v){ var est={};
+    (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; });
+    Object.keys(est).forEach(function(e){ if(!m.listo[v.id+"|"+e]) por[e]++; }); });
+  return por;
+}
+function stockEstado(){
+  var c=leeLocal("ea_control")||{}, pos=leeLocal("ea_pos")||{}, umbral=(pos.cfg&&pos.cfg.umbral)||6, off=0, bajo=0, nombres=[];
+  E.catalogo(E.general()).forEach(function(p){ var u=c.uni&&typeof c.uni[p.id]==="number"?c.uni[p.id]:null, e=u!=null?(u<=0?"off":u<=umbral?"bajo":"ok"):((c.st&&c.st[p.id])||"ok");
+    if(e==="off"){ off++; nombres.push(p.n); } else if(e==="bajo") bajo++; });
+  return {off:off, bajo:bajo, nombres:nombres};
+}
+
+/* ==================== DASHBOARD ==================== */
+var ringSp=null;
+function renderDash(){
+  var vs=ventasHoy(), total=vs.reduce(function(a,v){ return a+v.total; },0), n=vs.length, meta=metaDia(), ahora=new Date(), min=ahora.getHours()*60+ahora.getMinutes(), exp=esperadoA(min,meta.v);
+  $("dash").classList.toggle("nov",!verVentas());
+  U.numero($("kVentas"),total,clp);
+  var d=exp>0?(total/exp-1)*100:0, dl=$("kDelta"); dl.className="pill "+(d>=0?"up":"dn"); dl.textContent=exp>0?(d>=0?"▲ ":"▼ ")+Math.abs(d).toFixed(0)+"% vs lo esperado":"Antes de abrir";
+  $("kVentasS").textContent=(meta.ref?"Objetivo de referencia ":"Meta ")+clp(meta.v)+" · "+n+(n===1?" venta":" ventas");
+  if(!ringSp) ringSp=U.tween(new U.Spring(0,120,20),function(x){ var v=Math.max(0,Math.min(1,x)); $("ringArc").setAttribute("stroke-dashoffset",(339.3*(1-v)).toFixed(1)); $("ringPct").textContent=Math.round(v*100)+"%"; });
+  ringSp.set(Math.min(1,total/meta.v)); $("ringMark").setAttribute("transform","rotate("+(Math.min(1,exp/meta.v)*360).toFixed(1)+" 66 66)");
+  $("ringLbl").textContent=meta.ref?"del objetivo":"de la meta";
+  var cp=comandasPend(), tc=cp.cocina+cp.barra+cp.horno;
+  U.numero($("kCmd"),tc,function(x){ return Math.round(x); });
+  $("kCmdS").textContent="Cocina "+cp.cocina+" · Barra "+cp.barra+" · Horno "+cp.horno;
+  var st=stockEstado(); U.numero($("kStock"),st.off+st.bajo,function(x){ return Math.round(x); });
+  $("kStockS").textContent=st.off+" agotados · "+st.bajo+" quedan pocos";
+  U.numero($("kTicket"),n?total/n:0,clp); $("kTicketS").textContent=n+(n===1?" ticket cobrado hoy":" tickets cobrados hoy");
+  if(verVentas()){ renderSpark(vs,meta.v,min); renderChart(vs,meta.v); }
+  renderHub(vs,total,cp,st);
+}
+function renderSpark(vs,meta,min){
+  var box=$("spark"); if(!box.clientWidth) return; var W=box.clientWidth,H=Math.max(96,box.clientHeight),pad={l:4,r:6,t:8,b:16},OPEN=420,CLOSE=1380;
+  var x=function(t){ return pad.l+(t-OPEN)/(CLOSE-OPEN)*(W-pad.l-pad.r); }, tot=vs.reduce(function(a,v){ return a+v.total; },0), top=Math.max(meta,tot)*1.06, y=function(v){ return pad.t+(1-v/top)*(H-pad.t-pad.b); };
+  var e=""; for(var t=OPEN;t<=CLOSE;t+=10) e+=(t===OPEN?"M":"L")+x(t).toFixed(1)+" "+y(esperadoA(t,meta)).toFixed(1);
+  var ord=vs.map(function(v){ var d=new Date(v.ts); return {t:d.getHours()*60+d.getMinutes(), v:v.total}; }).sort(function(a,b){ return a.t-b.t; });
+  var acc=0, pts=[[x(OPEN),y(0)]]; ord.forEach(function(o){ var tt=Math.max(OPEN,Math.min(CLOSE,o.t)); pts.push([x(tt),y(acc)]); acc+=o.v; pts.push([x(tt),y(acc)]); });
+  var fin=Math.max(OPEN,Math.min(CLOSE,min)); pts.push([x(fin),y(acc)]);
+  var act=pts.map(function(p,i){ return (i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1); }).join(""), area=act+"L"+x(fin).toFixed(1)+" "+y(0).toFixed(1)+"L"+x(OPEN).toFixed(1)+" "+y(0).toFixed(1)+"Z";
+  var ticks=[8,12,16,20].map(function(h){ return '<text x="'+x(h*60).toFixed(1)+'" y="'+(H-3)+'" font-size="10" fill="#98ABA8" text-anchor="middle">'+h+':00</text>'; }).join("");
+  box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Ventas acumuladas frente al ritmo esperado"><defs><linearGradient id="gA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#40E0D0" stop-opacity=".35"/><stop offset="1" stop-color="#40E0D0" stop-opacity="0"/></linearGradient></defs>'+
+    '<line x1="0" x2="'+W+'" y1="'+y(meta).toFixed(1)+'" y2="'+y(meta).toFixed(1)+'" stroke="rgba(255,255,255,.08)" stroke-dasharray="2 4"/><line x1="0" x2="'+W+'" y1="'+y(0).toFixed(1)+'" y2="'+y(0).toFixed(1)+'" stroke="rgba(255,255,255,.14)"/>'+
+    '<path d="'+e+'" fill="none" stroke="#98ABA8" stroke-width="1.5" stroke-dasharray="4 4"/><path d="'+area+'" fill="url(#gA)"/><path d="'+act+'" fill="none" stroke="#40E0D0" stroke-width="2" stroke-linejoin="round"/>'+
+    '<circle cx="'+x(fin).toFixed(1)+'" cy="'+y(esperadoA(fin,meta)).toFixed(1)+'" r="3.5" fill="#FF7F50" stroke="#0A1012" stroke-width="1.5"/><circle cx="'+x(fin).toFixed(1)+'" cy="'+y(acc).toFixed(1)+'" r="4.5" fill="#40E0D0" stroke="#0A1012" stroke-width="2"/>'+ticks+'</svg>';
+}
+function niceMax(v){ var p=Math.pow(10,Math.floor(Math.log10(v))), m=v/p; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p; }
+function renderChart(vs,meta){
+  var box=$("chartMini"); if(!box.clientWidth) return; var W=box.clientWidth,H=W<520?170:190,pad={l:44,r:6,t:18,b:24};
+  var horas=[]; for(var h=7;h<=22;h++) horas.push(h);
+  var sales={}; vs.forEach(function(v){ var hh=new Date(v.ts).getHours(); sales[hh]=(sales[hh]||0)+v.total; });
+  var exp=function(h){ return (PROFILE[h]||0)/PROF_SUM*meta; }, cur=new Date().getHours();
+  var max=niceMax(Math.max.apply(null,horas.map(function(h){ return Math.max(sales[h]||0,exp(h)); }).concat([1]))*1.05);
+  var iw=W-pad.l-pad.r, ih=H-pad.t-pad.b, bw=iw/horas.length, y=function(v){ return pad.t+ih-v/max*ih; };
+  var g='<defs><linearGradient id="gbm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2FD3C1"/><stop offset="1" stop-color="#1AA89B"/></linearGradient></defs>';
+  for(var i=0;i<=4;i++){ var v=max*i/4, yy=y(v); g+='<line x1="'+pad.l+'" x2="'+(W-pad.r)+'" y1="'+yy+'" y2="'+yy+'" stroke="rgba(255,255,255,'+(i?0.06:0.18)+')"/><text x="'+(pad.l-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="#98ABA8">'+(v>=1e6?(v/1e6).toLocaleString("es-CL",{maximumFractionDigits:1})+"M":Math.round(v/1000)+"k")+'</text>'; }
+  horas.forEach(function(h,i){ var cx=pad.l+i*bw+bw/2, w=Math.max(4,bw-2*Math.max(2,bw*.16)), ey=y(exp(h));
+    g+='<rect x="'+(cx-w/2)+'" y="'+ey+'" width="'+w+'" height="'+(pad.t+ih-ey)+'" rx="5" fill="none" stroke="rgba(152,171,168,.55)" stroke-dasharray="3 3"/>';
+    var s=sales[h]||0; if(s>0){ var yy=y(s); g+='<rect x="'+(cx-w/2)+'" y="'+yy+'" width="'+w+'" height="'+(pad.t+ih-yy)+'" rx="5" fill="'+(h===cur?"#FF7F50":"url(#gbm)")+'"><title>'+h+':00 · '+clp(s)+'</title></rect>'; }
+    if(W>=520||i%2===0) g+='<text x="'+cx+'" y="'+(H-6)+'" text-anchor="middle" font-size="11" fill="'+(h===cur?"#F2F7F6":"#98ABA8")+'" font-weight="'+(h===cur?800:500)+'">'+String(h).padStart(2,"0")+'</text>'; });
+  box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Ventas por hora de hoy">'+g+'</svg>';
+}
+function renderHub(vs,total,cp,st){
+  var set=function(v,a,b,badge){ var el=$("ac-"+v); if(!el) return; el.querySelector("[data-st]").innerHTML=a; if(b!=null) el.querySelector("[data-ss]").innerHTML=b+(badge||""); };
+  var sf=sinFolio();
+  set("caja", verVentas()?clp(total):vs.length+" ventas", vs.length+(vs.length===1?" venta hoy":" ventas hoy")+(verVentas()&&sf?" · "+sf+" sin folio ":" "), sf&&verVentas()?'<span class="badge warn">Folio</span>':"");
+  set("salon", st.off+" agotados", st.bajo+" quedan pocos ", st.off?'<span class="badge crit">Revisar</span>':'<span class="badge ok">OK</span>');
+  set("cocina", (cp.cocina+cp.barra+cp.horno)+" pendientes", "Cocina "+cp.cocina+" · Barra "+cp.barra+" · Horno "+cp.horno);
+  var g=E.general(), cat=E.catalogo(g);
+  set("carta", cat.length+" productos", g.fuera.length? g.fuera.length+" fuera de carta":"Toda la carta vigente");
+  var pc=E.pendientes().length;
+  set("prueba", pc? pc+" cambios":"Sin borrador", pc?"Borrador sobre la versión "+g.v+" ":"Igual a la versión "+g.v+" ", pc?'<span class="badge warn">Por aplicar</span>':'<span class="badge ok">Al día</span>');
+  var dg=leeLocal("eapos_diag");
+  set("verificacion", dg&&dg.version===E.version? dg.ok+" de "+(dg.ok+dg.aviso+dg.falla):"Sin ejecutar", dg&&dg.version===E.version? "Última: "+fecha(dg.fecha)+" ":"Ejecútala en este equipo ", dg&&dg.falla?'<span class="badge crit">'+dg.falla+' con falla</span>':"");
+  set("versiones","v"+g.v, g.ts? "Aplicada "+fecha(g.ts):"");
+  set("retro", reportes.filter(function(r){ return r.estado!=="resuelto"; }).length+" activos", reportes.length+" en total");
+}
+function subtitulo(){
+  var g=E.general(), pc=E.pendientes().length, dir=USER&&E.ROLES[USER.r].sistema;
+  $("vSub").textContent=cur==="inicio"? "Hola, "+USER.n.split(" ")[0]+" · "+USER.c : VIEWS[cur].d;
+  $("cfgTxt").textContent="Configuración v"+g.v;
+  $("cfgChip").title=g.ts?"Aplicada el "+fecha(g.ts)+(g.por?" por "+g.por:""):"";
+  $("borradorBtn").hidden=!(dir&&pc&&cur!=="prueba"); $("borradorBtn").textContent=pc+(pc===1?" cambio":" cambios")+" en Prueba";
+}
+function red(){ var on=navigator.onLine!==false; $("netDot").className="dot"+(on?" live":" off"); $("netTxt").textContent=on?"En línea":"Sin internet · todo sigue en este equipo"; }
+addEventListener("online",red); addEventListener("offline",red);
+function renderView(){
+  if(!USER) return;
+  if(cur==="inicio") renderDash();
+  if(cur==="versiones"){ pintarVersiones(); pintarAccesos(); }
+  if(cur==="retro") pintarRetro();
+}
+addEventListener("storage",function(ev){ if(!USER) return;
+  if(ev.key==="eapos_sesion"){ var s=E.sesion(); if(!s||s.n!==USER.n){ arrancarApp(false); return; } }
+  if(["ea_pos","ea_control","eapos_comandas","eapos_cfg","eapos_prueba_cfg","eapos_versiones","eapos_diag"].indexOf(ev.key)>=0){ renderView(); subtitulo(); } });
+setInterval(function(){ if(USER&&cur==="inicio") renderDash(); },30000);
+
+/* ==================== VERSIONES Y ACCESOS ==================== */
 function pintarVersiones(){
-  var h=E.versiones().slice().reverse();
-  $("vers").innerHTML=h.map(function(v){
-    return '<li><b>v'+v.v+'</b> <span class="m">'+esc(fecha(v.ts))+' · '+esc(v.por||"")+(v.nota?" · "+esc(v.nota):"")+'</span>'+
+  $("vers").innerHTML=E.versiones().slice().reverse().map(function(v){
+    return '<li><b>v'+v.v+'</b> <span class="desc">'+esc(fecha(v.ts))+' · '+esc(v.por||"")+(v.nota?" · "+esc(v.nota):"")+'</span>'+
       (v.cambios.length?'<ul>'+v.cambios.slice(0,8).map(function(c){ return "<li>"+esc(c.texto)+"</li>"; }).join("")+(v.cambios.length>8?"<li>y "+(v.cambios.length-8)+" más</li>":"")+"</ul>":"")+"</li>";
-  }).join("")||"<li>Sin versiones todavía.</li>";
+  }).join("")||'<li class="empty-s">Sin versiones todavía.</li>';
 }
 var resetArm={};
-function pintarAccesos(s){
+function pintarAccesos(){
   var pins=E.pins();
-  $("accSub").textContent="Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar.";
   $("acc").innerHTML=E.EQUIPO.map(function(p){
-    return '<tr><td>'+esc(p.n)+'</td><td>'+esc(p.c)+'</td><td>'+(pins[p.n]?'<span class="tag ok">Creado</span>':'<span class="tag na">Pendiente</span>')+'</td><td class="r">'+
-      (pins[p.n]&&p.n!==s.n?'<button class="btn sm" type="button" data-reset="'+p.i+'">Restablecer</button>':"")+"</td></tr>";
+    return '<tr><td><span class="av" style="display:inline-grid;width:26px;height:26px;border-radius:8px;font-size:10px;vertical-align:middle;margin-right:8px;background:'+E.COLOR_ROL[p.r]+'">'+ini(p.n)+'</span>'+esc(p.n)+'<div class="desc">'+esc(p.c)+'</div></td><td>'+(pins[p.n]?'<span class="fcp ok">Creado</span>':'<span class="fcp na">Pendiente</span>')+'</td><td class="r">'+
+      (pins[p.n]&&p.n!==USER.n?'<button class="btn sm" type="button" data-reset="'+p.i+'">Restablecer</button>':"")+"</td></tr>";
   }).join("");
 }
 $("acc").addEventListener("click",function(e){ var b=e.target.closest("[data-reset]"); if(!b) return; var p=E.EQUIPO[+b.dataset.reset], t=Date.now();
-  if(t-(resetArm[p.i]||0)<2500){ resetArm={}; E.borrarPin(p.n); toast("PIN de "+p.n+" restablecido"); pintarAccesos(E.sesion()); }
-  else { resetArm[p.i]=t; toast("Toca otra vez para restablecer el PIN de "+p.n); } });
-
-/* ==================== VISOR DE MÓDULOS ==================== */
-var abierto=null;
-function abrirModulo(id){
-  var s=E.sesion();
-  if(!s){ toast("Entra con tu PIN para abrir los módulos"); return; }
-  if(!E.puede(id,s)){ toast("Tu cargo no tiene acceso a "+(E.MODULOS[id]||{n:id}).n); return; }
-  abierto=id; $("visorTitulo").textContent=E.MODULOS[id].n; $("visorMarco").src=E.MODULOS[id].ruta;
-  $("visor").hidden=false; document.body.classList.add("con-visor"); $("visorVolver").focus();
-}
-function cerrarVisor(){ if($("visor").hidden) return; $("visor").hidden=true; $("visorMarco").src="about:blank"; document.body.classList.remove("con-visor"); pintarTodo(); }
-/* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
-window.EAPOS_SISTEMA={abrir:function(id){ cerrarVisorSilencioso(); abrirModulo(id); }};
-function cerrarVisorSilencioso(){ $("visor").hidden=true; document.body.classList.remove("con-visor"); }
-document.addEventListener("click",function(e){ var b=e.target.closest("[data-modulo]"); if(b) abrirModulo(b.dataset.modulo); });
-$("visorVolver").addEventListener("click",cerrarVisor);
-$("visorReportar").addEventListener("click",function(){ var id=abierto; cerrarVisor(); $("fModulo").value=id; $("fTexto").focus(); $("hRetro").scrollIntoView({behavior:"smooth",block:"start"}); });
-addEventListener("storage",function(ev){ if(["eapos_cfg","eapos_prueba_cfg","eapos_versiones","eapos_sesion","es_pins"].indexOf(ev.key)>=0 && $("visor").hidden) pintarTodo(); });
+  if(t-(resetArm[p.i]||0)<2500){ resetArm={}; E.borrarPin(p.n); U.aviso("PIN de "+p.n+" restablecido"); pintarAccesos(); }
+  else { resetArm[p.i]=t; U.aviso("Toca otra vez para restablecer el PIN de "+p.n); } });
 
 /* ==================== VERIFICACIÓN ==================== */
 var PRUEBAS_MOD={
   caja:function(d){ return d.querySelectorAll("#rejilla .prod").length>0; },
   salon:function(d){ return (d.body.innerText||"").trim().length>50; },
-  cocina:function(d){ return !!d.getElementById("tablero") && d.getElementById("estaciones").children.length===4; },
+  cocina:function(d){ return !!d.getElementById("tablero") && d.getElementById("estaciones").querySelectorAll("button").length===4; },
   carta:function(d){ return d.querySelectorAll(".langgrid button").length>0||!!d.getElementById("splash"); },
   prueba:function(d){ return d.querySelectorAll("#nav a").length>0; }
 };
@@ -428,6 +492,7 @@ var CHECKS=[
   {g:"Equipo",n:"Tipografías de la marca",f:probarFuentes},
   {g:"Núcleo",n:"Carta única",f:probarCarta},
   {g:"Núcleo",n:"Configuración del sistema general",f:probarConfig},
+  {g:"Núcleo",n:"Diseño Emporio (estilos y comportamientos)",f:probarDiseno},
   {g:"Módulos",n:"Caja abre sin errores",f:function(){ return probarModulo("caja"); }},
   {g:"Módulos",n:"Control de Salón abre sin errores",f:function(){ return probarModulo("salon"); }},
   {g:"Módulos",n:"Comandas abre sin errores",f:function(){ return probarModulo("cocina"); }},
@@ -437,12 +502,10 @@ var CHECKS=[
   {g:"Contenido",n:"Datos guardados en este equipo",f:probarDatos},
   {g:"Servicio",n:"Libro de retroalimentación",f:probarRetro}
 ];
-function pintarPendientes(){
-  var html="", g="";
-  CHECKS.forEach(function(c,i){ if(c.g!==g){ g=c.g; html+='<li class="grupo" aria-hidden="true">'+g+'</li>'; }
+function pintarPendientes(){ var html="", g="";
+  CHECKS.forEach(function(c,i){ if(c.g!==g){ g=c.g; html+='<li class="grupo lbl" aria-hidden="true">'+g+'</li>'; }
     html+='<li id="ck'+i+'"><span class="pt"></span><span>'+c.n+'<small>Pendiente</small></span><span class="ms"></span></li>'; });
-  $("diagLista").innerHTML=html;
-}
+  $("diagLista").innerHTML=html; }
 function marcar(i,estado,detalle,ms){ var li=$("ck"+i); if(!li) return; li.className=estado; li.querySelector("small").textContent=detalle; li.querySelector(".ms").textContent=ms!=null?ms+" ms":""; }
 function probarAlmacen(){ try{ var k="eapos_prueba_alm"; localStorage.setItem(k,"1"); var ok=localStorage.getItem(k)==="1"; localStorage.removeItem(k);
   return ok?{e:"ok",d:"Lectura y escritura correctas"}:{e:"falla",d:"Se escribió pero no se pudo leer"}; }
@@ -452,8 +515,9 @@ function probarFuentes(){ if(!document.fonts) return {e:"aviso",d:"El navegador 
     return f.length?{e:"aviso",d:"Usando tipografía de respaldo para: "+f.join(", ")}:{e:"ok",d:"Sora, Plus Jakarta Sans y Caveat Brush cargadas"}; }); }
 function probarCarta(){ var n=E.base.length, sin=E.base.filter(function(p){ return p.p==null; }).length;
   return n===130?{e:"ok",d:n+" productos · "+sin+" sin precio en la carta base"}:{e:"aviso",d:n+" productos (se esperaban 130)"}; }
-function probarConfig(){ var g=E.general(), cat=E.catalogo(g);
-  return {e:"ok",d:"Versión "+g.v+" · "+cat.length+" productos en carta · "+Object.keys(g.precios).length+" precios definidos aparte"}; }
+function probarConfig(){ var g=E.general(), cat=E.catalogo(g); return {e:"ok",d:"Versión "+g.v+" · "+cat.length+" productos en carta · "+Object.keys(g.precios).length+" precios definidos aparte"}; }
+function probarDiseno(){ var acento=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+  return acento&&window.EA_UI?{e:"ok",d:"emporio.css y emporio.js cargados · acento "+acento}:{e:"falla",d:"Falta nucleo/emporio.css o nucleo/emporio.js"}; }
 window.__eaGancho=function(w){ var errs=[]; w.__eaErr=errs;
   w.addEventListener("error",function(e){ var t=e.target;
     if(t&&t!==w&&(t.src||t.href)){ var u=String(t.src||t.href); if(u.indexOf(location.origin)===0) errs.push("No carga "+u.slice(u.lastIndexOf("/")+1)); }
@@ -472,7 +536,8 @@ function probarModulo(id){
           if(!errs) return terminar("aviso","Abrió, pero sin el gancho de verificación: errores no observados");
           if(errs.length) return terminar("falla",errs.slice(0,2).join(" · "));
           if(!PRUEBAS_MOD[id](d)) return terminar("falla","Abrió, pero la pantalla inicial quedó vacía");
-          terminar("ok",kb+" KB · pantalla inicial completa"); }
+          if(!w.EA_UI) return terminar("aviso","Abrió sin el diseño Emporio");
+          terminar("ok",kb+" KB · pantalla inicial completa · diseño Emporio"); }
         catch(e){ terminar("aviso","No se pudo inspeccionar: "+e.message); } },2500); });
       fr.src=m.ruta; $("banco").appendChild(fr);
     });
@@ -482,7 +547,7 @@ function probarFotos(){ var malas=[];
   return Promise.all(FOTOS.map(function(p){ return fetch("carta/"+p).then(function(r){ var t=r.headers.get("content-type")||""; if(!r.ok||t.indexOf("image")<0) malas.push(p); }).catch(function(){ malas.push(p); }); })).then(function(){
     return malas.length?{e:"falla",d:malas.length+" sin cargar: "+malas.slice(0,4).join(", ")}:{e:"ok",d:FOTOS.length+" de "+FOTOS.length+" imágenes disponibles"}; }); }
 function probarDatos(){ try{ var pos=leeLocal("ea_pos")||{}, v=(pos.ventas||[]).length, ctrl=leeLocal("ea_control");
-  return {e:"ok",d:v+(v===1?" venta":" ventas")+" en la Caja · stock "+(ctrl?"marcado hoy":"sin marcar todavía")+" · "+Object.keys(E.pins()).length+" PIN creados"}; }
+  return {e:"ok",d:v+(v===1?" venta":" ventas")+" en la Caja · stock "+(ctrl?"marcado":"sin marcar todavía")+" · "+Object.keys(E.pins()).length+" PIN creados"}; }
   catch(e){ return {e:"aviso",d:"No se pudo leer el almacenamiento"}; } }
 function probarRetro(){ return dbListo.then(function(db){ return db?{e:"ok",d:"Conectado: los reportes los ve todo el equipo"}:{e:"aviso",d:"Sin conexión compartida: los reportes quedan solo en este equipo"}; }); }
 var corriendo=false;
@@ -493,11 +558,11 @@ function verificar(){
     return Promise.resolve().then(c.f).catch(function(e){ return {e:"falla",d:e.message}; }).then(function(r){ var ms=Math.round(performance.now()-t); marcar(i,r.e,r.d,ms); res.push({prueba:c.n,estado:r.e,detalle:r.d,ms:ms}); }); }); });
   cadena.then(function(){
     var n={ok:0,aviso:0,falla:0}; res.forEach(function(r){ n[r.estado]++; });
-    $("rOk").textContent=n.ok; $("rAviso").textContent=n.aviso; $("rFalla").textContent=n.falla;
+    U.numero($("rOk"),n.ok,Math.round); U.numero($("rAviso"),n.aviso,Math.round); U.numero($("rFalla"),n.falla,Math.round);
     var total=Math.round((performance.now()-t0)/100)/10;
-    $("diagEstado").textContent=(n.falla?n.falla+" con falla. Revisa el detalle y repórtalo abajo.":"Todo en orden.")+" "+res.length+" pruebas en "+String(total).replace(".",",")+" s.";
+    $("diagEstado").textContent=(n.falla?n.falla+" con falla. Revisa el detalle y repórtalo en Retroalimentación.":"Todo en orden.")+" "+res.length+" pruebas en "+String(total).replace(".",",")+" s.";
     $("diagEstado").setAttribute("data-fin","1");
-    var reg={fecha:new Date().toISOString(),version:E.version,ok:n.ok,aviso:n.aviso,falla:n.falla,resultados:res,por:(E.sesion()||{}).n||"",navegador:navigator.userAgent.slice(0,160)};
+    var reg={fecha:new Date().toISOString(),version:E.version,ok:n.ok,aviso:n.aviso,falla:n.falla,resultados:res,por:USER?USER.n:"",navegador:navigator.userAgent.slice(0,160)};
     guardaLocal("eapos_diag",reg);
     dbListo.then(function(db){ if(db) db.doc("diagnosticos/ultimo").set(reg).catch(function(){}); });
     corriendo=false; $("btnVerificar").disabled=false; $("btnVerificar").textContent="Verificar de nuevo";
@@ -514,18 +579,18 @@ var dbListo=(window.claude&&window.claude.use?window.claude.use("db"):Promise.re
 var NOMBRES={caja:"Caja",salon:"Control de Salón",cocina:"Comandas",carta:"Carta Interactiva",prueba:"Prueba",general:"Sistema general",sistema:"Emporio System"};
 var TIPOS={error:"Algo falla",mejora:"Mejora",dato:"Dato o precio",comentario:"Comentario"};
 var ESTADOS={abierto:"Abierto",revision:"En revisión",resuelto:"Resuelto"};
-var reportes=[], filtro="activos", modo="local";
+var reportes=leeLocal("eapos_retro")||[], filtro="activos", modo="local";
 function pintarRetro(){
   var vis=reportes.filter(function(r){ return filtro==="todos"?true:filtro==="activos"?r.estado!=="resuelto":r.estado===filtro; });
   $("retroCuenta").textContent=reportes.filter(function(r){ return r.estado!=="resuelto"; }).length+" activos · "+reportes.length+" en total";
   var ul=$("retroLista"); ul.textContent="";
-  if(!vis.length){ var li=document.createElement("li"); li.className="vacio";
+  if(!vis.length){ var li=document.createElement("li"); li.className="empty-s";
     li.textContent=reportes.length?"No hay reportes con este estado.":"Todavía no hay reportes. Cuando algo falle en un módulo, o se te ocurra una mejora, escríbelo arriba: queda con fecha y estado hasta que se resuelva."; ul.appendChild(li); return; }
   vis.forEach(function(r){
     var li=document.createElement("li"); li.className=r.prioridad||"media";
     var meta=document.createElement("div"); meta.className="meta";
     [["tag st-"+r.estado,ESTADOS[r.estado]||r.estado],["tag",NOMBRES[r.modulo]||r.modulo],["tag",TIPOS[r.tipo]||r.tipo]].forEach(function(t){ var s=document.createElement("span"); s.className=t[0]; s.textContent=t[1]; meta.appendChild(s); });
-    var quien=document.createElement("span"); quien.textContent=(r.autor?r.autor+" · ":"")+fecha(r.creado)+(r.prioridad==="alta"?" · prioridad alta":""); meta.appendChild(quien);
+    var q=document.createElement("span"); q.textContent=(r.autor?r.autor+" · ":"")+fecha(r.creado)+(r.prioridad==="alta"?" · prioridad alta":""); meta.appendChild(q);
     var p=document.createElement("p"); p.textContent=r.texto;
     var acc=document.createElement("div"); acc.className="acc";
     Object.keys(ESTADOS).filter(function(k){ return k!==r.estado; }).forEach(function(k){ var b=document.createElement("button"); b.type="button"; b.className="btn sm";
@@ -534,31 +599,45 @@ function pintarRetro(){
   });
 }
 function cambiarEstado(r,k,b){ b.disabled=true; var ahora=new Date().toISOString();
-  if(modo==="db"){ dbListo.then(function(db){ return db.doc("retro/"+r.id).update({estado:k,actualizado:ahora}); }).then(function(){ toast("Reporte: "+ESTADOS[k]); })
-    .catch(function(e){ b.disabled=false; toast(e&&e.code==="permission_denied"?"Tu acceso es de solo lectura: no puedes cambiar el estado.":"No se pudo guardar el cambio. Intenta de nuevo."); }); }
-  else { reportes=reportes.map(function(x){ return x.id===r.id?Object.assign({},x,{estado:k,actualizado:ahora}):x; }); guardaLocal("eapos_retro",reportes); pintarRetro(); toast("Reporte: "+ESTADOS[k]); } }
+  if(modo==="db"){ dbListo.then(function(db){ return db.doc("retro/"+r.id).update({estado:k,actualizado:ahora}); }).then(function(){ U.aviso("Reporte: "+ESTADOS[k]); })
+    .catch(function(e){ b.disabled=false; U.aviso(e&&e.code==="permission_denied"?"Tu acceso es de solo lectura: no puedes cambiar el estado.":"No se pudo guardar el cambio. Intenta de nuevo."); }); }
+  else { reportes=reportes.map(function(x){ return x.id===r.id?Object.assign({},x,{estado:k,actualizado:ahora}):x; }); guardaLocal("eapos_retro",reportes); pintarRetro(); U.aviso("Reporte: "+ESTADOS[k]); } }
 $("filtros").addEventListener("click",function(e){ var b=e.target.closest("button"); if(!b) return; filtro=b.dataset.f;
   [].forEach.call($("filtros").children,function(x){ x.setAttribute("aria-pressed",String(x===b)); }); pintarRetro(); });
 $("formRetro").addEventListener("submit",function(e){ e.preventDefault();
   var texto=$("fTexto").value.trim(); if(!texto){ $("fTexto").focus(); return; }
-  var ahora=new Date().toISOString(), s=E.sesion();
-  var r={modulo:$("fModulo").value,tipo:$("fTipo").value,prioridad:$("fPrioridad").value,texto:texto,autor:s?s.n:"",estado:"abierto",version:E.version,configuracion:E.general().v,creado:ahora,actualizado:ahora};
+  var ahora=new Date().toISOString();
+  var r={modulo:$("fModulo").value,tipo:$("fTipo").value,prioridad:$("fPrioridad").value,texto:texto,autor:USER?USER.n:"",estado:"abierto",version:E.version,configuracion:E.general().v,creado:ahora,actualizado:ahora};
   var btn=$("fEnviar"); btn.disabled=true;
-  var listo=function(){ btn.disabled=false; $("fTexto").value=""; toast("Reporte guardado"); };
+  var listo=function(){ btn.disabled=false; $("fTexto").value=""; U.aviso("Reporte guardado"); };
   if(modo==="db"){ dbListo.then(function(db){ return db.collection("retro").add(r); }).then(listo).catch(function(err){ btn.disabled=false;
-    toast(err&&err.code==="permission_denied"?"Tu acceso es de solo lectura: pide acceso de edición para reportar.":err&&err.code==="quota_exceeded"?"El libro está lleno: borra reportes resueltos antiguos.":"No se pudo guardar. Revisa la conexión e intenta de nuevo."); }); }
+    U.aviso(err&&err.code==="permission_denied"?"Tu acceso es de solo lectura: pide acceso de edición para reportar.":err&&err.code==="quota_exceeded"?"El libro está lleno: borra reportes resueltos antiguos.":"No se pudo guardar. Revisa la conexión e intenta de nuevo."); }); }
   else { r.id="l"+Date.now().toString(36); reportes=[r].concat(reportes); guardaLocal("eapos_retro",reportes); pintarRetro(); listo(); } });
-reportes=leeLocal("eapos_retro")||[];
 $("retroDonde").textContent="Guardado en este equipo";
 dbListo.then(function(db){
   if(!db){ $("retroDonde").textContent="Guardado solo en este equipo"; return; }
   modo="db"; $("retroDonde").textContent="Compartido con el equipo";
   db.collection("retro").orderBy("creado","desc").limit(300).onSnapshot(function(snap){
-    reportes=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }); pintarRetro(); },
+    reportes=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }); if(cur==="retro") pintarRetro(); if(USER&&cur==="inicio") renderDash(); },
     function(){ $("retroDonde").textContent="Sin conexión con el libro compartido"; });
 });
 
-pintarTodo();
+/* ==================== ARRANQUE ==================== */
+/* Moduleo que sale del hash se lee antes de que el historial lo reescriba. */
+var H0=(location.hash||"").slice(1);
+function arrancarApp(primera){
+  var s=E.sesion();
+  if(!s){ USER=null; $("app").hidden=true; $("login").hidden=false; renderPeople(); return; }
+  USER=s; $("login").hidden=true; $("app").hidden=false;
+  $("meAv").textContent=ini(s.n); $("meAv").style.background=E.COLOR_ROL[s.r]; $("meName").textContent=s.n; $("meRole").textContent=s.c;
+  buildNav(); buildHub(); red();
+  var v=(primera===true&&VIEWS[H0])?H0:"inicio"; H0="";
+  hist("replaceState",{ea:"root"},location.pathname+location.search+"#inicio");
+  cur="";
+  if(v!=="inicio"){ show("inicio",true); go(v); } else show("inicio",true);
+}
+U.reloj($("clock")); U.reloj($("loginClock"));
+arrancarApp(true);
 })();
 </script>
 </body></html>

@@ -3,7 +3,8 @@
 <meta name="description" content="Punto de venta y administración gastronómica de Emporio Andino: cobro, stock, costos, compras, mermas, estadísticas e informes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../nucleo/emporio.css">
 <style>
 /* ===== Caja Emporio Andino ==========================================
    Herramienta interna de caja. La carta del cliente vive en la noche del
@@ -16,46 +17,23 @@
    color (ΔE deutan 8.3) y siempre llevan texto, nunca solo color.
    ================================================================== */
 :root{
-  --crema:#FBF6EC; --papel:#FFFFFF; --papel2:#F4ECDD; --papel3:#EDE1CB;
-  --linea:#E3D6BF; --linea-f:#C19A6B;
-  --tinta:#2B2420; --tinta2:#6E5C4B; --tinta3:#8C7A67;
-  --marron:#6B4423; --marron2:#8B5A2B; --madera:#C19A6B; --arena:#D9CBA3;
-  --bien:#3F7A34; --bien-f:rgba(63,122,52,.13);
-  --avisa:#A8760C; --avisa-f:rgba(200,146,26,.20);
-  --grave:#8E2515; --grave-f:rgba(142,37,21,.12);
-  --dato:#8B5A2B; --dato-f:rgba(139,90,43,.14); --oro:#B8860B;
-  --sobre-accion:#FFF9EF;
-  --sombra:0 1px 2px rgba(43,36,32,.07), 0 10px 26px -18px rgba(43,36,32,.30);
-  --sombra-alta:0 2px 4px rgba(43,36,32,.10), 0 18px 40px -22px rgba(43,36,32,.40);
-  --r:13px; --r-s:9px;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --crema:#16110D; --papel:#201812; --papel2:#291F17; --papel3:#33271C;
-  --linea:#3C2E22; --linea-f:#6B4E36;
-  --tinta:#F7F0E3; --tinta2:#C4B098; --tinta3:#9C8770;
-  --marron:#EBCFA8; --marron2:#D9B68A; --madera:#C19A6B; --arena:#D9CBA3;
-  --bien:#7FC46B; --bien-f:rgba(127,196,107,.16);
-  --avisa:#E3B33C; --avisa-f:rgba(227,179,60,.18);
-  --grave:#F09277; --grave-f:rgba(240,146,119,.16);
-  --dato:#D9B68A; --dato-f:rgba(217,182,138,.16); --oro:#E3B33C;
-  --sobre-accion:#1C1510;
-  --sombra:0 1px 2px rgba(0,0,0,.30), 0 12px 28px -18px rgba(0,0,0,.70);
-  --sombra-alta:0 2px 6px rgba(0,0,0,.36), 0 20px 44px -22px rgba(0,0,0,.75);
-}}
-:root[data-theme="dark"]{
-  --crema:#16110D; --papel:#201812; --papel2:#291F17; --papel3:#33271C;
-  --linea:#3C2E22; --linea-f:#6B4E36;
-  --tinta:#F7F0E3; --tinta2:#C4B098; --tinta3:#9C8770;
-  --marron:#EBCFA8; --marron2:#D9B68A; --madera:#C19A6B; --arena:#D9CBA3;
-  --bien:#7FC46B; --bien-f:rgba(127,196,107,.16);
-  --avisa:#E3B33C; --avisa-f:rgba(227,179,60,.18);
-  --grave:#F09277; --grave-f:rgba(240,146,119,.16);
-  --dato:#D9B68A; --dato-f:rgba(217,182,138,.16); --oro:#E3B33C;
-  --sobre-accion:#1C1510;
-  --sombra:0 1px 2px rgba(0,0,0,.30), 0 12px 28px -18px rgba(0,0,0,.70);
-  --sombra-alta:0 2px 6px rgba(0,0,0,.36), 0 20px 44px -22px rgba(0,0,0,.75);
+  /* Tokens de la Caja con los valores de Emporio System 1.1 (nucleo/emporio.css):
+     noche volcánica, vidrio y acento turquesa. Look único y oscuro. */
+  color-scheme:dark;
+  --crema:#0A1012; --papel:rgba(24,36,40,.56); --papel2:rgba(255,255,255,.045); --papel3:rgba(255,255,255,.085);
+  --linea:rgba(255,255,255,.10); --linea-f:rgba(255,255,255,.18);
+  --tinta:#F2F7F6; --tinta2:#C9D6D4; --tinta3:#98ABA8;
+  --marron:#40E0D0; --marron2:#40E0D0; --madera:rgba(64,224,208,.55); --arena:#D9A93A;
+  --bien:#3DDC84; --bien-f:rgba(61,220,132,.13);
+  --avisa:#FFB547; --avisa-f:rgba(255,181,71,.14);
+  --grave:#FF6161; --grave-f:rgba(255,97,97,.13);
+  --dato:#1AA89B; --dato-f:rgba(64,224,208,.12); --oro:#D9A93A;
+  --sobre-accion:#04211E;
+  --sombra:inset 0 1px 0 rgba(255,255,255,.085), 0 12px 32px rgba(0,0,0,.32);
+  --sombra-alta:inset 0 1px 0 rgba(255,255,255,.085), 0 18px 44px rgba(0,0,0,.45);
+  --r:20px; --r-s:14px;
+  --sans:"Plus Jakarta Sans",ui-sans-serif,"Segoe UI",system-ui,sans-serif;
+  --mono:"Sora",ui-rounded,"Segoe UI",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -167,7 +145,8 @@ p.vs{margin:0; font-size:12.5px; color:var(--tinta2); line-height:1.5; max-width
 .estado.neutro{background:var(--papel2); color:var(--tinta2); border-color:var(--linea)}
 
 /* ---------- caja: rejilla de productos + cuenta ---------- */
-.caja{display:grid; gap:14px; min-height:0; min-width:0}
+.caja{display:grid; grid-template-columns:minmax(0,1fr); gap:14px; min-height:0; min-width:0}
+.caja>.izq,.caja>.der{min-width:0}
 .grupos{display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; margin:0 -16px; padding-inline:16px;
   scrollbar-width:none}
 .grupos::-webkit-scrollbar{display:none}
@@ -258,8 +237,6 @@ p.vs{margin:0; font-size:12.5px; color:var(--tinta2); line-height:1.5; max-width
 .kpi.principal .k{color:rgba(255,249,239,.72)}
 .kpi.principal .v{font-size:30px}
 .kpi.principal .p{color:rgba(255,249,239,.82)}
-:root[data-theme="dark"] .kpi.principal,
-:root:not([data-theme="light"]) .kpi.principal{color:var(--tinta)}
 .kpi.ojo{border-left:3px solid var(--avisa)}
 .kpi.ojo .v{color:var(--avisa)}
 .kpi.mal{border-left:3px solid var(--grave)}
@@ -528,6 +505,60 @@ input.mininum:focus{outline:2px solid var(--madera); outline-offset:1px}
 .clase{min-width:0}
 .tabox{max-width:100%}
 
+/* ===== Piel Emporio System 1.1 =====
+   La Caja conserva su armado (rejilla y cuenta, riel o pestañas) y toma el
+   vidrio, los resortes y los indicadores de Emporio System 1.1. */
+body{font-size:14.5px}
+.app{position:relative;z-index:1}
+.barra{background:rgba(10,16,18,.62);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);border-bottom:1px solid var(--linea)}
+.barra .sig{border-radius:10px;box-shadow:0 0 18px rgba(64,224,208,.35)}
+.barra .tit b{font-family:var(--mono);font-weight:700;letter-spacing:-.01em}
+h2.vt,.hoja .ph b,.graf .gt b,.clase .ct b,.metabar .mt b{font-family:var(--mono);font-weight:700}
+.tarjeta,.kpi,.graf,.tabox,.cuenta,.prod,.filtros,.venta,.aviso,.metabar,.normativa,.vacio{
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.02)),var(--papel);
+  backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%)}
+.kpi{border-radius:var(--r)}
+.kpi .v{font-weight:800}
+.kpi.principal{background:var(--marron);color:var(--sobre-accion);box-shadow:0 0 30px rgba(64,224,208,.25)}
+.kpi.principal .k,.kpi.principal .p{color:rgba(4,33,30,.72)}
+.kpi.principal .dlt.sube,.kpi.principal .dlt.baja,.kpi.principal .dlt.neutro{color:var(--sobre-accion)}
+.prod,.kpi,.btn,.pila,.pagos button,.modo button,.riel button,.pestanas button,.icobtn,.paso button{
+  transition:transform var(--spring-dur) var(--spring),background .2s,border-color .2s,box-shadow .3s,color .2s}
+.prod:hover{transform:translateY(-2px) scale(1.02);border-color:rgba(64,224,208,.5);box-shadow:var(--sombra-alta)}
+.prod:active,.pila:active,.pagos button:active,.modo button:active,.icobtn:active{transform:scale(.94);transition-duration:.08s}
+.btn:hover:not(:disabled){transform:translateY(-1px) scale(1.02);box-shadow:0 6px 20px rgba(64,224,208,.18)}
+.btn:active:not(:disabled){transform:scale(.95);transition-duration:.08s}
+.btn.suave{background:var(--papel2);border-color:var(--linea-f)}
+.btn.suave:hover{border-color:var(--madera)}
+.pila[aria-pressed="true"],.pagos button[aria-pressed="true"],.modo button[aria-pressed="true"]{background:var(--marron);border-color:var(--marron);color:var(--sobre-accion)}
+.pila:hover:not([aria-pressed="true"]){transform:translateY(-1px) scale(1.04);color:var(--tinta)}
+.riel{background:rgba(10,16,18,.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.riel button[aria-current="true"],.pestanas button[aria-current="true"]{background:var(--marron);color:var(--sobre-accion);box-shadow:0 0 24px rgba(64,224,208,.35)}
+.pestanas{background:rgba(10,16,18,.72)}
+.icobtn{background:var(--papel2)}
+.icobtn[aria-pressed="true"]{background:rgba(64,224,208,.14);border-color:var(--madera);color:var(--marron)}
+.turno{background:var(--papel2)}
+.turno select{color:var(--tinta)}
+.turno select option,.campo select option{background:#0E171A;color:var(--tinta)}
+thead th,.tbl th{background:rgba(14,22,25,.95)}
+.tbl tbody tr:hover{background:rgba(64,224,208,.06)}
+.campo input,.campo select,.campo textarea,.buscador input,.ingfila input,.ingfila select,input.mininum{background:rgba(10,16,18,.55);border-color:var(--linea-f);color:var(--tinta)}
+.campo input:focus,.campo select:focus,.campo textarea:focus,.buscador input:focus,.ingfila input:focus,input.mininum:focus{outline:none;border-color:var(--marron);box-shadow:0 0 0 4px rgba(64,224,208,.14)}
+.hoja .velo{background:rgba(5,9,10,.72)}
+.hoja .panel{background:rgba(14,22,25,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--linea);box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.hoja .ph{background:transparent}
+.hoja .cerrar{background:var(--papel2)}
+.toast{background:rgba(14,22,25,.94);color:var(--tinta);border:1px solid rgba(64,224,208,.4);border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.45)}
+.toast.bien{background:rgba(61,220,132,.94);color:#04211E;border-color:transparent}
+.toast.mal{background:rgba(255,97,97,.94);color:#2A0707;border-color:transparent}
+.paso .q{background:none;border:0;padding:0}
+.lin .lt,.sm b,.vuelto .v{font-weight:700}
+.sumas{background:rgba(255,255,255,.03)}
+.metabar .mb i{background:var(--marron)}
+.br .bt i{background:var(--dato)}
+.normativa{border-left-color:var(--oro)}
+.vale{box-shadow:0 12px 32px rgba(0,0,0,.4)}
+
 /* La hoja se mide contra la ventana: un porcentaje dentro de la rejilla
    crecía con el contenido y la ficha técnica larga quedaba fuera de vista. */
 .hoja .panel{max-height:90vh; max-height:90dvh}
@@ -630,6 +661,7 @@ input.mininum:focus{outline:2px solid var(--madera); outline-offset:1px}
 
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/emporio.js"></script>
 <script>
 /* ====================================================================
    Caja Emporio Andino · lógica

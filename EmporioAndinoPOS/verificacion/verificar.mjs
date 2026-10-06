@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 2.0.
+// Agente de verificación de EmporioAndinoPOS 2.1.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -60,12 +60,15 @@ async function cierre(M, page, errores, caidos) {
 async function sesion(page, nombre) {
   // Abre sesión en el sistema general como `nombre`, creando el PIN 1234 si hace falta
   await page.goto(BASE + "index.html");
-  if (await page.locator("#sistema").isVisible()) { await page.locator("#salir").click(); await page.locator("#salir").click(); }
-  await page.locator("#personas .persona", { hasText: nombre }).click();
+  if (await page.locator("#app").isVisible()) { await page.locator("#logoutBtn").click(); await page.locator("#logoutBtn").click(); }
+  await page.locator("#peopleList .person", { hasText: nombre }).click();
   const nuevo = (await page.locator("#pinMsg").innerText()).includes("Primera vez");
   for (let v = 0; v < (nuevo ? 2 : 1); v++) for (const d of "1234") await page.locator(`#pad [data-k="${d}"]`).click();
-  await page.waitForSelector("#sistema:not([hidden])", { timeout: 6000 }).catch(() => {});
+  await page.waitForSelector("#app:not([hidden])", { timeout: 6000 }).catch(() => {});
 }
+// Cada capa carga la base de diseño de Emporio System 1.1
+const disenoEmporio = page => page.evaluate(() => !!window.EA_UI && getComputedStyle(document.body).fontFamily.includes("Plus Jakarta Sans"));
+async function navA(page, v) { const a = page.locator(`#nav a[data-v="${v}"]`); if (await a.isVisible()) await a.click(); else await a.evaluate(el => el.click()); await page.waitForTimeout(400); }
 
 // ---------- Sistema general ----------
 async function probarGeneral(vista) {
@@ -73,25 +76,32 @@ async function probarGeneral(vista) {
   const { ctx, errores, caidos } = await contexto(vista);
   const page = await ctx.newPage();
   await page.goto(BASE + "index.html");
-  anota(M, "pide ingreso antes de mostrar módulos", await page.locator("#ingreso").isVisible() && await page.locator("#sistema").isHidden());
-  anota(M, "equipo completo en el ingreso", await page.locator("#personas .persona").count() === 16);
+  anota(M, "pide ingreso antes de mostrar módulos", await page.locator("#login").isVisible() && await page.locator("#app").isHidden());
+  anota(M, "equipo completo en el ingreso", await page.locator("#peopleList .person").count() === 16);
+  anota(M, "diseño Emporio System 1.1", await disenoEmporio(page));
   await sesion(page, "Constanza Veliz");
-  anota(M, "ingreso con PIN nuevo (crear y confirmar)", await page.locator("#sistema").isVisible());
-  const mods = await page.locator("#mods [data-modulo]").evaluateAll(b => b.map(x => x.dataset.modulo));
-  anota(M, "dirección ve los cinco módulos", mods.join(",") === "caja,salon,cocina,carta,prueba", mods.join(","));
+  anota(M, "ingreso con PIN nuevo (crear y confirmar)", await page.locator("#app").isVisible());
+  const nav = await page.locator("#nav a").evaluateAll(a => a.map(x => x.dataset.v));
+  anota(M, "dirección ve todas las áreas", nav.join(",") === "inicio,caja,salon,cocina,carta,prueba,verificacion,versiones,retro", nav.join(","));
+  anota(M, "dashboard con áreas del local", await page.locator("#hub .acard").count() === 8);
+  await navA(page, "verificacion");
   await page.locator("#btnVerificar").click();
   await page.waitForSelector("#diagEstado[data-fin]", { timeout: 90000 }).catch(() => {});
   const fallas = await page.locator("#diagLista li.falla").count(), total = await page.locator("#diagLista li:not(.grupo)").count();
   const detalle = await page.locator("#diagLista li.falla, #diagLista li.aviso").evaluateAll(ls => ls.map(l => l.innerText.replace(/\s+/g, " ")).join(" | "));
   anota(M, "autodiagnóstico interno", total > 0 && fallas === 0, `${total - fallas}/${total}` + (detalle ? " · " + detalle : ""));
-  for (const m of mods) {
-    await page.locator(`#mods [data-modulo="${m}"]`).click();
-    await page.waitForTimeout(900);
-    anota(M, `abre ${m} dentro del sistema`, await page.locator("#visor").isVisible());
-    await page.locator("#visorVolver").click();
+  for (const m of ["caja", "salon", "cocina", "carta", "prueba"]) {
+    await navA(page, m); await page.waitForTimeout(900);
+    const ok = await page.locator(`section[data-view="${m}"]`).isVisible();
+    const fr = page.frameLocator(`section[data-view="${m}"] iframe`);
+    const inc = await fr.locator("html").evaluate(h => h.classList.contains("incrustado") && !!window.EA_UI).catch(() => false);
+    anota(M, `abre ${m} como subcapa con el diseño Emporio`, ok && inc);
   }
-  await page.locator("#salir").click(); await page.locator("#salir").click();
-  anota(M, "cierra sesión con doble toque", await page.locator("#ingreso").isVisible());
+  await navA(page, "versiones");
+  anota(M, "versiones y accesos", await page.locator("#acc tr").count() === 16);
+  await navA(page, "inicio");
+  await page.locator("#logoutBtn").click(); await page.locator("#logoutBtn").click();
+  anota(M, "cierra sesión con doble toque", await page.locator("#login").isVisible());
   await cierre(M, page, errores, caidos);
   await ctx.close();
 }
@@ -115,18 +125,21 @@ async function probarCajaYComandas(vista) {
   const com = await ctx.newPage();
   await com.goto(BASE + "cocina/index.html"); await com.waitForTimeout(500);
   await com.locator('[data-est="todo"]').click();
-  anota(M, "la venta llega a Comandas por estación", await com.locator("#tablero .cmd").count() === 3);
+  anota(M, "la venta llega a Comandas por estación", await com.locator("#tablero .comanda").count() === 3);
   await com.locator('[data-est="cocina"]').click();
-  anota(M, "filtro de cocina", await com.locator("#tablero .cmd").count() === 1);
+  anota(M, "filtro de cocina", await com.locator("#tablero .comanda").count() === 1);
   await com.locator("#tablero [data-listo]").first().click();
-  anota(M, "marcar lista la comanda", await com.locator("#tablero .cmd").count() === 0);
+  anota(M, "marcar lista la comanda", await com.locator("#tablero .comanda").count() === 0);
   await cierre(M + " (comandas)", com, [], []);
   await sesion(page, "Wilbert");
   await caja.reload(); await caja.waitForTimeout(500);
   const secc = await caja.evaluate(() => SECC.map(s => s.id).join(","));
   anota(M, "garzón ve solo cobro y stock", secc === "caja,stock", secc);
-  const mods = await page.locator("#mods [data-modulo]").evaluateAll(b => b.map(x => x.dataset.modulo));
-  anota(M, "garzón no ve la Prueba", !mods.includes("prueba"), mods.join(","));
+  await page.waitForTimeout(300);
+  const mods = await page.locator("#nav a").evaluateAll(b => b.map(x => x.dataset.v));
+  anota(M, "garzón no ve la Prueba ni el sistema", !mods.includes("prueba") && !mods.includes("verificacion"), mods.join(","));
+  anota(M, "la Caja tiene el diseño Emporio", await disenoEmporio(caja));
+  anota(M, "Comandas tiene el diseño Emporio", await disenoEmporio(com));
   await cierre(M, caja, errores, caidos);
   await ctx.close();
 }
@@ -140,6 +153,7 @@ async function probarPruebaAplicar(vista) {
   const pr = await ctx.newPage();
   await pr.goto(BASE + "prueba/index.html#cambios"); await pr.waitForTimeout(1500);
   anota(M, "franja de prueba visible", await pr.locator(".franja").isVisible());
+  anota(M, "diseño Emporio System 1.1", await disenoEmporio(pr));
   const nav = await pr.locator("#nav a").evaluateAll(a => a.map(x => x.dataset.v));
   anota(M, "doce vistas", nav.length === 12, nav.join(","));
   for (const v of nav) { const a = pr.locator(`#nav a[data-v="${v}"]`); if (await a.isVisible()) await a.click(); else await a.evaluate(el => el.click()); await pr.waitForTimeout(250); }
@@ -162,7 +176,7 @@ async function probarPruebaAplicar(vista) {
   await carta.goto(BASE + "carta/index.html"); await carta.waitForTimeout(400);
   anota(M, "la Carta marca lo que salió de la carta", await carta.evaluate(() => gone("emp", "e-napolitana") && !gone("emp", "e-pino")));
   await page.reload(); await page.waitForTimeout(300);
-  anota(M, "el sistema general muestra la versión vigente", (await page.locator("#vigente .vn").innerText()) === "v" + g.v);
+  anota(M, "el sistema general muestra la versión vigente", (await page.locator("#cfgTxt").innerText()) === "Configuración v" + g.v);
   await pr.evaluate(() => go("reportes")); await pr.locator("#projBtn").click(); await pr.waitForTimeout(7000);
   anota(M, "proyección de 30 días", (await pr.locator("#projOut .stat").count()) === 6);
   await cierre(M, pr, errores, caidos);
@@ -177,6 +191,7 @@ async function probarCarta(vista) {
   await page.goto(BASE + "carta/index.html");
   await page.waitForSelector("#splash.off", { state: "attached", timeout: 12000 }).catch(() => {});
   anota(M, "termina la bienvenida", await page.locator("#splash.off").count() === 1);
+  anota(M, "diseño Emporio System 1.1", await disenoEmporio(page));
   const n = await page.locator(".langgrid button").count();
   anota(M, "selector de idioma", n > 0, `${n} idiomas directos`);
   const indefinidos = [];
@@ -204,6 +219,7 @@ async function probarSalon(vista) {
   await page.goto(BASE + "carta/salon.html"); await page.waitForTimeout(1200);
   anota(M, "título", (await page.title()) === "Control de Salón");
   anota(M, "dibuja contenido", await page.evaluate(() => document.body.innerText.trim().length > 50));
+  anota(M, "diseño Emporio System 1.1", await disenoEmporio(page));
   anota(M, "enlace a la Caja del paquete", (await page.locator("a.acaja").getAttribute("href")) === "../caja/index.html");
   await cierre(M, page, errores, caidos);
   await ctx.close();
@@ -219,7 +235,7 @@ for (const v of Object.keys(VISTAS)) {
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.0", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.1", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);

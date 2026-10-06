@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.0
+# EmporioAndinoPOS v2.1
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -16,6 +16,8 @@ Sistema general (index.html) ── capa superior: ingreso con PIN, cargos, vers
                                           general" es el único camino para cambiar precios, carta y metas
 nucleo/datos.js   la carta única (130 productos, 10 idiomas)
 nucleo/nucleo.js  catálogo, configuración general y de prueba, versiones, equipo, cargos, PIN y sesión
+nucleo/emporio.css  sistema de diseño de Emporio System 1.1, común a todas las capas
+nucleo/emporio.js   comportamientos de Emporio System 1.1 (resortes, indicador, mosaicos, atmósfera, avisos)
 ```
 
 Cómo fluye el dato:
@@ -26,6 +28,26 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Diseño base: Emporio System 1.1
+
+Desde la v2.1, el diseño y la forma de interactuar de Emporio System 1.1 son la base de todas las capas y
+subcapas: noche volcánica con manchas de luz y patrón andino, paneles de vidrio, Sora y Plus Jakarta Sans,
+acento turquesa con tinta oscura, menú lateral con indicador deslizante, tarjetas que siguen al puntero y
+movimientos con resorte calculados desde un resorte físico.
+
+- **Sistema general:** reconstruido sobre la estructura de 1.1 (ingreso por persona y PIN, menú agrupado,
+  dashboard con ventas reales, áreas del local). Cada módulo se abre dentro de él.
+- **Comandas:** reescrita con las piezas de 1.1 (segmentado de estaciones, tarjetas, conteos con resorte).
+- **Caja y Prueba:** usan `emporio.css` y `emporio.js`, con la Caja remapeada a los tokens de 1.1.
+- **Carta y Control de Salón:** mantienen su recorrido por capas y toman una piel de 1.1 (tokens, vidrio,
+  tipografía, resortes). No cargan `emporio.css` porque sus clases propias chocan con las del sistema.
+- **Modo incrustado:** dentro del sistema general, cada módulo se vuelve transparente, comparte la
+  atmósfera de la capa superior y cambia su menú lateral por uno horizontal compacto.
+
+Correcciones de la v2.1: la Carta y el Salón incrustados ya no muestran fondo blanco (esquema de color
+oscuro declarado), la Caja en celular ya no se sale por la derecha y las iniciales del usuario se leen en
+el menú.
 
 ## Cargos
 
@@ -67,7 +89,8 @@ NODE_PATH=$(npm root -g) node verificacion/verificar.mjs
 Prueba cada módulo a 1366 px y a 390 px, y los flujos que cruzan módulos: ingreso con PIN → venta en la
 Caja → comanda en Comandas; borrador en la Prueba → aplicar → precio nuevo en la Caja y producto fuera
 en la Carta; garzón → Caja con solo cobro y stock; la Carta en cada idioma directo sin textos
-indefinidos. Resultado en `verificacion/informe.json`.
+indefinidos; y en cada capa, que cargue el diseño de Emporio System 1.1. Resultado en
+`verificacion/informe.json` (124 de 124 en la v2.1).
 
 El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
 para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre
