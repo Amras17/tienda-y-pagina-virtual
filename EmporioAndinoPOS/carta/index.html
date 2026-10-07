@@ -1087,7 +1087,7 @@ var ENLACES={
 var TOPFRIO=["f-americano","f-caramel"], TOPCAL=["chococaliente","mocaccino"];
 
 /* ---------- estado ---------- */
-var HOY=new Date().toISOString().slice(0,10);
+var HOY=EAPOS.hoyLocal();   /* fecha local: en Chile el día UTC cambia a las 21:00 */
 var cfg={fecha:"", st:{}, modo:"local", hecho:0, personas:0, pagar:0};
 try{ var r1=localStorage.getItem("ea_viva_cfg"); if(r1){ var o1=JSON.parse(r1); if(o1&&typeof o1==="object") cfg=Object.assign(cfg,o1); } }catch(e){}
 if(cfg.fecha!==HOY){ cfg.fecha=HOY; cfg.st={}; cfg.modo="local"; cfg.hecho=0; cfg.personas=0; cfg.pagar=0; }
@@ -1216,7 +1216,7 @@ function leerSalon(){
     if(!raw) return null;
     var c=JSON.parse(raw);
     if(!c || typeof c!=="object") return null;
-    var hoy=new Date().toISOString().slice(0,10);
+    var hoy=EAPOS.hoyLocal();
     if(c.fecha && c.fecha!==hoy) return null;      /* el control se reinicia cada día */
     return c;
   }catch(e){ return null; }

@@ -764,6 +764,8 @@ function leerCtrl(){
   try{ var r=localStorage.getItem("ea_control"); if(r){ var o=JSON.parse(r); if(o&&typeof o==="object") CTRL=Object.assign(CTRL,o); } }catch(e){}
   if(!CTRL.uni||typeof CTRL.uni!=="object") CTRL.uni={};
   if(!CTRL.st||typeof CTRL.st!=="object") CTRL.st={};
+  /* Cada día parte de cero, con la fecha local (igual que el Salón y el Horno). */
+  if(CTRL.fecha!==EAPOS.hoyLocal()){ CTRL.fecha=EAPOS.hoyLocal(); CTRL.st={}; CTRL.uni={}; CTRL.horno=[]; }
 }
 leerCtrl();
 
@@ -774,6 +776,8 @@ function guardarPOS(){
   if(canal) try{ canal.postMessage({t:"pos"}); }catch(e){}
 }
 function guardarCtrl(){
+  /* El horno lo maneja su módulo: se conserva lo último que dejó. */
+  try{ var o=JSON.parse(localStorage.getItem("ea_control")||"null"); if(o&&o.fecha===CTRL.fecha) CTRL.horno=Array.isArray(o.horno)?o.horno:[]; }catch(e){}
   CTRL.tocado=new Date().toISOString();
   try{ localStorage.setItem("ea_control", JSON.stringify(CTRL)); }catch(e){}
   if(canal) try{ canal.postMessage({t:"ctrl"}); }catch(e){}

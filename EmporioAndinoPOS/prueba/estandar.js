@@ -1,11 +1,12 @@
 /* ====================================================================
-   Emporio · fichas técnicas y escandallos ESTÁNDAR (solo para la Prueba)
+   Emporio · fichas técnicas y escandallos ESTÁNDAR (Prueba y Panadería)
    --------------------------------------------------------------------
    Valores especulados con información pública, no medidos en el local:
    recetas tipo de cada preparación y precios de compra netos (sin IVA)
    estimados para octubre de 2026, con referencias de supermercados y
    mercados mayoristas de Chile. Sirven para simular costos, food cost y
-   consumo de insumos en la Prueba; no tocan la Caja ni el sistema general.
+   consumo de insumos en la Prueba, y los escandallos de empanadas de la
+   Panadería (por unidad y por lata de 15); no tocan la Caja.
 
    Referencias usadas para calibrar:
    · ODEPA, boletines de precios mayoristas de frutas y hortalizas 2026

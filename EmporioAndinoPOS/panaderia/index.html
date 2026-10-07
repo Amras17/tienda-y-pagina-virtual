@@ -1,0 +1,236 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>/* EmporioAndinoPOS: deja que el lanzador escuche errores desde el inicio */try{if(parent!==window&&parent.__eaGancho)parent.__eaGancho(window)}catch(e){}</script></head><body>
+<title>Panadería · EmporioAndinoPOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../nucleo/emporio.css">
+<style>
+/* Panadería: arma las empanadas por latas de 15 y se las manda al Horno.
+   Arriba el plan del día (con el precocido de ayer como punto de partida),
+   las solicitudes del Horno por confirmar y los pedidos de hoy; abajo los
+   escandallos y los insumos que pide el plan. */
+.modulo{position:relative;z-index:1;padding-block:16px 40px;padding-inline:16px;display:flex;flex-direction:column;gap:14px;max-width:1500px;margin:0 auto}
+html.incrustado .solo{display:none}
+html.incrustado .modulo{padding-top:4px}
+.hgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:start}
+.s7{grid-column:span 7}.s5{grid-column:span 5}.s6{grid-column:span 6}.s12{grid-column:1/-1}
+/* Los quiebres quedan fuera del rango en que cambia el ancho al plegarse la
+   barra del sistema (así el contenido no salta de columnas al desplazarse). */
+@media (max-width:1000px){.s7,.s5{grid-column:1/-1}}
+@media (max-width:680px){.s6{grid-column:1/-1}}
+.hd .acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.vcard{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:14px;border:1.5px solid var(--stroke);background:var(--glass-2);min-width:0}
+.vcard.on{border-color:var(--horno);background:color-mix(in srgb,var(--horno) 12%,var(--glass-2))}
+.vcard .vn{display:flex;flex-direction:column;gap:1px;font-weight:800;font-size:14px}
+.vcard .vn small{font-weight:700;color:var(--muted);font-size:11px}
+.vcard .vn small.ok{color:var(--ok)}
+.paso{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;gap:4px}
+.paso button{height:34px;border-radius:10px;border:1px solid var(--stroke-2);background:var(--glass);color:var(--fg);font-size:18px;font-weight:800;cursor:pointer}
+.paso button:disabled{opacity:.35}
+.paso b{text-align:center;font-family:var(--f-num);font-size:18px}
+.paso b small{display:block;font-size:10.5px;color:var(--muted);font-weight:700;font-family:inherit}
+.info{margin:12px 0 0;font-size:13px;color:var(--fg-2);line-height:1.45}
+.grande{width:100%;justify-content:center;margin-top:12px;padding:13px 16px;font-size:15px}
+.ctl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.lst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.lst>li{border:1px solid var(--stroke);border-radius:14px;padding:10px 12px;background:var(--glass-2);display:flex;flex-direction:column;gap:8px}
+.lst .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.lst .h b{font-family:var(--f-num)}
+.lst .h span{font-size:12px;color:var(--muted)}
+.lst .acc{display:flex;gap:6px;flex-wrap:wrap}
+.lst .search,.form .search{flex:none;width:100%;box-sizing:border-box;font:inherit;color:var(--fg)}
+.lst.urg>li{border-color:color-mix(in srgb,var(--warn) 60%,transparent)}
+.estd{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px;border:1px solid var(--stroke-2)}
+.estd.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.estd.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 55%,transparent)}
+.estd.crit{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 55%,transparent)}
+.prec{display:flex;flex-wrap:wrap;gap:6px}
+.prec span{border:1px solid var(--stroke);border-radius:99px;padding:4px 10px;font-size:13px;font-weight:700;background:var(--glass-2)}
+.prec span b{font-family:var(--f-num);margin-right:4px}
+.esc-tabla input{width:84px;padding:6px 8px;border-radius:9px;border:1px solid var(--stroke-2);background:var(--glass);color:var(--fg);font:inherit;font-family:var(--f-num);text-align:right}
+.esc-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px}
+.esc-res .stat b{font-size:22px}
+.prep{margin-top:12px;font-size:13px;color:var(--fg-2);line-height:1.5}
+details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:var(--fg-2)}
+</style>
+
+<div class="modulo">
+  <header class="top glass solo">
+    <div class="ttl"><div><h1>Panadería</h1><p>Plan por latas, pedidos al horno, solicitudes y escandallos</p></div></div>
+    <div class="ctl"><span class="clock num" id="reloj">--:--</span></div>
+  </header>
+
+  <div class="hgrid">
+    <article class="tile glass s7" id="tPlan"><div class="tc">
+      <div class="hd"><div><h2>Plan de hoy</h2><p id="planSub">Latas de 15 por variedad</p></div></div>
+      <div id="plan"></div>
+      <details class="aj" id="diario" style="margin-top:14px"><summary>Plan de cada día</summary><div id="defecto" style="margin-top:10px"></div></details>
+    </div></article>
+
+    <article class="tile glass s5" id="tPrec"><div class="tc">
+      <div class="hd"><div><h2>Precocido de ayer</h2><p>El punto de partida de hoy</p></div></div>
+      <div id="prec"></div></div></article>
+
+    <article class="tile glass s6" id="tSol"><div class="tc">
+      <div class="hd"><div><h2>Solicitudes del horno</h2><p id="solSub">Empanadas extra por sobredemanda, por confirmar</p></div></div>
+      <div id="sol"></div></div></article>
+
+    <article class="tile glass s6" id="tPed"><div class="tc">
+      <div class="hd"><div><h2>Pedidos de hoy</h2><p id="pedSub">Lo enviado al horno y lo que recibió</p></div></div>
+      <div id="ped"></div></div></article>
+
+    <article class="tile glass s12" id="tEsc"><div class="tc">
+      <div class="hd"><div><h2>Escandallos</h2><p id="escSub">Ficha de cada empanada: por unidad y por lata de 15</p></div></div>
+      <div class="fchips" id="escChips" role="group" aria-label="Variedad"></div>
+      <div id="esc" style="margin-top:12px"></div></div></article>
+
+    <article class="tile glass s12" id="tIns"><div class="tc">
+      <div class="hd"><div><h2>Insumos del plan de hoy</h2><p id="insSub">Lo que pide armar las latas de hoy, con 3 % de merma</p></div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Insumo</th><th class="r">Cantidad</th><th>Formato de compra</th><th class="r solo-dueno">Costo</th></tr></thead><tbody id="ins"></tbody></table></div>
+    </div></article>
+  </div>
+</div>
+
+<script src="../nucleo/datos.js"></script>
+<script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/produccion.js"></script>
+<script src="../prueba/estandar.js"></script>
+<script src="../nucleo/emporio.js"></script>
+<script>
+/* ====================================================================
+   Panadería: prepara por latas (6 de pino y 2 de cada otra variedad cada
+   día, salvo que se cambie el plan), cada lata trae 15. Manda el pedido al
+   Horno, donde cocina lo cuenta y lo confirma. El precocido que reporta el
+   Horno al cierre es el punto de partida del día siguiente. Si el Horno
+   se queda corto, pide más con una solicitud que aquí se confirma.
+   ==================================================================== */
+var U=EA_UI, E=EAPOS, P=E.prod, LATA=P.LATA, ST=window.EA_ESTANDAR||{INS:{},FICHAS:{}};
+var VER_COSTOS=E.verNumeros(), EDITA=(function(){ var s=E.sesion(); return !s||!!(E.ROLES[s.r]&&E.ROLES[s.r].sistema); })();
+document.documentElement.classList.toggle("sin-costos",!VER_COSTOS);
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function hora(ts){ return U.hhmm(new Date(ts)); }
+function quien(){ var s=E.sesion(); return s?s.n:"Panadería"; }
+function clp(n){ return "$"+Math.round(n||0).toLocaleString("es-CL"); }
+function suma(o){ var n=0; for(var k in o) n+=(+o[k]||0); return n; }
+function latasTxt(n){ return n+(n===1?" lata":" latas"); }
+function lista(items, enLatas){ return Object.keys(items).map(function(k){ return (enLatas?latasTxt(items[k]):items[k])+" "+esc(P.nombre(k)); }).join(" · "); }
+
+var ENV=null, SOLED={}, VAR=P.EMP[0].id, ESCED=null;
+
+/* Ya enviado hoy (pedidos del plan y solicitudes confirmadas), en latas. */
+function enviadoHoy(){ var o={}; P.pedidos().forEach(function(x){ if(x.estado==="enviado"||x.estado==="recibido") for(var k in x.items) o[k]=(o[k]||0)+x.items[k]; }); return o; }
+function enviadoPlan(){ var o={}; P.pedidos().forEach(function(x){ if(x.tipo==="plan"&&(x.estado==="enviado"||x.estado==="recibido")) for(var k in x.items) o[k]=(o[k]||0)+x.items[k]; }); return o; }
+/* Sugerido: el plan de cada día, menos las latas completas que ya quedaron
+   precocidas ayer, menos lo que ya se envió hoy. */
+function sugerido(){ var d=P.planDefecto(), pr=P.precocidoAyer(), env=enviadoPlan(), o={};
+  P.EMP.forEach(function(e){ var prl=pr&&pr.items?Math.floor((pr.items[e.id]||0)/LATA):0; o[e.id]=Math.max(0,d[e.id]-prl-(env[e.id]||0)); }); return o; }
+
+function pintarPlan(){
+  if(!ENV) ENV=sugerido();
+  var d=P.planDefecto(), env=enviadoPlan(), pr=P.precocidoAyer(), tot=suma(ENV);
+  $("planSub").textContent="Plan de cada día: "+suma(d)+" latas ("+suma(d)*LATA+" empanadas)"+(suma(env)?" · enviado hoy "+suma(env)+" latas":"");
+  $("plan").innerHTML='<div class="vgrid">'+P.EMP.map(function(e){ var n=ENV[e.id]||0, p=pr&&pr.items?pr.items[e.id]||0:0;
+      return '<div class="vcard'+(n?" on":"")+'"><span class="vn">'+esc(e.n)+'<small>plan '+latasTxt(d[e.id])+(p?' · '+p+' precocidas':'')+'</small>'+(env[e.id]?'<small class="ok">enviado '+latasTxt(env[e.id])+'</small>':'')+'</span>'+
+        '<div class="paso"><button type="button" data-env="'+e.id+'" data-d="-1" aria-label="Una lata menos de '+esc(e.n)+'"'+(n?'':' disabled')+'>−</button><b class="num">'+n+'<small>'+(n*LATA)+' u.</small></b><button type="button" data-env="'+e.id+'" data-d="1" aria-label="Una lata más de '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>'+
+    '<p class="info">'+(tot?'Se envían <b>'+latasTxt(tot)+'</b> = <b>'+tot*LATA+'</b> empanadas. El Horno las cuenta al recibirlas y confirma.':(suma(env)?'El plan de hoy ya está enviado. Si hace falta más, súmalo aquí y envíalo.':'Nada por enviar.'))+'</p>'+
+    '<div class="ctl-row"><button class="btn sm" type="button" id="volverSug">Volver al sugerido</button></div>'+
+    '<button class="btn pri grande" type="button" id="enviar"'+(tot?'':' disabled')+'>'+(tot?'Enviar al horno · '+latasTxt(tot):'Nada por enviar')+'</button>';
+  if(!$("diario").open||!$("defecto").innerHTML) $("defecto").innerHTML='<div class="vgrid">'+P.EMP.map(function(e){
+      return '<div class="vcard"><span class="vn">'+esc(e.n)+'</span><div class="paso"><button type="button" data-def="'+e.id+'" data-d="-1" aria-label="Menos">−</button><b class="num">'+d[e.id]+'<small>latas</small></b><button type="button" data-def="'+e.id+'" data-d="1" aria-label="Más">+</button></div></div>'; }).join("")+'</div>'+
+      '<p class="info">Lo que se prepara cada día por defecto: 6 latas de pino y 2 de cada otra variedad. Se guarda en este equipo.</p>';
+}
+function pintarPrec(){
+  var pr=P.precocidoAyer(), h;
+  if(pr&&Object.keys(pr.items).length){ var t=suma(pr.items);
+    h='<p class="info" style="margin-top:0">El Horno reportó ayer a las '+hora(pr.ts)+' ('+esc(pr.por)+') <b>'+t+'</b> empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.</p>'+
+      '<div class="prec">'+Object.keys(pr.items).map(function(k){ return '<span><b>'+pr.items[k]+'</b>'+esc(P.nombre(k))+'</span>'; }).join("")+'</div>'; }
+  else if(pr) h='<p class="info" style="margin-top:0">Ayer el Horno reportó que no quedó precocido. Se parte del plan completo.</p>';
+  else h='<div class="empty"><span class="ic">'+U.icono("horno")+'</span><p><b>Sin reporte de ayer.</b> El Horno reporta al cierre lo que queda precocido; mientras tanto se parte del plan completo.</p></div>';
+  $("prec").innerHTML=h;
+}
+function pintarSol(){
+  var l=P.porConfirmar();
+  $("solSub").textContent=l.length? l.length+(l.length===1?" solicitud por confirmar":" solicitudes por confirmar") : "Empanadas extra por sobredemanda, por confirmar";
+  $("sol").innerHTML=l.length? '<ul class="lst urg">'+l.map(function(x){ var ed=SOLED[x.id]||(SOLED[x.id]=Object.assign({},x.items));
+      return '<li><div class="h"><b>Solicitud '+x.n+' · '+latasTxt(suma(ed))+'</b><span>'+hora(x.ts)+' · '+esc(x.por)+'</span></div>'+(x.nota?'<div style="font-size:13px"><i>'+esc(x.nota)+'</i></div>':'')+
+        '<div class="vgrid">'+Object.keys(x.items).map(function(k){ var n=ed[k]||0; return '<div class="vcard on"><span class="vn">'+esc(P.nombre(k))+'<small>pidió '+latasTxt(x.items[k])+'</small></span><div class="paso"><button type="button" data-sol="'+x.id+'|'+k+'" data-d="-1"'+(n?'':' disabled')+' aria-label="Menos">−</button><b class="num">'+n+'<small>latas</small></b><button type="button" data-sol="'+x.id+'|'+k+'" data-d="1" aria-label="Más">+</button></div></div>'; }).join("")+'</div>'+
+        '<input class="search" type="text" id="mot-'+x.id+'" maxlength="140" placeholder="Si no se puede, por qué (opcional)">'+
+        '<div class="acc"><button class="btn pri" type="button" data-conf="'+x.id+'"'+(suma(ed)?'':' disabled')+'>Confirmar y enviar</button><button class="btn" type="button" data-rech="'+x.id+'">No se puede</button></div></li>'; }).join("")+'</ul>'
+    : '<p class="empty-s">Sin solicitudes por confirmar.</p>';
+}
+var EST={por_confirmar:["Por confirmar","warn"], enviado:["En camino al horno","warn"], recibido:["Recibido","ok"], rechazado:["No se pudo","crit"], anulado:["Anulado",""]};
+function pintarPed(){
+  var l=P.pedidos().filter(function(x){ return x.estado!=="por_confirmar"; }).reverse();
+  var env=enviadoHoy(), rec=0; P.pedidos().forEach(function(x){ if(x.rec) rec+=suma(x.rec.u); });
+  $("pedSub").textContent=l.length? latasTxt(suma(env))+" enviadas hoy · "+rec+" empanadas recibidas por el horno" : "Lo enviado al horno y lo que recibió";
+  $("ped").innerHTML=l.length? '<ul class="lst">'+l.map(function(x){ var e=EST[x.estado]||[x.estado,""], dif="";
+      if(x.rec){ var d=[]; for(var k in x.items){ var esp=x.items[k]*LATA, u=x.rec.u[k]||0; if(u!==esp) d.push(P.nombre(k)+" "+(u<esp?"−":"+")+Math.abs(u-esp)); } dif=d.length?'<br><span style="color:var(--warn)">Diferencias: '+esc(d.join(", "))+'</span>':'<br><span style="color:var(--ok)">Llegó completo</span>'; }
+      return '<li><div class="h"><b>'+(x.tipo==="solicitud"?"Solicitud ":"Pedido ")+x.n+' · '+latasTxt(suma(x.items))+'</b><span class="estd '+e[1]+'">'+e[0]+'</span></div>'+
+        '<div style="font-size:13px;color:var(--fg-2)">'+lista(x.items,true)+' · '+hora(x.ts)+(x.rec?' · recibido '+hora(x.rec.ts)+' por '+esc(x.rec.por):'')+dif+(x.estado==="rechazado"&&x.conf&&x.conf.motivo?'<br>'+esc(x.conf.motivo):'')+'</div>'+
+        (x.estado==="enviado"&&x.tipo==="plan"?'<div class="acc"><button class="btn sm" type="button" data-anular="'+x.id+'">Anular envío</button></div>':'')+'</li>'; }).join("")+'</ul>'
+    : '<p class="empty-s">Todavía no se envía nada hoy.</p>';
+}
+
+/* ---------- escandallos ---------- */
+function ficha(id){ var propio=P.escandalloPropio()["E"+id], f=ST.FICHAS["E"+id]||{ing:[],merma:3};
+  return {ing:(propio||f.ing).map(function(x){ return [x[0],+x[1]]; }), merma:f.merma||3, prep:f.prep||"", propio:!!propio}; }
+function cu(ins){ var i=ST.INS[ins]; return i&&i.fmt?i.precio/i.fmt:0; }
+function costoUnidad(f){ return f.ing.reduce(function(a,x){ return a+x[1]*cu(x[0]); },0)*(1+f.merma/100); }
+function cant(q,u){ if(u==="g") return q>=1000?(q/1000).toLocaleString("es-CL",{maximumFractionDigits:2})+" kg":Math.round(q)+" g"; if(u==="ml") return q>=1000?(q/1000).toLocaleString("es-CL",{maximumFractionDigits:2})+" L":Math.round(q)+" ml"; return (Math.round(q*10)/10).toLocaleString("es-CL")+" u."; }
+function pintarEsc(){
+  $("escChips").innerHTML=P.EMP.map(function(e){ return '<button class="fchip" type="button" data-var="'+e.id+'" aria-pressed="'+(VAR===e.id)+'">'+esc(e.n)+'</button>'; }).join("");
+  var f=ficha(VAR), e=P.EMP.filter(function(x){ return x.id===VAR; })[0];
+  if(ESCED&&ESCED.id!==VAR) ESCED=null;
+  var ed=ESCED?ESCED.ing:null, cuU=costoUnidad(f), pv=e.p||0;
+  var h='<div class="tbl-wrap esc-tabla"><table><thead><tr><th>Insumo</th><th class="r">Por unidad</th><th class="r">Por lata (15)</th><th class="r solo-dueno">Costo unidad</th><th class="r solo-dueno">Costo lata</th></tr></thead><tbody>'+
+    f.ing.map(function(x,i){ var I=ST.INS[x[0]]||{n:x[0],u:"g"}, q=ed?ed[i][1]:x[1];
+      return '<tr><td>'+esc(I.n)+'</td><td class="r num">'+(ed?'<input type="number" min="0" step="0.5" data-ing="'+i+'" value="'+q+'" aria-label="'+esc(I.n)+' por unidad">':cant(q,I.u))+'</td><td class="r num">'+cant(q*LATA,I.u)+'</td>'+
+        '<td class="r num solo-dueno">'+(VER_COSTOS?clp(q*cu(x[0])):"")+'</td><td class="r num solo-dueno">'+(VER_COSTOS?clp(q*cu(x[0])*LATA):"")+'</td></tr>'; }).join("")+
+    '</tbody></table></div>';
+  if(VER_COSTOS) h+='<div class="esc-res"><div class="stat"><b class="num">'+clp(cuU)+'</b><span>Costo por empanada (merma '+f.merma+' %)</span></div><div class="stat"><b class="num">'+clp(cuU*LATA)+'</b><span>Costo por lata de 15</span></div>'+
+    '<div class="stat"><b class="num">'+clp(pv)+'</b><span>Precio de venta</span></div><div class="stat"><b class="num">'+(pv?Math.round(cuU/(pv/1.19)*100):0)+' %</b><span>Food cost (precio sin IVA)</span></div></div>';
+  if(f.prep) h+='<p class="prep"><b>Preparación.</b> '+esc(f.prep)+'</p>';
+  h+='<p class="info">'+(f.propio?'Ficha ajustada en este equipo.':'Ficha estándar (valores de referencia, '+esc(ST.fecha||"2026")+').')+(EDITA?'':' Solo dirección puede ajustarla.')+'</p>';
+  if(EDITA) h+='<div class="ctl-row">'+(ESCED?'<button class="btn pri sm" type="button" id="escGuardar">Guardar la ficha</button><button class="btn sm" type="button" id="escCancelar">Cancelar</button>':'<button class="btn sm" type="button" id="escEditar">Ajustar cantidades</button>')+(f.propio&&!ESCED?'<button class="btn sm" type="button" id="escEstandar">Volver al estándar</button>':'')+'</div>';
+  $("esc").innerHTML=h;
+  $("escSub").textContent="Ficha de cada empanada: por unidad y por lata de 15"+(VER_COSTOS?"":" · costos solo para dueños");
+}
+function pintarIns(){
+  var env=enviadoHoy(), pend=ENV||{}, latas={}, tot={}, n=0;
+  P.EMP.forEach(function(e){ latas[e.id]=(env[e.id]||0)+(pend[e.id]||0); n+=latas[e.id]; });
+  P.EMP.forEach(function(e){ if(!latas[e.id]) return; var f=ficha(e.id); f.ing.forEach(function(x){ tot[x[0]]=(tot[x[0]]||0)+x[1]*LATA*latas[e.id]*(1+f.merma/100); }); });
+  var ks=Object.keys(tot).sort(function(a,b){ return tot[b]*cu(b)-tot[a]*cu(a); }), costo=0;
+  $("insSub").textContent=n? "Para "+latasTxt(n)+" ("+n*LATA+" empanadas) entre lo enviado y lo por enviar, con 3 % de merma" : "Sin latas en el plan de hoy";
+  $("ins").innerHTML=ks.map(function(k){ var I=ST.INS[k]||{n:k,u:"g"}, c=tot[k]*cu(k); costo+=c;
+    return '<tr><td>'+esc(I.n)+'</td><td class="r num">'+cant(tot[k],I.u)+'</td><td>'+(I.fmt?(Math.ceil(tot[k]/I.fmt*10)/10).toLocaleString("es-CL")+' × '+esc(I.fmtN):"")+'</td><td class="r num solo-dueno">'+(VER_COSTOS?clp(c):"")+'</td></tr>'; }).join("")+
+    (ks.length&&VER_COSTOS?'<tr><td><b>Total</b></td><td></td><td></td><td class="r num solo-dueno"><b>'+clp(costo)+'</b></td></tr>':'')||'<tr><td colspan="4" class="empty-s">Sin latas en el plan.</td></tr>';
+}
+
+function pintar(){ var f=document.activeElement, enTexto=f&&f.tagName==="INPUT";
+  pintarPlan(); pintarPrec(); if(!(enTexto&&$("tSol").contains(f))) pintarSol(); pintarPed(); if(!(enTexto&&$("tEsc").contains(f))) pintarEsc(); pintarIns(); }
+
+document.addEventListener("click",function(ev){
+  var b=ev.target.closest("button"); if(!b) return; var d=+b.getAttribute("data-d")||0;
+  if(b.dataset.env){ ENV[b.dataset.env]=Math.max(0,Math.min(40,(ENV[b.dataset.env]||0)+d)); pintarPlan(); pintarIns(); return; }
+  if(b.id==="volverSug"){ ENV=sugerido(); pintarPlan(); pintarIns(); return; }
+  if(b.id==="enviar"){ var x=P.nuevoPedido("plan",ENV,quien()); if(x){ U.aviso("Enviado al horno: "+latasTxt(suma(x.items))+" ("+suma(x.items)*LATA+" empanadas)"); ENV=null; } pintar(); return; }
+  if(b.dataset.def){ var dd=P.planDefecto(); dd[b.dataset.def]=Math.max(0,Math.min(40,dd[b.dataset.def]+d)); P.fijarPlanDefecto(dd); $("defecto").innerHTML=""; ENV=null; pintarPlan(); pintarIns(); return; }
+  if(b.dataset.sol){ var p=b.dataset.sol.split("|"); SOLED[p[0]][p[1]]=Math.max(0,Math.min(20,(SOLED[p[0]][p[1]]||0)+d)); pintarSol(); return; }
+  if(b.dataset.conf){ var c=P.confirmar(b.dataset.conf,SOLED[b.dataset.conf],quien()); delete SOLED[b.dataset.conf]; if(c) U.aviso("Solicitud confirmada y enviada al horno: "+latasTxt(suma(c.items))); pintar(); return; }
+  if(b.dataset.rech){ var m=$("mot-"+b.dataset.rech); P.rechazar(b.dataset.rech,m?m.value:"",quien()); U.aviso("Solicitud respondida: no se puede"); pintar(); return; }
+  if(b.dataset.anular){ P.anular(b.dataset.anular,quien()); U.aviso("Envío anulado"); ENV=null; pintar(); return; }
+  if(b.dataset.var){ VAR=b.dataset.var; ESCED=null; pintarEsc(); return; }
+  if(b.id==="escEditar"){ ESCED={id:VAR, ing:ficha(VAR).ing.map(function(x){ return [x[0],x[1]]; })}; pintarEsc(); return; }
+  if(b.id==="escCancelar"){ ESCED=null; pintarEsc(); return; }
+  if(b.id==="escGuardar"){ P.fijarEscandallo("E"+VAR,ESCED.ing); ESCED=null; U.aviso("Ficha guardada"); pintarEsc(); pintarIns(); return; }
+  if(b.id==="escEstandar"){ P.fijarEscandallo("E"+VAR,null); U.aviso("Ficha estándar"); pintarEsc(); pintarIns(); return; }
+});
+document.addEventListener("input",function(ev){ var i=ev.target.getAttribute&&ev.target.getAttribute("data-ing"); if(i!=null&&ESCED){ ESCED.ing[+i][1]=Math.max(0,+ev.target.value||0); } });
+addEventListener("storage",function(ev){ if(["eapos_panaderia","eapos_horno"].indexOf(ev.key)>=0) pintar(); });
+if(E.canal) E.canal.addEventListener("message",function(){ pintar(); });
+U.reloj($("reloj")); pintar(); U.revelar(document);
+setInterval(pintar,20000);
+</script>
+</body></html>

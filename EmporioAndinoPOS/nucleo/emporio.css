@@ -388,6 +388,11 @@ html.incrustado .top{position:relative;top:auto}
 .pn-et{display:block;font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--pt)}
 .pn-tit{display:block;font-family:var(--f-num);font-size:17px;line-height:1.25;margin-top:2px}
 .pn-sub{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+/* Resumen con reloj (Horno): la cuenta regresiva manda. */
+.pn-reloj{display:block;font-family:var(--f-num);font-weight:800;font-size:clamp(52px,7vw,92px);line-height:.95;letter-spacing:-.03em;color:var(--horno);margin:2px 0 4px}
+.panorama.pn-horno{grid-template-columns:minmax(260px,1.35fr) minmax(0,2fr)}
+.panorama.pn-horno .pn-ic{width:58px;height:58px}
+@media (max-width:900px){.panorama.pn-horno{grid-template-columns:minmax(0,1fr)}}
 .pn-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px;position:relative;z-index:1}
 .pn-k{text-align:left;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;background:var(--glass-2);border:1px solid var(--stroke);color:var(--fg);min-width:0;font:inherit}
 button.pn-k{cursor:pointer;transition:transform var(--spring-dur) var(--spring),border-color .2s}

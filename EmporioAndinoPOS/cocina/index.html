@@ -38,11 +38,11 @@ details summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:va
 
 <div class="modulo">
   <header class="top glass solo">
-    <div class="ttl"><div><h1>Comandas</h1><p>Lo cobrado en la Caja, separado por estación</p></div></div>
+    <div class="ttl"><div><h1 id="titulo">Comandas</h1><p id="bajada">Lo cobrado en la Caja, separado por estación</p></div></div>
     <div class="ctl"><span class="clock num" id="reloj">--:--</span></div>
   </header>
   <article class="tile glass">
-    <div class="tc"><div class="hd"><div><h2>Estaciones</h2><p id="sub">Lo cobrado en la Caja, separado por estación</p></div>
+    <div class="tc"><div class="hd"><div><h2 id="estT">Estaciones</h2><p id="sub">Lo cobrado en la Caja, separado por estación</p></div>
       <button class="btn sm" type="button" id="sonido" aria-pressed="false">Campana apagada</button></div>
       <div class="seg est" role="group" aria-label="Estación" id="estaciones"><span class="ind" id="estInd"></span></div></div>
   </article>
@@ -60,12 +60,14 @@ details summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:va
    de cada producto. Marcar "Listo" queda guardado por día en este equipo
    (eapos_comandas); la venta en sí no se toca.
    ==================================================================== */
+/* Cocina y barra tienen cada una su pantalla (?est=cocina o ?est=barra).
+   Las empanadas y la pastelería se atienden en el Horno. Abierto sin
+   estación fija, se puede cambiar entre las dos. */
 var ESTACIONES=[
   {id:"cocina", n:"Cocina"},
-  {id:"barra",  n:"Barra"},
-  {id:"horno",  n:"Horno y vitrina"},
-  {id:"todo",   n:"Todo"}
+  {id:"barra",  n:"Barra"}
 ];
+var FIJA=(function(){ var m=/[?&]est=(cocina|barra)/.exec(location.search); return m?m[1]:""; })();
 var MODOS={local:"Local", llevar:"Para llevar", delivery:"DesertGo"};
 var AVISO_MIN=8, TARDE_MIN=15, U=EA_UI;
 function $(id){ return document.getElementById(id); }
@@ -75,13 +77,16 @@ function hora(ts){ return U.hhmm(new Date(ts)); }
 function leer(k,def){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):def; }catch(e){ return def; } }
 function guardar(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 
-var est=(function(){ try{ return localStorage.getItem("eapos_comandas_est")||""; }catch(e){ return ""; } })();
+var est=FIJA||(function(){ try{ return localStorage.getItem("eapos_comandas_est")||""; }catch(e){ return ""; } })();
 /* La estación por defecto sale del cargo de quien está en sesión. */
-if(!est){ var s0=EAPOS.sesion(); est = !s0 ? "todo" : (s0.r==="cocina" ? "cocina" : (s0.r==="barista"||s0.r==="barista_enc") ? "barra" : "todo"); }
+if(est!=="cocina"&&est!=="barra"){ var s0=EAPOS.sesion(); est = s0&&(s0.r==="barista"||s0.r==="barista_enc") ? "barra" : "cocina"; }
+if(FIJA){ var NOM={cocina:"Comandas de cocina",barra:"Comandas de barra"}[FIJA]; document.title=NOM+" · EmporioAndinoPOS";
+  document.getElementById("titulo").textContent=NOM; document.getElementById("bajada").textContent=FIJA==="cocina"?"Los platos cobrados en la Caja":"Las bebidas cobradas en la Caja";
+  document.getElementById("estT").textContent=FIJA==="cocina"?"Cocina":"Barra"; document.getElementById("estaciones").hidden=true; }
 var sonido=false, vistos=null, deslizador=null;
 
 function marcas(){ var m=leer("eapos_comandas",null); if(!m||m.fecha!==hoyISO()) m={fecha:hoyISO(), listo:{}}; return m; }
-function estacionDe(id){ var p=EAPOS.producto(id), g=p?p.g:""; return g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":"todo"; }
+function estacionDe(id){ var p=EAPOS.producto(id), g=p?p.g:""; return g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; }
 /* Todas las comandas del día: una por venta y estación con algo que preparar. */
 function comandas(){
   var pos=leer("ea_pos",{}), vs=(pos&&Array.isArray(pos.ventas))?pos.ventas:[], hoy=hoyISO(), out=[];
@@ -89,7 +94,7 @@ function comandas(){
     if(v.anulada || hoyISO(new Date(v.ts))!==hoy) return;
     var por={};
     (v.lineas||[]).forEach(function(l){ var e=estacionDe(l.id); (por[e]=por[e]||[]).push(l); });
-    Object.keys(por).forEach(function(e){ out.push({clave:v.id+"|"+e, venta:v, est:e, lineas:por[e]}); });
+    Object.keys(por).forEach(function(e){ if(e!=="cocina"&&e!=="barra") return; out.push({clave:v.id+"|"+e, venta:v, est:e, lineas:por[e]}); });
   });
   return out;
 }
@@ -99,7 +104,7 @@ function nombreEst(id){ return (ESTACIONES.filter(function(e){ return e.id===id;
 function pintar(revelar){
   var todas=comandas(), m=marcas();
   var pend=todas.filter(function(c){ return !m.listo[c.clave]; });
-  var cuenta={cocina:0,barra:0,horno:0,todo:pend.length};
+  var cuenta={cocina:0,barra:0};
   pend.forEach(function(c){ cuenta[c.est]=(cuenta[c.est]||0)+1; });
   var cont=$("estaciones");
   if(!cont.querySelector("button")){
@@ -109,9 +114,9 @@ function pintar(revelar){
   cont.querySelectorAll("[data-est]").forEach(function(b){ b.setAttribute("aria-pressed",String(b.dataset.est===est)); });
   ESTACIONES.forEach(function(e){ U.numero(cont.querySelector('[data-n="'+e.id+'"]'),cuenta[e.id]||0,Math.round); });
   deslizador.to(cont.querySelector('[aria-pressed="true"]'),!revelar);
-  var vis=pend.filter(function(c){ return est==="todo" || c.est===est; }).sort(function(a,b){ return a.venta.ts<b.venta.ts?-1:1; });
+  var vis=pend.filter(function(c){ return c.est===est; }).sort(function(a,b){ return a.venta.ts<b.venta.ts?-1:1; });
   if(!vis.length){
-    $("tablero").innerHTML='<article class="tile glass vacio"><div class="tc"><div class="empty"><span class="ic">'+U.icono("cocina")+'</span><p><b>Sin comandas pendientes.</b> Lo que se cobre en la Caja aparece aquí al instante, separado por estación.</p></div></div></article>';
+    $("tablero").innerHTML='<article class="tile glass vacio"><div class="tc"><div class="empty"><span class="ic">'+U.icono("cocina")+'</span><p><b>Sin comandas pendientes.</b> Lo que se cobre en la Caja para '+(est==="cocina"?"cocina":"barra")+' aparece aquí al instante.</p></div></div></article>';
   } else {
     $("tablero").innerHTML=vis.map(function(c){
       var mi=minutos(c.venta.ts), cl=mi>=TARDE_MIN?" tarde":mi>=AVISO_MIN?" aviso":"";
@@ -125,13 +130,13 @@ function pintar(revelar){
   }
   U.mosaicos($("tablero"));
   if(revelar) U.revelar(document);
-  var hechas=todas.filter(function(c){ return m.listo[c.clave] && (est==="todo"||c.est===est); })
+  var hechas=todas.filter(function(c){ return m.listo[c.clave] && c.est===est; })
     .sort(function(a,b){ return m.listo[b.clave]<m.listo[a.clave]?-1:1; }).slice(0,30);
   $("hechasT").textContent="Listas hoy ("+hechas.length+")";
   $("hlist").innerHTML=hechas.map(function(c){
     return '<li><span><b>'+hora(m.listo[c.clave])+'</b>'+esc(c.venta.id.slice(-5))+' · '+esc(c.lineas.map(function(l){ return l.q+"× "+l.n; }).join(", "))+'</span><button class="btn sm" type="button" data-volver="'+esc(c.clave)+'">Volver a pendiente</button></li>';
   }).join("")||'<li>Nada marcado como listo todavía.</li>';
-  $("sub").textContent=pend.length? pend.length+(pend.length===1?" comanda pendiente":" comandas pendientes")+" en total" : "Lo cobrado en la Caja, separado por estación";
+  $("sub").textContent=vis.length? vis.length+(vis.length===1?" comanda pendiente":" comandas pendientes") : (est==="cocina"?"Los platos cobrados en la Caja":"Las bebidas cobradas en la Caja");
   /* campana: suena cuando entra una comanda nueva a la estación que se mira */
   var claves=vis.map(function(c){ return c.clave; });
   if(vistos && sonido && claves.some(function(k){ return vistos.indexOf(k)<0; })) campana();

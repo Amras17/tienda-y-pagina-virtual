@@ -706,6 +706,7 @@ footer{font-size:11px; color:var(--ink); opacity:.65; text-align:center; line-he
 
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/produccion.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
 /* La carta sale de nucleo/datos.js con los precios del sistema general. */
@@ -743,10 +744,10 @@ var ALTO=15;    /* desde aquí la bandeja está llena: conviene ofrecerla primer
 var LANGN={en:"English", pt:"Português", zh:"中文", ja:"日本語"};
 
 /* ---------- estado ---------- */
-var HOY=new Date().toISOString().slice(0,10);
+var HOY=EAPOS.hoyLocal();   /* fecha local: en Chile el día UTC cambia a las 21:00 */
 var cfg={fecha:"", st:{}, emp:{}, milks:{}, decaf:1, tocado:"", son:1};
 try{ var raw=localStorage.getItem("ea_control"); if(raw){ var o=JSON.parse(raw); if(o&&typeof o==="object") cfg=Object.assign(cfg,o); } }catch(e){}
-if(cfg.fecha!==HOY){ cfg.fecha=HOY; cfg.st={}; cfg.emp={}; cfg.uni={}; cfg.milks={}; cfg.decaf=1; cfg.tocado=""; }
+if(cfg.fecha!==HOY){ cfg.fecha=HOY; cfg.st={}; cfg.emp={}; cfg.uni={}; cfg.horno=[]; cfg.milks={}; cfg.decaf=1; cfg.tocado=""; }
 if(typeof cfg.son!=="number") cfg.son=1;
 COMIDA.forEach(function(d){ if(!cfg.st[d.id]) cfg.st[d.id]="ok"; });
 BEB.forEach(function(d){ if(!cfg.st[d.id]) cfg.st[d.id]="ok"; });
@@ -762,7 +763,16 @@ EMP.forEach(function(e){
 cfg.emp={};
 if(!cfg.uni || typeof cfg.uni!=="object") cfg.uni={};
 MILKS.forEach(function(m){ if(typeof cfg.milks[m.id]!=="number") cfg.milks[m.id]=1; });
-function save(){ cfg.tocado=new Date().toISOString(); try{ localStorage.setItem("ea_control", JSON.stringify(cfg)); }catch(e){} }
+/* Antes de guardar se toma lo último que dejaron la Caja y el Horno (el horno
+   ya no se maneja aquí): así esta pantalla no pisa lo que cambió otra. */
+function save(){
+  try{ var o=JSON.parse(localStorage.getItem("ea_control")||"null"); if(o&&o.fecha===cfg.fecha){ cfg.horno=Array.isArray(o.horno)?o.horno:[]; } }catch(e){}
+  cfg.tocado=new Date().toISOString(); try{ localStorage.setItem("ea_control", JSON.stringify(cfg)); }catch(e){}
+  try{ EAPOS.canal&&EAPOS.canal.postMessage({t:"ea_control"}); }catch(e){} }
+/* Lo que cambia en otra pantalla del mismo equipo (una venta en la Caja, una
+   tanda que sale del Horno) se trae al instante. */
+function recargar(){ try{ var o=JSON.parse(localStorage.getItem("ea_control")||"null"); if(o&&o.fecha===cfg.fecha){ cfg.st=o.st||cfg.st; cfg.uni=o.uni||{}; cfg.horno=Array.isArray(o.horno)?o.horno:[]; cfg.tocado=o.tocado||cfg.tocado; } }catch(e){} }
+addEventListener("storage",function(ev){ if(ev.key==="ea_control"){ recargar(); if(!document.querySelector("textarea:focus,input:focus")){ dir=""; pintar(); } } });
 
 /* ---------- notas del equipo ----------
    Se guardan aparte de cfg porque cfg se reinicia cada día y una nota no.
@@ -1098,7 +1108,7 @@ function capaGlosario(){
    aparte: si mañana cambia una ficha, cambia el ejercicio. */
 var prac={i:0, ver:false, baraja:null, tipo:"emp"};
 /* Producto desplegado en el control de stock, uno a la vez */
-var abiertoEn=null, resetHorno=false;
+var abiertoEn=null;
 function mazo(tipo){
   var out=[];
   if(tipo==="emp"){
@@ -1271,11 +1281,7 @@ function capaRevisar(){
    corre solo y al llegar a cero las unidades entran al stock y suena la campana.
    El aviso de arriba se desplaza para que se lea desde lejos. */
 
-var MIN_HORNO=5;                 /* lo que tarda una hornada, por defecto */
 var relojHorno=null;
-/* Se cargan varias variedades de una vez: la bandeja casi nunca lleva una sola */
-var cargando={sel:{}, n:LATA, min:MIN_HORNO};
-function selN(){ return Object.keys(cargando.sel).filter(function(k){ return cargando.sel[k]; }); }
 
 function hornadas(){
   if(!Array.isArray(cfg.horno)) cfg.horno=[];
@@ -1297,32 +1303,15 @@ function enHorno(empId){
 function totalHorno(){
   var n=0; hornadas().forEach(function(hd){ n+=hd.n; }); return n;
 }
-function meterAlHorno(empId, n, min){
-  n=Math.max(1, Math.min(99, n|0));
-  min=Math.max(1, Math.min(60, min|0));
-  hornadas().push({ id:"h"+Date.now()+Math.floor(Math.random()*999),
-    emp:empId, n:n, desde:new Date().toISOString(),
-    eta:new Date(Date.now()+min*60000).toISOString() });
-  save();
-}
-/* Al cumplirse el tiempo, la hornada entra al stock sola */
-function sacarHornada(hd){
-  var k="E"+hd.emp;
-  if(!cfg.uni) cfg.uni={};
-  cfg.uni[k]=uni(k)+hd.n;
-  delete cfg.st[k];                       /* sale del horno: hay */
-  cfg.horno=hornadas().filter(function(x){ return x.id!==hd.id; });
-  save();
-  var e=find(EMP, hd.emp);
-  campana(2);
-  avisar("Listas: "+hd.n+" "+(e?e.n:hd.emp), true);
-}
+/* El horno se maneja en su propio módulo (horno/index.html). Aquí solo se
+   muestra lo que está adentro; si una tanda cumplió su tiempo, la saca a la
+   vitrina el núcleo compartido, que no la cuenta dos veces. */
 function revisarHorno(){
-  var cambio=false;
-  hornadas().slice().forEach(function(hd){
-    if(restaMs(hd)<=0){ sacarHornada(hd); cambio=true; }
-  });
-  return cambio;
+  var salieron=EAPOS.prod.revisar();
+  if(!salieron.length) return false;
+  recargar(); campana(2);
+  avisar("Listas: "+salieron.map(function(x){ return Object.keys(x.items).map(function(k){ return x.items[k]+" "+EAPOS.prod.nombre(k); }).join(" · "); }).join(" · "), true);
+  return true;
 }
 /* El reloj corre siempre, pinte lo que pinte la pantalla */
 function arrancarReloj(){
@@ -1356,72 +1345,6 @@ function bloqueMarquesina(){
     '<span class="mtot">'+totalHorno()+'</span></div>';
 }
 
-/* ---------- capa del horno ---------- */
-function capaHorno(){
-  var h='<div class="gate"><h2>El horno</h2>'+
-    '<p>Carga la hornada cuando entra. El reloj corre solo y, al llegar a cero, las unidades pasan al stock y suena la campana.</p></div>';
-  h+=bloqueMarquesina();
-
-  var hs=hornadas().slice().sort(function(a,b){ return restaMs(a)-restaMs(b); });
-  if(hs.length){
-    h+='<div class="plabel">Adentro ahora</div><div class="hornol">'+hs.map(function(hd){
-      var e=find(EMP, hd.emp);
-      return '<div class="hrow">'+(e?empSVG(e,34):"")+
-        '<div class="hn">'+esc(e?e.n:hd.emp)+'<em>Entraron '+
-        new Date(hd.desde).toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"})+'</em></div>'+
-        '<div class="hq">'+hd.n+'<small>'+(hd.n%LATA===0?(hd.n/LATA)+(hd.n/LATA===1?" lata":" latas"):"u.")+'</small></div>'+
-        '<div class="hcron"><b data-eta="'+hd.id+'">'+relojTxt(restaMs(hd))+'</b><small>salen en</small></div>'+
-        '<button class="hya" type="button" data-sacar="'+hd.id+'">Listas ya</button></div>';
-    }).join("")+'</div>';
-  } else {
-    h+='<div class="nota">No hay nada en el horno. Carga una hornada abajo y el salón lo ve al instante.</div>';
-  }
-
-  h+='<div class="plabel">Cargar hornada</div>';
-  var sel=selN();
-  h+='<div class="carga"><div class="cq">¿Cuáles entraron?<em>Toca las que van en la bandeja</em></div>';
-  h+='<div class="selgrid">'+EMP.map(function(e){
-      var on=!!cargando.sel[e.id];
-      return '<button class="selemp'+(on?" on":"")+'" type="button" data-hemp="'+e.id+'" aria-pressed="'+(on?"true":"false")+'">'+
-        empSVG(e,40)+'<span>'+esc(e.n)+'</span>'+
-        (on?'<i class="tic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></i>':'')+
-        '</button>';
-    }).join("")+'</div>';
-  h+='<div class="crow"><span class="edl">Cuánto de cada una</span><div class="cctl">'+
-     [1,2,3].map(function(l){
-       return '<button class="tpb" type="button" data-hlata="'+l+'" aria-pressed="'+(cargando.n===l*LATA?"true":"false")+'">'+
-         l+(l===1?" lata":" latas")+'</button>';
-     }).join("")+
-     '<div class="step chico"><button type="button" data-hn="-1" aria-label="Menos">&minus;</button>'+
-     '<span class="cnt">'+cargando.n+'</span>'+
-     '<button type="button" data-hn="1" aria-label="Más">+</button></div></div>'+
-     '<span class="edlat">'+esc(enLatas(cargando.n))+' por variedad · la lata trae '+LATA+'</span></div>';
-  h+='<div class="crow"><span class="edl">Tiempo en el horno</span><div class="cctl">'+
-     [5,10,15].map(function(m){
-       return '<button class="tpb" type="button" data-hpre="'+m+'" aria-pressed="'+(cargando.min===m?"true":"false")+'">'+m+' min</button>';
-     }).join("")+
-     '<div class="step chico"><button type="button" data-hm="-1" aria-label="Menos">&minus;</button>'+
-     '<span class="cnt">'+cargando.min+'</span>'+
-     '<button type="button" data-hm="1" aria-label="Más">+</button></div></div></div>';
-  h+='<button class="bigbtn" type="button" id="alHorno"'+(sel.length?'':' disabled')+'>'+
-     (sel.length
-        ? 'Al horno · '+sel.length+(sel.length===1?' variedad':' variedades')+' × '+cargando.n+' u.'
-        : 'Elige cuáles entraron')+'</button>';
-  if(sel.length) h+='<div class="cnota">Entran '+esc(enLatas(sel.length*cargando.n))+' en total, con el mismo reloj.</div>';
-  h+='</div>';
-
-  /* Volver a cero: el horno se vacía sin tocar el stock ya cargado */
-  h+= resetHorno
-    ? '<div class="resetbox"><b>¿Vaciar el horno?</b>'+
-      '<p>Se borran las '+hornadas().length+' hornada'+(hornadas().length===1?'':'s')+' en curso. Las unidades que ya salieron al stock no se tocan.</p>'+
-      '<div class="btnrow"><button class="ghostbtn rojo" type="button" id="resetSi">Vaciar</button>'+
-      '<button class="ghostbtn" type="button" id="resetNo">Volver</button></div></div>'
-    : '<button class="ghostbtn" type="button" id="resetHorno"'+(hornadas().length?'':' disabled')+'>Vaciar el horno y partir de cero</button>';
-
-  h+='<div class="nota">Este horno corre en este equipo. Lo que sale se suma solo al stock que ven la Caja, la Carta y las Comandas.</div>';
-  return h;
-}
-
 /* ================= capas ================= */
 function capaInicio(){
   return '<div class="gate"><div class="kicker">Emporio Andino</div>'+
@@ -1430,8 +1353,8 @@ function capaInicio(){
     '<div class="opts">'+
     '<button class="opt plain wide" type="button" data-ir="stock"><b>Control de stock</b>'+
     '<small>Marcar lo que falta y contar empanadas. Se guarda en este dispositivo y se reinicia cada día.</small></button>'+
-    '<button class="opt plain wide" type="button" data-ir="horno"><b>El horno</b>'+
-    '<small>'+(totalHorno()?totalHorno()+' empanadas adentro, con su reloj corriendo.':'Carga la hornada y el reloj avisa cuando salen.')+'</small></button>'+
+    (EAPOS.puede("horno")?'<button class="opt plain wide" type="button" data-ir="horno"><b>El horno</b>'+
+    '<small>'+(totalHorno()?totalHorno()+' empanadas adentro, con su reloj corriendo.':'Tandas, pedido de la panadería y vitrina, en su propia área.')+'</small></button>':'')+
     '<button class="opt plain wide" type="button" data-ir="carta"><b>Estudiar la carta</b>'+
     '<small>Fichas, diccionario de barra, tarjetas para practicar y tus propias notas.</small></button>'+
     '</div></div>';
@@ -1702,7 +1625,6 @@ function contenido(){
     case "stock": return capaStockGrupos();
     case "grupo": return capaStock(a.p);
     case "revisar": return capaRevisar();
-    case "horno": return capaHorno();
     case "carta": return capaSecciones();
     case "gloss": return capaGlosario();
     case "practica": return capaPractica();
@@ -1720,7 +1642,7 @@ function pintar(){
   document.getElementById("app").innerHTML='<section class="layer '+dir+'">'+contenido()+'</section>';
   document.getElementById("titulo").textContent=a.t;
   var mq=document.getElementById("marquesina");
-  if(mq){ mq.innerHTML = (a.v==="horno") ? "" : bloqueMarquesina(); }
+  if(mq){ mq.innerHTML = bloqueMarquesina(); }
   document.getElementById("back").hidden = pila.length<2;
   var r=document.getElementById("ruta");
   r.innerHTML = pila.map(function(x,i){
@@ -1814,45 +1736,7 @@ document.addEventListener("click", function(ev){
     if(actual().v==="revisar") return;
     pila=[pila[0]]; entrar("revisar",null,"Revisar"); return;
   }
-  if(b.dataset.ir==="horno"){ entrar("horno",null,"El horno"); return; }
-  if(b.dataset.hemp){
-    var he=b.dataset.hemp;
-    if(cargando.sel[he]) delete cargando.sel[he]; else cargando.sel[he]=1;
-    dir=""; pintar(); return;
-  }
-  if(b.dataset.hpre){ cargando.min=+b.dataset.hpre; dir=""; pintar(); return; }
-  if(b.dataset.hlata){ cargando.n=(+b.dataset.hlata)*LATA; dir=""; pintar(); return; }
-  if(b.id==="resetHorno"){ resetHorno=true; dir=""; pintar(); return; }
-  if(b.id==="resetNo"){ resetHorno=false; dir=""; pintar(); return; }
-  if(b.id==="resetSi"){
-    cfg.horno=[]; save(); resetHorno=false;
-    avisar("Horno vacío"); dir=""; pintar(); return;
-  }
-  if(b.dataset.hn){
-    var dn=+b.dataset.hn;
-    cargando.n = Math.max(1, Math.min(99, (dn===12||dn===24) ? cargando.n+dn : cargando.n+dn));
-    dir=""; pintar(); return;
-  }
-  if(b.dataset.hm){
-    cargando.min = Math.max(1, Math.min(60, cargando.min+(+b.dataset.hm)));
-    dir=""; pintar(); return;
-  }
-  if(b.id==="alHorno"){
-    var sels=selN();
-    if(!sels.length) return;
-    sels.forEach(function(id){ meterAlHorno(id, cargando.n, cargando.min); });
-    campana(1);
-    avisar(sels.length===1
-      ? cargando.n+" "+((find(EMP,sels[0])||{}).n||"")+" al horno"
-      : (sels.length*cargando.n)+" unidades al horno · "+sels.length+" variedades");
-    cargando.sel={};
-    dir=""; pintar(); return;
-  }
-  if(b.dataset.sacar){
-    var hd=hornadas().filter(function(x){ return x.id===b.dataset.sacar; })[0];
-    if(hd) sacarHornada(hd);
-    dir=""; pintar(); return;
-  }
+  if(b.dataset.ir==="horno"){ EAPOS.irA("horno","../"); return; }
   if(b.dataset.abrir){
     abiertoEn = (abiertoEn===b.dataset.abrir) ? null : b.dataset.abrir;
     dir=""; pintar(); return;
@@ -1932,6 +1816,7 @@ document.addEventListener("click", function(ev){
 (function(){
   var dentroDeLaCarta=false;
   try{ dentroDeLaCarta = window.parent && window.parent !== window; }catch(e){ dentroDeLaCarta=true; }
+  if(EA_UI.incrustado) dentroDeLaCarta=false;   /* dentro del sistema general no hay "volver a la carta" */
   if(!dentroDeLaCarta) return;
   var btn=document.getElementById("volverCarta");
   btn.hidden=false;
@@ -1941,6 +1826,8 @@ document.addEventListener("click", function(ev){
   });
 })();
 
+/* El sistema general abre "Revisar" desde su resumen. */
+window.EA_IR=function(v){ if(v==="revisar"&&actual().v!=="revisar"){ pila=[pila[0]]; entrar("revisar",null,"Revisar"); } };
 pintar();
 revisarHorno();
 arrancarReloj();
@@ -2052,6 +1939,7 @@ h1,h2,h3,.gate h2,.familia,.bft{text-shadow:none}
 .pattern{position:absolute;inset:0;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='40'%3E%3Cpath d='M0 10 L12 26 L24 10 L36 26 L48 10' fill='none' stroke='%2340E0D0' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%2340E0D0'/%3E%3Ccircle cx='36' cy='12' r='2' fill='%2340E0D0'/%3E%3C/svg%3E")}
 html.incrustado,html.incrustado body{background:transparent}
 html.incrustado .atmo{display:none}
+html.incrustado #alertBar{display:none}   /* el resumen del sistema general la reemplaza, con su "Revisar" */
 .top{background:rgba(10,16,18,.62);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);border-bottom-color:rgba(255,255,255,.10)}
 .opt,.card,.mcard,.ecard,.block,.nota,.guia,.optbox,.langgrid button,.hjl,.ticket,.espera,.aviso-legal{
   background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.02)),var(--surface);

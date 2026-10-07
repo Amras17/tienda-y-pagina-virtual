@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.6</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.7</span></div><span class="chip num" id="loginClock">--:--</span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.6</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.7</span><small>Emporio Andino · San Pedro</small></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -161,7 +161,10 @@
     <!-- ===== MÓDULOS: cada uno es una subcapa dentro de la app ===== -->
     <section class="view" data-view="caja" hidden><div class="panorama tile glass pn-modulo" data-pn="caja"></div><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
     <section class="view" data-view="salon" hidden><div class="panorama tile glass pn-modulo" data-pn="salon"></div><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
-    <section class="view" data-view="cocina" hidden><div class="panorama tile glass pn-modulo" data-pn="cocina"></div><article class="tile glass marco"><iframe title="Comandas" data-src="cocina/index.html"></iframe></article></section>
+    <section class="view" data-view="cocina" hidden><div class="panorama tile glass pn-modulo" data-pn="cocina"></div><article class="tile glass marco"><iframe title="Comandas de cocina" data-src="cocina/index.html?est=cocina"></iframe></article></section>
+    <section class="view" data-view="barra" hidden><div class="panorama tile glass pn-modulo" data-pn="barra"></div><article class="tile glass marco"><iframe title="Comandas de barra" data-src="cocina/index.html?est=barra"></iframe></article></section>
+    <section class="view" data-view="horno" hidden><div class="panorama tile glass pn-modulo pn-horno" data-pn="horno"></div><article class="tile glass marco"><iframe title="Horno" data-src="horno/index.html"></iframe></article></section>
+    <section class="view" data-view="panaderia" hidden><div class="panorama tile glass pn-modulo" data-pn="panaderia"></div><article class="tile glass marco"><iframe title="Panadería" data-src="panaderia/index.html"></iframe></article></section>
     <section class="view" data-view="carta" hidden><div class="panorama tile glass pn-modulo" data-pn="carta"></div><article class="tile glass marco"><iframe title="Carta Interactiva" data-src="carta/index.html"></iframe></article></section>
     <section class="view" data-view="prueba" hidden><div class="panorama tile glass pn-modulo" data-pn="prueba"></div><article class="tile glass marco"><iframe title="Prueba y simulación" data-src="prueba/index.html"></iframe></article></section>
 
@@ -193,8 +196,20 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 2.6</h2><p>Horario del local con avisos y navegación sin capas que tapen, sobre la base de Emporio System 1.1</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 2.7</h2><p>Horno y Panadería en sus propias áreas, comandas separadas para cocina y barra, lista para la Prueba nº 1</p></div></div>
           <div class="notas">
+            <div><h3>Horno (2.7)</h3><ul>
+              <li>Su propia área: el temporizador de la tanda manda arriba, en grande; recibe y confirma el pedido de la panadería, carga tandas de hasta 4 latas (20 min), saca a la vitrina y avisa.</li>
+              <li>Vitrina con Revisar en el resumen, quienes esperan la tanda, comandas de empanadas y pastelería, solicitud de empanadas por confirmar y el precocido para mañana.</li>
+            </ul></div>
+            <div><h3>Panadería (2.7)</h3><ul>
+              <li>Plan diario por latas de 15: 6 de pino y 2 de cada otra variedad, menos lo precocido de ayer. Envía al horno y confirma las solicitudes por sobredemanda.</li>
+              <li>Escandallos por unidad y por lata, e insumos del plan de hoy (costos solo para dueños).</li>
+            </ul></div>
+            <div><h3>Comandas y Salón (2.7)</h3><ul>
+              <li>Comandas de cocina y Comandas de barra, cada una en su pantalla. El Control de Salón ya no lleva el horno, ni el acceso a la Carta ni la barrita: su Revisar pasó al resumen.</li>
+              <li>El día se cuenta con la hora local: la vitrina ya no se reinicia a las 21:00. Instrucciones para Mac y guía de la Prueba nº 1.</li>
+            </ul></div>
             <div><h3>Horario del local (2.6)</h3><ul>
               <li>Desayunos hasta las 12:00, mesas y cocina hasta las 21:30, cierre a las 22:00. Avisa a los 15 y a los 5 minutos (el cierre, a los 5) con el chip del encabezado, la campana y un aviso en pantalla.</li>
               <li>La Caja deja de vender desayunos a las 12:00 y cocina a las 21:30, y pasa a Para llevar. La Carta y la Prueba siguen el mismo horario.</li>
@@ -254,7 +269,7 @@
         <article class="tile glass s12"><div class="tc">
           <div class="hd"><div><h2>Retroalimentación y mantención</h2><p id="retroDonde">Conectando…</p></div><span class="chip num" id="retroCuenta"></span></div>
           <form id="formRetro" class="fform" autocomplete="off">
-            <label>Módulo<select class="search" id="fModulo"><option value="caja">Caja</option><option value="salon">Control de Salón</option><option value="cocina">Comandas</option><option value="carta">Carta Interactiva</option><option value="prueba">Prueba</option><option value="general">Sistema general</option></select></label>
+            <label>Módulo<select class="search" id="fModulo"><option value="caja">Caja</option><option value="salon">Control de Salón</option><option value="cocina">Comandas de cocina</option><option value="barra">Comandas de barra</option><option value="horno">Horno</option><option value="panaderia">Panadería</option><option value="carta">Carta Interactiva</option><option value="prueba">Prueba</option><option value="general">Sistema general</option></select></label>
             <label>Tipo<select class="search" id="fTipo"><option value="error">Algo falla</option><option value="mejora">Mejora</option><option value="dato">Dato o precio</option><option value="comentario">Comentario</option></select></label>
             <label>Prioridad<select class="search" id="fPrioridad"><option value="media">Media</option><option value="alta">Alta · afecta el servicio</option><option value="baja">Baja</option></select></label>
             <label class="ancho">Qué pasó o qué cambiarías<textarea class="fta" id="fTexto" required maxlength="1200" placeholder="Ej.: En Caja, el cierre no suma las propinas en efectivo."></textarea></label>
@@ -272,6 +287,7 @@
 
 <script src="nucleo/datos.js"></script>
 <script src="nucleo/nucleo.js"></script>
+<script src="nucleo/produccion.js"></script>
 <script src="nucleo/emporio.js"></script>
 <script>
 (function(){
@@ -289,8 +305,11 @@ function hoyISO(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMont
 var VIEWS={
   inicio:{t:"Dashboard",g:"Inicio",c:"#40E0D0"},
   caja:{t:"Caja",g:"Operación",c:"#C19A6B",d:"Cobro, boleta, stock, costos, compras, mermas e informes"},
-  salon:{t:"Control de Salón",g:"Operación",c:"#9A80D6",d:"Disponibilidad de la carta, horno y estudio de la carta"},
-  cocina:{t:"Comandas",g:"Operación",c:"#FF7F50",d:"Lo cobrado en la Caja, por estación: cocina, barra y horno"},
+  salon:{t:"Control de Salón",g:"Operación",c:"#9A80D6",d:"Disponibilidad de la carta y estudio de la carta"},
+  cocina:{t:"Comandas de cocina",g:"Operación",c:"#FF7F50",d:"Los platos cobrados en la Caja, para cocina"},
+  barra:{t:"Comandas de barra",g:"Operación",c:"#1AA89B",d:"Las bebidas cobradas en la Caja, para barra"},
+  horno:{t:"Horno",g:"Producción",c:"#E8674A",d:"Temporizador de las tandas, pedido de la panadería, vitrina y precocido"},
+  panaderia:{t:"Panadería",g:"Producción",c:"#D9A93A",d:"Plan por latas, pedidos al horno, solicitudes y escandallos"},
   carta:{t:"Carta Interactiva",g:"Operación",c:"#1AA89B",d:"La carta que usa el cliente en la mesa"},
   prueba:{t:"Prueba y simulación",g:"Gestión",c:"#FFB547",d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos"},
   verificacion:{t:"Verificación",g:"Sistema",c:"#3DDC84",d:"Que cada módulo abra y funcione en este equipo"},
@@ -298,7 +317,7 @@ var VIEWS={
   retro:{t:"Retroalimentación",g:"Sistema",c:"#D9A93A",d:"Lo que falla y lo que se puede mejorar"}
 };
 var ALLV=Object.keys(VIEWS);
-var GRUPOS=[["Dirección",["dueno","jefe"]],["Caja y salón",["encargado"]],["Garzones",["garzon"]],["Barra",["barista_enc","barista"]],["Cocina y horno",["cocina"]]];
+var GRUPOS=[["Dirección",["dueno","jefe"]],["Caja y salón",["encargado"]],["Garzones",["garzon"]],["Barra",["barista_enc","barista"]],["Cocina y horno",["cocina"]],["Panadería",["panaderia"]]];
 var USER=null;
 function puedeVer(v){ if(!USER) return false; var rol=E.ROLES[USER.r];
   if(v==="inicio"||v==="retro") return true;
@@ -390,7 +409,13 @@ function go(v){
 }
 addEventListener("popstate",function(e){ if(!USER) return; var st=e.state||{}; show(st.ea==="view"?st.v:"inicio"); });
 $("nav").addEventListener("click",function(e){ var a=e.target.closest("[data-v]"); if(!a) return; e.preventDefault(); if(a.dataset.v==="inicio"){ if(cur!=="inicio"){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); } } else go(a.dataset.v); });
-document.addEventListener("click",function(e){ var t=e.target.closest("[data-go]"); if(!t||!USER) return; if(e.target.closest("a,input")&&!t.matches("button")) return; go(t.dataset.go); });
+document.addEventListener("click",function(e){ var t=e.target.closest("[data-go]"); if(!t||!USER) return; if(e.target.closest("a,input")&&!t.matches("button")) return;
+  var p=t.dataset.go.split(":"); if(p[0]!==cur) go(p[0]); if(p[1]&&cur===p[0]) irDentro(p[0],p[1]); });
+/* Abre una parte de un módulo: "horno:vitrina" baja a la vitrina, "salon:revisar" abre Revisar. */
+function irDentro(v,destino){ var fr=document.querySelector('.view[data-view="'+v+'"] .marco iframe'), n=0;
+  (function intento(){ try{ var w=fr.contentWindow; if(w&&w.EA_IR){ w.EA_IR(destino); return; }
+      var el=w&&w.document&&w.document.getElementById(destino); if(el&&w.document.readyState==="complete"){ el.scrollIntoView({block:"start"}); return; } }catch(x){}
+    if(++n<25) setTimeout(intento,200); })(); }
 $("backBtn").addEventListener("click",function(){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); });
 /* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
 window.EAPOS_SISTEMA={abrir:function(id){ go(id); }, desplazo:function(y){ U.desplazo("modulo",y); }};
@@ -489,7 +514,11 @@ function renderHub(vs,total,cp,st){
   var sf=sinFolio();
   set("caja", verVentas()?clp(total):vs.length+" ventas", vs.length+(vs.length===1?" venta hoy":" ventas hoy")+(verVentas()&&sf?" · "+sf+" sin folio ":" "), sf&&verVentas()?'<span class="badge warn">Folio</span>':"");
   set("salon", st.off+" agotados", st.bajo+" quedan pocos ", st.off?'<span class="badge crit">Revisar</span>':'<span class="badge ok">OK</span>');
-  set("cocina", (cp.cocina+cp.barra+cp.horno)+" pendientes", "Cocina "+cp.cocina+" · Barra "+cp.barra+" · Horno "+cp.horno);
+  set("cocina", cp.cocina+" pendientes", "Platos por preparar");
+  set("barra", cp.barra+" pendientes", "Bebidas por preparar");
+  var PR=E.prod, hc=PR.control(), hd=hc.horno.filter(function(x){ return new Date(x.eta).getTime()>Date.now(); }), hp=hd.length?Math.max(0,Math.ceil((Math.min.apply(null,hd.map(function(x){ return new Date(x.eta).getTime(); }))-Date.now())/60000)):null;
+  set("horno", hp!=null?"Sale en "+hp+" min":"Horno libre", PR.totalVitrina(hc)+" en vitrina · "+PR.totalPorHornear()+" por hornear ", PR.porRecibir().length?'<span class="badge warn">Pedido por recibir</span>':'');
+  var ps=PR.porConfirmar().length; set("panaderia", ps?ps+" por confirmar":"Plan "+Object.keys(PR.planDefecto()).reduce(function(a,k){ return a+PR.planDefecto()[k]; },0)+" latas", "Latas de "+PR.LATA+" · pedidos al horno ", ps?'<span class="badge warn">Solicitud</span>':'');
   var g=E.general(), cat=E.catalogo(g);
   set("carta", cat.length+" productos", g.fuera.length? g.fuera.length+" fuera de carta":"Toda la carta vigente");
   var pc=E.pendientes().length;
@@ -517,7 +546,7 @@ function renderView(){
 }
 addEventListener("storage",function(ev){ if(!USER) return;
   if(ev.key==="eapos_sesion"){ var s=E.sesion(); if(!s||s.n!==USER.n){ arrancarApp(false); return; } }
-  if(["ea_pos","ea_control","eapos_comandas","eapos_cfg","eapos_prueba_cfg","eapos_versiones","eapos_diag"].indexOf(ev.key)>=0){ renderView(); subtitulo(); } });
+  if(["ea_pos","ea_control","eapos_comandas","eapos_cfg","eapos_prueba_cfg","eapos_versiones","eapos_diag","eapos_panaderia","eapos_horno"].indexOf(ev.key)>=0){ renderView(); subtitulo(); } });
 setInterval(function(){ if(USER&&cur==="inicio") renderDash(); },30000);
 setInterval(function(){ if(!USER) return; refrescarAvisos(); if(cur!=="inicio") renderPanorama(cur); },5000);
 
@@ -531,7 +560,7 @@ function comandasDetalle(){
     (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; });
     Object.keys(est).forEach(function(e){ if(!m.listo[v.id+"|"+e]){ por[e]++; viejas.push({e:e, min:minutosDesde(v.ts)}); } }); });
   viejas.sort(function(a,b){ return b.min-a.min; });
-  return {por:por, total:por.cocina+por.barra+por.horno, max:viejas.length?viejas[0].min:0, atrasadas:viejas.filter(function(x){ return x.min>=15; })};
+  return {por:por, total:por.cocina+por.barra+por.horno, max:viejas.length?viejas[0].min:0, viejas:viejas, atrasadas:viejas.filter(function(x){ return x.min>=15; })};
 }
 /* Vitrina y horno del Control de Salón (memoria compartida ea_control). */
 function hornoReal(){
@@ -543,6 +572,11 @@ function hornoReal(){
 }
 function nombreEmp(id){ var p=E.producto("E"+id); return p?p.n:id; }
 function lista3(a){ return a.slice(0,3).map(esc).join(", ")+(a.length>3?" y "+(a.length-3)+" más":""); }
+function cuenta(eta){ var s=Math.max(0,Math.round((new Date(eta).getTime()-Date.now())/1000)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function panoComandas(e){ var c=comandasDetalle(), n=c.por[e], viejas=c.viejas.filter(function(x){ return x.e===e; }), max=viejas.length?viejas[0].min:0, tarde=viejas.filter(function(x){ return x.min>=15; }).length;
+  return {tono:tarde?"warn":n?"info":"ok", titulo:n?n+(n===1?" comanda por preparar":" comandas por preparar"):"Sin comandas pendientes",
+    sub:n?"La más antigua espera hace "+max+" min"+(tarde?" · "+tarde+" pasan de 15 min":""):"Todo lo cobrado ya salió",
+    kpis:[{v:n,l:e==="cocina"?"En cocina":"En barra"},{v:max+" min",l:"La más antigua",tono:max>=15?"warn":""},{v:tarde,l:"Pasan de 15 min",tono:tarde?"warn":"ok"},{v:c.por[e==="cocina"?"barra":"cocina"],l:e==="cocina"?"En barra":"En cocina",go:e==="cocina"?"barra":"cocina"}]}; }
 var PANO={
   caja:function(){ var vs=ventasHoy(), n=vs.length, tot=vs.reduce(function(a,v){ return a+v.total; },0), sf=sinFolio(), st=stockEstado(), meta=metaDia();
     var tono=st.off?"crit":(sf||st.bajo)?"warn":"ok";
@@ -556,12 +590,29 @@ var PANO={
     return {tono:st.off?"crit":st.bajo||h.listas.length?"warn":"ok",
       titulo:st.off?st.off+(st.off===1?" producto agotado":" productos agotados"):st.bajo?st.bajo+" productos con poco stock":"Toda la carta disponible",
       sub:st.off?"Agotados: "+lista3(st.nombres):h.listas.length?"Hay una hornada lista para sacar":"La Carta muestra al cliente lo mismo que ves aquí",
-      kpis:[{v:st.off,l:"Agotados",tono:st.off?"crit":"ok"},{v:st.bajo,l:"Quedan pocos",tono:st.bajo?"warn":"ok"},{v:h.vit,l:"Empanadas en vitrina",s:h.ceros.length?h.ceros.length+" variedades en cero":"",tono:h.ceros.length?"warn":""},
-        {v:h.dentro,l:"En el horno",s:h.listas.length?h.listas.length+" lista para sacar":h.prox!=null?"salen en "+h.prox+" min":"sin hornada",tono:h.listas.length?"warn":""}]}; },
-  cocina:function(){ var c=comandasDetalle();
-    return {tono:c.atrasadas.length?"warn":c.total?"info":"ok", titulo:c.total?c.total+(c.total===1?" comanda por preparar":" comandas por preparar"):"Sin comandas pendientes",
-      sub:c.total?"La más antigua espera hace "+c.max+" min"+(c.atrasadas.length?" · "+c.atrasadas.length+" pasan de 15 min":""):"Todo lo cobrado ya salió",
-      kpis:[{v:c.por.cocina,l:"Cocina"},{v:c.por.barra,l:"Barra"},{v:c.por.horno,l:"Horno"},{v:c.max+" min",l:"La más antigua",tono:c.max>=15?"warn":""}]}; },
+      kpis:[{v:st.off,l:"Agotados · Revisar",tono:st.off?"crit":"ok",go:"salon:revisar"},{v:st.bajo,l:"Quedan pocos · Revisar",tono:st.bajo?"warn":"ok",go:"salon:revisar"},{v:h.vit,l:"Empanadas en vitrina",s:h.ceros.length?h.ceros.length+" variedades en cero":"",tono:h.ceros.length?"warn":""},
+        {v:h.dentro,l:"En el horno",s:h.prox!=null?"salen en "+h.prox+" min":"sin tanda",go:puedeVer("horno")?"horno":null}]}; },
+  cocina:function(){ return panoComandas("cocina"); },
+  barra:function(){ return panoComandas("barra"); },
+  /* El Horno: lo primero es el reloj de la tanda que sale. */
+  horno:function(){ var P=E.prod, aj=P.ajustesHorno(), c=P.control(), vit=P.totalVitrina(c), crudo=P.totalPorHornear(), rec=P.porRecibir(), sol=P.porConfirmar(), esp=P.espera(), tt=P.tandas();
+    var act=c.horno.filter(function(x){ return new Date(x.eta).getTime()>Date.now(); }).sort(function(a,b){ return new Date(a.eta)-new Date(b.eta); });
+    var k=[{v:vit,l:"En vitrina · Revisar",s:"mínimo "+aj.minimo,tono:vit<aj.minimo?"warn":"ok",go:"horno:vitrina"},{v:crudo,l:"Por hornear",s:rec.length?rec.length+" pedido por recibir":"de la panadería",tono:rec.length?"warn":"",go:"horno:tPedido"},
+      {v:esp.length,l:"Esperan la tanda",tono:esp.length?"warn":"",go:"horno:tEspera"},{v:tt.length,l:"Tandas hoy",s:tt.reduce(function(a,t){ return a+t.total; },0)+" empanadas",go:"horno:tTandas"}];
+    if(act.length){ var t=act[0], n=0, items={}; act.forEach(function(x){ if(x.eta===t.eta){ items[x.emp]=(items[x.emp]||0)+x.n; n+=x.n; } });
+      var tn=(tt.filter(function(y){ return y.id===t.tanda; })[0]||{}).n;
+      return {tono:"info", etiqueta:(tn?"Tanda "+tn+" · ":"")+"sale a las "+U.hhmm(new Date(t.eta)), reloj:t.eta, detalle:Object.keys(items).map(function(e){ return items[e]+" "+esc(P.nombre(e)); }).join(" · "),
+        titulo:'Sale en <span data-cuenta="'+t.eta+'">'+cuenta(t.eta)+'</span> · '+Object.keys(items).map(function(e){ return items[e]+" "+esc(P.nombre(e)); }).join(" · "),
+        sub:n+" empanadas"+(act.length>n?" · después "+(P.enHorno(c)-n)+" más":"")+(rec.length?" · pedido de la panadería por recibir":""), kpis:k}; }
+    return {tono:rec.length||vit<aj.minimo?"warn":"ok", etiqueta:"Horno libre", reloj:null,
+      titulo:rec.length?"Llegó un pedido de la panadería: cuéntalo y confírmalo":crudo?crudo+" empanadas por hornear":"Sin empanadas por hornear",
+      sub:vit<aj.minimo?"La vitrina está bajo el mínimo: conviene cargar una tanda":sol.length?"Solicitud a la panadería por confirmar":"Cocción de "+aj.min+" min por tanda", kpis:k}; },
+  panaderia:function(){ var P=E.prod, ped=P.pedidos(), sol=P.porConfirmar(), d=P.planDefecto(), env=0, rec=0, pr=P.precocidoAyer();
+    ped.forEach(function(x){ if(x.tipo==="plan"&&(x.estado==="enviado"||x.estado==="recibido")) for(var k in x.items) env+=x.items[k]; if(x.rec) for(var j in x.rec.u) rec+=x.rec.u[j]; });
+    var plan=0; for(var k in d) plan+=d[k];
+    return {tono:sol.length?"warn":env?"ok":"info", titulo:sol.length?sol.length+(sol.length===1?" solicitud del horno por confirmar":" solicitudes del horno por confirmar"):env?"Plan de hoy enviado: "+env+" latas":"Plan de hoy por enviar: "+plan+" latas",
+      sub:(pr?"Ayer quedaron "+Object.keys(pr.items).reduce(function(a,k){ return a+pr.items[k]; },0)+" precocidas · ":"Sin reporte de precocido de ayer · ")+"cada lata trae "+P.LATA,
+      kpis:[{v:plan,l:"Latas del plan",s:plan*P.LATA+" empanadas"},{v:env,l:"Latas enviadas"},{v:rec,l:"Recibidas por el horno",s:"empanadas"},{v:sol.length,l:"Por confirmar",tono:sol.length?"warn":"ok",go:"panaderia:tSol"}]}; },
   carta:function(){ var g=E.general(), cat=E.catalogo(g), st=stockEstado();
     return {tono:st.off?"warn":"ok", titulo:"Carta vigente · versión "+g.v, sub:cat.length+" productos en 10 idiomas"+(st.off?" · "+st.off+" no disponibles ahora":""),
       kpis:[{v:cat.length,l:"En la carta"},{v:g.fuera.length,l:"Fuera de carta"},{v:st.off,l:"No disponibles hoy",tono:st.off?"warn":"ok",go:"salon"},{v:10,l:"Idiomas"}]}; },
@@ -600,7 +651,7 @@ function avisosSistema(){
     bajo.slice(0,6).forEach(function(x){ L.push({k:"bajo|"+x.p.id,tono:"warn",tit:"Queda poco: "+esc(x.p.n),det:x.u!=null?x.u+" en vitrina":"Marcado con poco stock",go:"salon"}); });
     if(bajo.length>6) L.push({k:"bajo+",tono:"warn",tit:"Y "+(bajo.length-6)+" productos más con poco stock",go:"salon"});
     var h=hornoReal();
-    h.listas.forEach(function(x){ L.push({k:"lista|"+x.id,tono:"warn",tit:"Hornada lista: "+x.n+" "+esc(nombreEmp(x.emp)),det:"Salió hace "+minutosDesde(x.eta)+" min · sácala en el Control de Salón",go:"salon"}); });
+    h.listas.forEach(function(x){ L.push({k:"lista|"+x.id,tono:"warn",tit:"Hornada lista: "+x.n+" "+esc(nombreEmp(x.emp)),det:"Salió hace "+minutosDesde(x.eta)+" min · pasa sola a la vitrina",go:puedeVer("horno")?"horno":"salon"}); });
     if(h.dentro) L.push({k:"horno",tono:"info",tit:h.dentro+" empanadas en el horno",det:"Salen en "+h.prox+" min",go:"salon"});
   }
   if(puedeVer("cocina")){ var cd=comandasDetalle(); if(cd.atrasadas.length) L.push({k:"cmd",tono:"warn",tit:cd.atrasadas.length+(cd.atrasadas.length===1?" comanda espera":" comandas esperan")+" hace más de 15 min",det:"La más antigua: "+cd.max+" min",go:"cocina"}); }
@@ -610,10 +661,43 @@ function avisosSistema(){
     var alta=reportes.filter(function(r){ return r.estado!=="resuelto"&&r.prioridad==="alta"; }).length; if(alta) L.push({k:"retro",tono:"warn",tit:alta+(alta===1?" reporte de prioridad alta":" reportes de prioridad alta"),det:"Afectan el servicio",go:"retro"});
     var dg=leeLocal("eapos_diag"); if(dg&&dg.version===E.version&&dg.falla) L.push({k:"diag",tono:"crit",tit:"La verificación tiene "+dg.falla+(dg.falla===1?" falla":" fallas"),go:"verificacion"});
   }
+  avisosProduccion().forEach(function(a){ L.push(a); });
   avisosHorario().forEach(function(a){ L.push(a); });
   if(navigator.onLine===false) L.push({k:"red",tono:"info",tit:"Sin internet",det:"Todo sigue guardándose en este equipo"});
   return L;
 }
+/* ==================== PRODUCCIÓN: PANADERÍA Y HORNO ====================
+   Pedido por recibir, solicitud por confirmar, vitrina bajo el mínimo, quien
+   espera la tanda y el precocido sin reportar al cierre. */
+function avisosProduccion(){
+  var P=E.prod, L=[], min=E.minutoDe();
+  if(puedeVer("horno")){
+    P.porRecibir().forEach(function(x){ var l=0; for(var k in x.items) l+=x.items[k];
+      L.push({k:"rec|"+x.id,tono:"warn",tit:"Llegó "+(x.tipo==="solicitud"?"la solicitud":"el pedido")+" de la panadería: "+l+(l===1?" lata":" latas"),det:"Cuéntalo y confírmalo en el Horno",go:"horno:tPedido"}); });
+    var aj=P.ajustesHorno(), vit=P.totalVitrina(), tt=P.tandas();
+    if((tt.length||P.totalPorHornear())&&vit<aj.minimo&&min<1290&&!P.enHorno()) L.push({k:"vitmin",tono:"warn",tit:"Vitrina bajo el mínimo: "+vit+" empanadas",det:"El mínimo es "+aj.minimo+" · carga una tanda",go:"horno"});
+    var v=P.vitrina(); P.espera().forEach(function(e){ if(e.items&&Object.keys(e.items).every(function(k){ return (v[k]||0)>=e.items[k]; }))
+      L.push({k:"esp|"+e.id,tono:"warn",tit:"Entregar a "+esc(e.nombre||"cliente"),det:Object.keys(e.items).map(function(k){ return e.items[k]+" "+esc(P.nombre(k)); }).join(" · ")+" · ya hay en vitrina",go:"horno:tEspera"}); });
+    if(min>=1290&&!P.precocido()&&(tt.length||P.pedidos().length)) L.push({k:"prec",tono:"warn",tit:"Reporta el precocido para mañana",det:"Lo que queda armado sin hornear: con eso parte la panadería",go:"horno:tCierre"});
+    P.pedidos().forEach(function(x){ if(x.estado==="rechazado"&&x.conf&&minutosDesde(x.conf.ts)<60) L.push({k:"rech|"+x.id,tono:"info",tit:"La panadería no pudo con la solicitud "+x.n,det:x.conf.motivo?esc(x.conf.motivo):"Sin motivo",go:"horno:tPedido"}); });
+  }
+  if(puedeVer("panaderia")){
+    P.porConfirmar().forEach(function(x){ var l=0; for(var k in x.items) l+=x.items[k];
+      L.push({k:"sol|"+x.id,tono:"crit",tit:"El horno pide "+l+(l===1?" lata":" latas")+" más",det:"Solicitud por confirmar"+(x.nota?" · "+esc(x.nota):""),go:"panaderia:tSol"}); });
+    if(min<1290&&!P.pedidos().some(function(x){ return x.tipo==="plan"&&x.estado!=="anulado"; })) L.push({k:"plan",tono:"info",tit:"Plan de hoy por enviar al horno",go:"panaderia"});
+  }
+  return L;
+}
+/* La tanda que cumple su tiempo pasa sola a la vitrina, aunque el Horno no
+   esté abierto, y se avisa en pantalla. */
+var SALIDAS=null;
+function vigilarHorno(){ if(!USER) return; var P=E.prod; P.revisar();
+  var tt=P.tandas(), ids=tt.filter(function(t){ return t.salio; }).map(function(t){ return t.id; });
+  if(SALIDAS&&(puedeVer("horno")||puedeVer("salon"))){ var n=tt.filter(function(t){ return t.salio&&SALIDAS.indexOf(t.id)<0; }).pop();
+    if(n&&cur!=="horno") U.aviso("Salió la tanda "+n.n+": "+Object.keys(n.items).map(function(k){ return n.items[k]+" "+P.nombre(k); }).join(" · "),6000); }
+  SALIDAS=ids; }
+setInterval(vigilarHorno,3000);
+
 /* ==================== HORARIO DEL LOCAL ====================
    Desayunos hasta las 12:00, mesas y cocina hasta las 21:30, cierre a las
    22:00. Avisa a los 15 y a los 5 minutos con la campana, un aviso en
@@ -680,7 +764,10 @@ $("acc").addEventListener("click",function(e){ var b=e.target.closest("[data-res
 var PRUEBAS_MOD={
   caja:function(d){ return d.querySelectorAll("#rejilla .prod").length>0; },
   salon:function(d){ return (d.body.innerText||"").trim().length>50; },
-  cocina:function(d){ return !!d.getElementById("tablero") && d.getElementById("estaciones").querySelectorAll("button").length===4; },
+  cocina:function(d){ return !!d.getElementById("tablero") && d.getElementById("titulo").textContent==="Comandas de cocina"; },
+  barra:function(d){ return !!d.getElementById("tablero") && d.getElementById("titulo").textContent==="Comandas de barra"; },
+  horno:function(d){ return d.querySelectorAll("#carga .vcard").length===9 && !!d.getElementById("vitrina"); },
+  panaderia:function(d){ return d.querySelectorAll("#plan .vcard").length===9 && !!d.querySelector("#esc table"); },
   carta:function(d){ return d.querySelectorAll(".langgrid button").length>0||!!d.getElementById("splash"); },
   prueba:function(d){ return d.querySelectorAll("#nav a").length>0; }
 };
@@ -693,7 +780,10 @@ var CHECKS=[
   {g:"Núcleo",n:"Diseño Emporio (estilos y comportamientos)",f:probarDiseno},
   {g:"Módulos",n:"Caja abre sin errores",f:function(){ return probarModulo("caja"); }},
   {g:"Módulos",n:"Control de Salón abre sin errores",f:function(){ return probarModulo("salon"); }},
-  {g:"Módulos",n:"Comandas abre sin errores",f:function(){ return probarModulo("cocina"); }},
+  {g:"Módulos",n:"Comandas de cocina abre sin errores",f:function(){ return probarModulo("cocina"); }},
+  {g:"Módulos",n:"Comandas de barra abre sin errores",f:function(){ return probarModulo("barra"); }},
+  {g:"Módulos",n:"Horno abre sin errores",f:function(){ return probarModulo("horno"); }},
+  {g:"Módulos",n:"Panadería abre sin errores",f:function(){ return probarModulo("panaderia"); }},
   {g:"Módulos",n:"Carta Interactiva abre sin errores",f:function(){ return probarModulo("carta"); }},
   {g:"Módulos",n:"Prueba abre sin errores",f:function(){ return probarModulo("prueba"); }},
   {g:"Contenido",n:"Fotos y sello de la carta",f:probarFotos},
@@ -774,7 +864,7 @@ pintarPendientes();
 
 /* ==================== RETROALIMENTACIÓN ==================== */
 var dbListo=(window.claude&&window.claude.use?window.claude.use("db"):Promise.resolve(null)).catch(function(){ return null; });
-var NOMBRES={caja:"Caja",salon:"Control de Salón",cocina:"Comandas",carta:"Carta Interactiva",prueba:"Prueba",general:"Sistema general",sistema:"Emporio System"};
+var NOMBRES={caja:"Caja",salon:"Control de Salón",cocina:"Comandas de cocina",barra:"Comandas de barra",horno:"Horno",panaderia:"Panadería",carta:"Carta Interactiva",prueba:"Prueba",general:"Sistema general",sistema:"Emporio System"};
 var TIPOS={error:"Algo falla",mejora:"Mejora",dato:"Dato o precio",comentario:"Comentario"};
 var ESTADOS={abierto:"Abierto",revision:"En revisión",resuelto:"Resuelto"};
 var reportes=leeLocal("eapos_retro")||[], filtro="activos", modo="local";

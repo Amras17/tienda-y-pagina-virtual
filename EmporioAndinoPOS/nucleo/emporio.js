@@ -112,6 +112,9 @@
     caja:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
     salon:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
     cocina:'<path d="M6 13.9A4 4 0 0 1 7 6a5 5 0 0 1 10 0 4 4 0 0 1 1 7.9V20H6z"/><path d="M6 17h12"/>',
+    barra:'<path d="M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3v2M12 3v2"/>',
+    horno:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><rect x="7" y="12" width="10" height="5" rx="1"/><path d="M7 6.5h.01M10.5 6.5h.01"/>',
+    panaderia:'<path d="M4 14a8 5 0 0 1 16 0v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M9 10.5l1 3M14 10.5l-1 3"/>',
     carta:'<path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/>',
     prueba:'<path d="M4 7h10M18 7h2M4 12h3M11 12h9M4 17h8M16 17h4"/><circle cx="16" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="14" cy="17" r="2"/>',
     verificacion:'<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
@@ -128,10 +131,17 @@
   var TONO_N={ok:"Todo en orden",warn:"Atención",crit:"Urgente",info:"En curso"};
   var TONO_IC={ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.2v.3"/>',
     crit:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.3v.4"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.7v.3"/>'};
+  /* Cuentas regresivas: todo elemento con data-cuenta="<fecha ISO>" muestra
+     m:ss hasta esa hora, y se actualiza solo cada segundo. */
+  function cuentaTxt(eta){ var s=Math.max(0,Math.round((new Date(eta).getTime()-Date.now())/1000)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+  setInterval(function(){ var l=document.querySelectorAll("[data-cuenta]"); for(var i=0;i<l.length;i++) l[i].textContent=cuentaTxt(l[i].getAttribute("data-cuenta")); },1000);
   function panorama(el, d){
     if(!el||!d) return; var t=TONO_IC[d.tono]?d.tono:"info";
     var h='<div class="pn-estado"><span class="pn-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+TONO_IC[t]+'</svg></span>'+
-      '<div style="min-width:0"><span class="pn-et">'+(d.etiqueta||TONO_N[t])+'</span><b class="pn-tit">'+d.titulo+'</b>'+(d.sub?'<span class="pn-sub">'+d.sub+'</span>':'')+'</div></div>'+
+      '<div style="min-width:0"><span class="pn-et">'+(d.etiqueta||TONO_N[t])+'</span>'+
+      /* Con reloj (el Horno), la cuenta regresiva va primero y en grande. */
+      (d.reloj?'<b class="pn-reloj num" data-cuenta="'+d.reloj+'">'+cuentaTxt(d.reloj)+'</b><b class="pn-tit">'+(d.detalle||d.titulo)+'</b>':'<b class="pn-tit">'+d.titulo+'</b>')+
+      (d.sub?'<span class="pn-sub">'+d.sub+'</span>':'')+'</div></div>'+
       '<div class="pn-kpis">'+(d.kpis||[]).filter(Boolean).map(function(k){
         var tag=k.go?'button type="button" data-go="'+k.go+'"':'div';
         return '<'+tag+' class="pn-k" data-tono="'+(k.tono||"")+'"><b class="num">'+k.v+'</b><span>'+k.l+'</span>'+(k.s?'<small>'+k.s+'</small>':'')+'</'+(k.go?'button':'div')+'>';

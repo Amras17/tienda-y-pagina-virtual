@@ -1,0 +1,401 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>/* EmporioAndinoPOS: deja que el lanzador escuche errores desde el inicio */try{if(parent!==window&&parent.__eaGancho)parent.__eaGancho(window)}catch(e){}</script></head><body>
+<title>Horno · EmporioAndinoPOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../nucleo/emporio.css">
+<style>
+/* El Horno: lo primero es el reloj. Arriba lo que está adentro y cuánto le
+   falta; después cargar la tanda, el pedido de la Panadería, la vitrina,
+   quien espera, las comandas de horno y, al cierre, el precocido.
+   Dentro del sistema general el reloj grande vive en el resumen de arriba. */
+.modulo{position:relative;z-index:1;padding-block:16px 40px;padding-inline:16px;display:flex;flex-direction:column;gap:14px;max-width:1500px;margin:0 auto}
+html.incrustado .solo{display:none}
+html.incrustado .modulo{padding-top:4px}
+.hgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:start}
+.s7{grid-column:span 7}.s5{grid-column:span 5}.s6{grid-column:span 6}.s12{grid-column:1/-1}
+/* Los quiebres quedan fuera del rango en que cambia el ancho al plegarse la
+   barra del sistema (así el contenido no salta de columnas al desplazarse). */
+@media (max-width:1000px){.s7,.s5{grid-column:1/-1}}
+@media (max-width:680px){.s6{grid-column:1/-1}}
+.hd .acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+/* reloj grande */
+.rh{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center}
+.rh-ring{width:clamp(120px,22vw,190px);height:auto}
+.rh-t{display:block;font-family:var(--f-num);font-weight:800;font-size:clamp(56px,10vw,120px);line-height:.95;letter-spacing:-.03em;color:var(--horno)}
+.rh-t.libre{font-size:clamp(34px,6vw,58px);color:var(--fg)}
+.rh .lbl{display:block;margin-bottom:6px}
+.rh p{margin:8px 0 0;color:var(--fg-2);font-size:14px}
+.rh .acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:560px){.rh{grid-template-columns:minmax(0,1fr)}.rh-ring{display:none}}
+/* tandas adentro */
+.tanda{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;padding:12px 0;border-top:1px solid var(--stroke)}
+.tanda:first-child{border-top:0;padding-top:0}
+.tanda .tt{font-family:var(--f-num);font-weight:800;font-size:clamp(30px,5vw,44px);color:var(--horno);line-height:1;text-align:right}
+.tanda .tt small{display:block;font-family:inherit;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.tanda.lista .tt{color:var(--ok)}
+.tanda b{font-family:var(--f-num);font-size:15px}
+.tanda .it{color:var(--fg-2);font-size:13px;margin-top:3px}
+.tanda .bar{grid-column:1/-1;height:8px}
+.tanda .bar i{background:var(--horno)}
+.tanda .fila{grid-column:1/-1;display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+/* elegir variedades */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.vcard{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:14px;border:1.5px solid var(--stroke);background:var(--glass-2);min-width:0}
+.vcard.on{border-color:var(--horno);background:color-mix(in srgb,var(--horno) 14%,var(--glass-2))}
+.vcard .vn{display:flex;flex-direction:column;gap:1px;align-items:flex-start;font-weight:800;font-size:14px;background:none;border:0;color:inherit;padding:0;text-align:left;cursor:pointer;font-family:inherit}
+.vcard .vn small{font-weight:700;color:var(--muted);font-size:11px;white-space:nowrap}
+.vcard .vn small.cero{color:var(--warn)}
+.paso{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;gap:4px}
+.paso button{height:34px;border-radius:10px;border:1px solid var(--stroke-2);background:var(--glass);color:var(--fg);font-size:18px;font-weight:800;cursor:pointer}
+.paso button:disabled{opacity:.35}
+.paso b{text-align:center;font-family:var(--f-num);font-size:18px}
+.paso b small{display:block;font-size:10.5px;color:var(--muted);font-weight:700;font-family:inherit}
+.ctl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.ctl-row .lbl{margin-right:4px}
+.info{margin:12px 0 0;font-size:13px;color:var(--fg-2);line-height:1.45}
+.info .mal{color:var(--crit);font-weight:700}
+.info .ojo{color:var(--warn);font-weight:700}
+.grande{width:100%;justify-content:center;margin-top:12px;padding:13px 16px;font-size:15px}
+/* listas */
+.lst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.lst>li{border:1px solid var(--stroke);border-radius:14px;padding:10px 12px;background:var(--glass-2);display:flex;flex-direction:column;gap:8px}
+.lst .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.lst .h b{font-family:var(--f-num)}
+.lst .h span{font-size:12px;color:var(--muted)}
+.lst .acc{display:flex;gap:6px;flex-wrap:wrap}
+.lst .search,.form .search{flex:none;width:100%;box-sizing:border-box;font:inherit;color:var(--fg)}
+.lst.listo>li{opacity:.75}
+.estd{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px;border:1px solid var(--stroke-2)}
+.estd.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.estd.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 55%,transparent)}
+.estd.crit{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 55%,transparent)}
+.recgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.recgrid .vcard{gap:4px}
+/* vitrina */
+.vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.vit .vcard b.n{font-family:var(--f-num);font-size:28px;line-height:1}
+.vit .vcard.cero{border-color:color-mix(in srgb,var(--crit) 60%,transparent)}
+.vit .vcard.bajo{border-color:color-mix(in srgb,var(--warn) 60%,transparent)}
+.vit small{color:var(--muted);font-size:11.5px}
+.form{display:grid;gap:8px;margin-top:10px}
+.form input[type=text]{width:100%}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600}
+.cmdt{border-top:3px solid var(--horno)}
+.cmdt ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.cmdt li{font-weight:600}
+.cmdt li .q{font-family:var(--f-num);font-weight:800;margin-right:6px}
+.hecho{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--ok) 12%,transparent);border:1px solid color-mix(in srgb,var(--ok) 40%,transparent);font-size:13px;margin-bottom:10px}
+details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:var(--fg-2)}
+.ajgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+</style>
+
+<div class="modulo">
+  <header class="top glass solo">
+    <div class="ttl"><div><h1>Horno</h1><p>Temporizador de las tandas, pedido de la panadería, vitrina y precocido</p></div></div>
+    <div class="ctl"><span class="clock num" id="reloj">--:--</span></div>
+  </header>
+
+  <!-- El reloj grande (dentro del sistema general está en el resumen de arriba) -->
+  <article class="tile glass solo" id="tHero"><div class="tc" id="hero"></div></article>
+
+  <div class="hgrid">
+    <article class="tile glass s7" id="tDentro"><div class="tc">
+      <div class="hd"><div><h2>En el horno</h2><p id="dentroSub">Cada tanda con su reloj</p></div>
+        <div class="acc"><button class="btn sm" type="button" id="sonido" aria-pressed="false">Campana apagada</button></div></div>
+      <div id="dentro"></div></div></article>
+
+    <article class="tile glass s5" id="tCarga"><div class="tc">
+      <div class="hd"><div><h2 id="cargaT">Cargar tanda</h2><p id="cargaSub">Elige las variedades y cuántas de cada una</p></div></div>
+      <div id="carga"></div></div></article>
+
+    <article class="tile glass s6" id="tPedido"><div class="tc">
+      <div class="hd"><div><h2>Pedido de la panadería</h2><p id="pedSub">Registra lo que llega y confírmalo</p></div>
+        <div class="acc"><button class="btn sm warn" type="button" id="btnSolicitar">Solicitar empanadas</button></div></div>
+      <div id="pedido"></div></div></article>
+
+    <article class="tile glass s6" id="vitrina"><div class="tc">
+      <div class="hd"><div><h2>Vitrina</h2><p id="vitSub">Revisa y corrige lo que hay</p></div></div>
+      <div class="vit" id="vit"></div></div></article>
+
+    <article class="tile glass s6" id="tEspera"><div class="tc">
+      <div class="hd"><div><h2>Esperan la tanda</h2><p>Quien pagó o espera empanadas de la próxima tanda</p></div>
+        <div class="acc"><button class="btn sm" type="button" id="btnEspera">Anotar</button></div></div>
+      <div id="espera"></div></div></article>
+
+    <article class="tile glass s6" id="tComandas"><div class="tc">
+      <div class="hd"><div><h2>Comandas de horno</h2><p id="cmdSub">Empanadas y pastelería cobradas en la Caja</p></div></div>
+      <div id="comandas"></div></div></article>
+
+    <article class="tile glass s12" id="tCierre"><div class="tc">
+      <div class="hd"><div><h2>Precocido para mañana</h2><p>Al cierre, lo que queda armado y sin hornear: con esto parte la Panadería mañana</p></div></div>
+      <div id="cierre"></div></div></article>
+
+    <article class="tile glass s12" id="tTandas"><div class="tc">
+      <div class="hd"><div><h2>Tandas de hoy</h2><p id="tandasSub"></p></div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Entró</th><th>Sale</th><th>Variedades</th><th class="r">Unidades</th><th>Quién</th><th>Estado</th></tr></thead><tbody id="tandas"></tbody></table></div>
+      <details class="aj" id="ajustes"><summary>Ajustes del horno</summary><div class="ajgrid" id="ajgrid"></div></details>
+    </div></article>
+  </div>
+</div>
+
+<script src="../nucleo/datos.js"></script>
+<script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/produccion.js"></script>
+<script src="../nucleo/emporio.js"></script>
+<script>
+/* ====================================================================
+   Horno: recibe el pedido de la Panadería (latas de 15), carga las tandas
+   (20 minutos la cocción), las saca a la vitrina, avisa a quien espera y
+   reporta el precocido que queda para mañana. Todo en el equipo, con la
+   misma memoria que leen la Caja, el Salón y la Carta (nucleo/produccion.js).
+   ==================================================================== */
+var U=EA_UI, E=EAPOS, P=E.prod, LATA=P.LATA;
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function hora(ts){ return U.hhmm(new Date(ts)); }
+function quien(){ var s=E.sesion(); return s?s.n:"Horno"; }
+function mmss(ms){ var s=Math.max(0,Math.round(ms/1000)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function restaMs(eta){ return new Date(eta).getTime()-Date.now(); }
+function latas(n){ if(!n) return "0"; var l=n/LATA; return l===Math.floor(l)? l+(l===1?" lata":" latas") : n+" u."; }
+function lista(items){ return Object.keys(items).map(function(k){ return items[k]+" "+esc(P.nombre(k)); }).join(" · "); }
+
+var SEL={}, MIN=null, REC={}, SOL=null, PREC=null, PREC_TOCADO=false, ESP=null;
+
+/* ---------- reloj grande ---------- */
+function activas(){ var c=P.control(), por={}, l=[];
+  c.horno.forEach(function(x){ var k=x.tanda||x.id; if(!por[k]){ por[k]={id:k, eta:x.eta, desde:x.desde, items:{}, total:0}; l.push(por[k]); } por[k].items[x.emp]=(por[k].items[x.emp]||0)+x.n; por[k].total+=x.n; });
+  var tt=P.tandas(); l.forEach(function(a){ var t=tt.filter(function(y){ return y.id===a.id; })[0]; a.n=t?t.n:null; a.por=t?t.por:""; a.min=t?t.min:Math.round((new Date(a.eta)-new Date(a.desde))/60000); });
+  return l.sort(function(a,b){ return new Date(a.eta)-new Date(b.eta); }); }
+function anillo(pct){ var r=54, L=2*Math.PI*r; return '<svg class="rh-ring" viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="'+r+'" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/>'+
+  '<circle data-arco cx="66" cy="66" r="'+r+'" fill="none" stroke="var(--horno)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 66 66)" stroke-dasharray="'+L.toFixed(1)+'" stroke-dashoffset="'+(L*(1-pct)).toFixed(1)+'"/></svg>'; }
+function pintarHero(){
+  var a=activas(), h;
+  if(a.length){ var t=a[0], dur=new Date(t.eta)-new Date(t.desde), pct=Math.min(1,Math.max(0,1-restaMs(t.eta)/dur));
+    h='<div class="rh">'+anillo(pct)+'<div><span class="lbl">'+(t.n?"Tanda "+t.n+" · ":"")+'sale a las '+hora(t.eta)+'</span>'+
+      '<span class="rh-t num" data-cuenta="'+t.eta+'">'+mmss(restaMs(t.eta))+'</span>'+
+      '<p>'+lista(t.items)+(a.length>1?' · después '+(a.length-1)+(a.length===2?' tanda más':' tandas más'):'')+'</p></div></div>'; }
+  else { var s=P.sugerencia(), primera=!P.tandas().length;
+    h='<div class="rh"><div style="grid-column:1/-1"><span class="lbl">Horno libre</span><span class="rh-t libre">'+(P.totalPorHornear()?P.totalPorHornear()+" por hornear":"Sin empanadas por hornear")+'</span>'+
+      '<p>'+(P.porRecibir().length?"Hay un pedido de la panadería por recibir.":s.total?"Sugerido: "+lista(s.items)+".":"Confirma el pedido de la panadería para empezar.")+'</p>'+
+      (s.total?'<div class="acc"><button class="btn pri" type="button" data-sug>'+(primera?"Comenzar producción · primera tanda":"Cargar la sugerencia")+'</button></div>':'')+'</div></div>'; }
+  $("hero").innerHTML=h;
+}
+
+/* ---------- en el horno ---------- */
+function pintarDentro(){
+  var a=activas(), c=P.ajustesHorno();
+  $("dentroSub").textContent=a.length? P.enHorno()+" empanadas adentro · capacidad "+c.cap+" ("+latas(c.cap)+")" : "Horno libre · capacidad "+c.cap+" ("+latas(c.cap)+")";
+  $("dentro").innerHTML=a.length? a.map(function(t){ var dur=new Date(t.eta)-new Date(t.desde), pct=Math.min(1,Math.max(0,1-restaMs(t.eta)/dur));
+      return '<div class="tanda"><div><b>'+(t.n?"Tanda "+t.n:"Hornada")+' · '+t.total+' u.</b><div class="it">'+lista(t.items)+'</div></div>'+
+        '<div class="tt num"><span data-cuenta="'+t.eta+'">'+mmss(restaMs(t.eta))+'</span><small>SALE '+hora(t.eta)+'</small></div>'+
+        '<div class="bar"><i data-avance="'+t.desde+'|'+t.eta+'" style="width:'+(pct*100).toFixed(1)+'%"></i></div>'+
+        '<div class="fila"><span>Entró '+hora(t.desde)+' · '+t.min+' min'+(t.por?' · '+esc(t.por):'')+'</span><button class="btn sm" type="button" data-ya="'+t.id+'">Salió ya</button></div></div>'; }).join("")
+    : '<div class="empty"><span class="ic">'+U.icono("horno")+'</span><p><b>No hay nada en el horno.</b> Carga una tanda: el reloj corre solo y, al llegar a cero, las empanadas pasan a la vitrina y suena la campana.</p></div>';
+}
+
+/* ---------- cargar tanda ---------- */
+function pintarCarga(){
+  var aj=P.ajustesHorno(), crudo=P.porHornear(), libre=Math.max(0,aj.cap-P.enHorno()), min=MIN||aj.min, primera=!P.tandas().length;
+  var total=0, fuera=[]; for(var k in SEL){ total+=SEL[k]; if(SEL[k]>Math.max(0,crudo[k])) fuera.push(P.nombre(k)); }
+  $("cargaT").textContent=primera?"Comenzar producción":"Cargar tanda";
+  $("cargaSub").textContent=primera?"Primera tanda del día: "+aj.min+" minutos de cocción":"Elige las variedades y cuántas de cada una";
+  var h='<div class="vgrid">'+P.EMP.map(function(e){ var n=SEL[e.id]||0, d=Math.max(0,crudo[e.id]);
+    return '<div class="vcard'+(n?" on":"")+'"><button class="vn" type="button" data-tg="'+e.id+'" aria-pressed="'+(n?"true":"false")+'">'+esc(e.n)+'<small class="'+(d?"":"cero")+'">'+d+' por hornear</small></button>'+
+      '<div class="paso"><button type="button" data-sel="'+e.id+'" data-d="-5" aria-label="Menos '+esc(e.n)+'"'+(n?'':' disabled')+'>−</button><b class="num">'+n+'<small>'+(n?latas(n):"—")+'</small></b><button type="button" data-sel="'+e.id+'" data-d="5" aria-label="Más '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>';
+  h+='<div class="ctl-row"><span class="lbl">Cocción</span>'+[15,20,25].map(function(m){ return '<button class="fchip" type="button" data-min="'+m+'" aria-pressed="'+(min===m)+'">'+m+' min</button>'; }).join("")+
+    '<div class="paso" style="width:130px"><button type="button" data-mind="-1" aria-label="Un minuto menos">−</button><b class="num">'+min+'<small>min</small></b><button type="button" data-mind="1" aria-label="Un minuto más">+</button></div></div>';
+  var s=P.sugerencia();
+  h+='<p class="info">'+(total? '<b>'+total+'</b> empanadas · sale a las <b>'+U.hhmm(new Date(Date.now()+min*60000))+'</b> · quedan '+libre+' lugares en el horno'+(total>libre?' · <span class="mal">no caben: sobran '+(total-libre)+'</span>':'')+(fuera.length?' · <span class="ojo">más de lo registrado en '+esc(fuera.join(", "))+'</span>':'')
+      : (P.totalPorHornear()? P.totalPorHornear()+' empanadas por hornear'+(s.total?' · sugerido: '+lista(s.items):'') : P.porRecibir().length? 'Primero confirma el pedido de la panadería.' : 'No hay empanadas por hornear registradas: pide a la panadería o carga igual si llegaron sin registro.'))+'</p>';
+  h+='<div class="ctl-row">'+(s.total?'<button class="btn sm" type="button" data-sug>Usar la sugerencia</button>':'')+(total?'<button class="btn sm" type="button" id="limpiar">Limpiar</button>':'')+'</div>';
+  h+='<button class="btn pri grande" type="button" id="alHorno"'+(total&&total<=libre?'':' disabled')+'>'+(total?(primera?"Comenzar producción · ":"Al horno · ")+total+" empanadas · "+min+" min":"Elige qué entra")+'</button>';
+  $("carga").innerHTML=h;
+}
+
+/* ---------- pedido de la panadería ---------- */
+var ESTADO={por_confirmar:["Por confirmar","warn"], enviado:["Por recibir","warn"], recibido:["Recibido","ok"], rechazado:["No se pudo","crit"], anulado:["Anulado",""]};
+function pintarPedido(){
+  var ped=P.pedidos(), rec=ped.filter(function(x){ return x.estado==="enviado"; }), h="";
+  $("pedSub").textContent=rec.length? rec.length+(rec.length===1?" pedido por recibir":" pedidos por recibir")+": cuenta lo que llegó y confírmalo" : "Registra lo que llega y confírmalo";
+  if(SOL){ h+='<div class="lst"><li style="list-style:none"><div class="h"><b>Solicitud de empanadas</b><span>queda por confirmar hasta que la panadería responda</span></div>'+
+      '<div class="recgrid">'+P.EMP.map(function(e){ var n=SOL.items[e.id]||0; return '<div class="vcard'+(n?" on":"")+'"><span class="vn">'+esc(e.n)+'</span><div class="paso"><button type="button" data-sol="'+e.id+'" data-d="-1"'+(n?'':' disabled')+' aria-label="Menos '+esc(e.n)+'">−</button><b class="num">'+n+'<small>latas</small></b><button type="button" data-sol="'+e.id+'" data-d="1" aria-label="Más '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>'+
+      '<input class="search" type="text" id="solNota" maxlength="140" placeholder="Motivo (opcional): sobredemanda, grupo grande…" value="'+esc(SOL.nota)+'">'+
+      '<div class="acc"><button class="btn pri" type="button" id="solEnviar"'+(Object.keys(SOL.items).some(function(k){ return SOL.items[k]>0; })?'':' disabled')+'>Enviar solicitud a la panadería</button><button class="btn" type="button" id="solCancelar">Cancelar</button></div></li></div>'; }
+  if(rec.length) h+='<ul class="lst">'+rec.map(function(x){ var ed=REC[x.id]||(REC[x.id]=(function(){ var o={}; for(var k in x.items) o[k]=x.items[k]*LATA; return o; })());
+      return '<li><div class="h"><b>'+(x.tipo==="solicitud"?"Solicitud":"Pedido")+' '+x.n+' · '+latas(sumaLatas(x.items)*LATA)+'</b><span>Enviado '+hora(x.conf?x.conf.ts:x.ts)+' por '+esc((x.conf&&x.conf.por)||x.por)+'</span></div>'+
+        '<div class="recgrid">'+Object.keys(x.items).map(function(k){ var n=ed[k]||0, esp=x.items[k]*LATA;
+          return '<div class="vcard on"><span class="vn">'+esc(P.nombre(k))+'<small>'+x.items[k]+(x.items[k]===1?" lata":" latas")+'</small></span><div class="paso"><button type="button" data-rec="'+x.id+'|'+k+'" data-d="-1" aria-label="Una menos">−</button><b class="num">'+n+'<small>'+(n===esp?"llegaron":(n<esp?"faltan "+(esp-n):"sobran "+(n-esp)))+'</small></b><button type="button" data-rec="'+x.id+'|'+k+'" data-d="1" aria-label="Una más">+</button></div></div>'; }).join("")+'</div>'+
+        '<div class="acc"><button class="btn pri" type="button" data-recibir="'+x.id+'">Confirmar recepción</button></div></li>'; }).join("")+'</ul>';
+  var resto=ped.filter(function(x){ return x.estado!=="enviado"; }).reverse();
+  if(resto.length) h+='<ul class="lst listo" style="margin-top:10px">'+resto.map(function(x){ var e=ESTADO[x.estado]||[x.estado,""], u=x.rec?x.rec.u:null;
+      return '<li><div class="h"><b>'+(x.tipo==="solicitud"?"Solicitud":"Pedido")+' '+x.n+'</b><span class="estd '+e[1]+'">'+e[0]+'</span></div>'+
+        '<div style="font-size:13px;color:var(--fg-2)">'+(u?lista(u)+' · recibido '+hora(x.rec.ts)+' por '+esc(x.rec.por):Object.keys(x.items).map(function(k){ return x.items[k]+" "+(x.items[k]===1?"lata":"latas")+" "+esc(P.nombre(k)); }).join(" · "))+
+        (x.nota?'<br><i>'+esc(x.nota)+'</i>':'')+(x.estado==="rechazado"&&x.conf&&x.conf.motivo?'<br>Panadería: '+esc(x.conf.motivo):'')+'</div>'+
+        (x.estado==="por_confirmar"?'<div class="acc"><button class="btn sm" type="button" data-anular="'+x.id+'">Anular solicitud</button></div>':'')+'</li>'; }).join("")+'</ul>';
+  if(!h) h='<div class="empty"><span class="ic">'+U.icono("panaderia")+'</span><p><b>Sin pedidos hoy.</b> Cuando la panadería mande las latas, aparecen aquí para contarlas y confirmarlas. Si falta, usa <b>Solicitar empanadas</b>.</p></div>';
+  $("pedido").innerHTML=h;
+}
+function sumaLatas(o){ var n=0; for(var k in o) n+=o[k]; return n; }
+
+/* ---------- vitrina ---------- */
+function pintarVitrina(){
+  var v=P.vitrina(), ven=P.vendidasHoy(), aj=P.ajustesHorno(), tot=P.totalVitrina();
+  $("vitSub").textContent=tot+" en vitrina · mínimo "+aj.minimo+(tot<aj.minimo?" · bajo el mínimo: conviene hornear":"");
+  $("vit").innerHTML=P.EMP.map(function(e){ var n=v[e.id], u=n==null?0:n;
+    return '<div class="vcard'+(n===0?" cero":u&&u<=6?" bajo":"")+'"><span class="vn">'+esc(e.n)+'<small>'+ven[e.id]+' vendidas</small></span>'+
+      '<div class="paso"><button type="button" data-vit="'+e.id+'" data-d="-1" aria-label="Una menos de '+esc(e.n)+'"'+(u?'':' disabled')+'>−</button><b class="num n">'+(n==null?"—":u)+'</b><button type="button" data-vit="'+e.id+'" data-d="1" aria-label="Una más de '+esc(e.n)+'">+</button></div></div>'; }).join("");
+}
+
+/* ---------- esperan la tanda ---------- */
+function pintarEspera(){
+  var l=P.espera(), v=P.vitrina(), h="";
+  if(ESP){ h+='<div class="form"><input class="search" type="text" id="espNombre" maxlength="40" placeholder="Nombre o seña del cliente" value="'+esc(ESP.nombre)+'">'+
+      '<div class="recgrid">'+P.EMP.map(function(e){ var n=ESP.items[e.id]||0; return '<div class="vcard'+(n?" on":"")+'"><span class="vn">'+esc(e.n)+'</span><div class="paso"><button type="button" data-esp="'+e.id+'" data-d="-1"'+(n?'':' disabled')+' aria-label="Menos '+esc(e.n)+'">−</button><b class="num">'+n+'</b><button type="button" data-esp="'+e.id+'" data-d="1" aria-label="Más '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>'+
+      '<label class="chk"><input type="checkbox" id="espPagado"'+(ESP.pagado?" checked":"")+'> Ya pagó en la Caja</label>'+
+      '<div class="ctl-row" style="margin-top:0"><button class="btn pri" type="button" id="espGuardar">Anotar</button><button class="btn" type="button" id="espCancelar">Cancelar</button></div></div>'; }
+  if(l.length) h+='<ul class="lst" style="margin-top:10px">'+l.map(function(e){ var hay=e.items&&Object.keys(e.items).every(function(k){ return (v[k]||0)>=e.items[k]; });
+      return '<li><div class="h"><b>'+esc(e.nombre||"Cliente")+'</b><span>desde '+hora(e.ts)+' · '+Math.max(0,Math.floor((Date.now()-new Date(e.ts))/60000))+' min'+(e.pagado?' · pagado':'')+'</span></div>'+
+        '<div style="font-size:13px">'+(e.items?lista(e.items):e.n+" empanadas")+'</div>'+
+        '<div class="acc">'+(hay?'<span class="estd ok">Ya hay en vitrina</span>':'')+'<button class="btn sm'+(hay?' pri':'')+'" type="button" data-entregar="'+e.id+'">Entregado</button></div></li>'; }).join("")+'</ul>';
+  else if(!ESP) h='<p class="empty-s">Nadie espera ahora.</p>';
+  $("espera").innerHTML=h;
+}
+
+/* ---------- comandas de horno (lo de empanadas y pastelería) ---------- */
+function marcas(){ var m=E.leer("eapos_comandas"); if(!m||m.fecha!==E.hoyLocal()) m={fecha:E.hoyLocal(), listo:{}}; return m; }
+function comandasHorno(){ var pos=E.leer("ea_pos")||{}, vs=Array.isArray(pos.ventas)?pos.ventas:[], f=E.hoyLocal(), m=marcas(), out=[];
+  vs.forEach(function(v){ if(v.anulada||E.hoyLocal(new Date(v.ts))!==f) return;
+    var l=(v.lineas||[]).filter(function(x){ var p=E.producto(x.id); return p&&(p.g==="emp"||p.g==="past"); });
+    if(l.length&&!m.listo[v.id+"|horno"]) out.push({clave:v.id+"|horno", venta:v, lineas:l}); });
+  return out; }
+function pintarComandas(){
+  var l=comandasHorno();
+  $("cmdSub").textContent=l.length? l.length+(l.length===1?" comanda pendiente":" comandas pendientes") : "Empanadas y pastelería cobradas en la Caja";
+  $("comandas").innerHTML=l.length? '<ul class="lst">'+l.map(function(c){ var mi=Math.max(0,Math.floor((Date.now()-new Date(c.venta.ts))/60000));
+      return '<li class="cmdt"><div class="h"><b>'+esc(c.venta.id.slice(-5))+'</b><span>'+hora(c.venta.ts)+' · '+mi+' min</span></div><ul>'+c.lineas.map(function(x){ return '<li><span class="q">'+x.q+'</span>'+esc(x.n)+'</li>'; }).join("")+'</ul>'+
+        '<div class="acc"><button class="btn sm pri" type="button" data-listo="'+esc(c.clave)+'">Listo</button></div></li>'; }).join("")+'</ul>'
+    : '<p class="empty-s">Sin comandas de horno pendientes.</p>';
+}
+
+/* ---------- precocido para mañana ---------- */
+function pintarCierre(){
+  var pr=P.precocido(), crudo=P.porHornear(), h="";
+  /* Mientras nadie lo corrija, sigue a lo que el sistema calcula sin hornear. */
+  if(!PREC||!PREC_TOCADO){ PREC={}; P.EMP.forEach(function(e){ PREC[e.id]=pr&&pr.items?(pr.items[e.id]||0):Math.max(0,crudo[e.id]); }); }
+  if(pr) h+='<div class="hecho">✓ Reportado a las '+hora(pr.ts)+' por '+esc(pr.por)+': '+(Object.keys(pr.items).length?lista(pr.items):"no quedó precocido")+'. La panadería lo ve en su plan de mañana.</div>';
+  h+='<div class="recgrid">'+P.EMP.map(function(e){ var n=PREC[e.id]||0;
+    return '<div class="vcard'+(n?" on":"")+'"><span class="vn">'+esc(e.n)+'<small>'+Math.max(0,crudo[e.id])+' sin hornear</small></span><div class="paso"><button type="button" data-prec="'+e.id+'" data-d="-1"'+(n?'':' disabled')+' aria-label="Menos '+esc(e.n)+'">−</button><b class="num">'+n+'<small>'+(n?latas(n):"—")+'</small></b><button type="button" data-prec="'+e.id+'" data-d="1" aria-label="Más '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>';
+  h+='<p class="info">Parte con lo que el sistema calcula sin hornear (lo precocido de ayer + lo recibido hoy − lo que entró al horno). Corrígelo con lo que cuentes.</p>';
+  h+='<div class="ctl-row"><button class="btn pri" type="button" id="reportar">'+(pr?"Corregir el reporte":"Reportar precocido para mañana")+' · '+sumaLatas(PREC)+' u.</button></div>';
+  $("cierre").innerHTML=h;
+}
+
+/* ---------- tandas de hoy y ajustes ---------- */
+function pintarTandas(){
+  var tt=P.tandas(), tot=tt.reduce(function(a,t){ return a+t.total; },0);
+  $("tandasSub").textContent=tt.length? tt.length+(tt.length===1?" tanda":" tandas")+" · "+tot+" empanadas horneadas hoy" : "Todavía no entra ninguna tanda hoy";
+  $("tandas").innerHTML=tt.slice().reverse().map(function(t){ var dentro=!t.salio&&restaMs(t.eta)>0;
+    return '<tr><td class="num">'+t.n+'</td><td class="num">'+hora(t.desde)+'</td><td class="num">'+hora(t.salio||t.eta)+'</td><td>'+lista(t.items)+'</td><td class="r num">'+t.total+'</td><td>'+esc(t.por)+'</td><td><span class="estd '+(dentro?"warn":"ok")+'">'+(dentro?"En el horno":"En vitrina")+'</span></td></tr>'; }).join("")||'<tr><td colspan="7" class="empty-s">Sin tandas.</td></tr>';
+  var aj=P.ajustesHorno();
+  if(!$("ajustes").open) $("ajgrid").innerHTML=[["cap","Capacidad del horno",aj.cap/LATA,"latas",1],["min","Cocción por defecto",aj.min,"min",1],["minimo","Mínimo en vitrina",aj.minimo,"empanadas",1]].map(function(x){
+    return '<div class="vcard"><span class="vn">'+x[1]+'</span><div class="paso"><button type="button" data-aj="'+x[0]+'" data-d="-'+x[4]+'" aria-label="Menos">−</button><b class="num">'+x[2]+'<small>'+x[3]+'</small></b><button type="button" data-aj="'+x[0]+'" data-d="'+x[4]+'" aria-label="Más">+</button></div></div>'; }).join("");
+}
+
+/* ---------- todo junto ---------- */
+var SECCIONES=[["tHero",pintarHero],["tDentro",pintarDentro],["tCarga",pintarCarga],["tPedido",pintarPedido],["vitrina",pintarVitrina],["tEspera",pintarEspera],["tComandas",pintarComandas],["tCierre",pintarCierre],["tTandas",pintarTandas]];
+function pintar(forzar){
+  var foco=document.activeElement;
+  SECCIONES.forEach(function(s){ var el=$(s[0]);
+    /* No se repinta la sección donde alguien está escribiendo. */
+    if(!forzar&&foco&&foco.tagName==="INPUT"&&foco.type==="text"&&el.contains(foco)) return;
+    s[1](); });
+}
+
+/* El reloj corre siempre: números cada segundo, revisión del horno cada dos. */
+var SALIDAS=null, sonido=false, AC=null;
+function campana(){ if(!sonido) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume();
+    [[988,0],[784,.2],[988,.4]].forEach(function(n){ var o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+n[1];
+      o.frequency.value=n[0]; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.2,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+.3);
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+.35); }); }catch(e){} }
+function vigilarSalidas(){
+  var tt=P.tandas(), salidas=tt.filter(function(t){ return t.salio; }).map(function(t){ return t.id; });
+  if(SALIDAS){ var nuevas=tt.filter(function(t){ return t.salio&&SALIDAS.indexOf(t.id)<0; });
+    if(nuevas.length){ campana(); var t=nuevas[nuevas.length-1], v=P.vitrina();
+      var ent=P.espera().filter(function(e){ return e.items&&Object.keys(e.items).every(function(k){ return (v[k]||0)>=e.items[k]; }); });
+      U.aviso("Salió la tanda "+t.n+": "+Object.keys(t.items).map(function(k){ return t.items[k]+" "+P.nombre(k); }).join(" · ")+(ent.length?" · entregar a "+ent.map(function(e){ return e.nombre||"cliente"; }).join(", "):""),6000);
+      pintar(); } }
+  SALIDAS=salidas;
+}
+function tic(){
+  document.querySelectorAll("[data-cuenta]").forEach(function(n){ n.textContent=mmss(restaMs(n.getAttribute("data-cuenta"))); });
+  document.querySelectorAll("[data-avance]").forEach(function(n){ var p=n.getAttribute("data-avance").split("|"), a=new Date(p[0]).getTime(), b=new Date(p[1]).getTime();
+    n.style.width=(Math.min(1,Math.max(0,(Date.now()-a)/(b-a)))*100).toFixed(1)+"%"; });
+  var arco=document.querySelector("[data-arco]"), a0=activas()[0];
+  if(arco&&a0){ var L=+arco.getAttribute("stroke-dasharray"), dur=new Date(a0.eta)-new Date(a0.desde); arco.setAttribute("stroke-dashoffset",(L*Math.min(1,Math.max(0,restaMs(a0.eta)/dur))).toFixed(1)); }
+}
+setInterval(tic,1000);
+setInterval(function(){ P.revisar(); vigilarSalidas(); },2000);
+
+/* ---------- acciones ---------- */
+function paso(v,d,min,max){ return Math.max(min,Math.min(max,v+d)); }
+document.addEventListener("click",function(ev){
+  var b=ev.target.closest("button"); if(!b) return; var d=+b.getAttribute("data-d")||0;
+  if(b.hasAttribute("data-sug")){ var s=P.sugerencia(); SEL=Object.assign({},s.items); pintarCarga();
+    if(b.closest("#hero")){ alHorno(); } else document.getElementById("tCarga").scrollIntoView({block:"nearest"}); return; }
+  if(b.dataset.tg){ var id=b.dataset.tg; if(SEL[id]) delete SEL[id]; else SEL[id]=Math.min(LATA,Math.max(5,Math.max(0,P.porHornear()[id])||LATA)); pintarCarga(); return; }
+  if(b.dataset.sel){ var k=b.dataset.sel, n=paso(SEL[k]||0,d,0,P.ajustesHorno().cap); if(n) SEL[k]=n; else delete SEL[k]; pintarCarga(); return; }
+  if(b.dataset.min){ MIN=+b.dataset.min; pintarCarga(); return; }
+  if(b.hasAttribute("data-mind")){ MIN=paso(MIN||P.ajustesHorno().min,+b.getAttribute("data-mind"),1,90); pintarCarga(); return; }
+  if(b.id==="limpiar"){ SEL={}; pintarCarga(); return; }
+  if(b.id==="alHorno"){ alHorno(); return; }
+  if(b.dataset.ya){ P.sacarYa(b.dataset.ya); vigilarSalidas(); pintar(); return; }
+  if(b.id==="sonido"){ sonido=!sonido; b.setAttribute("aria-pressed",String(sonido)); b.textContent=sonido?"Campana encendida":"Campana apagada"; b.classList.toggle("pri",sonido); campana(); return; }
+  /* pedido */
+  if(b.id==="btnSolicitar"){ SOL=SOL?null:{items:{}, nota:""}; pintarPedido(); if(SOL) $("tPedido").scrollIntoView({block:"nearest"}); return; }
+  if(b.dataset.sol){ guardarNotaSol(); var ks=b.dataset.sol, ns=paso(SOL.items[ks]||0,d,0,20); if(ns) SOL.items[ks]=ns; else delete SOL.items[ks]; pintarPedido(); return; }
+  if(b.id==="solCancelar"){ SOL=null; pintarPedido(); return; }
+  if(b.id==="solEnviar"){ guardarNotaSol(); var x=P.nuevoPedido("solicitud",SOL.items,quien(),SOL.nota); SOL=null; if(x) U.aviso("Solicitud enviada a la panadería: queda por confirmar"); pintar(true); return; }
+  if(b.dataset.anular){ P.anular(b.dataset.anular,quien()); U.aviso("Solicitud anulada"); pintar(); return; }
+  if(b.dataset.rec){ var pr=b.dataset.rec.split("|"); REC[pr[0]][pr[1]]=paso(REC[pr[0]][pr[1]]||0,d,0,999); pintarPedido(); return; }
+  if(b.dataset.recibir){ var r=P.recibir(b.dataset.recibir,REC[b.dataset.recibir],quien()); delete REC[b.dataset.recibir];
+    if(r){ var tot=0; for(var q in r.rec.u) tot+=r.rec.u[q]; U.aviso("Recepción confirmada: "+tot+" empanadas por hornear"); if(!P.tandas().length){ SEL=Object.assign({},P.sugerencia().items); } }
+    pintar(); return; }
+  /* vitrina */
+  if(b.dataset.vit){ var vv=P.vitrina()[b.dataset.vit]||0; P.fijarVitrina(b.dataset.vit,vv+d); pintar(); return; }
+  /* espera */
+  if(b.id==="btnEspera"){ ESP=ESP?null:{nombre:"", items:{}, pagado:true}; pintarEspera(); if(ESP) setTimeout(function(){ $("espNombre").focus(); },30); return; }
+  if(b.dataset.esp){ guardarEsp(); var ke=b.dataset.esp, ne=paso(ESP.items[ke]||0,d,0,60); if(ne) ESP.items[ke]=ne; else delete ESP.items[ke]; pintarEspera(); return; }
+  if(b.id==="espCancelar"){ ESP=null; pintarEspera(); return; }
+  if(b.id==="espGuardar"){ guardarEsp(); if(!Object.keys(ESP.items).length){ U.aviso("Elige qué empanadas espera"); return; } P.esperar(ESP.nombre||"Cliente",ESP.items,0,ESP.pagado); ESP=null; U.aviso("Anotado: espera la próxima tanda"); pintar(true); return; }
+  if(b.dataset.entregar){ P.entregar(b.dataset.entregar); pintar(); return; }
+  /* comandas */
+  if(b.dataset.listo){ var m=marcas(); m.listo[b.dataset.listo]=new Date().toISOString(); E.guardar("eapos_comandas",m); try{ E.canal&&E.canal.postMessage({t:"eapos_comandas"}); }catch(x){} U.aviso("Comanda lista"); pintarComandas(); return; }
+  /* precocido */
+  if(b.dataset.prec){ PREC_TOCADO=true; PREC[b.dataset.prec]=paso(PREC[b.dataset.prec]||0,d,0,999); pintarCierre(); return; }
+  if(b.id==="reportar"){ var rp=P.reportarPrecocido(PREC,quien()); PREC_TOCADO=false; U.aviso("Precocido reportado: "+sumaLatas(rp.items)+" empanadas para mañana"); pintarCierre(); return; }
+  /* ajustes */
+  if(b.dataset.aj){ var aj=P.ajustesHorno(), c={}; if(b.dataset.aj==="cap") c.cap=paso(aj.cap/LATA,d,1,12)*LATA; else if(b.dataset.aj==="min") c.min=paso(aj.min,d,1,90); else c.minimo=paso(aj.minimo,d,0,99);
+    P.fijarAjustesHorno(c); $("ajustes").open=false; pintarTandas(); $("ajustes").open=true; pintarCarga(); pintarDentro(); pintarVitrina(); return; }
+});
+function guardarNotaSol(){ var n=$("solNota"); if(n&&SOL) SOL.nota=n.value; }
+function guardarEsp(){ if(!ESP) return; var n=$("espNombre"), p=$("espPagado"); if(n) ESP.nombre=n.value; if(p) ESP.pagado=p.checked; }
+function alHorno(){
+  var aj=P.ajustesHorno(), r=P.hornear(SEL,MIN||aj.min,quien());
+  if(r.error==="capacidad"){ U.aviso("No caben: quedan "+r.libre+" lugares en el horno"); return; }
+  if(r.error){ U.aviso("Elige qué entra al horno"); return; }
+  U.aviso("Al horno: tanda "+r.tanda.n+" · "+r.tanda.total+" empanadas · sale a las "+hora(r.tanda.eta),5000);
+  SEL={}; MIN=null; pintar(); vigilarSalidas();
+}
+
+/* Lo que cambia en otra pantalla del mismo equipo se ve aquí al instante. */
+addEventListener("storage",function(ev){ if(["ea_control","eapos_panaderia","eapos_horno","ea_pos","eapos_comandas"].indexOf(ev.key)>=0){ pintar(); } });
+if(E.canal) E.canal.addEventListener("message",function(){ pintar(); });
+document.addEventListener("input",function(ev){ if(ev.target.id==="solNota") guardarNotaSol(); if(ev.target.id==="espNombre"||ev.target.id==="espPagado") guardarEsp(); });
+U.reloj($("reloj"));
+P.revisar(); vigilarSalidas(); pintar(true); U.revelar(document);
+setInterval(function(){ pintar(); },15000);
+if(location.hash) setTimeout(function(){ var t=document.querySelector(location.hash); if(t) t.scrollIntoView({block:"start"}); },300);
+</script>
+</body></html>

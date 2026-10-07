@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.6
+# EmporioAndinoPOS v2.7
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -30,6 +30,64 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Horno, Panadería y comandas separadas (v2.7)
+
+**Instalar en Mac:** `INSTALAR-MAC.md` (doble clic en `Iniciar EmporioAndinoPOS.command`).
+**Prueba nº 1:** `PRUEBA-1.md`, el recorrido de un turno real.
+
+### Panadería → Horno → Vitrina
+
+Vive en `nucleo/produccion.js` (`EAPOS.prod`), compartido por el Horno, la Panadería, el Salón y el
+sistema general. Cada operación lee lo último guardado y guarda solo lo suyo.
+
+1. **Panadería** (`panaderia/index.html`): plan del día por latas de 15. Por defecto 6 de pino y 2 de cada
+   otra variedad (22 latas, 330 empanadas), editable en *Plan de cada día*. El sugerido descuenta las
+   latas completas que el Horno reportó precocidas ayer. *Enviar al horno* crea el pedido.
+2. **Horno** (`horno/index.html`): cocina cuenta lo que llegó (por unidad), corrige y *Confirma la
+   recepción*; pasa a *por hornear*. *Comenzar producción* carga la primera tanda: 20 minutos, hasta 4
+   latas, varias variedades con el mismo reloj (capacidad, cocción y mínimo en vitrina se ajustan).
+3. Al llegar a cero (o *Salió ya*), la tanda pasa a la vitrina (`ea_control.uni`) que descuenta la Caja.
+   El sistema general la saca aunque el Horno no esté abierto.
+4. **Sobredemanda:** *Solicitar empanadas* deja una solicitud *por confirmar*; la Panadería la confirma
+   (puede cambiar las latas) o responde que no se puede, con motivo.
+5. **Cierre:** *Precocido para mañana* reporta lo armado sin hornear (parte de lo que calcula el sistema:
+   precocido de ayer + recibido − horneado). Es el punto de partida de la Panadería al día siguiente.
+
+Además, del horno en vivo probado en la Prueba: sugerencia de qué hornear (lo que alguien espera y las
+variedades que más faltan según lo vendido), *Esperan la tanda* con aviso de entregar, comandas de
+empanadas y pastelería, y el historial de tandas del día.
+
+**Resumen del Horno:** la cuenta regresiva de la tanda que sale va en grande (también en la barra
+plegada); *En vitrina · Revisar* baja a la vitrina para contar y corregir.
+
+**Escandallos:** por unidad y por lata, con la masa común y el relleno de cada variedad (fichas
+estándar de `prueba/estandar.js`, ajustables por dirección), e insumos del plan de hoy con formato de
+compra. Los costos y el food cost solo los ven los dueños.
+
+**Datos:** `eapos_panaderia` (plan, pedidos, solicitudes, precocido; 30 días) y `eapos_horno` (tandas,
+espera y ajustes; 21 días).
+
+### Cargos
+
+| Cargo | Áreas |
+|---|---|
+| Dirección | Todas |
+| Encargados | Caja, Salón, Comandas de cocina y de barra, Horno, Carta |
+| Garzones | Caja, Salón, Comandas de cocina y de barra, Carta |
+| Barra | Comandas de barra, Salón, Carta |
+| Cocina y horno | Comandas de cocina, Horno, Salón, Carta |
+| Panadería (nuevo usuario) | Panadería, Carta |
+
+### Otros cambios
+
+- **Comandas separadas:** `cocina/index.html?est=cocina` y `?est=barra`, cada una en su área. Las
+  empanadas y la pastelería van a las comandas del Horno.
+- **Control de Salón:** sin pantalla de horno (lleva al área Horno), sin el botón *Carta* dentro del
+  sistema y sin la barrita de estado (su *Revisar* está en el resumen de arriba). Se actualiza cuando la
+  Caja o el Horno cambian la vitrina, y al guardar ya no pisa lo que cambió otra pantalla.
+- **Fecha local:** Salón, Carta, Caja y Horno reinician el día con la fecha de Chile. Antes usaban la
+  fecha UTC, que en Chile cambia a las 21:00 y reiniciaba la vitrina en pleno servicio.
 
 ## Horario del local (v2.6)
 
@@ -238,7 +296,8 @@ sube la demanda de un día, abrir ese día en vivo, los pedidos a mano en mesa, 
 fichas estándar de todos los productos, que el stock estándar alcance un día de temporada alta, editar un
 escandallo, una hornada personalizada, un ingreso de mercadería y que nada de eso toque la Caja. Desde la
 v2.6 revisa también el horario a horas fijadas (fases a los 15 y 5 minutos, chip, campana, Caja a las
-21:27 y 21:40, Carta y la Prueba a las 21:30) y que la Caja quepa bajo el encabezado sin capas encima.
+21:27 y 21:40, Carta y la Prueba a las 21:30) y que la Caja quepa bajo el encabezado sin capas encima. Desde
+la v2.7, el recorrido Panadería → Horno → Vitrina completo, las comandas separadas y el Salón sin horno.
 
 El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
 para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre

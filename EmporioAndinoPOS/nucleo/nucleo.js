@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "2.6";
+  var VERSION = "2.7";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -165,8 +165,11 @@
   /* ---------- equipo, cargos y acceso ---------- */
   var MODULOS = {
     caja:   {n:"Caja", d:"Cobro, boleta, stock, costos, compras, mermas e informes", ruta:"caja/index.html"},
-    salon:  {n:"Control de Salón", d:"Disponibilidad de la carta, horno y estudio de la carta", ruta:"carta/salon.html"},
-    cocina: {n:"Comandas", d:"Lo que se vendió en la caja, por estación: cocina, barra y horno", ruta:"cocina/index.html"},
+    salon:  {n:"Control de Salón", d:"Disponibilidad de la carta y estudio de la carta", ruta:"carta/salon.html"},
+    cocina: {n:"Comandas de cocina", d:"Los platos cobrados en la Caja, para cocina", ruta:"cocina/index.html?est=cocina"},
+    barra:  {n:"Comandas de barra", d:"Las bebidas cobradas en la Caja, para barra", ruta:"cocina/index.html?est=barra"},
+    horno:  {n:"Horno", d:"Temporizador de las tandas, pedido de la panadería, vitrina y precocido", ruta:"horno/index.html"},
+    panaderia:{n:"Panadería", d:"Plan por latas, pedidos al horno, solicitudes y escandallos", ruta:"panaderia/index.html"},
     carta:  {n:"Carta Interactiva", d:"La carta que usa el cliente en la mesa", ruta:"carta/index.html"},
     prueba: {n:"Prueba y simulación", d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos", ruta:"prueba/index.html"}
   };
@@ -174,22 +177,23 @@
      historial) o "cobro" (cobro y stock). numeros: ventas en pesos, costos,
      metas, estadísticas y fichas; solo los dueños. */
   var ROLES = {
-    dueno:      {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"todo", sistema:1, numeros:1},
-    jefe:       {n:"Dirección",      m:["caja","salon","cocina","carta","prueba"], caja:"turno", sistema:1},
-    encargado:  {n:"Caja y salón",   m:["caja","salon","cocina","carta"], caja:"turno"},
-    garzon:     {n:"Garzones",       m:["caja","salon","cocina","carta"], caja:"cobro"},
-    barista_enc:{n:"Barra",          m:["cocina","salon","carta"]},
-    barista:    {n:"Barra",          m:["cocina","salon","carta"]},
-    cocina:     {n:"Cocina y horno", m:["cocina","salon","carta"]}
+    dueno:      {n:"Dirección",      m:["caja","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"todo", sistema:1, numeros:1},
+    jefe:       {n:"Dirección",      m:["caja","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"turno", sistema:1},
+    encargado:  {n:"Caja y salón",   m:["caja","salon","cocina","barra","horno","carta"], caja:"turno"},
+    garzon:     {n:"Garzones",       m:["caja","salon","cocina","barra","carta"], caja:"cobro"},
+    barista_enc:{n:"Barra",          m:["barra","salon","carta"]},
+    barista:    {n:"Barra",          m:["barra","salon","carta"]},
+    cocina:     {n:"Cocina y horno", m:["cocina","horno","salon","carta"]},
+    panaderia:  {n:"Panadería",      m:["panaderia","carta"]}
   };
   var EQUIPO = [
     ["Constanza Veliz","dueno","Dueña"],["Edgardo Morales","dueno","Dueño"],
     ["Gustavo Veliz","jefe","Jefe de operaciones · turno 1"],["Marbelis Colmenares","jefe","Jefa de operaciones · turno 2"],
     ["Jose Ignacio Argadoña","encargado","Encargado de turno"],["Andrea Rodriguez","encargado","Encargada de turno"],["Maria Eugenia Mamami","encargado","Encargada de turno"],
-    ["Magda","cocina","Encargada de cocina"],["Jona","barista_enc","Encargado barista"],["Daline","barista","Barista"],
+    ["Magda","cocina","Encargada de cocina"],["Panadería","panaderia","Equipo de panadería"],["Jona","barista_enc","Encargado barista"],["Daline","barista","Barista"],
     ["Juan Ignacio","garzon","Garzón"],["Daniela","garzon","Garzona"],["Cindel","garzon","Garzona"],["Claudia","garzon","Garzona"],["Wilbert","garzon","Garzón"],["Mariela","garzon","Garzona"]
   ].map(function(x,i){ return {i:i, n:x[0], r:x[1], c:x[2]}; });
-  var COLOR_ROL = {dueno:"#40E0D0", jefe:"#40E0D0", encargado:"#D9A93A", garzon:"#FF7F50", barista_enc:"#1AA89B", barista:"#1AA89B", cocina:"#9A80D6"};
+  var COLOR_ROL = {dueno:"#40E0D0", jefe:"#40E0D0", encargado:"#D9A93A", garzon:"#FF7F50", barista_enc:"#1AA89B", barista:"#1AA89B", cocina:"#9A80D6", panaderia:"#E8674A"};
 
   /* El PIN se guarda como huella SHA-256, igual que en Emporio System 1.1:
      los PIN ya creados en este equipo siguen sirviendo. */
@@ -206,7 +210,7 @@
   function guardarPin(nombre, huella){ var p=pins(); p[nombre]=huella; guardar(K.pins,p); }
   function borrarPin(nombre){ var p=pins(); delete p[nombre]; guardar(K.pins,p); }
 
-  function hoy(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function hoy(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
   /* La sesión dura el día: al día siguiente se vuelve a pedir el PIN. */
   function sesion(){ var s=leer(K.sesion); if(!s||s.dia!==hoy()) return null; var p=EQUIPO.filter(function(x){ return x.n===s.n; })[0]; return p?{n:p.n, r:p.r, c:p.c, dia:s.dia}:null; }
   function abrirSesion(p){ guardar(K.sesion,{n:p.n, dia:hoy(), ts:new Date().toISOString()}); avisarCambio("sesion"); }
@@ -238,7 +242,7 @@
     catalogo:catalogo, datos:datos, fueraDeCarta:fueraDeCarta, precioEn:precioEn,
     MODULOS:MODULOS, ROLES:ROLES, EQUIPO:EQUIPO, COLOR_ROL:COLOR_ROL,
     hashPin:hashPin, pins:pins, guardarPin:guardarPin, borrarPin:borrarPin,
-    sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede, verNumeros:verNumeros,
+    hoyLocal:hoy, sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede, verNumeros:verNumeros,
     abrirEnSistema:abrirEnSistema, irA:irA,
     HORARIO:HORARIO, horario:horario, proximoHito:proximoHito, porHorario:porHorario, mesasAbiertas:mesasAbiertas, minutoDe:minutoDe, hhmm:hhmm
   };

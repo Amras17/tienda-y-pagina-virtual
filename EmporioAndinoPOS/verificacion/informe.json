@@ -1,7 +1,7 @@
 {
-  "version": "2.6",
-  "fecha": "2026-10-07T01:29:51.747Z",
-  "total": 222,
+  "version": "2.7",
+  "fecha": "2026-10-07T02:15:33.178Z",
+  "total": 286,
   "fallas": 0,
   "resultados": [
     {
@@ -32,7 +32,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,carta,prueba,verificacion,versiones,retro"
+      "detalle": "inicio,caja,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -44,7 +44,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": "13/13 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
+      "detalle": "16/16 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -67,6 +67,24 @@
     {
       "modulo": "Sistema general · escritorio",
       "prueba": "abre cocina como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre barra como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre horno como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre panaderia como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
@@ -102,6 +120,24 @@
     },
     {
       "modulo": "Sistema general · escritorio",
+      "prueba": "resumen arriba de barra",
+      "ok": true,
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Sin comandas pendientes\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "resumen arriba de horno",
+      "ok": true,
+      "detalle": "{\"tono\":\"warn\",\"tit\":\"Sin empanadas por hornear\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "resumen arriba de panaderia",
+      "ok": true,
+      "detalle": "{\"tono\":\"info\",\"tit\":\"Plan de hoy por enviar: 22 latas\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
       "prueba": "resumen arriba de carta",
       "ok": true,
       "detalle": "{\"tono\":\"ok\",\"tit\":\"Carta vigente · versión 1\",\"k\":4}"
@@ -134,7 +170,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "avisos importantes: se acabó",
       "ok": true,
-      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\"]}"
+      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\",\"Plan de hoy por enviar al horno\"]}"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -192,13 +228,19 @@
     },
     {
       "modulo": "Caja y Comandas · escritorio",
-      "prueba": "la venta llega a Comandas por estación",
+      "prueba": "Comandas de barra: solo la bebida",
+      "ok": true,
+      "detalle": "{\"n\":1,\"t\":\"Comandas de barra\",\"sel\":true}"
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "la empanada llega a las comandas del Horno",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Caja y Comandas · escritorio",
-      "prueba": "filtro de cocina",
+      "prueba": "Comandas de cocina: solo el plato",
       "ok": true,
       "detalle": ""
     },
@@ -254,7 +296,7 @@
       "modulo": "Caja y Comandas · escritorio",
       "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,carta,retro"
+      "detalle": "inicio,caja,salon,cocina,barra,carta,retro"
     },
     {
       "modulo": "Caja y Comandas · escritorio",
@@ -620,7 +662,7 @@
       "modulo": "Horario · escritorio",
       "prueba": "aviso en la campana antes del cierre de mesas",
       "ok": true,
-      "detalle": "[\"Cierran las mesas y la cocina a las 21:30\"]"
+      "detalle": "[\"Cierran las mesas y la cocina a las 21:30\",\"Plan de hoy por enviar al horno\"]"
     },
     {
       "modulo": "Horario · escritorio",
@@ -671,6 +713,156 @@
       "detalle": "{\"sub\":\"Miércoles, 7 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     },
     {
+      "modulo": "Producción · escritorio",
+      "prueba": "panadería entra solo a lo suyo",
+      "ok": true,
+      "detalle": "inicio,panaderia,carta,retro"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
+      "ok": true,
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 02:12 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "escandallo por unidad y por lata, sin costos para panadería",
+      "ok": true,
+      "detalle": "{\"filas\":10,\"costos\":false,\"ins\":23}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "envía el pedido al horno",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "cocina ve el Horno y no la Panadería",
+      "ok": true,
+      "detalle": "inicio,salon,cocina,carta,horno,retro"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "el horno recibe el pedido por confirmar",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "registra lo que llegó (59 de pino) y propone la primera tanda",
+      "ok": true,
+      "detalle": "{\"crudo\":331,\"pino\":91,\"t\":\"Comenzar producción\",\"sel\":3}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "primera tanda: 20 minutos y tope de 4 latas",
+      "ok": true,
+      "detalle": "{\"min\":20,\"total\":45,\"cap\":\"capacidad\"}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "resumen del Horno: el temporizador en grande y Revisar vitrina",
+      "ok": true,
+      "detalle": "{\"reloj\":\"19:58\",\"grande\":92,\"revisar\":true}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "Revisar baja a la vitrina dentro del Horno",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "al salir, la tanda pasa a la vitrina que ve la Caja (fecha local)",
+      "ok": true,
+      "detalle": "{\"pino\":15,\"fecha\":true,\"horno\":0}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "solicitud de empanadas queda por confirmar",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "la panadería confirma y el horno la ve por recibir",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "anota a quien espera y avisa que ya hay en vitrina",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "reporta el precocido para mañana",
+      "ok": true,
+      "detalle": "{\"e-pino\":76,\"e-pollo\":15,\"e-napolitana\":15,\"e-oriental\":30,\"e-caprese\":30,\"e-rustica\":30,\"e-champinon\":30,\"e-redvegan\":30,\"e-greenvegan\":30}"
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "Salón: sin acceso a la Carta ni barrita, el horno vive en su área",
+      "ok": true,
+      "detalle": "{\"carta\":false,\"barra\":false,\"horno\":\"undefined\"}"
+    },
+    {
+      "modulo": "Producción · escritorio (horno)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio (horno)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio (horno)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio (panadería)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio (panadería)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio (panadería)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
       "modulo": "Sistema general · telefono",
       "prueba": "pide ingreso antes de mostrar módulos",
       "ok": true,
@@ -698,7 +890,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,carta,prueba,verificacion,versiones,retro"
+      "detalle": "inicio,caja,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -710,7 +902,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": "13/13 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
+      "detalle": "16/16 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -733,6 +925,24 @@
     {
       "modulo": "Sistema general · telefono",
       "prueba": "abre cocina como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre barra como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre horno como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre panaderia como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
     },
@@ -768,6 +978,24 @@
     },
     {
       "modulo": "Sistema general · telefono",
+      "prueba": "resumen arriba de barra",
+      "ok": true,
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Sin comandas pendientes\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "resumen arriba de horno",
+      "ok": true,
+      "detalle": "{\"tono\":\"warn\",\"tit\":\"Sin empanadas por hornear\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "resumen arriba de panaderia",
+      "ok": true,
+      "detalle": "{\"tono\":\"info\",\"tit\":\"Plan de hoy por enviar: 22 latas\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
       "prueba": "resumen arriba de carta",
       "ok": true,
       "detalle": "{\"tono\":\"ok\",\"tit\":\"Carta vigente · versión 1\",\"k\":4}"
@@ -800,7 +1028,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "avisos importantes: se acabó",
       "ok": true,
-      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\"]}"
+      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\",\"Plan de hoy por enviar al horno\"]}"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -858,13 +1086,19 @@
     },
     {
       "modulo": "Caja y Comandas · telefono",
-      "prueba": "la venta llega a Comandas por estación",
+      "prueba": "Comandas de barra: solo la bebida",
+      "ok": true,
+      "detalle": "{\"n\":1,\"t\":\"Comandas de barra\",\"sel\":true}"
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "la empanada llega a las comandas del Horno",
       "ok": true,
       "detalle": ""
     },
     {
       "modulo": "Caja y Comandas · telefono",
-      "prueba": "filtro de cocina",
+      "prueba": "Comandas de cocina: solo el plato",
       "ok": true,
       "detalle": ""
     },
@@ -920,7 +1154,7 @@
       "modulo": "Caja y Comandas · telefono",
       "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,carta,retro"
+      "detalle": "inicio,caja,salon,cocina,barra,carta,retro"
     },
     {
       "modulo": "Caja y Comandas · telefono",
@@ -1286,7 +1520,7 @@
       "modulo": "Horario · telefono",
       "prueba": "aviso en la campana antes del cierre de mesas",
       "ok": true,
-      "detalle": "[\"Cierran las mesas y la cocina a las 21:30\"]"
+      "detalle": "[\"Cierran las mesas y la cocina a las 21:30\",\"Plan de hoy por enviar al horno\"]"
     },
     {
       "modulo": "Horario · telefono",
@@ -1335,6 +1569,156 @@
       "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
       "ok": true,
       "detalle": "{\"sub\":\"Miércoles, 7 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "panadería entra solo a lo suyo",
+      "ok": true,
+      "detalle": "inicio,panaderia,carta,retro"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
+      "ok": true,
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 02:15 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "escandallo por unidad y por lata, sin costos para panadería",
+      "ok": true,
+      "detalle": "{\"filas\":10,\"costos\":false,\"ins\":23}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "envía el pedido al horno",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "cocina ve el Horno y no la Panadería",
+      "ok": true,
+      "detalle": "inicio,salon,cocina,carta,horno,retro"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "el horno recibe el pedido por confirmar",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "registra lo que llegó (59 de pino) y propone la primera tanda",
+      "ok": true,
+      "detalle": "{\"crudo\":331,\"pino\":91,\"t\":\"Comenzar producción\",\"sel\":3}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "primera tanda: 20 minutos y tope de 4 latas",
+      "ok": true,
+      "detalle": "{\"min\":20,\"total\":45,\"cap\":\"capacidad\"}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "resumen del Horno: el temporizador en grande y Revisar vitrina",
+      "ok": true,
+      "detalle": "{\"reloj\":\"19:58\",\"grande\":52,\"revisar\":true}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "Revisar baja a la vitrina dentro del Horno",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "al salir, la tanda pasa a la vitrina que ve la Caja (fecha local)",
+      "ok": true,
+      "detalle": "{\"pino\":15,\"fecha\":true,\"horno\":0}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "solicitud de empanadas queda por confirmar",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "la panadería confirma y el horno la ve por recibir",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "anota a quien espera y avisa que ya hay en vitrina",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "reporta el precocido para mañana",
+      "ok": true,
+      "detalle": "{\"e-pino\":76,\"e-pollo\":15,\"e-napolitana\":15,\"e-oriental\":30,\"e-caprese\":30,\"e-rustica\":30,\"e-champinon\":30,\"e-redvegan\":30,\"e-greenvegan\":30}"
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "Salón: sin acceso a la Carta ni barrita, el horno vive en su área",
+      "ok": true,
+      "detalle": "{\"carta\":false,\"barra\":false,\"horno\":\"undefined\"}"
+    },
+    {
+      "modulo": "Producción · telefono (horno)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono (horno)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono (horno)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono (panadería)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono (panadería)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono (panadería)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Producción · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
     }
   ]
 }
