@@ -367,6 +367,8 @@ html.incrustado .side{position:relative;top:auto;height:auto;padding:4px 0 0}
 html.incrustado .side-in{flex-direction:row;align-items:center;flex-wrap:wrap;overflow:hidden}
 html.incrustado .band,html.incrustado .side-foot,html.incrustado .nav .grp,html.incrustado .brand,html.incrustado .me{display:none}
 html.incrustado .nav{flex-direction:row;overflow-x:auto;padding:8px;flex:1 1 100%;scrollbar-width:none}
+/* Dentro del sistema general, con espacio, el menú se reparte en filas: todas las áreas a la vista. */
+@media (min-width:600px){html.incrustado .nav{flex-wrap:wrap;overflow:visible;row-gap:4px}}
 html.incrustado .nav a{white-space:nowrap;flex:none}
 html.incrustado .main{padding-inline:0;padding-top:12px}
 html.incrustado .top{position:relative;top:auto}
@@ -425,6 +427,15 @@ button.av-item:hover{border-color:var(--stroke-2);transform:translateX(2px)}
 .av-vacio{padding:18px 6px;text-align:center;color:var(--muted)}
 
 /* ---------- barra colapsable (al desplazar hacia abajo) ---------- */
+/* Chip del horario: cuenta los minutos antes de cada hito del día. */
+.hora-chip{cursor:pointer;font-family:inherit;max-width:min(46vw,34ch)}
+.hora-chip[hidden]{display:none}
+.hora-chip i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.hora-chip span{overflow:hidden;text-overflow:ellipsis}
+.hora-chip[data-tono="warn"]{border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn)}
+.hora-chip[data-tono="warn"] i{background:var(--warn);box-shadow:0 0 10px var(--warn)}
+.hora-chip[data-tono="crit"]{border-color:color-mix(in srgb,var(--crit) 60%,transparent);color:#fff;background:color-mix(in srgb,var(--crit) 28%,var(--glass-2))}
+.hora-chip[data-tono="crit"] i{background:var(--crit);box-shadow:0 0 10px var(--crit);animation:pnPulso 1.8s ease-in-out infinite}
 .top-pn{display:none;align-items:center;gap:8px;min-width:0;max-width:46ch;padding:4px 12px 4px 10px;border-radius:99px;border:1px solid var(--stroke);background:var(--glass-2);font-size:12.5px;font-weight:700;color:var(--fg-2);cursor:pointer;font-family:inherit}
 .top-pn i{flex:none;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
 .top-pn[data-tono="ok"] i{background:var(--ok);box-shadow:0 0 10px var(--ok)}
@@ -439,7 +450,7 @@ html.colapsado .top .ttl p{display:none}
 html.colapsado .clock{font-size:17px}
 html.colapsado .top .btn.icon,html.colapsado #backBtn{transform:scale(.88)}
 /* El resumen de un módulo incrustado se pliega dentro de la barra y el módulo crece. */
-.panorama.pn-modulo{max-height:420px;transition:max-height .4s var(--spring-soft),opacity .25s,padding .4s var(--spring-soft),margin .4s var(--spring-soft)}
+.panorama.pn-modulo{max-height:900px;transition:max-height .4s var(--spring-soft),opacity .25s,padding .4s var(--spring-soft),margin .4s var(--spring-soft)}
 html.colapsado .panorama.pn-modulo{max-height:0;opacity:0;padding-block:0;margin-bottom:-16px;border-width:0;pointer-events:none}
 .marco iframe{transition:height .4s var(--spring-soft)}
 html.colapsado .marco iframe{height:calc(100vh - 92px)}
@@ -473,11 +484,21 @@ html.colapsado .marco iframe{height:calc(100vh - 92px)}
 }
 @media (max-width:900px){
   /* En el teléfono queda fija arriba solo la fila del menú. */
-  html:not(.incrustado) .side{position:sticky;top:0;z-index:20}
-  html.colapsado:not(.incrustado) .side{padding-top:6px}
+  /* Fija arriba solo ya plegada: antes taparía el encabezado con la marca y el usuario. */
+  html.colapsado:not(.incrustado) .side{position:sticky;top:0;z-index:20;padding-top:6px}
   html.colapsado .brand,html.colapsado .me{display:none}
   html.colapsado .side-in{background:rgba(14,22,25,.94)}
   html.colapsado .nav{padding:6px}
   html.colapsado .marco iframe{height:calc(100vh - 150px)}
 }
 @media (prefers-reduced-motion:reduce){.app,.side-in,.top,.top h1,.clock,.panorama.pn-modulo,.marco iframe{transition:none!important}}
+
+/* ---------- menús que se deslizan de lado ----------
+   Si no caben, se desvanecen en los bordes para avisar que hay más; la rueda
+   del mouse también los mueve de lado y el área activa queda centrada. */
+.desborda-x{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 22px,#000 calc(100% - 22px),transparent)}
+.desborda-x.al-inicio{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent)}
+.desborda-x.al-final{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22px);mask-image:linear-gradient(90deg,transparent 0,#000 22px)}
+
+/* Al saltar a un elemento (foco con Tab, enlaces) queda bajo las barras fijas, no detrás. */
+html:not(.incrustado){scroll-padding-top:96px;scroll-padding-bottom:24px}

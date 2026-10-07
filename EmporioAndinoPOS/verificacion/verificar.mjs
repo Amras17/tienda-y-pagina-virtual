@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 2.5.
+// Agente de verificación de EmporioAndinoPOS 2.6.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -344,6 +344,64 @@ async function probarCarta(vista) {
   await ctx.close();
 }
 
+// ---------- Horario: desayunos 12:00, mesas y cocina 21:30, cierre 22:00 ----------
+async function conHora(vista, hora) {
+  const c = await contexto(vista);
+  await c.ctx.addInitScript(h => { try { sessionStorage.setItem("eapos_hora", h); } catch (e) {} }, hora);
+  return c;
+}
+async function probarHorario(vista) {
+  const M = `Horario · ${vista}`;
+  let { ctx, errores, caidos } = await conHora(vista, "21:27");
+  let page = await ctx.newPage();
+  await sesion(page, "Constanza Veliz"); await page.waitForTimeout(600);
+  const fases = await page.evaluate(() => { const f = m => EAPOS.horario(m).map(h => h.fase).join(","); return {
+    a705: f(705), a716: f(716), a720: f(720), a1275: f(1275), a1286: f(1286), a1310: f(1310), a1316: f(1316), a1320: f(1320),
+    desayuno: [EAPOS.porHorario({ g: "coc", sub: "desayunos" }, 719), EAPOS.porHorario({ g: "coc", sub: "desayunos" }, 720)],
+    cocina: [EAPOS.porHorario({ g: "coc", sub: "brunch" }, 1289), EAPOS.porHorario({ g: "coc", sub: "brunch" }, 1290)],
+    barra: [EAPOS.porHorario({ g: "bar", sub: "cafe" }, 1300), EAPOS.porHorario({ g: "bar", sub: "cafe" }, 1320)] }; });
+  anota(M, "fases a los 15 y 5 minutos de cada hito", fases.a705 === "aviso,antes,antes" && fases.a716 === "ultimo,antes,antes" && fases.a720 === "terminado,antes,antes"
+    && fases.a1275 === "terminado,aviso,antes" && fases.a1286 === "terminado,ultimo,antes" && fases.a1310 === "terminado,terminado,antes" && fases.a1316 === "terminado,terminado,ultimo" && fases.a1320 === "terminado,terminado,terminado", JSON.stringify(fases));
+  anota(M, "bloqueos: desayuno 12:00, cocina 21:30, local 22:00", !fases.desayuno[0] && !!fases.desayuno[1] && !fases.cocina[0] && !!fases.cocina[1] && !fases.barra[0] && !!fases.barra[1], JSON.stringify(fases));
+  const chip = await page.evaluate(() => { const c = document.getElementById("horaChip"); return { t: c.innerText, tono: c.dataset.tono, ve: !c.hidden && c.getBoundingClientRect().width > 0 }; });
+  anota(M, "chip del encabezado cuenta los minutos (21:27)", chip.ve && /mesas y la cocina en 3 min/.test(chip.t) && chip.tono === "crit", JSON.stringify(chip));
+  await page.locator("#avisosBtn").click(); await page.waitForTimeout(200);
+  const av = await page.evaluate(() => [...document.querySelectorAll(".avisos .av-item")].map(a => a.innerText.split("\n")[0]));
+  anota(M, "aviso en la campana antes del cierre de mesas", av.some(t => /Cierran las mesas y la cocina a las 21:30/.test(t)), JSON.stringify(av));
+  await page.keyboard.press("Escape");
+  await navA(page, "caja"); await page.waitForTimeout(1500);
+  // El módulo cabe entero bajo el encabezado, sin capas encima
+  const marco = await page.evaluate(() => { const f = document.querySelector('section[data-view="caja"] iframe'); scrollTo(0, 1e5); const r = f.getBoundingClientRect(), top = [...document.querySelectorAll(".top,.side")].filter(e => getComputedStyle(e).position === "sticky" && e.getBoundingClientRect().width > innerWidth * .6).reduce((a, e) => Math.max(a, e.getBoundingClientRect().bottom), 0);
+    const a = { arriba: Math.round(r.top), abajo: Math.round(r.bottom), vh: innerHeight, cabecera: Math.round(top) }; scrollTo(0, 0); return a; });
+  anota(M, "la Caja cabe bajo el encabezado sin quedar tapada", marco.abajo <= marco.vh + 1 && marco.arriba >= marco.cabecera - 1, JSON.stringify(marco));
+  let fr = page.frames().find(f => f.url().includes("caja/index"));
+  const c1 = await fr.evaluate(() => { const d = CAT.filter(p => p.sub === "desayunos")[0], b = CAT.filter(p => p.g === "coc" && p.sub !== "desayunos")[0]; const n0 = carro.length; agregar(d); const n1 = carro.length; agregar(b); const n2 = carro.length; carro = []; pintarCuenta();
+    return { franja: !document.querySelector("#horaAviso").hidden && document.querySelector("#horaAviso").innerText, desayuno: n1 > n0, cocina: n2 > n1, local: !document.querySelector("#modoVenta [data-modo=local]").disabled }; });
+  anota(M, "Caja 21:27: franja de aviso, sin desayunos, cocina y mesas aún abiertas", !!c1.franja && /21:30/.test(c1.franja) && !c1.desayuno && c1.cocina && c1.local, JSON.stringify(c1));
+  await cierre(M, page, errores, caidos);
+  await ctx.close();
+
+  ({ ctx, errores, caidos } = await conHora(vista, "21:40"));
+  page = await ctx.newPage(); await page.goto(BASE + "caja/index.html"); await page.waitForTimeout(1200);
+  const c2 = await page.evaluate(() => { const b = CAT.filter(p => p.g === "coc")[0], e = CAT.filter(p => p.g === "emp")[0]; agregar(b); const coc = carro.length; agregar(e); const emp = carro.length; carro = []; pintarCuenta();
+    return { cocina: coc > 0, emp: emp > coc, modo: modoActivo, local: document.querySelector("#modoVenta [data-modo=local]").disabled, marcados: document.querySelectorAll(".prod.fuerahora").length + (grupoActivo !== "coc" ? 1 : 0) }; });
+  anota(M, "Caja 21:40: mesas cerradas, pasa a Para llevar y no vende cocina", !c2.cocina && c2.emp && c2.modo === "llevar" && c2.local, JSON.stringify(c2));
+  await page.goto(BASE + "carta/index.html"); await page.waitForTimeout(900);
+  const ct = await page.evaluate(() => ({ des: enHorario(secDe("desayunos")), brunch: enHorario(secDe("brunch")) }));
+  anota(M, "Carta 21:40: desayuno y brunch fuera de horario", !ct.des && !ct.brunch, JSON.stringify(ct));
+  await ctx.close();
+
+  // La Prueba usa el mismo horario con la hora simulada
+  ({ ctx, errores, caidos } = await contexto(vista));
+  page = await ctx.newPage(); await page.goto(BASE + "prueba/index.html"); await page.waitForTimeout(1400);
+  const pr = await page.evaluate(() => { while (S.t < 1278) step(); renderAll(); const sub = document.querySelector("#vSub").textContent, av = avisosPrueba().some(a => /^hora\|mesas/.test(a.k));
+    const coc = () => Object.keys(S.sold).reduce((a, id) => a + (MENU[id] && CATS[MENU[id].c].a === "cocina" ? S.sold[id] : 0), 0);
+    while (S.t < 1291) step(); const c0 = coc(), oc = S.tables.filter(x => x.state === "ocupada").length; while (S.t < 1318) step();
+    return { sub, av, ocupadas: oc, cocinaDespues: coc() - c0, fila: S.queue.length }; });
+  anota(M, "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina", /mesas y la cocina en 12 min/.test(pr.sub) && pr.av && pr.ocupadas === 0 && pr.cocinaDespues === 0, JSON.stringify(pr));
+  await ctx.close();
+}
+
 // ---------- Control de Salón ----------
 async function probarSalon(vista) {
   const M = `Salón · ${vista}`;
@@ -366,11 +424,12 @@ for (const v of Object.keys(VISTAS)) {
   await probarPruebaFichas(v);
   await probarCarta(v);
   await probarSalon(v);
+  await probarHorario(v);
 }
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.5", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.6", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);

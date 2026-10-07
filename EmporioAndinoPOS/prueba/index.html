@@ -431,6 +431,8 @@ html.incrustado .franja{position:relative}
 html.colapsado .franja{padding-block:4px}
 html.colapsado .franja span{display:none}
 @media (max-width:900px){html.colapsado:not(.incrustado) .side{top:30px}}
+/* La franja PRUEBA también está fija arriba: un poco más de margen al saltar a un elemento. */
+html:not(.incrustado){scroll-padding-top:132px}
 /* Encabezado plegado en una fila: reloj, avisos, velocidad y pausa. */
 html.colapsado #hdrSync,html.colapsado .ctl .chip:has(#liveDot),html.colapsado #horSeg,html.colapsado #reset{display:none}
 @media (max-width:640px){.vs{grid-template-columns:minmax(0,1fr)}.aplicar{grid-template-columns:minmax(0,1fr)}.aplicar label{grid-column:auto!important}.franja{font-size:11.5px;padding-block:6px}}
@@ -1013,7 +1015,7 @@ function armarMenu(){const cfg=EAPOS.prueba();MENU=construirMenu(cfg);SINPRECIO=
 armarMenu();
 const AREAS={barra:{n:"Barra",col:"#1AA89B"},horno:{n:"Horno · empanadas",col:"#E8674A"},cocina:{n:"Cocina",col:"#9A80D6"}};
 const PROFILE={7:.35,8:.6,9:.85,10:.95,11:.9,12:1.15,13:1.35,14:1.15,15:.85,16:.95,17:1.05,18:.95,19:.75,20:.6,21:.4};
-let GOAL=EAPOS.prueba().metas.dia||1800000;const OPEN=420,CLOSE=1320,START=790;
+let GOAL=EAPOS.prueba().metas.dia||1800000;const OPEN=420,CLOSE=1320,START=790,MESAS_FIN=1290;   /* mesas y cocina cierran a las 21:30, el local a las 22:00 */
 const PROF_SUM=Object.values(PROFILE).reduce((a,b)=>a+b,0);
 const SEASONS={alta:1,baja:.6};
 let DEMAND=SEASONS.baja;
@@ -1068,7 +1070,8 @@ const hourOf=t=>Math.floor(t/60);
 /* Hay producto si alcanzan los insumos de su ficha; las empanadas, si quedan en la vitrina. */
 const avail=it=>it.c==="emp"?(S.vit[it.key]||0)>=1:it.rec.every(([k,q])=>S.stock[k]>=q-1e-9);
 function hourMult(it,h){const c=it.c;if(c==="cf"||c==="bf")return h<11?.5:h<18?1.5:.8;if(c==="cc"||c==="tc")return h<11?1.5:h<17?.75:1.25;if(c==="emp")return h<11?.4:1.3;return 1}
-function okTime(it,t){const c=CATS[it.c];if(c.to&&t>=c.to)return false;if(c.from&&t<c.from)return false;return true}
+function okTime(it,t){const c=CATS[it.c];if(c.to&&t>=c.to)return false;if(c.from&&t<c.from)return false;if(c.a==="cocina"&&t>=MESAS_FIN)return false;return true}
+function notaHora(it,t){const c=CATS[it.c];return c.a==="cocina"&&t>=MESAS_FIN&&!(c.to&&t>=c.to)?"Cocina cerrada 21:30":c.note}
 function pick(kind,opt){const h=hourOf(S.t);const pool=MENU.filter(it=>CATS[it.c].k===kind&&it.w>0&&okTime(it,S.t)&&!(opt.away&&it.local)&&(!opt.cats||opt.cats.includes(it.c))&&avail(it));
   return wpick(pool,it=>it.w*hourMult(it,h)*(opt.deliv&&it.c==="emp"?2.2:1)*(opt.deliv&&it.c==="san"?1.6:1)*(opt.away&&it.c==="emp"?1.8:1))}
 function consume(it){S.costoVentas+=it.costo||0;
@@ -1146,20 +1149,21 @@ function step(){
   const t=S.t;const m15=S.tables[14];
   if(inColacion(t)&&m15.state==="libre"){m15.state="colacion";m15.since=t;m15.flash=true}
   if(!inColacion(t)&&m15.state==="colacion"){m15.state="libre";m15.since=t;m15.flash=true}
-  for(const tb of S.tables){if(tb.state==="ocupada"&&t>=tb.since+tb.dur){tb.state="cuenta";tb.since=t;tb.dur=ri(3,8);tb.flash=true}else if(tb.state==="cuenta"&&t>=tb.since+tb.dur)closeTable(tb,"Simulación")}
+  for(const tb of S.tables){if(tb.state==="ocupada"&&(t>=tb.since+tb.dur||t>=MESAS_FIN)){tb.state="cuenta";tb.since=t;tb.dur=ri(3,8);tb.flash=true}else if(tb.state==="cuenta"&&t>=tb.since+tb.dur)closeTable(tb,"Simulación")}
   const qb=S.queue.length;S.queue=S.queue.filter(g=>t-g.t<16);S.abandon+=qb-S.queue.length;
   /* Quien espera mira la carta de la fila y a veces pide algo. */
   for(const g of S.queue)if(!g.compro&&t-g.t>=2&&rnd()<.07)ventaFila(g,"mesa");
   for(const e of S.espEmp)if(!e.compro&&t-e.t>=1&&rnd()<.06)ventaFila(e,"emp");
   /* Se sienta al primero de la fila que ya puede pasar (los ingresados a mano esperan que se prepare su mesa). */
-  for(const tb of S.tables){if(tb.state!=="libre")continue;const i=S.queue.findIndex(g=>!(g.hasta>t));if(i<0)break;seat(tb,S.queue.splice(i,1)[0].pax)}
+  if(t>=MESAS_FIN&&S.queue.length)S.queue=[];   /* a las 21:30 ya no se sientan mesas */
+  for(const tb of S.tables){if(t>=MESAS_FIN)break;if(tb.state!=="libre")continue;const i=S.queue.findIndex(g=>!(g.hasta>t));if(i<0)break;seat(tb,S.queue.splice(i,1)[0].pax)}
   S.deliv=S.deliv.filter(d=>t<d.t+d.eta);S.llevar=S.llevar.filter(x=>t-x<6);
   for(const h of S.horno.slice())if(t>=h.end){for(const k in h.items)S.vit[k]=(S.vit[k]||0)+h.items[k];S.horno=S.horno.filter(x=>x!==h);S.ovenDone=t}
   servirEspera();
   hornoAutomatico();
   if(t<CLOSE-15){const k=poisson(.2*DEMAND*(PROFILE[hourOf(t)]||0));
     for(let i=0;i<k;i++){const r=rnd();
-      if(r<.55){const pax=wpick([1,2,3,4],p=>[.25,.4,.2,.15][p-1]);const free=S.tables.filter(x=>x.state==="libre");
+      if(r<.55&&t<MESAS_FIN){const pax=wpick([1,2,3,4],p=>[.25,.4,.2,.15][p-1]);const free=S.tables.filter(x=>x.state==="libre");
         if(free.length)seat(free[Math.floor(rnd()*free.length)],pax);else if(S.queue.length<5)S.queue.push({t,pax,id:++S.eseq});else S.lostFull++}
       else if(r<.82){if(totalVit()<3&&rnd()<.6){S.espEmp.push({t,n:ri(1,3),pax:1,id:++S.eseq});hornoAutomatico()}
         else{const items=buildOrder("llevar");S.llevar.push(t);order("Mostrador","llevar",items);pay("Mostrador","llevar",items,"Simulación")}}
@@ -1210,7 +1214,7 @@ const hhmm=t=>String(Math.floor(t/60)%24).padStart(2,"0")+":"+String(Math.floor(
 const fmtQ=(v,u)=>(u==="kg"||u==="L")?v.toLocaleString("es-CL",{maximumFractionDigits:1,minimumFractionDigits:1}):Math.round(v).toLocaleString("es-CL");
 const pct=x=>(x*100).toLocaleString("es-CL",{maximumFractionDigits:1})+"%";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
-function toast(msg){const el=$("toast");el.hidden=true;void el.offsetWidth;el.textContent=msg;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,2800)}
+function toast(msg,ms){const el=$("toast");el.hidden=true;void el.offsetWidth;el.textContent=msg;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,ms||2800)}
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const LEAF='<svg class="leaf" viewBox="0 0 16 16" role="img" aria-label="Opción vegana"><path d="M14 2C7 2 2 5 2 11c0 1.4.4 2.4 1 3 1-4 4-6.5 8-8-3.5 2-6 4.5-7 8.2C10 14.5 14 10 14 2Z" fill="#3DDC84"/></svg>';
 const NUMS={};
@@ -1283,7 +1287,7 @@ function show(v,silent){
   document.querySelectorAll(".view").forEach(el=>el.hidden=el.dataset.view!==v);
   $("vTitle").textContent=VIEWS[v].t;$("backBtn").hidden=v==="inicio";
   document.querySelectorAll("#nav a").forEach(a=>{const on=a.dataset.v===v;a.classList.toggle("on",on);a.toggleAttribute("aria-current",on)});
-  navSl&&navSl.to(document.querySelector("#nav a.on"),silent);
+  navSl&&navSl.to(document.querySelector("#nav a.on"),silent);UI.centrarActivo&&UI.centrarActivo($("nav"),document.querySelector("#nav a.on"));
   if(booted){renderView();segs(true);document.querySelectorAll(`.view[data-view="${v}"] .tc`).forEach((el,i)=>{el.style.setProperty("--d",(i*50)+"ms");el.style.animation="none";void el.offsetWidth;el.style.animation=""})}
   if(!silent){window.scrollTo(0,0);$("vTitle").focus({preventScroll:true})}
   renderClock();
@@ -1392,7 +1396,7 @@ function renderDetail(){
   const busy=tb.state==="ocupada"||tb.state==="cuenta";
   d.innerHTML=`<div class="row"><b>Mesa ${tb.n} · ${stLabel(tb.state)}</b>${busy?`<span class="num">${tb.pax} pers. · ${clp(tb.total)}</span>`:""}</div>`+
    (busy?`<ul>${tb.items.map(i=>`<li>${esc(i.n)} <span class="num" style="color:var(--muted)">${clp(i.p)}</span></li>`).join("")}</ul><div class="row" style="justify-content:flex-end">${tb.state==="ocupada"?`<button class="btn sm" type="button" data-act="cuenta">Pedir cuenta</button>`:""}<button class="btn sm pri" type="button" data-act="cobrar">Cobrar ${clp(tb.total)}</button></div>`
-   :`<div class="row"><span class="empty-s">${tb.state==="colacion"?"Espacio de colación del personal":"Mesa disponible"}</span>${tb.state==="libre"?`<button class="btn sm pri" type="button" data-act="pedido">Tomar pedido</button>`:""}</div>`);
+   :`<div class="row"><span class="empty-s">${tb.state==="colacion"?"Espacio de colación del personal":"Mesa disponible"}</span>${tb.state==="libre"&&S.t<MESAS_FIN?`<button class="btn sm pri" type="button" data-act="pedido">Tomar pedido</button>`:""}</div>`);
 }
 function cocinaActivas(){return S.orders.filter(o=>S.t-o.t<20&&o.items.some(i=>i.a==="cocina"))}
 function renderCocina(){
@@ -1618,9 +1622,19 @@ function setSliders(jump){navSl&&navSl.to(document.querySelector("#nav a.on"),ju
 
 /* =============== CICLO =============== */
 let speed=60,playing=true,acc=0,lastTick=performance.now(),secs=0,booted=false;
-function renderClock(){if(!S)return;const t=S.t,closed=t>=CLOSE;
+/* El horario del núcleo, con la hora simulada: desayunos hasta las 12:00,
+   mesas y cocina hasta las 21:30, cierre a las 22:00, con aviso a los 15 y 5 min. */
+function frHorario(t){const h=EAPOS.proximoHito(t);if(!h)return"Local cerrado · 22:00";
+  if(h.fase==="aviso"||h.fase==="ultimo")return`${h.txt} en ${Math.max(1,Math.ceil(h.falta))} min`;
+  return t<720?h.hasta:t<MESAS_FIN?"Carta completa · "+h.hasta.toLowerCase():"Solo para llevar · cierra a las 22:00"}
+let FASE_SIM={};
+function avisarHorario(t){for(const h of EAPOS.horario(t)){const a=FASE_SIM[h.id];FASE_SIM[h.id]=h.fase;
+  if(a===undefined||a===h.fase||!USER)continue;
+  if(h.fase==="aviso"||h.fase==="ultimo")toast(`⏱ ${h.txt} en ${Math.max(1,Math.ceil(h.falta))} min (${h.hora})`,6000);
+  else if(h.fase==="terminado")toast(`⏱ ${h.hecho}. ${h.efecto}`,6000)}}
+function renderClock(){if(!S)return;const t=S.t,closed=t>=CLOSE;avisarHorario(t);
   $("clock").textContent=speed===1?hhmm(t)+":"+String(Math.floor(secs)).padStart(2,"0"):hhmm(t);
-  const fr=closed?"Local cerrado · 22:00":(t<720?"Desayunos hasta las 12:00":"Brunch y carta completa");
+  const fr=closed?"Local cerrado · 22:00":frHorario(t);
   $("vSub").textContent=cur==="inicio"?`${cap(fechaLarga(CTX.fecha))} · ${fr} · temporada ${CTX.temporada}`:VIEWS[cur].d+" · "+fechaCorta(CTX.fecha)+" · "+fr;
   $("modeTxt").textContent=closed?"Día terminado":playing?"Simulación en vivo":"En pausa";$("liveDot").className="dot"+(playing&&!closed?" live":" idle")}
 function renderView(){if(!USER||!S)return;
@@ -1635,7 +1649,7 @@ function setPlay(){const b=$("play");b.querySelector("span").textContent=playing
   b.querySelector("svg").innerHTML=playing?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 5l12 7-12 7z"/>'}
 function boot(first){
   armarMenu();GOAL=EAPOS.prueba().metas.dia||1800000;renderPhotos();
-  seed=semillaDe(CTX.fecha);DEMAND=demandaDe(CTX.fecha);S=newState();PD.lineas={};PD.mesa=null;PD.fila=null;while(S.t<START)step();S.pulses=[];NET.queue=0;NET.log=[];NET.last=S.t;selTable=null;lastTxId=S.tx.length?S.tx[S.tx.length-1].id:0;
+  FASE_SIM={};seed=semillaDe(CTX.fecha);DEMAND=demandaDe(CTX.fecha);S=newState();PD.lineas={};PD.mesa=null;PD.fila=null;while(S.t<START)step();S.pulses=[];NET.queue=0;NET.log=[];NET.last=S.t;selTable=null;lastTxId=S.tx.length?S.tx[S.tx.length-1].id:0;
   const app=$("app");app.classList.add("loading");booted=false;
   setTimeout(()=>{app.classList.remove("loading");booted=true;lastTick=performance.now();renderAll();setSliders(true);
     document.querySelectorAll(`.view[data-view="${cur}"] .tc`).forEach((el,i)=>{el.style.setProperty("--d",(i*50)+"ms");el.style.animation="none";void el.offsetWidth;el.style.animation=""})},REDUCE?0:(first?900:600));
@@ -1662,6 +1676,7 @@ $("tables").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if
 $("detail").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const tb=S.tables.find(x=>x.n===selTable);if(!tb)return;
   if(b.dataset.act==="cobrar"){const amt=tb.total;closeTable(tb,ACTOR.name);toast(`Mesa ${tb.n} cobrada · ${clp(amt)}`)}
   if(b.dataset.act==="cuenta"){tb.state="cuenta";tb.since=S.t;tb.dur=ri(3,8);tb.flash=true}
+  if(b.dataset.act==="pedido"&&S.t>=MESAS_FIN){toast("Las mesas cerraron a las 21:30");return}
   if(b.dataset.act==="pedido"){PD.dest="mesa";PD.mesa=tb.n;go("pedido");return}
   renderAll()});
 $("inv").addEventListener("click",e=>{const b=e.target.closest("[data-rep]");if(!b)return;const k=b.dataset.rep;
@@ -1793,10 +1808,13 @@ function renderPedido(){
   const q=norm(PD.q),cerrado=S.t>=CLOSE;
   const rows=MENU.filter(it=>cats.includes(it.c)&&(PD.cat==="all"||it.c===PD.cat)&&(!q||norm(it.n+" "+it.d).includes(q)));
   $("pdCarta").hx=rows.map(it=>{const tw=!okTime(it,S.t),loc=PD.dest!=="mesa"&&it.local,espera=it.c==="emp"&&(S.vit[it.key]||0)<1,out=!avail(it)&&!(espera&&PD.dest==="llevar");
-    const dis=cerrado||tw||loc||out,why=tw?CATS[it.c].note:loc?"Solo en el local":out?"Sin insumo":espera?"Espera la tanda":"",qn=PD.lineas[it.id]||0;
+    const dis=cerrado||tw||loc||out,why=tw?notaHora(it,S.t):loc?"Solo en el local":out?"Sin insumo":espera?"Espera la tanda":"",qn=PD.lineas[it.id]||0;
     return `<button type="button" class="pprod${qn?" on":""}" data-add="${it.id}" ${dis?"disabled":""}><span class="nm">${esc(it.n)}${it.v?LEAF:""}</span><span class="pr">${clp(it.p)}</span>${why?`<span class="why">${esc(why)}</span>`:""}${qn?`<span class="qn">${qn}</span>`:""}</button>`}).join("")||`<p class="empty-s">Sin productos para este filtro.</p>`;
   let dh="";const pax=`<div class="pdpax"><span class="lbl">Personas</span><button type="button" class="btn sm" data-pax="-1" aria-label="Una persona menos">−</button><b class="num" id="pdPax">${PD.pax}</b><button type="button" class="btn sm" data-pax="1" aria-label="Una persona más">+</button></div>`;
-  if(PD.dest==="mesa"){const libres=S.tables.filter(x=>x.state==="libre");if(PD.mesa&&!libres.some(x=>x.n===PD.mesa))PD.mesa=null;
+  const mesasCerradas=S.t>=MESAS_FIN;
+  if(PD.dest==="mesa"&&mesasCerradas){PD.mesa=null;$("pdTit").textContent="Pedido de mesa";$("pdTxt").textContent="Las mesas y la cocina cerraron a las 21:30.";
+    dh=`<p class="note" style="margin-top:0">Desde las 21:30 no se sientan mesas nuevas: usa <b>Para llevar</b> hasta el cierre de las 22:00.</p>`}
+  else if(PD.dest==="mesa"){const libres=S.tables.filter(x=>x.state==="libre");if(PD.mesa&&!libres.some(x=>x.n===PD.mesa))PD.mesa=null;
     $("pdTit").textContent="Pedido de mesa";$("pdTxt").textContent="Se sienta el grupo, el pedido sale a cocina, barra y horno, y la mesa se cobra en el Salón.";
     dh=`<span class="lbl">Mesa libre</span><div class="pdmesas">${libres.map(x=>`<button type="button" class="fchip" data-mesa="${x.n}" aria-pressed="${PD.mesa===x.n}">Mesa ${x.n}</button>`).join("")||`<span class="empty-s">No hay mesas libres. El grupo puede esperar en la fila y pedir desde ahí.</span>`}</div>${pax}
       ${libres.length?"":`<button type="button" class="btn sm" data-afila="mesa">Grupo de ${PD.pax} espera mesa en la fila</button>`}`}
@@ -1805,7 +1823,7 @@ function renderPedido(){
   else{const L=filaEsperando();if(PD.fila&&!L.some(x=>x.k===PD.fila))PD.fila=null;if(!PD.fila&&L.length)PD.fila=L[0].k;
     $("pdTit").textContent="Venta en la fila";$("pdTxt").textContent="Para quien espera mesa o la salida de empanadas: se cobra ahí mismo.";
     dh=`<span class="lbl">Quién pide</span><div class="pdfila">${L.map(x=>`<button type="button" class="pfila" data-fila="${x.k}" aria-pressed="${PD.fila===x.k}"><span>${x.txt}</span><span class="num">${x.min} min${x.g.compro?" · ya pidió":""}</span></button>`).join("")||`<span class="empty-s">Nadie espera ahora. Forma la fila con los botones de abajo.</span>`}</div>${pax}
-      <div class="pdacc"><button type="button" class="btn sm" data-afila="mesa">Grupo de ${PD.pax} espera mesa</button><button type="button" class="btn sm" data-afila="emp">Cliente espera la próxima tanda (${PD.pax} empanadas)</button></div>
+      <div class="pdacc">${mesasCerradas?"":`<button type="button" class="btn sm" data-afila="mesa">Grupo de ${PD.pax} espera mesa</button>`}<button type="button" class="btn sm" data-afila="emp">Cliente espera la próxima tanda (${PD.pax} empanadas)</button></div>
       <p class="note">El grupo pasa a su mesa en unos 5 minutos, cuando haya una libre; quien espera empanadas las recibe al salir la tanda.</p>`}
   $("pdDestino").hx=dh;
   const its=Object.entries(PD.lineas).filter(([id,qq])=>qq>0&&MENU[id]);
@@ -1820,6 +1838,7 @@ function enviarPedido(){
   const its=pdItems();if(!its.length||S.t>=CLOSE)return;
   const r=revisarInsumos(its,PD.dest==="llevar");if(r.ins){toast(`No alcanza ${INS[r.ins].n.toLowerCase()} para todo el pedido`);return}if(r.emp){toast(`No quedan empanadas ${r.emp} en la vitrina`);return}
   let txt="",amt=0;
+  if(PD.dest==="mesa"&&S.t>=MESAS_FIN){toast("Las mesas cerraron a las 21:30");return}
   if(PD.dest==="mesa"){const tb=S.tables.find(x=>x.n===PD.mesa&&x.state==="libre");if(!tb){toast("Esa mesa ya no está libre");return}
     tb.state="ocupada";tb.since=S.t;tb.pax=PD.pax;tb.items=[];its.forEach(it=>addItem(tb.items,it));tb.total=amt=sum(tb.items);tb.dur=ri(22,38)+PD.pax*ri(5,9);tb.flash=true;
     order("Mesa "+tb.n,"mesa",tb.items);txt=`Mesa ${tb.n} · ${PD.pax} pers. · ${its.length} productos`;PD.mesa=null;toast(`Mesa ${tb.n}: pedido enviado · ${clp(amt)}`)}
@@ -1842,6 +1861,7 @@ $("pdDestino").addEventListener("click",e=>{const t=e.target;
   const p=t.closest("[data-pax]");if(p){PD.pax=Math.min(8,Math.max(1,PD.pax+ +p.dataset.pax));renderPedido();return}
   const f=t.closest("[data-fila]");if(f){PD.fila=f.dataset.fila;renderPedido();return}
   const af=t.closest("[data-afila]");if(af){if(S.t>=CLOSE)return;
+    if(af.dataset.afila==="mesa"&&S.t>=MESAS_FIN){toast("Las mesas cerraron a las 21:30");return}
     if(af.dataset.afila==="mesa"){const g={t:S.t,pax:PD.pax,id:++S.eseq,hasta:S.t+5};S.queue.push(g);PD.fila="m:"+g.id;toast(`Grupo de ${g.pax} en la fila: puede pedir mientras se prepara su mesa`)}
     else{const e={t:S.t,n:PD.pax,pax:1,id:++S.eseq,tanda:true};S.espEmp.push(e);hornoAutomatico();PD.fila="e:"+e.id;toast(`Cliente espera ${e.n} empanadas de la próxima tanda`)}
     PD.dest="fila";renderAll()}});
@@ -1992,6 +2012,9 @@ let USO_MIN=null;
 function usoMinimo(){if(USO_MIN&&USO_MIN.v===menuV)return USO_MIN.m;const m={};
   MENU.forEach(it=>{const rec=it.c==="emp"?[]:it.rec;rec.forEach(([k,q])=>{if(q>0&&(m[k]==null||q<m[k]))m[k]=q})});USO_MIN={v:menuV,m};return m}
 function avisosPrueba(){if(!S)return[];const L=[],um=usoMinimo(),S0=stockInicial();
+  for(const h of EAPOS.horario(S.t)){const m=Math.max(1,Math.ceil(h.falta));
+    if(h.fase==="aviso"||h.fase==="ultimo")L.push({k:"hora|"+h.id+"|"+h.fase,tono:h.fase==="ultimo"?"crit":"warn",tit:`${h.txt} a las ${h.hora}`,det:`${m===1?"Falta 1 minuto":`Faltan ${m} minutos`} de la simulación · ${h.efecto}`,go:h.id==="mesas"?"salon":null});
+    else if(h.fase==="terminado"&&h.id!=="cierre"&&S.t<CLOSE&&-h.falta<30)L.push({k:"hora|"+h.id+"|fin",tono:"info",tit:h.hecho,det:h.efecto})}
   const se=Object.keys(um).filter(k=>S.stock[k]<um[k]-1e-9);
   se.slice(0,5).forEach(k=>{const n=MENU.filter(it=>it.c!=="emp"&&it.rec.some(x=>x[0]===k)).length;L.push({k:"ins|"+k,tono:"crit",tit:"Se acabó: "+esc(INS[k].n.toLowerCase()),det:`${n} ${n===1?"producto queda":"productos quedan"} sin vender`,go:"inventario"})});
   if(se.length>5)L.push({k:"ins+",tono:"crit",tit:`Y ${se.length-5} insumos más agotados`,go:"inventario"});

@@ -2018,10 +2018,12 @@ function capaSecciones(){
     (nPed()?botonLimpiar():'')+
     '';
 }
+/* El horario sale del núcleo: desayunos hasta las 12:00 y la cocina (brunch
+   incluido) hasta las 21:30, cuando se cierran las mesas. */
 function enHorario(sc){
   if(!sc || typeof sc.desde!=="number") return true;
-  var hh=new Date().getHours();
-  return hh>=sc.desde && hh<sc.hasta;
+  var m=EAPOS.minutoDe();
+  return m>=sc.desde*60 && m<Math.min(sc.hasta*60, 1290);
 }
 /* ---------- portada de bebidas ---------- */
 function capaBebidas(){

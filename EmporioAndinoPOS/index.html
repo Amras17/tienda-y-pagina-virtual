@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.5</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.6</span></div><span class="chip num" id="loginClock">--:--</span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.5</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.6</span><small>Emporio Andino · San Pedro</small></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -114,6 +114,7 @@
         <button class="top-pn" type="button" id="topPn" title="Volver arriba"></button>
       </div>
       <div class="ctl">
+        <button class="chip hora-chip" type="button" id="horaChip" hidden></button>
         <span class="clock num" id="clock">--:--</span>
         <button class="btn sm icon avisos-btn" type="button" id="avisosBtn" aria-label="Avisos importantes" title="Avisos importantes"></button>
         <span class="chip" id="cfgChip"><span class="dot"></span><span id="cfgTxt">Configuración</span></span>
@@ -192,8 +193,16 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 2.5</h2><p>Barra colapsable para ver la pantalla completa, sobre la base de Emporio System 1.1</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 2.6</h2><p>Horario del local con avisos y navegación sin capas que tapen, sobre la base de Emporio System 1.1</p></div></div>
           <div class="notas">
+            <div><h3>Horario del local (2.6)</h3><ul>
+              <li>Desayunos hasta las 12:00, mesas y cocina hasta las 21:30, cierre a las 22:00. Avisa a los 15 y a los 5 minutos (el cierre, a los 5) con el chip del encabezado, la campana y un aviso en pantalla.</li>
+              <li>La Caja deja de vender desayunos a las 12:00 y cocina a las 21:30, y pasa a Para llevar. La Carta y la Prueba siguen el mismo horario.</li>
+            </ul></div>
+            <div><h3>Navegación (2.6)</h3><ul>
+              <li>Cada módulo cabe entero bajo el encabezado, en computador, tablet y teléfono; ninguna capa tapa botones.</li>
+              <li>Las filas de pestañas que no caben se desplazan con la rueda, muestran un degradado en el borde y centran la pestaña activa.</li>
+            </ul></div>
             <div><h3>Barra colapsable (2.5)</h3><ul>
               <li>Al bajar, la columna izquierda queda en íconos y el encabezado se achica a una barra con el resumen de la pestaña; al volver arriba, todo se abre.</li>
               <li>Con el cursor sobre la columna, se abre encima del contenido. Dentro de un módulo, su resumen se pliega y el módulo ocupa casi toda la pantalla.</li>
@@ -368,6 +377,7 @@ function show(v,silent){
   document.querySelectorAll("#nav a").forEach(function(a){ var on=a.dataset.v===v; a.classList.toggle("on",on); a.toggleAttribute("aria-current",on); });
   navSl&&navSl.to(document.querySelector("#nav a.on"),silent);
   renderView(); U.revelar(document.querySelector('.view[data-view="'+v+'"]'));
+  ajustarMarco(); U.centrarActivo($("nav"),document.querySelector("#nav a.on"));
   if(!silent){ window.scrollTo(0,0); $("vTitle").focus({preventScroll:true}); }
   subtitulo();
 }
@@ -388,7 +398,16 @@ window.EAPOS_SISTEMA={abrir:function(id){ go(id); }, desplazo:function(y){ U.des
    queda en íconos y el encabezado muestra el resumen de la pestaña. */
 var colapsoListo=false;
 function iniciarColapso(){ if(colapsoListo) return; colapsoListo=true;
-  U.colapsable(function(){ navSl&&navSl.to(document.querySelector("#nav a.on"),true); }); }
+  U.colapsable(function(on,medido){ navSl&&navSl.to(document.querySelector("#nav a.on"),true); ajustarMarco(); if(!medido) setTimeout(ajustarMarco,450); }); }
+/* El módulo abierto mide exactamente lo que queda bajo las barras fijas: con la
+   página al fondo se ve entero, sin partes tapadas por el encabezado. */
+function ajustarMarco(){
+  var fr=document.querySelector('.view[data-view="'+cur+'"] .marco iframe'); if(!fr) return;
+  var fijas=[].slice.call(document.querySelectorAll(".top,.side")).filter(function(e){ var r=e.getBoundingClientRect(); return getComputedStyle(e).position==="sticky"&&r.width>innerWidth*.6; });
+  var arriba=fijas.reduce(function(a,e){ return a+e.getBoundingClientRect().height; },0), main=document.querySelector(".main"), cs=getComputedStyle(main);
+  var abajo=parseFloat(cs.paddingBottom)||0, gap=parseFloat(cs.rowGap||cs.gap)||16;
+  fr.style.height=Math.max(420,Math.floor(innerHeight-arriba-gap-abajo))+"px"; }
+addEventListener("resize",function(){ if(USER) ajustarMarco(); });
 $("topPn").addEventListener("click",function(){ window.scrollTo({top:0,behavior:U.REDUCE?"auto":"smooth"}); U.desplazo("modulo",0);
   var fr=document.querySelector('.view[data-view="'+cur+'"] .marco iframe'); try{ if(fr&&fr.contentWindow) fr.contentWindow.scrollTo(0,0); }catch(e){} });
 new ResizeObserver(function(){ if(USER){ navSl&&navSl.to(document.querySelector("#nav a.on"),true); if(cur==="inicio") renderDash(); } }).observe(document.body);
@@ -591,13 +610,52 @@ function avisosSistema(){
     var alta=reportes.filter(function(r){ return r.estado!=="resuelto"&&r.prioridad==="alta"; }).length; if(alta) L.push({k:"retro",tono:"warn",tit:alta+(alta===1?" reporte de prioridad alta":" reportes de prioridad alta"),det:"Afectan el servicio",go:"retro"});
     var dg=leeLocal("eapos_diag"); if(dg&&dg.version===E.version&&dg.falla) L.push({k:"diag",tono:"crit",tit:"La verificación tiene "+dg.falla+(dg.falla===1?" falla":" fallas"),go:"verificacion"});
   }
+  avisosHorario().forEach(function(a){ L.push(a); });
   if(navigator.onLine===false) L.push({k:"red",tono:"info",tit:"Sin internet",det:"Todo sigue guardándose en este equipo"});
   return L;
 }
+/* ==================== HORARIO DEL LOCAL ====================
+   Desayunos hasta las 12:00, mesas y cocina hasta las 21:30, cierre a las
+   22:00. Avisa a los 15 y a los 5 minutos con la campana, un aviso en
+   pantalla y el chip del encabezado, que cuenta los minutos. */
+function avisosHorario(){
+  var L=[], min=E.minutoDe(), caja=puedeVer("caja")?"caja":null;
+  E.horario(min).forEach(function(h){
+    var m=Math.max(1,Math.ceil(h.falta));
+    if(h.fase==="aviso"||h.fase==="ultimo") L.push({k:"hora|"+h.id+"|"+h.fase,tono:h.fase==="ultimo"?"crit":"warn",tit:h.txt+" a las "+h.hora,det:(m===1?"Falta 1 minuto":"Faltan "+m+" minutos")+" · "+h.efecto,go:h.id==="cierre"?null:caja});
+    else if(h.fase==="terminado"&&h.id!=="cierre"&&min<1320&&-h.falta<30) L.push({k:"hora|"+h.id+"|fin",tono:"info",tit:h.hecho,det:h.efecto,go:caja});
+  });
+  if(min>=1320) L.push({k:"hora|cerrado",tono:"info",tit:"Local cerrado",det:"Abre mañana a las 07:00"});
+  return L;
+}
+var FASE_HORA={};
+function pintarHorario(){
+  var ch=$("horaChip"); if(!ch) return; if(!USER){ ch.hidden=true; return; }
+  var hs=E.horario(), p=hs.filter(function(h){ return h.fase!=="terminado"; })[0], txt, tono;
+  if(!p){ txt="Local cerrado"; tono="crit"; }
+  else if(p.fase==="antes"){ txt=p.hasta; tono="info"; }
+  else { var m=Math.max(1,Math.ceil(p.falta)); txt=p.txt+" en "+m+" min"; tono=p.fase==="ultimo"?"crit":"warn"; }
+  var h='<i aria-hidden="true"></i><span>'+esc(txt)+'</span>';
+  if(ch._h!==h){ ch._h=h; ch.innerHTML=h; }
+  ch.setAttribute("data-tono",tono); ch.hidden=false;
+  ch.title=hs.map(function(x){ return x.hora+" · "+x.n+(x.fase==="terminado"?" (listo)":""); }).join("\n");
+  /* Un aviso en pantalla cada vez que un hito cambia de fase. */
+  hs.forEach(function(x){
+    var antes=FASE_HORA[x.id]; FASE_HORA[x.id]=x.fase;
+    if(antes===x.fase||(antes===undefined&&x.fase!=="aviso"&&x.fase!=="ultimo")) return;
+    var m=Math.max(1,Math.ceil(x.falta));
+    var msg="⏱ "+x.txt+" en "+m+" min ("+x.hora+")";
+    if(x.fase==="aviso"||x.fase==="ultimo"){ if(antes===undefined) setTimeout(function(){ U.aviso(msg,7000); },3200); else U.aviso(msg,7000); }
+    else if(x.fase==="terminado") U.aviso("⏱ "+x.hecho+". "+x.efecto,7000);
+  });
+}
+$("horaChip").addEventListener("click",function(){ var hs=E.horario();
+  U.aviso(hs.map(function(x){ return x.hora+" "+x.n.toLowerCase()+(x.fase==="terminado"?" ✓":""); }).join(" · "),6000); });
+
 var AV=null;
 function refrescarAvisos(){ if(!USER) return; if(!AV){ $("avisosBtn").innerHTML=U.CAMPANA;
-    AV=U.avisos($("avisosBtn"),{ir:function(v){ go(v); }, alNuevo:function(a){ U.aviso(a.tit.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&")); }}); }
-  AV.render(avisosSistema()); }
+    AV=U.avisos($("avisosBtn"),{ir:function(v){ go(v); }, alNuevo:function(a){ if(String(a.k).indexOf("hora|")===0) return; U.aviso(a.tit.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&")); }}); }
+  AV.render(avisosSistema()); pintarHorario(); }
 
 /* ==================== VERSIONES Y ACCESOS ==================== */
 function pintarVersiones(){

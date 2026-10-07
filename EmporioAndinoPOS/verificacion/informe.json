@@ -1,7 +1,7 @@
 {
-  "version": "2.5",
-  "fecha": "2026-10-06T22:41:01.182Z",
-  "total": 198,
+  "version": "2.6",
+  "fecha": "2026-10-07T01:29:51.747Z",
+  "total": 222,
   "fallas": 0,
   "resultados": [
     {
@@ -374,13 +374,13 @@
       "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "un evento en un día sube su demanda",
       "ok": true,
-      "detalle": "{\"antes\":1295700,\"ev\":\"evento\",\"rev\":1780400}"
+      "detalle": "{\"antes\":1338400,\"ev\":\"evento\",\"rev\":1819100}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "abre ese día en vivo en el Dashboard",
       "ok": true,
-      "detalle": "{\"h\":\"dia\",\"fecha\":\"2026-10-16\",\"cur\":\"inicio\",\"sub\":\"Viernes, 16 de octubre de 2026 · Brunch y carta completa · temporada baja\"}"
+      "detalle": "{\"h\":\"dia\",\"fecha\":\"2026-10-16\",\"cur\":\"inicio\",\"sub\":\"Viernes, 16 de octubre de 2026 · Carta completa · mesas y cocina hasta las 21:30 · temporada baja\"}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
@@ -434,7 +434,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "el stock estándar alcanza un día de temporada alta",
       "ok": true,
-      "detalle": "{\"sin\":0,\"fc\":0.2537874558620399}"
+      "detalle": "{\"sin\":0,\"fc\":0.2442517835136405}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -446,13 +446,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":3794,\"vit\":2},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":3098.75}}"
+      "detalle": "{\"h0\":{\"pollo\":3562.25,\"vit\":5},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2867}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "al salir del horno las unidades pasan a la vitrina",
       "ok": true,
-      "detalle": "{\"vit\":17,\"horno\":0}"
+      "detalle": "{\"vit\":19,\"horno\":0}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -482,7 +482,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | warn:2 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 10 espera la cuenta hace 7 min"
+      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -597,6 +597,78 @@
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "fases a los 15 y 5 minutos de cada hito",
+      "ok": true,
+      "detalle": "{\"a705\":\"aviso,antes,antes\",\"a716\":\"ultimo,antes,antes\",\"a720\":\"terminado,antes,antes\",\"a1275\":\"terminado,aviso,antes\",\"a1286\":\"terminado,ultimo,antes\",\"a1310\":\"terminado,terminado,antes\",\"a1316\":\"terminado,terminado,ultimo\",\"a1320\":\"terminado,terminado,terminado\",\"desayuno\":[\"\",\"Terminó el desayuno (12:00)\"],\"cocina\":[\"\",\"Cocina cerrada (21:30)\"],\"barra\":[\"\",\"Local cerrado (22:00)\"]}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "bloqueos: desayuno 12:00, cocina 21:30, local 22:00",
+      "ok": true,
+      "detalle": "{\"a705\":\"aviso,antes,antes\",\"a716\":\"ultimo,antes,antes\",\"a720\":\"terminado,antes,antes\",\"a1275\":\"terminado,aviso,antes\",\"a1286\":\"terminado,ultimo,antes\",\"a1310\":\"terminado,terminado,antes\",\"a1316\":\"terminado,terminado,ultimo\",\"a1320\":\"terminado,terminado,terminado\",\"desayuno\":[\"\",\"Terminó el desayuno (12:00)\"],\"cocina\":[\"\",\"Cocina cerrada (21:30)\"],\"barra\":[\"\",\"Local cerrado (22:00)\"]}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "chip del encabezado cuenta los minutos (21:27)",
+      "ok": true,
+      "detalle": "{\"t\":\"Cierran las mesas y la cocina en 3 min\",\"tono\":\"crit\",\"ve\":true}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "aviso en la campana antes del cierre de mesas",
+      "ok": true,
+      "detalle": "[\"Cierran las mesas y la cocina a las 21:30\"]"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "la Caja cabe bajo el encabezado sin quedar tapada",
+      "ok": true,
+      "detalle": "{\"arriba\":92,\"abajo\":811,\"vh\":860,\"cabecera\":77}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "Caja 21:27: franja de aviso, sin desayunos, cocina y mesas aún abiertas",
+      "ok": true,
+      "detalle": "{\"franja\":\"3 min\\nCierran las mesas y la cocina a las 21:30. Desde las 21:30 no se abren mesas ni se piden platos de cocina; queda para llevar.\",\"desayuno\":false,\"cocina\":true,\"local\":true}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "Caja 21:40: mesas cerradas, pasa a Para llevar y no vende cocina",
+      "ok": true,
+      "detalle": "{\"cocina\":false,\"emp\":true,\"modo\":\"llevar\",\"local\":true,\"marcados\":1}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "Carta 21:40: desayuno y brunch fuera de horario",
+      "ok": true,
+      "detalle": "{\"des\":false,\"brunch\":false}"
+    },
+    {
+      "modulo": "Horario · escritorio",
+      "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
+      "ok": true,
+      "detalle": "{\"sub\":\"Miércoles, 7 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -968,13 +1040,13 @@
       "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "un evento en un día sube su demanda",
       "ok": true,
-      "detalle": "{\"antes\":1295700,\"ev\":\"evento\",\"rev\":1780400}"
+      "detalle": "{\"antes\":1338400,\"ev\":\"evento\",\"rev\":1819100}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "abre ese día en vivo en el Dashboard",
       "ok": true,
-      "detalle": "{\"h\":\"dia\",\"fecha\":\"2026-10-16\",\"cur\":\"inicio\",\"sub\":\"Viernes, 16 de octubre de 2026 · Brunch y carta completa · temporada baja\"}"
+      "detalle": "{\"h\":\"dia\",\"fecha\":\"2026-10-16\",\"cur\":\"inicio\",\"sub\":\"Viernes, 16 de octubre de 2026 · Carta completa · mesas y cocina hasta las 21:30 · temporada baja\"}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
@@ -1028,7 +1100,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "el stock estándar alcanza un día de temporada alta",
       "ok": true,
-      "detalle": "{\"sin\":0,\"fc\":0.2537874558620399}"
+      "detalle": "{\"sin\":0,\"fc\":0.2442517835136405}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1040,13 +1112,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":3794,\"vit\":2},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":3098.75}}"
+      "detalle": "{\"h0\":{\"pollo\":3562.25,\"vit\":5},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2867}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "al salir del horno las unidades pasan a la vitrina",
       "ok": true,
-      "detalle": "{\"vit\":17,\"horno\":0}"
+      "detalle": "{\"vit\":19,\"horno\":0}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1076,7 +1148,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | warn:2 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 10 espera la cuenta hace 7 min"
+      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1191,6 +1263,78 @@
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "fases a los 15 y 5 minutos de cada hito",
+      "ok": true,
+      "detalle": "{\"a705\":\"aviso,antes,antes\",\"a716\":\"ultimo,antes,antes\",\"a720\":\"terminado,antes,antes\",\"a1275\":\"terminado,aviso,antes\",\"a1286\":\"terminado,ultimo,antes\",\"a1310\":\"terminado,terminado,antes\",\"a1316\":\"terminado,terminado,ultimo\",\"a1320\":\"terminado,terminado,terminado\",\"desayuno\":[\"\",\"Terminó el desayuno (12:00)\"],\"cocina\":[\"\",\"Cocina cerrada (21:30)\"],\"barra\":[\"\",\"Local cerrado (22:00)\"]}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "bloqueos: desayuno 12:00, cocina 21:30, local 22:00",
+      "ok": true,
+      "detalle": "{\"a705\":\"aviso,antes,antes\",\"a716\":\"ultimo,antes,antes\",\"a720\":\"terminado,antes,antes\",\"a1275\":\"terminado,aviso,antes\",\"a1286\":\"terminado,ultimo,antes\",\"a1310\":\"terminado,terminado,antes\",\"a1316\":\"terminado,terminado,ultimo\",\"a1320\":\"terminado,terminado,terminado\",\"desayuno\":[\"\",\"Terminó el desayuno (12:00)\"],\"cocina\":[\"\",\"Cocina cerrada (21:30)\"],\"barra\":[\"\",\"Local cerrado (22:00)\"]}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "chip del encabezado cuenta los minutos (21:27)",
+      "ok": true,
+      "detalle": "{\"t\":\"Cierran las mesas y la cocina en 3 min\",\"tono\":\"crit\",\"ve\":true}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "aviso en la campana antes del cierre de mesas",
+      "ok": true,
+      "detalle": "[\"Cierran las mesas y la cocina a las 21:30\"]"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "la Caja cabe bajo el encabezado sin quedar tapada",
+      "ok": true,
+      "detalle": "{\"arriba\":15,\"abajo\":795,\"vh\":844,\"cabecera\":0}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "Caja 21:27: franja de aviso, sin desayunos, cocina y mesas aún abiertas",
+      "ok": true,
+      "detalle": "{\"franja\":\"3 min\\nCierran las mesas y la cocina a las 21:30. Desde las 21:30 no se abren mesas ni se piden platos de cocina; queda para llevar.\",\"desayuno\":false,\"cocina\":true,\"local\":true}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "Caja 21:40: mesas cerradas, pasa a Para llevar y no vende cocina",
+      "ok": true,
+      "detalle": "{\"cocina\":false,\"emp\":true,\"modo\":\"llevar\",\"local\":true,\"marcados\":1}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "Carta 21:40: desayuno y brunch fuera de horario",
+      "ok": true,
+      "detalle": "{\"des\":false,\"brunch\":false}"
+    },
+    {
+      "modulo": "Horario · telefono",
+      "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
+      "ok": true,
+      "detalle": "{\"sub\":\"Miércoles, 7 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     }
   ]
 }

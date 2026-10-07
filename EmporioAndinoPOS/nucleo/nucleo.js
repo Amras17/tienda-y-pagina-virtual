@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "2.5";
+  var VERSION = "2.6";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -122,6 +122,46 @@
   }
   function fueraDeCarta(id, c){ c=c||activa(); return c.fuera.indexOf(id)>=0; }
 
+  /* ---------- horario del local ----------
+     Tres hitos del día, en minutos desde medianoche. Cada uno avisa cuando
+     faltan 15 y 5 minutos (el cierre solo a los 5) y desde su hora bloquea lo
+     que corresponde: los desayunos a las 12:00; las mesas y la cocina a las
+     21:30; el local entero a las 22:00. Para probar, la hora se puede fijar
+     en la pestaña con sessionStorage "eapos_hora" = "21:20". */
+  var HORARIO = [
+    {id:"desayuno", fin:720,  avisos:[15,5], n:"Desayunos",        hasta:"Desayunos hasta las 12:00",      txt:"Terminan los desayunos",        hecho:"Terminó el desayuno",     efecto:"Desde las 12:00 la Caja no vende desayunos; sigue el brunch"},
+    {id:"mesas",    fin:1290, avisos:[15,5], n:"Mesas y cocina",   hasta:"Mesas y cocina hasta las 21:30", txt:"Cierran las mesas y la cocina", hecho:"Mesas y cocina cerradas", efecto:"Desde las 21:30 no se abren mesas ni se piden platos de cocina; queda para llevar"},
+    {id:"cierre",   fin:1320, avisos:[5],    n:"Cierre del local", hasta:"Abierto hasta las 22:00",        txt:"Cierra el local",               hecho:"Local cerrado",           efecto:"A las 22:00 se cierra la caja y el local"}
+  ];
+  function hhmm(m){ m=Math.max(0,Math.round(m)); return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); }
+  function minutoDe(d){
+    if(!d){ try{ var f=sessionStorage.getItem("eapos_hora"); if(f&&/^\d{1,2}:\d{2}$/.test(f)){ var q=f.split(":"); return +q[0]*60+(+q[1]); } }catch(e){} d=new Date(); }
+    return d.getHours()*60+d.getMinutes()+d.getSeconds()/60;
+  }
+  /* Fase de cada hito: "antes", "aviso" (faltan 15 o menos), "ultimo" (5 o
+     menos) o "terminado". La lista viene ordenada por hora. */
+  function horario(min){
+    min=min==null?minutoDe():min;
+    return HORARIO.map(function(h){
+      var falta=h.fin-min, primero=h.avisos[0];
+      var fase=falta<=0?"terminado":falta<=5?"ultimo":falta<=primero?"aviso":"antes";
+      return {id:h.id, n:h.n, hasta:h.hasta, txt:h.txt, hecho:h.hecho, efecto:h.efecto, fin:h.fin, hora:hhmm(h.fin), falta:falta, fase:fase};
+    });
+  }
+  /* El próximo hito que todavía no termina (o null pasadas las 22:00). */
+  function proximoHito(min){ return horario(min).filter(function(h){ return h.fase!=="terminado"; })[0]||null; }
+  /* ¿Se puede vender este producto a esta hora? Devuelve el motivo o "". */
+  function porHorario(id, min){
+    var p=typeof id==="object"?id:POR_ID[id]; if(!p) return "";
+    min=min==null?minutoDe():min;
+    if(min>=1320) return "Local cerrado (22:00)";
+    if(p.g==="coc" && min>=1290) return "Cocina cerrada (21:30)";
+    if(p.sub==="desayunos" && min>=720) return "Terminó el desayuno (12:00)";
+    return "";
+  }
+  /* Las mesas (consumo en el local) se cierran con la cocina. */
+  function mesasAbiertas(min){ min=min==null?minutoDe():min; return min<1290; }
+
   /* ---------- equipo, cargos y acceso ---------- */
   var MODULOS = {
     caja:   {n:"Caja", d:"Cobro, boleta, stock, costos, compras, mermas e informes", ruta:"caja/index.html"},
@@ -199,6 +239,7 @@
     MODULOS:MODULOS, ROLES:ROLES, EQUIPO:EQUIPO, COLOR_ROL:COLOR_ROL,
     hashPin:hashPin, pins:pins, guardarPin:guardarPin, borrarPin:borrarPin,
     sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede, verNumeros:verNumeros,
-    abrirEnSistema:abrirEnSistema, irA:irA
+    abrirEnSistema:abrirEnSistema, irA:irA,
+    HORARIO:HORARIO, horario:horario, proximoHito:proximoHito, porHorario:porHorario, mesasAbiertas:mesasAbiertas, minutoDe:minutoDe, hhmm:hhmm
   };
 })();

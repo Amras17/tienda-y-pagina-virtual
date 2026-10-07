@@ -164,6 +164,17 @@ p.vs{margin:0; font-size:12.5px; color:var(--tinta2); line-height:1.5; max-width
 .prod.sinprecio{border-style:dashed; border-color:var(--avisa)}
 .prod.sinprecio .pp{color:var(--avisa)}
 .prod.agotado{opacity:.55}
+.prod.fuerahora{opacity:.5}
+.estado.hora{background:var(--avisa-f); color:var(--avisa); border-color:var(--avisa)}
+.modo button:disabled{opacity:.45; cursor:not-allowed}
+/* Aviso del horario: desayunos a las 12:00, mesas y cocina a las 21:30, cierre a las 22:00. */
+.hora-aviso{display:flex; align-items:center; gap:10px; margin:0 0 10px; padding:9px 13px; border-radius:12px;
+  border:1.5px solid var(--avisa); background:var(--avisa-f); color:var(--avisa); font-size:13px; line-height:1.35}
+.hora-aviso[hidden]{display:none}
+.hora-aviso b{font-weight:800}
+.hora-aviso .rel{font-family:var(--mono); font-weight:800; font-size:15px; flex:none}
+.hora-aviso.ultimo{border-color:var(--grave); background:var(--grave-f); color:var(--grave)}
+.hora-aviso.listo{border-color:var(--linea-f); background:var(--papel); color:var(--tinta2)}
 .prod .en{position:absolute}
 .vacio{text-align:center; color:var(--tinta2); font-size:13.5px; padding:26px 14px;
   border:1px dashed var(--linea); border-radius:var(--r); background:var(--papel2)}
@@ -380,6 +391,8 @@ body.conhoja{overflow:hidden}
     font-weight:600; display:grid; place-items:center; padding:0 3px}
   .vista{padding:16px 20px 22px}
   .caja{grid-template-columns:minmax(0,1fr) minmax(300px,348px); align-items:start; height:100%}
+  /* Con la cuenta al lado, las categorías no se meten bajo su columna. */
+  .caja .grupos{margin-inline:0; padding-inline:0}
   .caja .izq{display:grid; gap:12px; align-content:start; min-height:0; min-width:0}
   .cuenta{position:sticky; top:0; max-height:calc(100dvh - 118px); overflow:auto}
   .lineas{max-height:none}
@@ -608,6 +621,7 @@ thead th,.tbl th{background:rgba(14,22,25,.95)}
   <main class="vista" id="vCaja">
     <div class="caja">
       <div class="izq">
+        <div class="hora-aviso" id="horaAviso" role="status" hidden></div>
         <div class="fila">
           <span class="buscador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-lupa"/></svg><input id="buscaProd" type="search" placeholder="Buscar producto, empanada, café…" autocomplete="off"></span>
         </div>
@@ -877,10 +891,11 @@ function pintarRejilla(){
       r.innerHTML="<b>"+esc(SUBN[sub]||sub)+"</b>";
       cont.appendChild(r);
     }
-    var pr=precioDe(p), es=estadoDe(p.id), u=unidades(p.id);
-    var b=el("button","prod"+(pr==null?" sinprecio":"")+(es==="off"?" agotado":"")); b.type="button";
+    var pr=precioDe(p), es=estadoDe(p.id), u=unidades(p.id), fh=fueraDeHora(p);
+    var b=el("button","prod"+(pr==null?" sinprecio":"")+(es==="off"?" agotado":"")+(fh?" fuerahora":"")); b.type="button";
     var pie="";
-    if(es==="off") pie+='<span class="estado off">'+ico("i-x",2.4)+"Agotado</span>";
+    if(fh) pie+='<span class="estado hora">'+ico("i-alerta",2)+esc(fh)+"</span>";
+    else if(es==="off") pie+='<span class="estado off">'+ico("i-x",2.4)+"Agotado</span>";
     else if(es==="bajo") pie+='<span class="estado bajo">'+ico("i-alerta",2)+(u!=null? "Quedan "+u : "Quedan pocas")+"</span>";
     else if(u!=null) pie+='<span class="estado ok">'+ico("i-check",2.4)+u+" u.</span>";
     if(p.loc) pie+='<span class="estado neutro">Solo local</span>';
@@ -893,7 +908,9 @@ function pintarRejilla(){
 function agregar(p){
   var pr=precioDe(p);
   if(pr==null){ avisar("«"+p.n+"» todavía no tiene precio. Se define en la Prueba y se aplica al sistema general.","mal"); return; }
+  var fh=fueraDeHora(p); if(fh){ avisar("«"+p.n+"»: "+fh+". Ya no se vende hoy.","mal"); return; }
   if(estadoDe(p.id)==="off"){ avisar("«"+p.n+"» está marcado como agotado. Repón o corrige el stock antes de venderlo.","mal"); return; }
+  if(modoActivo==="local" && !EAPOS.mesasAbiertas()){ avisar("Las mesas cerraron a las 21:30: elige Para llevar o DesertGo.","mal"); return; }
   if(p.loc && modoActivo!=="local"){ avisar("«"+p.n+"» se sirve solo para comer en el local.","mal"); return; }
   var ex=null;
   for(var i=0;i<carro.length;i++) if(carro[i].id===p.id && !carro[i].mod.length) ex=carro[i];
@@ -1330,7 +1347,7 @@ function graficoHoras(datos){
       '" rx="3" fill="var(--dato)"><title>'+d.h+":00 · "+plata(d.v)+"</title></rect>";
     if(i%2===0) s+='<text x="'+(x+ancho/2).toFixed(1)+'" y="'+(H-B+12)+'" font-size="8.5" text-anchor="middle" fill="var(--tinta3)" font-family="var(--mono)">'+d.h+"</text>";
   });
-  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-3)+'" font-size="8.5" text-anchor="middle" fill="var(--tinta3)">hora del día · 07:00 a 23:00</text>';
+  s+='<text x="'+((L+W-R)/2)+'" y="'+(H-3)+'" font-size="8.5" text-anchor="middle" fill="var(--tinta3)">hora del día · 07:00 a 22:00</text>';
   return s+"</svg>";
 }
 function barrasHTML(items, fmt){
@@ -1355,7 +1372,7 @@ function pintarPanel(){
   var pend=pendientesFolio(), falt=sinPrecio();
 
   var h='<div class="seccion"><h2 class="vt">Cómo va el día</h2>'+
-    '<p class="vs">'+fechaLarga(hoy)+" · horario continuo de 07:00 a 23:00. Todo lo que ves aquí sale de las ventas registradas en este equipo.</p></div>";
+    '<p class="vs">'+fechaLarga(hoy)+" · horario continuo de 07:00 a 22:00: desayunos hasta las 12:00, mesas y cocina hasta las 21:30. Todo lo que ves aquí sale de las ventas registradas en este equipo.</p></div>";
 
   h+='<div class="seccion"><div class="kpis">'+
     '<div class="kpi principal"><span class="k">Vendido hoy</span><span class="v num">'+plata(totalHoy)+'</span><span class="p">'+vs.length+(vs.length===1?" venta":" ventas")+" · ticket promedio "+plata(prom)+"</span></div>"+
@@ -1385,7 +1402,7 @@ function pintarPanel(){
       '<button class="btn chico suave" type="button" data-prueba="1">Definir en Prueba</button></div></div>';
   }
 
-  var horas=[]; for(var i=7;i<=23;i++) horas.push({h:String(i).padStart(2,"0"), v:0});
+  var horas=[]; for(var i=7;i<=22;i++) horas.push({h:String(i).padStart(2,"0"), v:0});
   vs.forEach(function(v){ var hh=new Date(v.ts).getHours(); var f=horas.filter(function(x){ return +x.h===hh; })[0]; if(f) f.v+=v.total; });
   var top={}; vs.forEach(function(v){ v.lineas.forEach(function(l){ top[l.n]=(top[l.n]||0)+l.q; }); });
   var topArr=Object.keys(top).map(function(k){ return {n:k, v:top[k]}; }).sort(function(a,b){ return b.v-a.v; }).slice(0,7);
@@ -2350,7 +2367,7 @@ function pintarEstad(){
       (m.mermaPct!=null? " · "+m.mermaPct.toFixed(1)+"% de la venta neta (meta "+(POS.cfg.metas.merma||3)+"%)":"")+"</span></div></div></div>";
   }
 
-  var horas=[]; for(var i=7;i<=23;i++){ var k=String(i).padStart(2,"0"); horas.push({h:k, v:m.porHora[k]||0}); }
+  var horas=[]; for(var i=7;i<=22;i++){ var k=String(i).padStart(2,"0"); horas.push({h:k, v:m.porHora[k]||0}); }
   var sem=[1,2,3,4,5,6,0].map(function(d){ return {n:DIASEM[d].slice(0,3), v:m.porSemana[d]||0}; });
   var prods=Object.keys(m.porProd).map(function(k){ return m.porProd[k]; });
   var topQ=prods.slice().sort(function(a,b){ return b.q-a.q; }).slice(0,8).map(function(p){ return {n:p.n, v:p.q}; });
@@ -2804,7 +2821,7 @@ function pintarResp(){
   });
 }
 function pintarTodo(){
-  pintarResp(); pintarGrupos(); pintarRejilla(); pintarPagos(); pintarCuenta(); pintarNav();
+  pintarHorario(); pintarResp(); pintarGrupos(); pintarRejilla(); pintarPagos(); pintarCuenta(); pintarNav();
   if(seccActiva==="panel") pintarPanel();
   if(seccActiva==="stock") pintarStock();
   if(seccActiva==="gest") pintarGest();
@@ -2846,6 +2863,7 @@ $("#btnSon").setAttribute("aria-pressed", POS.cfg.son?"true":"false");
 $("#btnAjustes").onclick=function(){ irA("ajustes"); };
 $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(b){
   b.onclick=function(){
+    if(b.dataset.modo==="local" && !EAPOS.mesasAbiertas()){ avisar("Las mesas y la cocina cerraron a las 21:30.","mal"); return; }
     modoActivo=b.dataset.modo;
     $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(x){ x.setAttribute("aria-pressed", x===b?"true":"false"); });
     if(modoActivo!=="local") conPropina=false; else conPropina=true;
@@ -2865,6 +2883,37 @@ $("#btnCuentaMesa").onclick=cuentaPrevia;
 $("#hojaX").onclick=cerrarHoja;
 $("#hojaVelo").onclick=cerrarHoja;
 document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !$("#hoja").hidden) cerrarHoja(); });
+
+/* ---------- horario del local ----------
+   Desde las 12:00 no se venden desayunos; desde las 21:30 se cierran las
+   mesas (Para el local) y la cocina; a las 22:00 cierra el local. Avisa a
+   los 15 y a los 5 minutos con una franja arriba de la venta. */
+function fueraDeHora(p){ return EAPOS.porHorario(p); }
+var firmaHora="";
+function pintarHorario(){
+  var hs=EAPOS.horario(), min=EAPOS.minutoDe(), mesas=EAPOS.mesasAbiertas(min);
+  var firma=hs.map(function(h){ return h.fase; }).join("|");
+  var bl=$("#modoVenta [data-modo=local]");
+  if(bl){ bl.disabled=!mesas; bl.title=mesas?"":"Las mesas cerraron a las 21:30"; }
+  if(!mesas && modoActivo==="local"){
+    modoActivo="llevar"; conPropina=false;
+    $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(x){ x.setAttribute("aria-pressed", x.dataset.modo==="llevar"?"true":"false"); });
+    var fuera=carro.filter(function(l){ var it=itemCat(l.id); return it&&it.loc; });
+    if(fuera.length) carro=carro.filter(function(l){ return fuera.indexOf(l)<0; });
+    avisar("Mesas y cocina cerradas (21:30): la caja pasó a Para llevar"+(fuera.length?" y salieron "+fuera.length+" ítems de consumo en el local":"")+".","alerta");
+    pintarCuenta();
+  }
+  var a=hs.filter(function(h){ return h.fase==="aviso"||h.fase==="ultimo"; })[0], f=$("#horaAviso");
+  var listo=hs.filter(function(h){ return h.fase==="terminado"&&h.id!=="cierre"&&-h.falta<30; }).pop();
+  if(min>=1320){ f.className="hora-aviso ultimo"; f.innerHTML='<span class="rel">22:00</span><span><b>Local cerrado.</b> Registra lo último y haz el cierre de caja.</span>'; f.hidden=false; }
+  else if(a){ var m=Math.max(1,Math.ceil(a.falta));
+    f.className="hora-aviso"+(a.fase==="ultimo"?" ultimo":"");
+    f.innerHTML='<span class="rel">'+(m===1?"1 min":m+" min")+'</span><span><b>'+esc(a.txt)+' a las '+a.hora+'.</b> '+esc(a.efecto)+'.</span>'; f.hidden=false; }
+  else if(listo){ f.className="hora-aviso listo"; f.innerHTML='<span class="rel">'+listo.hora+'</span><span><b>'+esc(listo.hecho)+'.</b> '+esc(listo.efecto)+'.</span>'; f.hidden=false; }
+  else f.hidden=true;
+  if(firma!==firmaHora){ var antes=firmaHora; firmaHora=firma; if(antes) pintarRejilla(); }
+}
+setInterval(pintarHorario,15000);
 
 function arrancar(estado){
   if(estado && estado.carro){ carro=estado.carro; modoActivo=estado.modo||"local"; grupoActivo=estado.grupo||"emp"; }

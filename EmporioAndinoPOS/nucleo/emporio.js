@@ -100,11 +100,11 @@
   function hhmm(d){ d=d||new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
   function reloj(el){ if(!el) return; var f=function(){ el.textContent=hhmm(); }; f(); setInterval(f,5000); }
   var tAviso=null;
-  function aviso(msg){
+  function aviso(msg, ms){
     var el=document.getElementById("ea-toast");
     if(!el){ el=document.createElement("div"); el.id="ea-toast"; el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el); }
     el.hidden=true; void el.offsetWidth; el.textContent=msg; el.hidden=false;
-    clearTimeout(tAviso); tAviso=setTimeout(function(){ el.hidden=true; },2800);
+    clearTimeout(tAviso); tAviso=setTimeout(function(){ el.hidden=true; },ms||2800);
   }
   /* Íconos de las áreas, los mismos trazos de Emporio System 1.1. */
   var ICONOS={
@@ -193,11 +193,23 @@
      a una barra con el resumen de la pestaña; al volver arriba, todo se abre.
      Cada fuente (la página, el módulo incrustado) informa cuánto bajó; con
      margen para que no parpadee: se pliega pasando 64 px y se abre bajo 8 px. */
-  var COL={on:false, fuentes:{}, cb:null};
+  var COL={on:false, fuentes:{}, cb:null, t:0};
   function evaluarColapso(){ var y=0; for(var k in COL.fuentes) y=Math.max(y,COL.fuentes[k]||0);
     var on=COL.on? y>8 : y>64;
-    if(on!==COL.on){ COL.on=on; document.documentElement.classList.toggle("colapsado",on); if(COL.cb) COL.cb(on); } }
-  function desplazo(fuente,y){ COL.fuentes[fuente]=Math.max(0,+y||0); evaluarColapso(); }
+    if(on!==COL.on){ COL.on=on; COL.t=Date.now(); COL.por=COL.ultima; document.documentElement.classList.toggle("colapsado",on); if(COL.cb) COL.cb(on); } }
+  function desplazo(fuente,y){ y=Math.max(0,+y||0);
+    /* Al plegarse o abrirse, el módulo cambia de tamaño y su contenido se reordena
+       (su desplazamiento puede volver a 0 solo). Durante ese reacomodo no cuentan
+       los avisos que revertirían el estado: así no entra en un vaivén. */
+    if(Date.now()-COL.t<700 && (COL.on? y<=8 : y>64)){
+      /* El desplazo de la propia página sí es del usuario: al terminar la pausa
+         se vuelve a mirar dónde quedó, para no quedar plegado tras subir rápido. */
+      if(fuente==="pagina" && COL.por==="pagina"){ clearTimeout(COL.re); COL.re=setTimeout(function(){ desplazo("pagina",scrollY||document.documentElement.scrollTop); },720-(Date.now()-COL.t)); }
+      return; }
+    COL.fuentes[fuente]=y; COL.ultima=fuente;
+    /* Volver la página arriba es pedir la barra abierta, aunque el módulo siga abajo. */
+    if(fuente==="pagina" && y<=8) COL.fuentes.modulo=0;
+    evaluarColapso(); }
   function colapsable(cb){
     COL.cb=cb||null; var raf=0;
     addEventListener("scroll",function(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; desplazo("pagina",scrollY||document.documentElement.scrollTop); }); },{passive:true});
@@ -213,10 +225,26 @@
         var y=(!t||t===document||t===document.documentElement||t===document.body)?(scrollY||document.documentElement.scrollTop):t.scrollTop;
         try{ var S=window.parent.EAPOS_SISTEMA; if(S&&S.desplazo) S.desplazo(y); }catch(x){} }); },{capture:true,passive:true}); }
 
+  /* ---------- menús que se deslizan de lado ---------- */
+  function esFilaX(el){ if(!el||el.nodeType!==1) return false; var c=getComputedStyle(el); return /(auto|scroll)/.test(c.overflowX) && el.scrollWidth>el.clientWidth+2 && el.scrollHeight<=el.clientHeight+2; }
+  function marcarBordes(el){ var d=el.scrollWidth>el.clientWidth+2; el.classList.toggle("desborda-x",d);
+    el.classList.toggle("al-inicio",d&&el.scrollLeft<=2); el.classList.toggle("al-final",d&&el.scrollLeft+el.clientWidth>=el.scrollWidth-2); }
+  /* La rueda vertical mueve de lado una fila que no cabe (con mouse no hay otra forma de verla entera). */
+  addEventListener("wheel",function(e){ if(e.ctrlKey||Math.abs(e.deltaX)>Math.abs(e.deltaY)) return;
+    var el=e.target; while(el&&el!==document.body&&!esFilaX(el)) el=el.parentElement;
+    if(!el||el===document.body) return; var antes=el.scrollLeft; el.scrollLeft+=e.deltaY;
+    if(el.scrollLeft!==antes) e.preventDefault(); },{passive:false});
+  addEventListener("scroll",function(e){ var t=e.target; if(t&&t.nodeType===1&&t.classList.contains("desborda-x")) marcarBordes(t); },true);
+  function filasX(raiz){ (raiz||document).querySelectorAll(".nav,.grupos,.fchips,.subtabs,.pestanas").forEach(marcarBordes); }
+  /* Centra el área activa de un menú horizontal sin mover la página. */
+  function centrarActivo(nav,el){ if(!nav||!el||nav.scrollWidth<=nav.clientWidth+2) return;
+    nav.scrollLeft=Math.max(0,el.offsetLeft-(nav.clientWidth-el.offsetWidth)/2); marcarBordes(nav); }
+  var roX=null; try{ roX=new ResizeObserver(function(){ filasX(); }); }catch(e){}
+
   function listo(fn){ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fn); else fn(); }
-  listo(function(){ atmosfera(); mosaicos(document); });
+  listo(function(){ atmosfera(); mosaicos(document); if(roX) roX.observe(document.body); setTimeout(filasX,300); });
 
   window.EA_UI={REDUCE:REDUCE, Spring:Spring, tween:tween, numero:numero, deslizador:deslizador, mosaicos:mosaicos, revelar:revelar,
     atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado,
-    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA, colapsable:colapsable, desplazo:desplazo};
+    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA, colapsable:colapsable, desplazo:desplazo, filasX:filasX, centrarActivo:centrarActivo};
 })();

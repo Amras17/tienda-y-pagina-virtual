@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.5
+# EmporioAndinoPOS v2.6
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -30,6 +30,40 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Horario del local (v2.6)
+
+Tres hitos del día, definidos una sola vez en `nucleo/nucleo.js` (`EAPOS.HORARIO`):
+
+| Hito | Hora | Avisos | Desde esa hora |
+|---|---|---|---|
+| Término del desayuno | 12:00 | 15 y 5 min antes | La Caja no vende desayunos; sigue el brunch |
+| Cierre de mesas y cocina | 21:30 | 15 y 5 min antes | No se abren mesas (Para el local) ni se piden platos de cocina; queda para llevar |
+| Cierre del local | 22:00 | 5 min antes | Se cierra la caja y el local |
+
+- **Sistema general:** un chip en el encabezado dice el próximo hito y, en los últimos 15 minutos, cuenta
+  los minutos (ámbar a los 15, rojo a los 5). La campana lo muestra y cada cambio de fase sale como aviso
+  en pantalla, para todos los cargos.
+- **Caja:** franja de aviso arriba de la venta; los desayunos y la cocina quedan marcados y no se agregan
+  fuera de hora; a las 21:30 el botón *Para el local* se desactiva y la cuenta pasa sola a *Para llevar*.
+- **Carta:** desayunos y brunch salen de horario con el mismo reloj (el brunch, a las 21:30).
+- **Prueba:** usa la hora simulada. A las 21:30 las mesas ocupadas pasan a cuenta, no se sienta a nadie
+  más y la cocina deja de vender; los avisos y la línea del encabezado cuentan los minutos.
+
+Para probar otra hora sin tocar el reloj del equipo: en la consola, `sessionStorage.setItem("eapos_hora","21:20")`
+y recargar (vale solo para esa pestaña).
+
+## Navegación sin capas encima (v2.6)
+
+- El módulo abierto dentro del sistema general mide lo que queda bajo el encabezado (`ajustarMarco`), así
+  cabe entero también cuando el encabezado ocupa dos filas en tablet.
+- Las filas de pestañas que no caben se desplazan con la rueda del mouse, muestran un degradado donde
+  sigue el contenido y centran la pestaña activa (`EA_UI.filasX`, `EA_UI.centrarActivo`). Dentro del
+  sistema general, el menú de la Prueba se acomoda en varias filas.
+- En teléfono la columna de la Prueba queda fija solo con la barra plegada, para no tapar el encabezado.
+- La barra plegada ya no rebota: cuando un módulo cambia de tamaño al plegarse, la barra espera 0,7 s
+  antes de volver a abrirse.
+- Auditado en 1366, 1024 y 390 px: en las 144 áreas, cada botón visible es lo que está en su centro.
 
 ## Barra colapsable (v2.5)
 
@@ -202,7 +236,9 @@ indefinidos; y en cada capa, que cargue el diseño de Emporio System 1.1. Result
 `verificacion/informe.json`. En la Prueba revisa además la semana y el mes del contexto, un evento que
 sube la demanda de un día, abrir ese día en vivo, los pedidos a mano en mesa, para llevar y en la fila, las
 fichas estándar de todos los productos, que el stock estándar alcance un día de temporada alta, editar un
-escandallo, una hornada personalizada, un ingreso de mercadería y que nada de eso toque la Caja.
+escandallo, una hornada personalizada, un ingreso de mercadería y que nada de eso toque la Caja. Desde la
+v2.6 revisa también el horario a horas fijadas (fases a los 15 y 5 minutos, chip, campana, Caja a las
+21:27 y 21:40, Carta y la Prueba a las 21:30) y que la Caja quepa bajo el encabezado sin capas encima.
 
 El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
 para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre
