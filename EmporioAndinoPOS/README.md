@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.8
+# EmporioAndinoPOS v3.0
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -30,6 +30,60 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Equipo, pantalla de inicio y seguridad (v3.0)
+
+### Pantalla de inicio
+
+Mosaico por áreas (Dirección, Jefatura, Encargados de turno, Barra y café, Salón y atención, Cocina,
+Panadería y pastelería) con las 28 personas de la lista oficial. Al tocar a alguien pide su PIN de 4
+dígitos (la primera vez lo crea) y entra **directo a su área**: barra a Comandas de barra, cocina a
+Comandas de cocina, panadería a Panadería, garzones a Fila y mesas; dirección, jefatura y encargados al
+Inicio. 5 PIN equivocados bloquean a esa persona un minuto. La sesión de Caja, Fila y gestión se cierra
+tras 10 minutos sin uso; las pantallas de cocina, barra y panadería quedan abiertas.
+
+Los PIN creados con el nombre anterior (Jona, Daline, Mariela, Wilbert, Andrea Rodriguez y los demás nombres cortos) siguen sirviendo y
+pasan al nombre nuevo en el primer ingreso. Salieron Magda y el usuario genérico *Panadería*, que no están
+en la lista oficial.
+
+### Cargos (RBAC + área)
+
+| Cargo (clave) | Entra a | Áreas | Puede además |
+|---|---|---|---|
+| Dirección (`DUENO`) | Inicio | todas, Prueba, verificación, versiones | cifras, costos, PIN ajenos |
+| Jefatura (`JEFE_AREA`) | Inicio | todas, Prueba, verificación, versiones | stock, compras, mermas, informes, anular sin pedir clave |
+| Encargados (`ENCARGADO_TURNO`) | Inicio | Caja, Fila, Salón, Comandas, Horno, Panadería, Carta | cobro, cierre e informes de la Caja (sin stock ni compras); anulan y autorizan con su PIN |
+| Garzones (`GARZON`) | Fila y mesas | Fila, Caja (solo cobro), Salón (consulta), Carta | sus ventas y sus propinas |
+| Barra (`BARISTA`) | Comandas de barra | Comandas de barra | disponibilidad de lo suyo |
+| Cocina (`COCINA`) | Comandas de cocina | Comandas de cocina, Horno | María Torrez recibe, solicita y reporta precocido; Daisy Pérez recibe |
+| Panadería (`PANADERIA`) | Panadería | Panadería | Eva Galarza y Claudia Garcías envían al horno y confirman solicitudes |
+
+Los costos y las cifras en pesos siguen solo para dirección. Las acciones que piden la **clave de un
+encargado** (o de jefatura/dirección): anular una venta, volver una comanda lista a pendiente y cambiar un
+pedido de la fila que ya salió a comandas. El encargado elige su nombre y da su PIN en la misma pantalla;
+la autorización vale una sola vez y por 60 segundos.
+
+### Cómo se hace cumplir
+
+- **`EAPOS.seguridad.guardia(modulo)`** al comienzo de cada módulo (Caja, Fila, pantalla de llamado,
+  Salón, Comandas, Horno, Panadería, Prueba): sin sesión, con la sesión vencida (14 h) o fuera del área
+  del cargo, la página se detiene, muestra **403** y anota el intento. Vale también al abrir el módulo
+  por su dirección.
+- **`EAPOS.seguridad.exigir(accion, recurso)`** dentro de las funciones que escriben datos
+  (`nucleo/produccion.js`, `nucleo/fila.js`, Caja, Salón, Comandas): aunque el botón se esconda, la
+  escritura se vuelve a revisar contra el cargo, las acciones propias de la persona y, si corresponde, la
+  autorización de un encargado.
+- **Bitácora** (`eapos_bitacora`, últimos 1.500 registros): ingresos, salidas, PIN fallidos, bloqueos, 403 y
+  autorizaciones. Cada registro lleva la huella del anterior, así que borrar o cambiar uno rompe la
+  cadena; *Versiones → Bitácora de seguridad* lo muestra y avisa. Ahí mismo está el perímetro de cada cargo.
+- La política (cargos, áreas y acciones) es una tabla en `nucleo/nucleo.js`, pensada para que un
+  servidor use la misma.
+
+**Límite honesto:** EmporioAndinoPOS no tiene servidor: son páginas estáticas que guardan en el
+navegador. Toda esta seguridad corre en el mismo navegador, así que ordena el trabajo y deja rastro, pero
+alguien con conocimientos técnicos y acceso al equipo podría saltársela con las herramientas del
+navegador. Un *middleware* de verdad (token firmado y 403 en cada ruta de una API) necesita un servidor
+con base de datos; es el paso siguiente y también resuelve compartir datos entre varios equipos.
 
 ## Fila de espera y mesas (v2.8)
 
@@ -122,7 +176,7 @@ compra. Los costos y el food cost solo los ven los dueños.
 **Datos:** `eapos_panaderia` (plan, pedidos, solicitudes, precocido; 30 días) y `eapos_horno` (tandas,
 espera y ajustes; 21 días).
 
-### Cargos
+### Cargos (v2.7; desde la v3.0 rige la tabla de arriba)
 
 | Cargo | Áreas |
 |---|---|
@@ -300,17 +354,10 @@ menú de la Prueba también tocaba la Caja. Ahora esa regla solo aplica a la Pru
 
 ## Cargos
 
-| Cargo | Módulos | Caja | Cifras y costos |
-|---|---|---|---|
-| Dueños | todos, incluida la Prueba, más verificación y accesos | completa | sí |
-| Jefes de operación | todos, incluida la Prueba, más verificación y accesos | cobro, stock, compras, mermas, cierre e historial | no |
-| Encargados de turno | Caja, Salón, Comandas, Carta | cobro, stock, compras, mermas, cierre e historial | no |
-| Garzones | Caja, Salón, Comandas, Carta | solo cobro y stock | no |
-| Barra, cocina | Comandas, Salón, Carta | — | no |
-
-"Cifras y costos" son las ventas en pesos del dashboard, el panel del día de la Caja, costos, metas,
-estadísticas, la entrega al contador y, en la Prueba, las fichas, precios de compra, valor del stock y
-food cost. Un módulo abierto suelto, sin sesión, muestra todo como antes del sistema general.
+La tabla vigente está en *Equipo, pantalla de inicio y seguridad (v3.0)*. "Cifras y costos" son las
+ventas en pesos del dashboard, el panel del día de la Caja, costos, metas, estadísticas, la entrega al
+contador y, en la Prueba, las fichas, precios de compra, valor del stock y food cost: solo para dirección.
+Desde la v3.0 un módulo abierto suelto, sin sesión, responde 403; solo la Carta del cliente es pública.
 
 ## Qué se fusionó, qué salió
 

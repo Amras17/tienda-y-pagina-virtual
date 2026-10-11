@@ -709,14 +709,16 @@ footer{font-size:11px; color:var(--ink); opacity:.65; text-align:center; line-he
 <script src="../nucleo/produccion.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("salon");
 /* La carta sale de nucleo/datos.js con los precios del sistema general. */
 var DATOS = EAPOS.datos(EAPOS.general());
 var COMIDA=DATOS.COMIDA, EMP=DATOS.EMP, BEB=DATOS.BEB, PAST=DATOS.PAST,
     MILKS=DATOS.MILKS;
 
 var SEC=[
-  {id:"desayunos", n:"Desayunos", img:"img/atacamena.webp", hora:"Hasta las 12:00", note:"Hasta medio día. Incluye jugo de naranja exprimido y taza de café americano, espresso o té negro."},
-  {id:"brunch", n:"Brunch", img:"img/atacama.webp", hora:"Desde las 12:00", note:"Desde el medio día. Incluye jugo natural del día y café a elección."},
+  {id:"desayunos", n:"Desayunos", img:"img/atacamena.webp", hora:"Hasta las 12:00", note:"Hasta medio día. Incluye jugo de naranja exprimido y taza de café o té negro. Cualquier café de la barra, salvo filtrados, frappés, café con helado, affogato, espresso tonic y espresso ginger. El cliente puede armarlo como quiera pagando los extras."},
+  {id:"brunch", n:"Brunch", img:"img/atacama.webp", hora:"Desde las 12:00", note:"Desde el medio día. Incluye jugo natural del día y café a elección: cualquiera de la barra, salvo filtrados, frappés, café con helado, affogato, espresso tonic y espresso ginger. El cliente puede armarlo como quiera pagando los extras."},
   {id:"bruschettas", n:"Bruschettas", img:"img/caspana.webp", note:"Sobre pan artesanal de masa madre, horneado en la casa."},
   {id:"tostadas", n:"Tostadas", img:"img/t-palta.webp", note:"Canasto de tostadas de masa madre con el acompañamiento elegido."},
   {id:"sandwiches", n:"Sandwiches", img:"img/sandwich.svg", note:"Sandwiches de la casa, armados al momento."},
@@ -767,6 +769,9 @@ MILKS.forEach(function(m){ if(typeof cfg.milks[m.id]!=="number") cfg.milks[m.id]
 /* Antes de guardar se toma lo último que dejaron la Caja y el Horno (el horno
    ya no se maneja aquí): así esta pantalla no pisa lo que cambió otra. */
 function save(){
+  /* Solo encargados, jefes y dueños cambian la disponibilidad; para el resto
+     esta pantalla es de consulta: el cambio se deshace y queda en la bitácora. */
+  if(!EAPOS.seguridad.exigir("stock.disponibilidad","Control de Salón")){ recargar(); avisar("403 · Tu cargo consulta la disponibilidad; la cambia un encargado. Quedó registrado."); dir=""; setTimeout(pintar,0); return; }
   try{ var o=JSON.parse(localStorage.getItem("ea_control")||"null"); if(o&&o.fecha===cfg.fecha){ cfg.horno=Array.isArray(o.horno)?o.horno:[]; } }catch(e){}
   cfg.tocado=new Date().toISOString(); try{ localStorage.setItem("ea_control", JSON.stringify(cfg)); }catch(e){}
   try{ EAPOS.canal&&EAPOS.canal.postMessage({t:"ea_control"}); }catch(e){} }
@@ -1753,7 +1758,8 @@ document.addEventListener("click", function(ev){
   }
   if(b.dataset.ir==="stock"){ entrar("stock",null,"Control de stock"); return; }
   if(b.id==="sonBtn"){
-    cfg.son=cfg.son?0:1; save(); dir=""; pintar();
+    /* La campana es del equipo, no del stock: cualquiera la cambia. */
+    cfg.son=cfg.son?0:1; try{ var o0=JSON.parse(localStorage.getItem("ea_control")||"null"); if(o0&&o0.fecha===cfg.fecha){ o0.son=cfg.son; localStorage.setItem("ea_control",JSON.stringify(o0)); } }catch(e){} dir=""; pintar();
     if(cfg.son){ campana(1); avisar("Campana activada",true); } else avisar("Campana en silencio");
     return;
   }

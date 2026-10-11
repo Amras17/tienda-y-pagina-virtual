@@ -32,7 +32,9 @@
     return d; }
   function guardar(f){ var ks=Object.keys(f.dias).sort(); while(ks.length>14) delete f.dias[ks.shift()];
     E.guardar(K,f); try{ E.canal&&E.canal.postMessage({t:K}); }catch(e){} }
-  function con(fn){ var f=leer(), d=dia(f), r=fn(d,f); guardar(f); return r; }
+  /* Toda operación sobre la fila exige su acción (nucleo.js); sin ella, 403 y
+     queda en la bitácora. */
+  function con(fn, accion, recurso){ if(E.seguridad&&!E.seguridad.exigir(accion||"fila.operar", recurso||"fila")) return null; var f=leer(), d=dia(f), r=fn(d,f); guardar(f); return r; }
   function buscar(d,id){ return d.grupos.filter(function(g){ return g.id===id; })[0]||null; }
 
   /* ---------- lectura ---------- */
@@ -56,11 +58,13 @@
   function cambiar(id, cambios){ return con(function(d){ var g=buscar(d,id); if(g) Object.assign(g,cambios); return g; }); }
   /* Pedido: lineas [{id,n,q,p}], comanda "ahora" (sale ya a cocina y barra) o
      "despues" (al sentarse o al llegar al mesón). */
-  function pedir(id, lineas, cuando, codigo){ return con(function(d){ var g=buscar(d,id); if(!g) return null;
+  function pedir(id, lineas, cuando, codigo){
+    var g0=buscar(dia(leer()),id), yaEnviado=!!(g0&&g0.pedido&&g0.pedido.enviado);
+    return con(function(d){ var g=buscar(d,id); if(!g) return null;
     var ya=g.pedido&&g.pedido.enviado;
     g.pedido={lineas:lineas, ts:new Date().toISOString(), cuando:cuando==="ahora"?"ahora":"despues", codigo:codigo||"", enviado:ya||null};
     if(cuando==="ahora"&&!ya) g.pedido.enviado=new Date().toISOString();
-    return g; }); }
+    return g; }, yaEnviado?"fila.cambiarComandado":"fila.operar", yaEnviado?"pedido ya comandado de Nº "+g0.num:"pedido"); }
   function comandar(id){ return con(function(d){ var g=buscar(d,id); if(g&&g.pedido&&!g.pedido.enviado) g.pedido.enviado=new Date().toISOString(); return g; }); }
   function marcarListo(id){ return cambiar(id,{estado:"listo", listo:new Date().toISOString()}); }
   function retirar(id, motivo){ return con(function(d){ var g=buscar(d,id); if(!g) return null;
@@ -68,7 +72,7 @@
     if(d.llamado&&d.llamado.grupo===id) d.llamado=null;
     for(var m in d.mesas) if(d.mesas[m].grupo===id&&d.mesas[m].estado==="llamada") d.mesas[m]={estado:"libre", grupo:null, desde:null};
     return g; }); }
-  function marcarCobrado(id, venta){ return cambiar(id,{cobrado:new Date().toISOString(), venta:venta||""}); }
+  function marcarCobrado(id, venta){ return con(function(d){ var g=buscar(d,id); if(g){ g.cobrado=new Date().toISOString(); g.venta=venta||""; } return g; }, "venta.cobrar", "cobro de la fila"); }
 
   /* ---------- mesas y llamados ---------- */
   /* Llama a un grupo para una mesa: la mesa queda guardada para él y la
@@ -87,7 +91,7 @@
     if(d.llamado&&d.llamado.grupo===id) d.llamado=null;
     return g; }); }
   /* Sienta a alguien que llegó sin pasar por la fila. */
-  function ocupar(mesa, pax){ var g=anotar({nombre:"Mesa "+mesa, pax:pax||2, destino:"mesa"}); return sentar(g.id, mesa); }
+  function ocupar(mesa, pax){ var g=anotar({nombre:"Mesa "+mesa, pax:pax||2, destino:"mesa"}); return g?sentar(g.id, mesa):null; }
   /* Libera la mesa; el grupo que estaba termina. Devuelve el siguiente en la fila, si hay. */
   function liberar(mesa){ con(function(d){ var x=d.mesas[mesa]; if(!x) return;
       if(x.grupo){ var g=buscar(d,x.grupo); if(g&&g.estado==="sentado"){ g.estado="termino"; g.fin=new Date().toISOString(); }
@@ -95,7 +99,7 @@
       d.mesas[mesa]={estado:"libre", grupo:null, desde:null}; });
     return siguiente(); }
   function cerrarLlamado(){ return con(function(d){ d.llamado=null; }); }
-  function ajustes(c){ var f=leer(); if(c.mesas>0) f.cfg.mesas=Math.min(40,Math.max(1,c.mesas|0)); if(c.espera>0) f.cfg.espera=Math.min(30,c.espera|0); dia(f); guardar(f); return f.cfg; }
+  function ajustes(c){ if(E.seguridad&&!E.seguridad.exigir("fila.ajustes")) return null; var f=leer(); if(c.mesas>0) f.cfg.mesas=Math.min(40,Math.max(1,c.mesas|0)); if(c.espera>0) f.cfg.espera=Math.min(30,c.espera|0); dia(f); guardar(f); return f.cfg; }
 
   /* ---------- comandas ----------
      Las comandas del día: ventas de la Caja más los pedidos de la fila ya
@@ -112,7 +116,7 @@
   /* ---------- a la Caja ----------
      El pedido pasa a la Caja para cobrarlo; la Caja lo toma apenas su cuenta
      está vacía. */
-  function aCaja(id){ var g=buscar(dia(leer()),id); if(!g||!g.pedido) return null;
+  function aCaja(id){ if(E.seguridad&&!E.seguridad.exigir("fila.operar","enviar a la Caja")) return null; var g=buscar(dia(leer()),id); if(!g||!g.pedido) return null;
     var t={ts:new Date().toISOString(), grupo:g.id, num:g.num, nombre:g.nombre, mesa:g.mesa, modo:g.destino==="llevar"?"llevar":"local",
       comandado:!!g.pedido.enviado, lineas:g.pedido.lineas.map(function(l){ return {id:l.id, q:l.q}; })};
     E.guardar("eapos_traspaso",t); try{ E.canal&&E.canal.postMessage({t:"eapos_traspaso"}); }catch(e){}

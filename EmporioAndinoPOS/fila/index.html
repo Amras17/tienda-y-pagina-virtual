@@ -134,6 +134,8 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
 <script src="../nucleo/codigo-fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("fila");
 /* ====================================================================
    Fila y mesas: se anota a quien llega (para comer aquí o para llevar),
    se le toma el pedido mientras espera (a mano o con el código que arma en
@@ -285,7 +287,7 @@ function pintarComandar(){
   $("comandar").innerHTML=h;
 }
 function agregar(id){ var p=POR[id]; if(!p||p.p==null) return; var l=PED.lineas.filter(function(x){ return x.id===id; })[0]; if(l) l.q++; else PED.lineas.push({id:p.id, n:p.n, q:1, p:p.p}); pintarComandar(); }
-function guardarPedido(){ if(!PED.lineas.length) return null; var g=F.pedir(COM, PED.lineas, PED.cuando, PED.codigo);
+function guardarPedido(){ if(!PED.lineas.length) return null; var g=F.pedir(COM, PED.lineas, PED.cuando, PED.codigo); if(!g) return null;
   U.aviso("Pedido de Nº "+g.num+" "+(g.pedido.enviado?"comandado":"anotado")+" · "+clp(total(PED.lineas))); return g; }
 
 /* ---------- ajustes ---------- */
@@ -335,8 +337,13 @@ document.addEventListener("click",function(ev){
   if(b.id==="cLeer"){ var cc=$("cCodigo").value, r=C.leer(window.EA_DATOS,cc); if(r.error){ U.aviso(r.error,5000); return; }
     var ls=lineasDeCodigo(r); PED.codigo=cc; ls.lineas.forEach(function(x){ var l=PED.lineas.filter(function(y){ return y.id===x.id; })[0]; if(l) l.q+=x.q; else PED.lineas.push(x); });
     U.aviso(ls.lineas.length+" productos desde la Carta"+(ls.faltan.length?" · "+ls.faltan.length+" sin precio no entraron":"")); pintarComandar(); return; }
-  if(b.id==="cGuardar"){ if(guardarPedido()){ COM=null; PED=null; } pintar(); return; }
-  if(b.id==="cGuardarCaja"){ var gg=guardarPedido(); if(gg){ var tt=F.aCaja(gg.id); COM=null; PED=null; pintar(); if(tt) E.irA("caja","../"); } return; }
+  if(b.id==="cGuardar"||b.id==="cGuardarCaja"){ var aCajaTambien=b.id==="cGuardarCaja";
+    /* Cambiar un pedido que ya salió a cocina lo hace (o lo autoriza) un encargado. */
+    var g0=F.grupos().filter(function(x){ return x.id===COM; })[0], yaFue=!!(g0&&g0.pedido&&g0.pedido.enviado);
+    U.conPermiso(yaFue?"fila.cambiarComandado":"fila.operar","pedido de Nº "+(g0?g0.num:""),function(){
+      var gg=guardarPedido(); if(!gg){ U.aviso("403 · No se guardó el pedido. Quedó registrado."); return; }
+      var tt=aCajaTambien?F.aCaja(gg.id):null; COM=null; PED=null; pintar(); if(tt) E.irA("caja","../"); });
+    return; }
   if(b.dataset.aj){ var c=F.estado().cfg, nv={}; nv[b.dataset.aj]=c[b.dataset.aj]+d; F.ajustes(nv); $("ajgrid").innerHTML=""; pintar(); return; }
 });
 document.addEventListener("input",function(ev){ if(ev.target.id==="cBusca"){ BUSCA=ev.target.value; var pos=ev.target.selectionStart; pintarComandar(); var i=$("cBusca"); i.focus(); try{ i.setSelectionRange(pos,pos); }catch(e){} }
@@ -351,6 +358,7 @@ function campana(){ try{ AC=AC||new (window.AudioContext||window.webkitAudioCont
 
 addEventListener("storage",function(ev){ if(ev.key==="eapos_fila"||ev.key==="eapos_cfg"){ if(ev.key==="eapos_cfg"){ CAT=E.catalogo(E.general()); POR={}; CAT.forEach(function(p){ POR[p.id]=p; }); } pintar(); } });
 if(E.canal) E.canal.addEventListener("message",function(){ pintar(); });
+if(!E.permite("fila.ajustes")) $("ajustes").hidden=true;
 U.reloj($("reloj")); pintar(true); U.revelar(document);
 setInterval(function(){ pintar(); },20000);
 </script>

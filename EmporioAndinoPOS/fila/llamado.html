@@ -48,6 +48,8 @@ body{overflow:hidden}
 <script src="../nucleo/fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("fila");
 /* El llamado lo hace el módulo Fila y mesas; esta pantalla solo lo muestra y
    suena. Se actualiza sola cuando cambia la fila en este equipo. */
 var F=EAPOS.fila, ultimo="", AC=null;

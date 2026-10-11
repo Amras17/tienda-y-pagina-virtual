@@ -678,6 +678,8 @@ thead th,.tbl th{background:rgba(14,22,25,.95)}
 <script src="../nucleo/fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("caja");
 /* ====================================================================
    Caja Emporio Andino · lógica
    --------------------------------------------------------------------
@@ -985,7 +987,7 @@ function pintarPagos(){
 function hojaExtras(i){
   var l=carro[i];
   abrirHoja("Extras de "+l.n, function(b){
-    var p=el("p","vs","Extras de la carta: leche vegetal, café descafeinado y miel. En desayunos y brunch el café va incluido, pero los extras se cobran aparte. Si un precio no está definido, se define en Ajustes.");
+    var p=el("p","vs","Extras de la carta: leche vegetal, café descafeinado, miel y sirope. En desayunos y brunch el café va incluido (cualquiera de la barra, salvo filtrados, frappés, café con helado, affogato, espresso tonic ni espresso ginger); el cliente puede armarlo como quiera y los extras se cobran aparte. Si un precio no está definido, se define en Ajustes.");
     b.appendChild(p);
     EXTRAS.forEach(function(x){
       var pr=precioExtra(x.id);
@@ -1005,6 +1007,7 @@ function hojaExtras(i){
 /* ---------- registrar ---------- */
 function registrar(){
   if(!carro.length || !pagoActivo) return;
+  if(!EAPOS.seguridad.exigir("venta.cobrar","registrar venta")){ avisar("403 · Tu cargo no puede cobrar. Quedó registrado.","mal"); return; }
   var t=totalCarro(), pr=propinaSug(), rec=Number($("#inEfectivo").value||0);
   var v={
     id:"V"+Date.now().toString(36).toUpperCase(),
@@ -1020,7 +1023,7 @@ function registrar(){
   if(filaRef) v.fila={grupo:filaRef.grupo, num:filaRef.num, nombre:filaRef.nombre, comandado:!!filaRef.comandado};
   POS.ventas.push(v);
   v.lineas.forEach(function(l){ descontar(l.id, l.q); });
-  guardarPOS(); guardarCtrl();
+  guardarPOS(); guardarCtrl(); pintarPropias();
   if(filaRef){ try{ EAPOS.fila.marcarCobrado(filaRef.grupo, v.id); }catch(e){} filaRef=null; }
   carro=[]; pagoActivo=""; $("#inEfectivo").value="";
   setTimeout(tomarTraspaso, 1600);
@@ -1040,6 +1043,7 @@ function anular(v){
     btn.onclick=function(){
       var m=($("#inMotivo").value||"").trim();
       if(!m){ avisar("Escribe el motivo: es lo que después explica el descuadre.","mal"); return; }
+      if(!EAPOS.seguridad.exigir("venta.anular","venta "+v.id)){ cerrarHoja(); avisar("403 · Anular requiere la autorización de un encargado.","mal"); return; }
       v.anulada={ts:new Date().toISOString(), motivo:m, por:POS.cfg.respActivo||"(sin asignar)"};
       v.lineas.forEach(function(l){ devolver(l.id, l.q); });
       guardarPOS(); guardarCtrl(); cerrarHoja(); pintarTodo();
@@ -1278,7 +1282,7 @@ function hojaVenta(v, recien){
     if(!v.anulada && !recien){
       var b4=el("button","btn suave lleno","Anular esta venta"); b4.type="button";
       b4.style.color="var(--grave)";
-      b4.onclick=function(){ cerrarHoja(); setTimeout(function(){ anular(v); },60); };
+      b4.onclick=function(){ cerrarHoja(); setTimeout(function(){ EA_UI.conPermiso("venta.anular","venta "+v.id,function(){ anular(v); }); },60); };
       acc.appendChild(b4);
     }
     b.appendChild(acc);
@@ -2831,9 +2835,11 @@ function pintarResp(){
   POS.cfg.resp.forEach(function(r){
     var o=el("option",null,r); o.value=r; if(r===POS.cfg.respActivo) o.selected=true; s.appendChild(o);
   });
+  /* Quien no es encargado vende a su propio nombre. */
+  if(SESION&&!EAPOS.permite("venta.responsable")){ POS.cfg.respActivo=SESION.n; s.value=SESION.n; s.disabled=true; s.title="Las ventas quedan a tu nombre"; }
 }
 function pintarTodo(){
-  pintarHorario(); pintarResp(); pintarGrupos(); pintarRejilla(); pintarPagos(); pintarCuenta(); pintarNav();
+  pintarHorario(); pintarResp(); pintarGrupos(); pintarRejilla(); pintarPagos(); pintarCuenta(); pintarNav(); pintarPropias();
   if(seccActiva==="panel") pintarPanel();
   if(seccActiva==="stock") pintarStock();
   if(seccActiva==="gest") pintarGest();
@@ -2852,10 +2858,17 @@ if(SESION){
   if(POS.cfg.resp.indexOf(SESION.n)<0) POS.cfg.resp.unshift(SESION.n);
   POS.cfg.respActivo=SESION.n;
   var _nivel=EAPOS.ROLES[SESION.r] && EAPOS.ROLES[SESION.r].caja;
+  /* Garzones: solo cobrar (y ver sus propinas). Encargados: cobro, cierre e
+     historial, sin stock, compras ni mermas. Jefes: además stock, compras y
+     mermas. Dueños: todo. */
   if(_nivel==="cobro"){
-    SECC=SECC.filter(function(x){ return x.id==="caja"||x.id==="stock"; });
+    SECC=SECC.filter(function(x){ return x.id==="caja"; });
     var _ba=$("#btnAjustes"); if(_ba) _ba.hidden=true;
-  } else if(_nivel==="turno"){
+  } else if(_nivel==="encargado"){
+    SECC=SECC.filter(function(x){ return x.id==="caja"||x.id==="inf"; });
+    SUBINF=SUBINF.filter(function(x){ return x.id==="rep"||x.id==="hist"; }); subInf="rep";
+    var _bb=$("#btnAjustes"); if(_bb) _bb.hidden=true;
+  } else if(_nivel==="jefe"){
     SECC=SECC.filter(function(x){ return x.id!=="panel"; });
     SUBGEST=SUBGEST.filter(function(x){ return x.id==="compras"||x.id==="mermas"; }); subGest="compras";
     SUBINF=SUBINF.filter(function(x){ return x.id==="rep"||x.id==="hist"; }); subInf="rep";
@@ -2864,8 +2877,14 @@ if(SESION){
 
 /* ==================== ARRANQUE ==================== */
 $("#barFecha").textContent = fechaLarga(hoyISO())+" · Caracoles 151";
+/* El garzón ve sus propinas del día (solo las suyas). */
+function pintarPropias(){ if(!SESION||EAPOS.permite("venta.responsable")) return;
+  var hoy=hoyISO(), mias=POS.ventas.filter(function(v){ return !v.anulada&&v.resp===SESION.n&&hoyISO(new Date(v.ts))===hoy; }), p=mias.reduce(function(a,v){ return a+(v.propina||0); },0);
+  $("#barFecha").textContent=fechaLarga(hoy)+" · tus propinas de hoy: "+plata(p)+" en "+mias.length+(mias.length===1?" venta":" ventas"); }
 $("#buscaProd").oninput=function(){ pintarRejilla(); };
-$("#selResp").onchange=function(){ POS.cfg.respActivo=$("#selResp").value; guardarPOS(); };
+$("#selResp").onchange=function(){
+  if(!EAPOS.permite("venta.responsable")){ EAPOS.seguridad.exigir("venta.responsable",$("#selResp").value); $("#selResp").value=POS.cfg.respActivo; avisar("403 · Solo un encargado registra ventas a nombre de otra persona.","mal"); return; }
+  POS.cfg.respActivo=$("#selResp").value; guardarPOS(); };
 $("#btnSon").onclick=function(){
   POS.cfg.son = POS.cfg.son?0:1; guardarPOS();
   $("#btnSon").setAttribute("aria-pressed", POS.cfg.son?"true":"false");

@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "2.8";
+  var VERSION = "3.0";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -115,6 +115,7 @@
   function pendientes(){ return hayBorrador() ? cambios(general(), prueba()) : []; }
   /* El único camino para cambiar el sistema general: aplicar el borrador de la prueba. */
   function aplicar(por, nota){
+    if(!exigir("sistema","aplicar la Prueba al sistema general")) return null;
     var g=general(), p=prueba(), ch=cambios(g,p);
     if(!ch.length) return null;
     var n=normal(p); n.v=g.v+1; n.ts=new Date().toISOString(); n.por=por||"Sin nombre"; n.nota=nota||"";
@@ -186,39 +187,101 @@
   /* Las mesas (consumo en el local) se cierran con la cocina. */
   function mesasAbiertas(min){ min=min==null?minutoDe():min; return min<1290; }
 
-  /* ---------- equipo, cargos y acceso ---------- */
+  /* ====================================================================
+     PERSONAL, CARGOS Y SEGURIDAD (RBAC + perímetro por área)
+     --------------------------------------------------------------------
+     Una sola política, declarativa, que leen el sistema general y todos los
+     módulos. Cada cargo tiene:
+       · m: las áreas (módulos) que puede abrir; fuera de ellas no hay ruta;
+       · inicio: la pantalla a la que entra directo al identificarse;
+       · caja: el nivel dentro de la Caja;
+       · sistema / numeros: administración y cifras del negocio.
+     Las acciones sensibles (anular, pedir entre panadería y cocina, cambiar
+     una comanda ya enviada…) se piden por nombre con exigir(): si el cargo o
+     la persona no la tiene, se niega (403) y queda en la bitácora.
+     Esto corre en el navegador: protege del error y del curioso, pero quien
+     controla el equipo puede saltárselo. La misma política sirve tal cual
+     para el servidor que la haga cumplir de verdad (ver README).
+     ==================================================================== */
   var MODULOS = {
     caja:   {n:"Caja", d:"Cobro, boleta, stock, costos, compras, mermas e informes", ruta:"caja/index.html"},
+    fila:   {n:"Fila y mesas", d:"Quién espera, su pedido en la fila y a quién llamar cuando se libera una mesa", ruta:"fila/index.html"},
     salon:  {n:"Control de Salón", d:"Disponibilidad de la carta y estudio de la carta", ruta:"carta/salon.html"},
     cocina: {n:"Comandas de cocina", d:"Los platos cobrados en la Caja, para cocina", ruta:"cocina/index.html?est=cocina"},
-    fila:   {n:"Fila y mesas", d:"Quién espera, su pedido en la fila y a quién llamar cuando se libera una mesa", ruta:"fila/index.html"},
     barra:  {n:"Comandas de barra", d:"Las bebidas cobradas en la Caja, para barra", ruta:"cocina/index.html?est=barra"},
     horno:  {n:"Horno", d:"Temporizador de las tandas, pedido de la panadería, vitrina y precocido", ruta:"horno/index.html"},
     panaderia:{n:"Panadería", d:"Plan por latas, pedidos al horno, solicitudes y escandallos", ruta:"panaderia/index.html"},
     carta:  {n:"Carta Interactiva", d:"La carta que usa el cliente en la mesa", ruta:"carta/index.html"},
     prueba: {n:"Prueba y simulación", d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos", ruta:"prueba/index.html"}
   };
-  /* caja: "todo" (dueños), "turno" (cobro, stock, compras, mermas, cierre e
-     historial) o "cobro" (cobro y stock). numeros: ventas en pesos, costos,
-     metas, estadísticas y fichas; solo los dueños. */
+  /* caja: "todo" (dueños: todo), "jefe" (cobro, stock, compras, mermas, cierre
+     e historial), "encargado" (cobro, ventas, cierre e historial) o "cobro"
+     (solo cobrar y sus propinas). inicio: "inicio" es el Dashboard. */
   var ROLES = {
-    dueno:      {n:"Dirección",      m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"todo", sistema:1, numeros:1},
-    jefe:       {n:"Dirección",      m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"turno", sistema:1},
-    encargado:  {n:"Caja y salón",   m:["caja","fila","salon","cocina","barra","horno","carta"], caja:"turno"},
-    garzon:     {n:"Garzones",       m:["caja","fila","salon","cocina","barra","carta"], caja:"cobro"},
-    barista_enc:{n:"Barra",          m:["barra","salon","carta"]},
-    barista:    {n:"Barra",          m:["barra","salon","carta"]},
-    cocina:     {n:"Cocina y horno", m:["cocina","horno","salon","carta"]},
-    panaderia:  {n:"Panadería",      m:["panaderia","carta"]}
+    dueno:     {n:"Dirección", clave:"DUENO", m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], inicio:"inicio", caja:"todo", sistema:1, numeros:1, dash:1,
+                d:"Acceso total y transversal"},
+    jefe:      {n:"Jefatura de operaciones", clave:"JEFE_AREA", m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], inicio:"inicio", caja:"jefe", sistema:1, dash:1,
+                d:"Control total de la operación: modificación, stock e informes"},
+    encargado: {n:"Encargados de turno", clave:"ENCARGADO_TURNO", m:["caja","fila","salon","cocina","barra","horno","panaderia","carta"], inicio:"inicio", caja:"encargado", dash:1,
+                d:"Visión operativa de todas las áreas; modifica mesas, mostrador y ventas"},
+    garzon:    {n:"Salón y atención", clave:"GARZON", m:["fila","caja","salon","carta"], inicio:"fila", caja:"cobro",
+                d:"Fila, pedidos, carta, cobro y sus propinas"},
+    barista:   {n:"Barra y café", clave:"BARISTA", m:["barra"], inicio:"barra", area:"bar",
+                d:"Comandas de barra y disponibilidad de la barra"},
+    cocina:    {n:"Cocina", clave:"COCINA", m:["cocina","horno"], inicio:"cocina", area:"coc",
+                d:"Comandas de cocina, horno y disponibilidad de la cocina"},
+    panaderia: {n:"Panadería y pastelería", clave:"PANADERIA", m:["panaderia"], inicio:"panaderia", area:"pan",
+                d:"Plan por latas, escandallos e insumos"}
   };
+  /* Lista oficial del personal. x: acciones que la persona tiene además de
+     las de su cargo (los encargados designados de cada canal entre áreas). */
   var EQUIPO = [
     ["Constanza Veliz","dueno","Dueña"],["Edgardo Morales","dueno","Dueño"],
-    ["Gustavo Veliz","jefe","Jefe de operaciones · turno 1"],["Marbelis Colmenares","jefe","Jefa de operaciones · turno 2"],
-    ["Jose Ignacio Argadoña","encargado","Encargado de turno"],["Andrea Rodriguez","encargado","Encargada de turno"],["Maria Eugenia Mamami","encargado","Encargada de turno"],
-    ["Magda","cocina","Encargada de cocina"],["Panadería","panaderia","Equipo de panadería"],["Jona","barista_enc","Encargado barista"],["Daline","barista","Barista"],
-    ["Juan Ignacio","garzon","Garzón"],["Daniela","garzon","Garzona"],["Cindel","garzon","Garzona"],["Claudia","garzon","Garzona"],["Wilbert","garzon","Garzón"],["Mariela","garzon","Garzona"]
-  ].map(function(x,i){ return {i:i, n:x[0], r:x[1], c:x[2]}; });
-  var COLOR_ROL = {dueno:"#40E0D0", jefe:"#40E0D0", encargado:"#D9A93A", garzon:"#FF7F50", barista_enc:"#1AA89B", barista:"#1AA89B", cocina:"#9A80D6", panaderia:"#E8674A"};
+    ["Marbelis Colmenares","jefe","Jefa de operaciones · resolución de problemas"],["Gustavo Veliz","jefe","Jefe de operaciones · resolución de problemas"],
+    ["José Ignacio Argandoña","encargado","Encargado de turno · jefe directo de todas las áreas"],
+    ["Andrea Saray Rodríguez","encargado","Encargada de turno · jefa directa de todas las áreas"],
+    ["María Eugenia Mamani","encargado","Encargada de turno · jefa directa de todas las áreas"],
+    ["Jonathan Constanzo","barista","Encargado de barra de café · barista"],["Joanne Daline Rodas","barista","Barista"],
+    ["Inés Mariela Narváez","garzon","Garzona"],["Claudia Inostroza","garzon","Garzona"],["Juan Ignacio Díaz","garzon","Garzón"],
+    ["Daniela Flores","garzon","Garzona"],["Cindel Mamani","garzon","Garzona · postulante barista"],["Wilbert Escalona","garzon","Garzón · postulante barista"],
+    ["María Torrez","cocina","Encargada de cocina",["horno.recibir","horno.solicitar","horno.precocido","horno.ajustes"]],
+    ["Alexmay Ramirez","cocina","Cocina"],["Andrea Vela","cocina","Cocina"],["Pamela Rio","cocina","Cocina"],["Máxima Patty","cocina","Cocina"],
+    ["Pamela Sulema Condori","cocina","Picados y preparación"],["Nancy Salguero","cocina","Picados y preparación"],["Celia Negretty","cocina","Picados y preparación"],
+    ["Karina Mamani","cocina","Picados y preparación"],["Daisy Pérez","cocina","Picados, preparación y transporte panadería → cocina",["horno.recibir"]],
+    ["Eva Galarza","panaderia","Encargada de panadería · armado",["pan.pedidos"]],["Claudia Garcías","panaderia","Encargada de panadería · armado",["pan.pedidos"]],
+    ["Yarella Aguilar","panaderia","Pastelería"]
+  ].map(function(x,i){ return {i:i, n:x[0], r:x[1], c:x[2], x:x[3]||[]}; });
+  var COLOR_ROL = {dueno:"#40E0D0", jefe:"#3ABCFC", encargado:"#D9A93A", garzon:"#FF7F50", barista:"#1AA89B", cocina:"#9A80D6", panaderia:"#E8674A"};
+  /* Nombres que tenía el personal antes de la lista oficial: su PIN sigue
+     sirviendo (se comprueba con el nombre anterior y se pasa al nuevo). */
+  var ALIAS = {"José Ignacio Argandoña":"Jose Ignacio Argadoña","Andrea Saray Rodríguez":"Andrea Rodriguez","María Eugenia Mamani":"Maria Eugenia Mamami",
+    "Jonathan Constanzo":"Jona","Joanne Daline Rodas":"Daline","Juan Ignacio Díaz":"Juan Ignacio","Daniela Flores":"Daniela","Cindel Mamani":"Cindel",
+    "Claudia Inostroza":"Claudia","Wilbert Escalona":"Wilbert","Inés Mariela Narváez":"Mariela"};
+
+  /* Acciones sensibles: qué cargos las tienen y si un encargado puede
+     autorizarlas con su PIN a quien no las tiene. */
+  var ACCIONES = {
+    "venta.cobrar":        {n:"Cobrar en la Caja", roles:["dueno","jefe","encargado","garzon"]},
+    "venta.anular":        {n:"Anular una venta", roles:["dueno","jefe","encargado"], autoriza:true},
+    "venta.responsable":   {n:"Registrar una venta a nombre de otra persona", roles:["dueno","jefe","encargado"]},
+    "comanda.listo":       {n:"Marcar una comanda lista", roles:["dueno","jefe","encargado","barista","cocina"]},
+    "comanda.reabrir":     {n:"Reabrir una comanda cerrada", roles:["dueno","jefe","encargado"], autoriza:true},
+    "fila.operar":         {n:"Anotar, llamar y sentar en la fila", roles:["dueno","jefe","encargado","garzon"]},
+    "fila.cambiarComandado":{n:"Cambiar un pedido ya enviado a cocina", roles:["dueno","jefe","encargado"], autoriza:true},
+    "fila.ajustes":        {n:"Ajustes de la fila (mesas y espera)", roles:["dueno","jefe","encargado"]},
+    "stock.disponibilidad":{n:"Marcar disponibilidad de la carta", roles:["dueno","jefe","encargado"]},
+    "stock.area":          {n:"Marcar disponibilidad de su área", roles:["dueno","jefe","encargado","barista","cocina"]},
+    "stock.unidades":      {n:"Stock, compras y mermas", roles:["dueno","jefe"]},
+    "horno.operar":        {n:"Cargar y sacar tandas, vitrina", roles:["dueno","jefe","encargado","cocina"]},
+    "horno.recibir":       {n:"Recibir el pedido de la panadería", roles:["dueno","jefe","encargado"]},
+    "horno.solicitar":     {n:"Solicitar empanadas a la panadería", roles:["dueno","jefe","encargado"]},
+    "horno.precocido":     {n:"Reportar el precocido", roles:["dueno","jefe","encargado"]},
+    "horno.ajustes":       {n:"Ajustes del horno", roles:["dueno","jefe"]},
+    "pan.pedidos":         {n:"Enviar al horno y responder solicitudes", roles:["dueno","jefe"]},
+    "pan.escandallo":      {n:"Ajustar escandallos", roles:["dueno","jefe"]},
+    "sistema":             {n:"Administración del sistema", roles:["dueno","jefe"]},
+    "numeros":             {n:"Cifras del negocio y costos", roles:["dueno"]}
+  };
 
   /* El PIN se guarda como huella SHA-256, igual que en Emporio System 1.1:
      los PIN ya creados en este equipo siguen sirviendo. */
@@ -232,18 +295,101 @@
   }
   function respaldo(txt){ var h=5381; for(var i=0;i<txt.length;i++) h=((h<<5)+h+txt.charCodeAt(i))|0; return "d"+(h>>>0).toString(16); }
   function pins(){ return leer(K.pins)||{}; }
-  function guardarPin(nombre, huella){ var p=pins(); p[nombre]=huella; guardar(K.pins,p); }
-  function borrarPin(nombre){ var p=pins(); delete p[nombre]; guardar(K.pins,p); }
+  /* Crear el PIN propio la primera vez no pide permiso; cambiar o borrar el
+     de otra persona es administración. */
+  function guardarPin(nombre, huella){ var p=pins(), s=sesion();
+    /* Cambiar un PIN existente, o crear el de otra persona estando con sesión, es administración. */
+    if((p[nombre]||(s&&s.n!==nombre))&&!exigir("sistema","PIN de "+nombre)) return false;
+    p[nombre]=huella; guardar(K.pins,p); return true; }
+  function borrarPin(nombre){ if(!exigir("sistema","PIN de "+nombre)) return false; var p=pins(); delete p[nombre]; guardar(K.pins,p); registrar({tipo:"pin_borrado", recurso:nombre}); return true; }
+  /* Comprueba un PIN: con el nombre actual o, si la persona venía con otro
+     nombre, con el anterior (y lo pasa al nombre nuevo). */
+  function verificarPin(nombre, pin){
+    var p=pins(), viejo=ALIAS[nombre];
+    if(p[nombre]) return hashPin(nombre,pin).then(function(h){ return h===p[nombre]; });
+    if(viejo&&p[viejo]) return hashPin(viejo,pin).then(function(h){
+      if(h!==p[viejo]) return false;
+      return hashPin(nombre,pin).then(function(hn){ var q=pins(); q[nombre]=hn; delete q[viejo]; guardar(K.pins,q); return true; }); });
+    return Promise.resolve(null);
+  }
+  function tienePin(nombre){ var p=pins(); return !!(p[nombre]||(ALIAS[nombre]&&p[ALIAS[nombre]])); }
 
   function hoy(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-  /* La sesión dura el día: al día siguiente se vuelve a pedir el PIN. */
-  function sesion(){ var s=leer(K.sesion); if(!s||s.dia!==hoy()) return null; var p=EQUIPO.filter(function(x){ return x.n===s.n; })[0]; return p?{n:p.n, r:p.r, c:p.c, dia:s.dia}:null; }
-  function abrirSesion(p){ guardar(K.sesion,{n:p.n, dia:hoy(), ts:new Date().toISOString()}); avisarCambio("sesion"); }
-  function cerrarSesion(){ borrar(K.sesion); avisarCambio("sesion"); }
+  function persona(n){ return EQUIPO.filter(function(x){ return x.n===n; })[0]||null; }
+  /* La sesión dura el día y a lo más 14 horas; lleva un token al azar. El
+     cargo nunca se lee de lo guardado: sale siempre de la lista oficial. */
+  var DURA=14*3600e3;
+  function sesion(){ var s=leer(K.sesion); if(!s||s.dia!==hoy()||!s.tk) return null;
+    if(Date.now()-new Date(s.ts).getTime()>DURA) return null;
+    var p=persona(s.n); return p?{n:p.n, r:p.r, c:p.c, x:p.x, dia:s.dia, tk:s.tk}:null; }
+  function token(){ try{ var a=new Uint8Array(16); crypto.getRandomValues(a); return Array.from(a).map(function(b){ return b.toString(16).padStart(2,"0"); }).join(""); }catch(e){ return Date.now().toString(36)+Math.random().toString(36).slice(2); } }
+  function abrirSesion(p){ guardar(K.sesion,{n:p.n, dia:hoy(), ts:new Date().toISOString(), tk:token()}); registrar({tipo:"ingreso", quien:p.n, rol:p.r}); avisarCambio("sesion"); }
+  function cerrarSesion(motivo){ var s=sesion(); if(s) registrar({tipo:"salida", quien:s.n, rol:s.r, detalle:motivo||""}); borrar(K.sesion); avisarCambio("sesion"); }
   function puede(modulo, s){ s=s||sesion(); return !!(s && ROLES[s.r] && ROLES[s.r].m.indexOf(modulo)>=0); }
-  /* Cifras del negocio y costos: solo dueños. Sin sesión (un módulo abierto
-     suelto en el equipo del local) se muestra todo, como antes del sistema general. */
-  function verNumeros(s){ s=s===undefined?sesion():s; return !s || !!(ROLES[s.r] && ROLES[s.r].numeros); }
+  /* ¿Esta sesión puede hacer esta acción? */
+  function permite(accion, s){ s=s===undefined?sesion():s; if(!s) return false; var a=ACCIONES[accion];
+    return !!(a && (a.roles.indexOf(s.r)>=0 || (s.x||[]).indexOf(accion)>=0)); }
+  /* Cifras del negocio y costos: solo dueños. Sin sesión no se ve nada. */
+  function verNumeros(s){ s=s===undefined?sesion():s; return !!(s && ROLES[s.r] && ROLES[s.r].numeros); }
+
+  /* ---------- bitácora de seguridad ----------
+     Solo agrega. Cada entrada lleva la huella de la anterior: si alguien
+     borra o cambia una, la cadena se rompe y la verificación lo muestra. */
+  var KB="eapos_bitacora";
+  function huella(txt){ var h=0x811c9dc5; for(var i=0;i<txt.length;i++){ h^=txt.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return ("0000000"+h.toString(16)).slice(-8); }
+  function bitacora(){ var b=leer(KB); return Array.isArray(b)?b:[]; }
+  function registrar(e){
+    var b=bitacora(), s=e.quien?null:sesion(), prev=b.length?b[b.length-1].h:"inicio";
+    var x={ts:new Date().toISOString(), tipo:e.tipo, quien:e.quien||(s?s.n:"sin sesión"), rol:e.rol||(s?s.r:""), recurso:e.recurso||"", detalle:e.detalle||"",
+      lugar:(function(){ try{ return location.pathname.split("/").slice(-2).join("/"); }catch(z){ return ""; } })()};
+    x.h=huella(prev+"|"+x.ts+"|"+x.tipo+"|"+x.quien+"|"+x.recurso+"|"+x.detalle);
+    b.push(x); if(b.length>1500) b=b.slice(-1500); guardar(KB,b); return x;
+  }
+  /* Revisa la cadena: devuelve el índice de la primera entrada alterada o -1. */
+  function revisarBitacora(){ var b=bitacora(); for(var i=1;i<b.length;i++){ var x=b[i];
+      if(x.h!==huella(b[i-1].h+"|"+x.ts+"|"+x.tipo+"|"+x.quien+"|"+x.recurso+"|"+x.detalle)) return i; } return -1; }
+
+  /* ---------- exigir una acción (el "middleware" de cada operación) ----------
+     Devuelve true si la sesión la tiene, o si un encargado la autorizó con su
+     PIN hace menos de un minuto. Si no, registra el intento y devuelve false. */
+  var AUT={};
+  function autorizar(accion, por){ AUT[accion]={por:por, hasta:Date.now()+60e3}; registrar({tipo:"autorizado", recurso:accion, detalle:"autoriza "+por}); }
+  function exigir(accion, recurso){
+    var s=sesion();
+    if(permite(accion,s)) return true;
+    var a=AUT[accion]; if(a&&a.hasta>Date.now()){ delete AUT[accion]; registrar({tipo:"con_autorizacion", recurso:accion, detalle:(recurso||"")+" · autorizó "+a.por}); return true; }
+    registrar({tipo:"denegado", recurso:accion, detalle:(recurso||"")+(s?"":" · sin sesión")});
+    return false;
+  }
+  /* Personas que pueden autorizar una acción con su PIN. */
+  function autorizadores(accion){ var a=ACCIONES[accion]; if(!a||!a.autoriza) return [];
+    return EQUIPO.filter(function(p){ return a.roles.indexOf(p.r)>=0||(p.x||[]).indexOf(accion)>=0; }); }
+  function validarAutorizacion(accion, nombre, pin){
+    var p=persona(nombre); if(!p||autorizadores(accion).indexOf(p)<0) return Promise.resolve(false);
+    return verificarPin(nombre,pin).then(function(ok){ if(ok){ autorizar(accion,nombre); return true; }
+      registrar({tipo:"pin_fallido", recurso:accion, detalle:"autorización de "+nombre}); return false; }); }
+
+  /* ---------- guardia de un módulo ----------
+     Cada módulo la llama al cargar. Sin sesión o fuera del área del cargo,
+     la página no se muestra: queda "403 · Acceso denegado" y el intento en la
+     bitácora. Lanza un error marcado para que el resto del módulo no corra. */
+  function guardia(modulo){
+    var s=sesion();
+    if(s&&puede(modulo,s)) return s;
+    registrar({tipo:"denegado", recurso:"módulo "+modulo, detalle:s?"fuera del área de "+ROLES[s.r].n:"sin sesión"});
+    var raiz=location.pathname.indexOf("/fila/")>=0||location.pathname.indexOf("/caja/")>=0||/\/(cocina|horno|panaderia|prueba|carta)\//.test(location.pathname)?"../":"";
+    var html='<div style="min-height:100vh;display:grid;place-items:center;background:#0B1A1C;color:#F2F7F6;font:16px/1.5 system-ui,sans-serif;padding:24px;text-align:center">'+
+      '<div style="max-width:420px"><div style="font:800 64px/1 system-ui;color:#FF6B5B">403</div><h1 style="margin:10px 0 6px;font-size:22px">Acceso denegado</h1>'+
+      '<p style="margin:0 0 18px;color:#98ABA8">'+(s?esc(s.n)+", esta área no es parte de tu cargo ("+esc(ROLES[s.r].n)+"). El intento quedó registrado.":"Primero identifícate en el sistema con tu nombre y tu PIN.")+'</p>'+
+      '<a href="'+raiz+'index.html" style="display:inline-block;padding:11px 18px;border-radius:12px;background:#40E0D0;color:#06201d;font-weight:800;text-decoration:none">Ir al inicio</a></div></div>';
+    /* Se corta la carga: el resto de la página (y sus scripts) no se lee. */
+    try{ window.stop(); }catch(e){}
+    try{ document.body.innerHTML=html; document.title="403 · Acceso denegado"; document.documentElement.setAttribute("data-403",modulo); }catch(e){}
+    var err=new Error("EAPOS 403: "+modulo); err.ea403=true;
+    try{ window.addEventListener("error",function(ev){ if(ev.error&&ev.error.ea403) ev.preventDefault(); }); }catch(e){}
+    throw err;
+  }
+  function esc(t){ return String(t==null?"":t).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 
   /* Pide al sistema general (la capa superior) que abra un módulo. Busca hacia
      arriba entre los marcos del mismo origen; si no hay sistema general,
@@ -265,9 +411,10 @@
     general:general, prueba:prueba, hayBorrador:hayBorrador, guardarPrueba:guardarPrueba, descartarPrueba:descartarPrueba,
     entorno:entorno, activa:activa, cambios:cambios, pendientes:pendientes, aplicar:aplicar, versiones:versiones,
     catalogo:catalogo, datos:datos, fueraDeCarta:fueraDeCarta, precioEn:precioEn,
-    MODULOS:MODULOS, ROLES:ROLES, EQUIPO:EQUIPO, COLOR_ROL:COLOR_ROL,
-    hashPin:hashPin, pins:pins, guardarPin:guardarPin, borrarPin:borrarPin,
-    hoyLocal:hoy, sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede, verNumeros:verNumeros,
+    MODULOS:MODULOS, ROLES:ROLES, EQUIPO:EQUIPO, COLOR_ROL:COLOR_ROL, ACCIONES:ACCIONES, ALIAS:ALIAS,
+    hashPin:hashPin, pins:pins, guardarPin:guardarPin, borrarPin:borrarPin, verificarPin:verificarPin, tienePin:tienePin,
+    hoyLocal:hoy, sesion:sesion, abrirSesion:abrirSesion, cerrarSesion:cerrarSesion, puede:puede, permite:permite, verNumeros:verNumeros, persona:persona,
+    seguridad:{exigir:exigir, autorizadores:autorizadores, validarAutorizacion:validarAutorizacion, guardia:guardia, registrar:registrar, bitacora:bitacora, revisarBitacora:revisarBitacora},
     abrirEnSistema:abrirEnSistema, irA:irA,
     HORARIO:HORARIO, horario:horario, proximoHito:proximoHito, porHorario:porHorario, mesasAbiertas:mesasAbiertas, minutoDe:minutoDe, hhmm:hhmm
   };

@@ -894,6 +894,8 @@ html.colapsado #hdrSync,html.colapsado .ctl .chip:has(#liveDot),html.colapsado #
 <script src="../nucleo/emporio.js"></script>
 <script src="estandar.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("prueba");
 /*ENGINE-START*/
 /* Categorías de la simulación: a qué área sale cada producto, si es comida o
    bebida y en qué horario se sirve. Los productos salen de la carta única. */
@@ -1269,8 +1271,8 @@ const ALLV=Object.keys(VIEWS).filter(v=>v!=="fichas"||VER_COSTOS);
 /* La prueba se abre desde el sistema general, que ya pidió el PIN; aquí solo
    se muestra quién está en sesión. */
 const SES=EAPOS.sesion();
-const USER={n:SES?SES.n:"Sin sesión",r:"dueno",c:SES?SES.c:"Abierta fuera del sistema general"};
-const ROLES={dueno:{v:ALLV,ventas:1}};
+const USER={n:SES.n,r:SES.r,c:SES.c};   /* la guardia ya exigió dirección o jefatura */
+const ROLES={dueno:{v:ALLV,ventas:1},jefe:{v:ALLV,ventas:1}};   /* la Prueba solo la abren dirección y jefatura */
 const initials=n=>n.split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const can=v=>ALLV.includes(v);
 

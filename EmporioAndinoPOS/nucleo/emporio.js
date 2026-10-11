@@ -255,7 +255,44 @@
   function listo(fn){ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",fn); else fn(); }
   listo(function(){ atmosfera(); mosaicos(document); if(roX) roX.observe(document.body); setTimeout(filasX,300); });
 
+  /* ---------- permisos en pantalla ----------
+     conPermiso(accion, recurso, fn): si el cargo tiene la acción, hace fn().
+     Si la acción se puede autorizar (anular, cambiar un pedido ya enviado,
+     reabrir una comanda), pide el PIN de un encargado; si no, avisa 403. La
+     operación misma vuelve a exigir el permiso en el núcleo. */
+  function conPermiso(accion, recurso, fn){
+    var E=window.EAPOS; if(!E||!E.seguridad) return fn();
+    if(E.permite(accion)) return fn();
+    var a=E.ACCIONES[accion]||{n:accion};
+    if(a.autoriza) return autorizar(accion, recurso).then(function(ok){ if(ok) fn(); });
+    E.seguridad.exigir(accion, recurso);
+    aviso("403 · Tu cargo no puede: "+a.n.toLowerCase()+". Quedó registrado.",4500);
+  }
+  function autorizar(accion, recurso){
+    var E=window.EAPOS, a=E.ACCIONES[accion]||{n:accion}, quienes=E.seguridad.autorizadores(accion);
+    return new Promise(function(res){
+      var m=document.createElement("div"); m.className="ea-modal"; m.setAttribute("role","dialog"); m.setAttribute("aria-modal","true");
+      var sel=null;
+      m.innerHTML='<div class="ea-mc"><b class="ea-mt">Autorización de un encargado</b><p class="ea-mp">'+escH(a.n)+(recurso?' · '+escH(recurso):'')+'. Tu cargo no puede hacerlo solo: quien autoriza escribe su PIN y queda en la bitácora.</p>'+
+        '<div class="ea-ql">'+quienes.map(function(p){ return '<button type="button" data-q="'+p.i+'">'+escH(p.n)+'<small>'+escH(p.c)+'</small></button>'; }).join("")+'</div>'+
+        '<input class="ea-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="PIN de quien autoriza" aria-label="PIN de quien autoriza">'+
+        '<p class="ea-err" role="status"></p><div class="ea-acc"><button type="button" class="ea-no">Cancelar</button><button type="button" class="ea-si" disabled>Autorizar</button></div></div>';
+      document.body.appendChild(m);
+      var pin=m.querySelector(".ea-pin"), si=m.querySelector(".ea-si"), err=m.querySelector(".ea-err");
+      function listo(){ si.disabled=!(sel&&/^\d{4}$/.test(pin.value)); }
+      function cerrar(v){ m.remove(); res(v); }
+      m.addEventListener("click",function(ev){ var b=ev.target.closest("button"); if(!b){ if(ev.target===m) cerrar(false); return; }
+        if(b.dataset.q){ sel=E.EQUIPO[+b.dataset.q]; m.querySelectorAll("[data-q]").forEach(function(x){ x.setAttribute("aria-pressed",String(x===b)); }); pin.focus(); listo(); return; }
+        if(b.classList.contains("ea-no")) return cerrar(false);
+        if(b.classList.contains("ea-si")){ si.disabled=true;
+          E.seguridad.validarAutorizacion(accion, sel.n, pin.value).then(function(ok){ if(ok){ aviso("Autorizado por "+sel.n); cerrar(true); } else { err.textContent="PIN incorrecto. Quedó registrado."; pin.value=""; listo(); } }); } });
+      pin.addEventListener("input",function(){ pin.value=pin.value.replace(/\D/g,"").slice(0,4); listo(); });
+      pin.addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&!si.disabled) si.click(); if(ev.key==="Escape") cerrar(false); });
+    });
+  }
+  function escH(t){ return String(t==null?"":t).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
   window.EA_UI={REDUCE:REDUCE, Spring:Spring, tween:tween, numero:numero, deslizador:deslizador, mosaicos:mosaicos, revelar:revelar,
-    atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado,
+    atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado, conPermiso:conPermiso, autorizar:autorizar,
     panorama:panorama, avisos:avisos, CAMPANA:CAMPANA, colapsable:colapsable, desplazo:desplazo, filasX:filasX, centrarActivo:centrarActivo};
 })();

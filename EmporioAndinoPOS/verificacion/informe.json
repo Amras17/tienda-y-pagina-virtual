@@ -1,7 +1,7 @@
 {
-  "version": "2.8",
-  "fecha": "2026-10-11T03:28:39.698Z",
-  "total": 330,
+  "version": "3.0",
+  "fecha": "2026-10-11T18:21:15.783Z",
+  "total": 366,
   "fallas": 0,
   "resultados": [
     {
@@ -288,9 +288,9 @@
     },
     {
       "modulo": "Caja y Comandas · escritorio",
-      "prueba": "encargado: sin panel, costos, metas ni estadísticas",
+      "prueba": "encargado: cobro, cierre e historial; sin panel, stock, compras, costos ni metas",
       "ok": true,
-      "detalle": "{\"secc\":\"caja,stock,gest,inf,ajustes\",\"gest\":\"compras,mermas\",\"inf\":\"rep,hist\"}"
+      "detalle": "{\"secc\":\"caja,inf\",\"gest\":\"costos,compras,mermas,metas\",\"inf\":\"rep,hist\"}"
     },
     {
       "modulo": "Caja y Comandas · escritorio",
@@ -306,15 +306,15 @@
     },
     {
       "modulo": "Caja y Comandas · escritorio",
-      "prueba": "garzón ve solo cobro y stock",
+      "prueba": "garzón ve solo el cobro",
       "ok": true,
-      "detalle": "caja,stock"
+      "detalle": "caja"
     },
     {
       "modulo": "Caja y Comandas · escritorio",
       "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,retro"
+      "detalle": "caja,fila,salon,carta,retro"
     },
     {
       "modulo": "Caja y Comandas · escritorio",
@@ -506,7 +506,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":3000,\"vit\":0},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2304.75}}"
+      "detalle": "{\"h0\":{\"pollo\":2768.25,\"vit\":0},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2073}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -542,7 +542,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 6 espera la cuenta hace 6 min"
+      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 6 espera la cuenta hace 7 min"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -734,13 +734,13 @@
       "modulo": "Producción · escritorio",
       "prueba": "panadería entra solo a lo suyo",
       "ok": true,
-      "detalle": "inicio,panaderia,carta,retro"
+      "detalle": "panaderia,retro"
     },
     {
       "modulo": "Producción · escritorio",
       "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
       "ok": true,
-      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 03:25 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 18:15 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
     },
     {
       "modulo": "Producción · escritorio",
@@ -758,7 +758,7 @@
       "modulo": "Producción · escritorio",
       "prueba": "cocina ve el Horno y no la Panadería",
       "ok": true,
-      "detalle": "inicio,salon,cocina,carta,horno,retro"
+      "detalle": "cocina,horno,retro"
     },
     {
       "modulo": "Producción · escritorio",
@@ -902,7 +902,7 @@
       "modulo": "Fila y mesas · escritorio",
       "prueba": "llama al siguiente (Juan) a la mesa libre",
       "ok": true,
-      "detalle": "{\"grupo\":\"gmv39g4hr7i\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T03:25:34.669Z\",\"vez\":1}"
+      "detalle": "{\"grupo\":\"gmv459t4ouz\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T18:16:30.000Z\",\"vez\":1}"
     },
     {
       "modulo": "Fila y mesas · escritorio",
@@ -926,7 +926,7 @@
       "modulo": "Fila y mesas · escritorio",
       "prueba": "aviso: mesa libre, llama a Nº 3 Ana",
       "ok": true,
-      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\"]"
+      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\",\"Plan de hoy por enviar al horno\"]"
     },
     {
       "modulo": "Fila y mesas · escritorio",
@@ -938,7 +938,7 @@
       "modulo": "Fila y mesas · escritorio",
       "prueba": "venta registrada sin duplicar la comanda",
       "ok": true,
-      "detalle": "{\"fila\":{\"grupo\":\"gmv39g4hr7i\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
+      "detalle": "{\"fila\":{\"grupo\":\"gmv459t4ouz\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
     },
     {
       "modulo": "Fila y mesas · escritorio (fila)",
@@ -990,6 +990,114 @@
     },
     {
       "modulo": "Fila y mesas · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "selector en mosaico: 7 áreas y 28 personas",
+      "ok": true,
+      "detalle": "{\"grupos\":7,\"personas\":28}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "barista entra directo a Comandas de barra y solo la ve a ella",
+      "ok": true,
+      "detalle": "{\"en\":\"barra\",\"nav\":\"barra,retro\"}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "403 al pedir la Caja desde el sistema, y queda en la bitácora",
+      "ok": true,
+      "detalle": "{\"ts\":\"2026-10-11T18:16:45.995Z\",\"tipo\":\"denegado\",\"quien\":\"Joanne Daline Rodas\",\"rol\":\"barista\",\"recurso\":\"vista caja\",\"detalle\":\"fuera del área de Barra y café\",\"lugar\":\"/index.html\",\"h\":\"2bced4ee\"}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "403 al abrir la Caja por su dirección (URL directa)",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "403 a Comandas de cocina para barra",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "garzón entra directo a la Fila",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "garzón: la venta queda a su nombre y ve sus propinas",
+      "ok": true,
+      "detalle": "{\"resp\":\"Wilbert Escalona\",\"fijo\":true,\"secc\":\"caja\",\"propinas\":\"11 de octubre de 2026 · tus propinas de hoy: $400 en 1 venta\"}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "anular pide la autorización de un encargado",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "PIN equivocado se rechaza; con el de Andrea queda autorizado y registrado",
+      "ok": true,
+      "detalle": "{\"ok\":1,\"modal\":0,\"tipos\":\"ingreso,pin_fallido,autorizado\"}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "garzón: el Salón es de consulta (el cambio se deshace y queda registrado)",
+      "ok": true,
+      "detalle": "{\"latte\":\"ok\",\"log\":\"stock.disponibilidad\"}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "cocina: comandas y horno; recibir y solicitar quedan para la encargada",
+      "ok": true,
+      "detalle": "cocina,horno,retro {\"solicitar\":false,\"recibir\":null,\"tanda\":true}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "panadería: solo Eva Galarza y Claudia Garcías envían al horno",
+      "ok": true,
+      "detalle": "{\"boton\":false,\"envia\":null}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "el PIN creado con el nombre anterior sigue sirviendo",
+      "ok": true,
+      "detalle": "{\"app\":true,\"nuevo\":true,\"viejo\":false}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "5 PIN equivocados bloquean a esa persona y queda registrado",
+      "ok": true,
+      "detalle": "{\"msg\":\"5 PIN incorrectos: bloqueado un minuto. Quedó registrado.\",\"log\":true}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "bitácora íntegra a la vista de dirección y perímetro de los 7 cargos",
+      "ok": true,
+      "detalle": "{\"filas\":33,\"sub\":\"Cadena íntegra · 33 registros · 13 alertas hoy\",\"cargos\":7,\"rota\":-1}"
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · escritorio",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -1278,9 +1386,9 @@
     },
     {
       "modulo": "Caja y Comandas · telefono",
-      "prueba": "encargado: sin panel, costos, metas ni estadísticas",
+      "prueba": "encargado: cobro, cierre e historial; sin panel, stock, compras, costos ni metas",
       "ok": true,
-      "detalle": "{\"secc\":\"caja,stock,gest,inf,ajustes\",\"gest\":\"compras,mermas\",\"inf\":\"rep,hist\"}"
+      "detalle": "{\"secc\":\"caja,inf\",\"gest\":\"costos,compras,mermas,metas\",\"inf\":\"rep,hist\"}"
     },
     {
       "modulo": "Caja y Comandas · telefono",
@@ -1296,15 +1404,15 @@
     },
     {
       "modulo": "Caja y Comandas · telefono",
-      "prueba": "garzón ve solo cobro y stock",
+      "prueba": "garzón ve solo el cobro",
       "ok": true,
-      "detalle": "caja,stock"
+      "detalle": "caja"
     },
     {
       "modulo": "Caja y Comandas · telefono",
       "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,retro"
+      "detalle": "caja,fila,salon,carta,retro"
     },
     {
       "modulo": "Caja y Comandas · telefono",
@@ -1724,13 +1832,13 @@
       "modulo": "Producción · telefono",
       "prueba": "panadería entra solo a lo suyo",
       "ok": true,
-      "detalle": "inicio,panaderia,carta,retro"
+      "detalle": "panaderia,retro"
     },
     {
       "modulo": "Producción · telefono",
       "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
       "ok": true,
-      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 03:28 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 18:20 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
     },
     {
       "modulo": "Producción · telefono",
@@ -1748,7 +1856,7 @@
       "modulo": "Producción · telefono",
       "prueba": "cocina ve el Horno y no la Panadería",
       "ok": true,
-      "detalle": "inicio,salon,cocina,carta,horno,retro"
+      "detalle": "cocina,horno,retro"
     },
     {
       "modulo": "Producción · telefono",
@@ -1772,7 +1880,7 @@
       "modulo": "Producción · telefono",
       "prueba": "resumen del Horno: el temporizador en grande y Revisar vitrina",
       "ok": true,
-      "detalle": "{\"reloj\":\"19:58\",\"grande\":52,\"revisar\":true}"
+      "detalle": "{\"reloj\":\"19:57\",\"grande\":52,\"revisar\":true}"
     },
     {
       "modulo": "Producción · telefono",
@@ -1892,7 +2000,7 @@
       "modulo": "Fila y mesas · telefono",
       "prueba": "llama al siguiente (Juan) a la mesa libre",
       "ok": true,
-      "detalle": "{\"grupo\":\"gmv39jz8k34\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T03:28:33.487Z\",\"vez\":1}"
+      "detalle": "{\"grupo\":\"gmv45fbs6ro\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T18:20:44.190Z\",\"vez\":1}"
     },
     {
       "modulo": "Fila y mesas · telefono",
@@ -1916,7 +2024,7 @@
       "modulo": "Fila y mesas · telefono",
       "prueba": "aviso: mesa libre, llama a Nº 3 Ana",
       "ok": true,
-      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\"]"
+      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\",\"Plan de hoy por enviar al horno\"]"
     },
     {
       "modulo": "Fila y mesas · telefono",
@@ -1928,7 +2036,7 @@
       "modulo": "Fila y mesas · telefono",
       "prueba": "venta registrada sin duplicar la comanda",
       "ok": true,
-      "detalle": "{\"fila\":{\"grupo\":\"gmv39jz8k34\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
+      "detalle": "{\"fila\":{\"grupo\":\"gmv45fbs6ro\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
     },
     {
       "modulo": "Fila y mesas · telefono (fila)",
@@ -1980,6 +2088,114 @@
     },
     {
       "modulo": "Fila y mesas · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "selector en mosaico: 7 áreas y 28 personas",
+      "ok": true,
+      "detalle": "{\"grupos\":7,\"personas\":28}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "barista entra directo a Comandas de barra y solo la ve a ella",
+      "ok": true,
+      "detalle": "{\"en\":\"barra\",\"nav\":\"barra,retro\"}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "403 al pedir la Caja desde el sistema, y queda en la bitácora",
+      "ok": true,
+      "detalle": "{\"ts\":\"2026-10-11T18:20:55.540Z\",\"tipo\":\"denegado\",\"quien\":\"Joanne Daline Rodas\",\"rol\":\"barista\",\"recurso\":\"vista caja\",\"detalle\":\"fuera del área de Barra y café\",\"lugar\":\"/index.html\",\"h\":\"e59845e8\"}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "403 al abrir la Caja por su dirección (URL directa)",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "403 a Comandas de cocina para barra",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "garzón entra directo a la Fila",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "garzón: la venta queda a su nombre y ve sus propinas",
+      "ok": true,
+      "detalle": "{\"resp\":\"Wilbert Escalona\",\"fijo\":true,\"secc\":\"caja\",\"propinas\":\"11 de octubre de 2026 · tus propinas de hoy: $400 en 1 venta\"}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "anular pide la autorización de un encargado",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "PIN equivocado se rechaza; con el de Andrea queda autorizado y registrado",
+      "ok": true,
+      "detalle": "{\"ok\":1,\"modal\":0,\"tipos\":\"ingreso,pin_fallido,autorizado\"}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "garzón: el Salón es de consulta (el cambio se deshace y queda registrado)",
+      "ok": true,
+      "detalle": "{\"latte\":\"ok\",\"log\":\"stock.disponibilidad\"}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "cocina: comandas y horno; recibir y solicitar quedan para la encargada",
+      "ok": true,
+      "detalle": "cocina,horno,retro {\"solicitar\":false,\"recibir\":null,\"tanda\":true}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "panadería: solo Eva Galarza y Claudia Garcías envían al horno",
+      "ok": true,
+      "detalle": "{\"boton\":false,\"envia\":null}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "el PIN creado con el nombre anterior sigue sirviendo",
+      "ok": true,
+      "detalle": "{\"app\":true,\"nuevo\":true,\"viejo\":false}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "5 PIN equivocados bloquean a esa persona y queda registrado",
+      "ok": true,
+      "detalle": "{\"msg\":\"5 PIN incorrectos: bloqueado un minuto. Quedó registrado.\",\"log\":true}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "bitácora íntegra a la vista de dirección y perímetro de los 7 cargos",
+      "ok": true,
+      "detalle": "{\"filas\":33,\"sub\":\"Cadena íntegra · 33 registros · 13 alertas hoy\",\"cargos\":7,\"rota\":-1}"
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Seguridad · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""

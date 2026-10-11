@@ -57,10 +57,10 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">2.8</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.0</span></div><span class="chip num" id="loginClock">--:--</span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
-      <p class="lead">Elige tu nombre para entrar. Cada cargo ve las áreas que le corresponden.</p>
+      <p class="lead">Toca tu nombre y escribe tu PIN: entras directo a tu área. Cada cargo ve solo lo que le corresponde.</p>
       <div id="peopleList"></div>
     </div>
     <div id="pinStep" hidden>
@@ -70,7 +70,7 @@
           <div class="pin-who" style="margin-top:18px"><span class="av" id="pinAv"></span><div><h1 style="margin:0" id="pinName"></h1><span style="color:var(--muted)" id="pinRole"></span></div></div>
           <div class="pin-dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
           <div class="pin-msg" id="pinMsg" role="status"></div>
-          <p class="note">El PIN se guarda cifrado solo en este equipo. Es un acceso operativo, no reemplaza una cuenta con servidor.</p>
+          <p class="note">El PIN se guarda cifrado solo en este equipo. Tras 5 intentos fallidos esa persona queda bloqueada un minuto y el intento queda en la bitácora de seguridad.</p>
         </div>
         <div class="pad" id="pad" aria-label="Teclado del PIN">
           <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">2.8</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.0</span><small>Emporio Andino · San Pedro</small></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -197,8 +197,23 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 2.8</h2><p>Fila de espera y mesas, y todo el sistema con los precios de la carta de junio de 2026</p></div></div>
+          <div class="hd"><div><h2>Perímetro de cada cargo</h2><p>Qué áreas abre cada cargo; fuera de ellas no hay ruta (403) y el intento queda en la bitácora</p></div></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Cargo</th><th>Entra a</th><th>Áreas</th><th>Acciones sensibles</th></tr></thead><tbody id="perimetro"></tbody></table></div></div></article>
+        <article class="tile glass s12"><div class="tc">
+          <div class="hd"><div><h2>Bitácora de seguridad</h2><p id="bitSub">Ingresos, salidas, accesos denegados y autorizaciones</p></div>
+            <div class="seg" role="group" aria-label="Filtro" id="bitFiltro"><button type="button" data-bf="todo" aria-pressed="true">Todo</button><button type="button" data-bf="alerta" aria-pressed="false">Solo alertas</button></div></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Hora</th><th>Quién</th><th>Qué</th><th>Recurso</th><th>Detalle</th></tr></thead><tbody id="bitacora"></tbody></table></div></div></article>
+        <article class="tile glass s12"><div class="tc">
+          <div class="hd"><div><h2>Notas de la versión 3.0</h2><p>Equipo real, pantalla de inicio por áreas y seguridad por cargo y área</p></div></div>
           <div class="notas">
+            <div><h3>Pantalla de inicio (3.0)</h3><ul>
+              <li>Mosaico por áreas con las 28 personas del equipo. Al elegir a alguien y dar su PIN entra directo a su área: barra a Comandas de barra, cocina a Comandas de cocina, panadería a Panadería, garzones a Fila y mesas.</li>
+              <li>PIN de 4 dígitos que cada persona crea la primera vez; 5 intentos fallidos bloquean un minuto. La sesión de Caja, Fila y gestión se cierra tras 10 minutos sin uso; las pantallas de cocina, barra y panadería quedan abiertas.</li>
+            </ul></div>
+            <div><h3>Seguridad por cargo (3.0)</h3><ul>
+              <li>Cada módulo revisa la sesión y el área antes de abrir: fuera del perímetro muestra 403 y lo anota en la bitácora. Cada acción sensible (cobrar, anular, reabrir, recibir en el horno, enviar desde la panadería) se vuelve a revisar al guardar.</li>
+              <li>Anular una venta, reabrir una comanda o cambiar un pedido ya comandado pide el PIN de un encargado. Bitácora encadenada en Versiones: ingresos, denegaciones y autorizaciones.</li>
+            </ul></div>
             <div><h3>Fila y mesas (2.8)</h3><ul>
               <li>Se anota a quien llega, para comer aquí o para llevar, y se le toma el pedido mientras espera: a mano o con el código que arma en la Carta. Se prepara ya o al sentarse, y se cobra en la Caja sin comandarlo dos veces.</li>
               <li>Al liberar una mesa se llama al siguiente: pantalla de llamado con sonido, aviso en la campana y WhatsApp si dejó teléfono.</li>
@@ -328,28 +343,43 @@ var VIEWS={
   retro:{t:"Retroalimentación",g:"Sistema",c:"#D9A93A",d:"Lo que falla y lo que se puede mejorar"}
 };
 var ALLV=Object.keys(VIEWS);
-var GRUPOS=[["Dirección",["dueno","jefe"]],["Caja y salón",["encargado"]],["Garzones",["garzon"]],["Barra",["barista_enc","barista"]],["Cocina y horno",["cocina"]],["Panadería",["panaderia"]]];
+var GRUPOS=[["Dirección",["dueno"],"inicio"],["Jefatura de operaciones",["jefe"],"verificacion"],["Encargados de turno",["encargado"],"caja"],
+  ["Salón y atención",["garzon"],"fila"],["Barra y café",["barista"],"barra"],["Cocina",["cocina"],"cocina"],["Panadería y pastelería",["panaderia"],"panaderia"]];
 var USER=null;
 function puedeVer(v){ if(!USER) return false; var rol=E.ROLES[USER.r];
-  if(v==="inicio"||v==="retro") return true;
+  if(v==="inicio") return !!rol.dash;
+  if(v==="retro") return true;
   if(v==="verificacion"||v==="versiones") return !!rol.sistema;
   return rol.m.indexOf(v)>=0; }
+/* La pantalla donde entra cada cargo: el Dashboard o su área. */
+function casa(){ var r=USER&&E.ROLES[USER.r]; return r&&r.inicio&&(r.inicio==="inicio"||puedeVer(r.inicio))?r.inicio:(ALLV.filter(puedeVer)[0]||"retro"); }
 /* Ventas en pesos, ticket, metas y costos: solo dueños (ver nucleo.js). */
 function verVentas(){ return !!USER && E.verNumeros(USER); }
 
 /* ==================== INGRESO ==================== */
 var pinTarget=null, pinBuf="", pinFirst=null, pinFails=0;
 function renderPeople(){
+  /* Selector en mosaico (Bento): un bloque por área, con su gente y su cargo. */
+  $("peopleList").className="bento";
   $("peopleList").innerHTML=GRUPOS.map(function(g){
-    return '<div class="lbl who-grp">'+g[0]+'</div><div class="people">'+E.EQUIPO.filter(function(p){ return g[1].indexOf(p.r)>=0; }).map(function(p){
+    var ps=E.EQUIPO.filter(function(p){ return g[1].indexOf(p.r)>=0; }), rol=E.ROLES[g[1][0]];
+    return '<section class="bt bt-'+g[1][0]+'" style="--c:'+E.COLOR_ROL[g[1][0]]+'"><header class="bt-hd"><span class="bt-ic">'+U.icono(g[2])+'</span><div><b>'+g[0]+'</b><small>'+esc(rol.d)+'</small></div><span class="bt-n num">'+ps.length+'</span></header>'+
+      '<div class="people">'+ps.map(function(p){
       return '<button type="button" class="person" data-p="'+p.i+'"><span class="av" style="background:'+E.COLOR_ROL[p.r]+'">'+ini(p.n)+'</span><span style="min-width:0"><span class="pn">'+esc(p.n)+'</span><span class="pc">'+esc(p.c)+'</span></span></button>';
-    }).join("")+"</div>";
+    }).join("")+"</div></section>";
   }).join("");
 }
+/* Bloqueo tras 5 PIN fallidos: un minuto, por persona. */
+function bloqueos(){ try{ return JSON.parse(localStorage.getItem("eapos_bloqueos")||"{}"); }catch(e){ return {}; } }
+function bloqueadoHasta(n){ var b=bloqueos()[n]; return b&&b.hasta>Date.now()?b.hasta:0; }
+function fallo(p){ var b=bloqueos(), x=b[p.n]||{n:0}; x.n=(x.n||0)+1; E.seguridad.registrar({tipo:"pin_fallido", quien:p.n, rol:p.r, detalle:"intento "+x.n});
+  if(x.n>=5){ x.hasta=Date.now()+60e3; x.n=0; E.seguridad.registrar({tipo:"bloqueo", quien:p.n, rol:p.r, detalle:"5 PIN fallidos · 1 minuto"}); }
+  b[p.n]=x; try{ localStorage.setItem("eapos_bloqueos",JSON.stringify(b)); }catch(e){} return x.hasta||0; }
 function openPin(p){
   pinTarget=p; pinBuf=""; pinFirst=null; pinFails=0; $("whoStep").hidden=true; $("pinStep").hidden=false;
-  $("pinAv").textContent=ini(p.n); $("pinAv").style.background=E.COLOR_ROL[p.r]; $("pinName").textContent=p.n; $("pinRole").textContent=p.c;
-  $("pinMsg").className="pin-msg"; $("pinMsg").textContent=E.pins()[p.n]?"Ingresa tu PIN de 4 dígitos":"Primera vez en este equipo: crea tu PIN de 4 dígitos";
+  $("pinAv").textContent=ini(p.n); $("pinAv").style.background=E.COLOR_ROL[p.r]; $("pinName").textContent=p.n; $("pinRole").textContent=p.c+" · "+E.ROLES[p.r].n;
+  var bh=bloqueadoHasta(p.n);
+  $("pinMsg").className="pin-msg"+(bh?" err":""); $("pinMsg").textContent=bh?"Bloqueado por PIN incorrecto: espera "+Math.ceil((bh-Date.now())/1000)+" s":E.tienePin(p.n)?"Ingresa tu PIN de 4 dígitos":"Primera vez en este equipo: crea tu PIN de 4 dígitos";
   drawDots();
 }
 function drawDots(){ [].forEach.call($("pinDots").children,function(d,i){ d.classList.toggle("on",i<pinBuf.length); }); }
@@ -357,25 +387,30 @@ function pinErr(msg){ var d=$("pinDots"); d.classList.remove("shake"); void d.of
 /* El código se toma al completar los 4 dígitos y el buffer queda libre al instante. */
 function pinComplete(code){
   var p=pinTarget; if(!p) return;
-  E.hashPin(p.n,code).then(function(h){
-    var g=E.pins()[p.n];
-    if(g){ if(h===g) return login(p); pinFails++; return pinErr(pinFails>=3?"PIN incorrecto. Si lo olvidaste, dirección puede restablecerlo en Versiones y accesos.":"PIN incorrecto, intenta de nuevo"); }
-    if(!pinFirst){ pinFirst=h; drawDots(); $("pinMsg").className="pin-msg"; $("pinMsg").textContent="Repite el PIN para confirmarlo"; return; }
-    if(pinFirst!==h){ pinFirst=null; return pinErr("Los PIN no coinciden. Créalo otra vez"); }
-    E.guardarPin(p.n,h); login(p);
+  var bh=bloqueadoHasta(p.n); if(bh) return pinErr("Bloqueado por PIN incorrecto: espera "+Math.ceil((bh-Date.now())/1000)+" s");
+  E.verificarPin(p.n,code).then(function(ok){
+    if(ok===true) return login(p);
+    if(ok===false){ var h=fallo(p); pinFails++;
+      return pinErr(h?"5 PIN incorrectos: bloqueado un minuto. Quedó registrado.":pinFails>=3?"PIN incorrecto. Si lo olvidaste, dirección puede restablecerlo en Versiones y accesos.":"PIN incorrecto, intenta de nuevo"); }
+    /* Sin PIN todavía: se crea y se confirma. */
+    return E.hashPin(p.n,code).then(function(h){
+      if(!pinFirst){ pinFirst=h; drawDots(); $("pinMsg").className="pin-msg"; $("pinMsg").textContent="Repite el PIN para confirmarlo"; return; }
+      if(pinFirst!==h){ pinFirst=null; return pinErr("Los PIN no coinciden. Créalo otra vez"); }
+      E.guardarPin(p.n,h); E.seguridad.registrar({tipo:"pin_creado", quien:p.n, rol:p.r}); login(p); });
   });
 }
 function pinKey(k){ if(!pinTarget) return;
   if(k==="del") pinBuf=pinBuf.slice(0,-1); else if(k==="clr") pinBuf=""; else if(/^\d$/.test(k)&&pinBuf.length<4) pinBuf+=k;
   drawDots(); if(pinBuf.length===4){ var c=pinBuf; pinBuf=""; setTimeout(function(){ pinComplete(c); },120); } }
-function login(p){ E.abrirSesion(p); pinTarget=null; arrancarApp(true); U.aviso("Hola, "+p.n.split(" ")[0]+". Tienes acceso a "+(ALLV.filter(puedeVer).length-1)+" áreas"); }
-function logout(msg){ if(AV) AV.cerrar(); E.cerrarSesion(); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
+function login(p){ E.abrirSesion(p); pinTarget=null; arrancarApp(true); var n=ALLV.filter(puedeVer).filter(function(v){ return v!=="inicio"&&v!=="retro"; }).length;
+  U.aviso("Hola, "+p.n.split(" ")[0]+". Entras a "+(VIEWS[casa()]||{t:""}).t+" · "+n+(n===1?" área":" áreas")+" de tu cargo"); }
+function logout(msg){ if(AV) AV.cerrar(); E.cerrarSesion(msg||""); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
 $("peopleList").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) openPin(E.EQUIPO[+b.dataset.p]); });
 $("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) pinKey(b.dataset.k); });
 $("pinBack").addEventListener("click",function(){ pinTarget=null; $("pinStep").hidden=true; $("whoStep").hidden=false; });
 document.addEventListener("keydown",function(e){
   if(!$("pinStep").hidden&&!$("login").hidden){ if(/^\d$/.test(e.key)) pinKey(e.key); else if(e.key==="Backspace") pinKey("del"); }
-  if(e.key==="Escape"&&USER&&cur!=="inicio") go("inicio");
+  if(e.key==="Escape"&&USER&&cur!==casa()) go(casa());
 });
 var logoutArmed=0;
 $("logoutBtn").addEventListener("click",function(){ var t=Date.now(); if(t-logoutArmed<2500){ logoutArmed=0; logout("Sesión cerrada"); } else { logoutArmed=t; U.aviso("Toca otra vez para cerrar sesión"); } });
@@ -399,11 +434,11 @@ function buildHub(){
 }
 function vaciarMarcos(){ document.querySelectorAll(".marco iframe").forEach(function(f){ f.removeAttribute("src"); f._cargado=false; }); }
 function show(v,silent){
-  if(!puedeVer(v)) v="inicio"; cur=v; U.desplazo("modulo",0);
+  if(!puedeVer(v)){ if(v&&VIEWS[v]) E.seguridad.registrar({tipo:"denegado", recurso:"vista "+v, detalle:"fuera del área de "+E.ROLES[USER.r].n}); v=casa(); } cur=v; U.desplazo("modulo",0);
   document.querySelectorAll(".view").forEach(function(el){ el.hidden=el.dataset.view!==v; });
   var fr=document.querySelector('.view[data-view="'+v+'"] .marco iframe');
   if(fr&&!fr._cargado){ fr.src=fr.dataset.src; fr._cargado=true; }
-  $("vTitle").textContent=VIEWS[v].t; $("backBtn").hidden=v==="inicio";
+  $("vTitle").textContent=VIEWS[v].t; $("backBtn").hidden=v===casa();
   document.querySelectorAll("#nav a").forEach(function(a){ var on=a.dataset.v===v; a.classList.toggle("on",on); a.toggleAttribute("aria-current",on); });
   navSl&&navSl.to(document.querySelector("#nav a.on"),silent);
   renderView(); U.revelar(document.querySelector('.view[data-view="'+v+'"]'));
@@ -415,10 +450,10 @@ var histOK=true;
 function hist(fn,st,h){ if(!histOK) return; try{ history[fn](st,"",h); }catch(e){ histOK=false; } }
 function go(v){
   if(v===cur) return;
-  if(!puedeVer(v)){ U.aviso("Tu cargo no tiene acceso a "+((E.MODULOS[v]||VIEWS[v]||{n:v}).n||VIEWS[v].t)); return; }
-  hist(cur==="inicio"?"pushState":"replaceState",{ea:"view",v:v},"#"+v); show(v);
+  if(!puedeVer(v)){ E.seguridad.registrar({tipo:"denegado", recurso:"vista "+v, detalle:"fuera del área de "+E.ROLES[USER.r].n}); U.aviso("403 · Tu cargo no tiene acceso a "+((E.MODULOS[v]||VIEWS[v]||{n:v}).n||(VIEWS[v]||{}).t||v)+". Quedó registrado."); return; }
+  hist(cur===casa()?"pushState":"replaceState",{ea:"view",v:v},"#"+v); show(v);
 }
-addEventListener("popstate",function(e){ if(!USER) return; var st=e.state||{}; show(st.ea==="view"?st.v:"inicio"); });
+addEventListener("popstate",function(e){ if(!USER) return; var st=e.state||{}; show(st.ea==="view"?st.v:casa()); });
 $("nav").addEventListener("click",function(e){ var a=e.target.closest("[data-v]"); if(!a) return; e.preventDefault(); if(a.dataset.v==="inicio"){ if(cur!=="inicio"){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); } } else go(a.dataset.v); });
 document.addEventListener("click",function(e){ var t=e.target.closest("[data-go]"); if(!t||!USER) return; if(e.target.closest("a,input")&&!t.matches("button")) return;
   var p=t.dataset.go.split(":"); if(p[0]!==cur) go(p[0]); if(p[1]&&cur===p[0]) irDentro(p[0],p[1]); });
@@ -427,7 +462,7 @@ function irDentro(v,destino){ var fr=document.querySelector('.view[data-view="'+
   (function intento(){ try{ var w=fr.contentWindow; if(w&&w.EA_IR){ w.EA_IR(destino); return; }
       var el=w&&w.document&&w.document.getElementById(destino); if(el&&w.document.readyState==="complete"){ el.scrollIntoView({block:"start"}); return; } }catch(x){}
     if(++n<25) setTimeout(intento,200); })(); }
-$("backBtn").addEventListener("click",function(){ hist("replaceState",{ea:"view",v:"inicio"},"#inicio"); show("inicio"); });
+$("backBtn").addEventListener("click",function(){ var c=casa(); hist("replaceState",{ea:"view",v:c},"#"+c); show(c); });
 /* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
 window.EAPOS_SISTEMA={abrir:function(id){ go(id); }, desplazo:function(y){ U.desplazo("modulo",y); }};
 /* Barra colapsable: al bajar (en la página o dentro de un módulo) la columna
@@ -553,7 +588,7 @@ addEventListener("online",red); addEventListener("offline",red);
 function renderView(){
   if(!USER) return;
   if(cur==="inicio") renderDash();
-  if(cur==="versiones"){ pintarVersiones(); pintarAccesos(); }
+  if(cur==="versiones"){ pintarVersiones(); pintarAccesos(); pintarPerimetro(); pintarBitacora(); }
   if(cur==="retro") pintarRetro();
   renderPanorama(cur); refrescarAvisos();
 }
@@ -593,6 +628,10 @@ function panoComandas(e){ var c=comandasDetalle(), n=c.por[e], viejas=c.viejas.f
 var PANO={
   caja:function(){ var vs=ventasHoy(), n=vs.length, tot=vs.reduce(function(a,v){ return a+v.total; },0), sf=sinFolio(), st=stockEstado(), meta=metaDia();
     var tono=st.off?"crit":(sf||st.bajo)?"warn":"ok";
+    /* Garzones: solo lo suyo, con sus propinas del día. */
+    if(E.ROLES[USER.r].caja==="cobro"){ var mias=vs.filter(function(v){ return v.resp===USER.n; }), prop=mias.reduce(function(a,v){ return a+(v.propina||0); },0);
+      return {tono:"info", titulo:"Tus propinas de hoy: "+clp(prop), sub:mias.length+(mias.length===1?" venta registrada a tu nombre":" ventas registradas a tu nombre")+" · la propina es voluntaria (Art. 64 Código del Trabajo)",
+        kpis:[{v:clp(prop),l:"Tus propinas",tono:"ok"},{v:mias.length,l:"Tus ventas"},{v:st.off,l:"Agotados",tono:st.off?"crit":"ok"},{v:st.bajo,l:"Quedan pocos",tono:st.bajo?"warn":"ok"}]}; }
     /* Si hay un problema, el titular lo nombra; si no, cuenta cómo va el día. */
     var prob=st.off?st.off+(st.off===1?" producto agotado: ":" productos agotados: ")+lista3(st.nombres):sf?sf+(sf===1?" venta sin folio de boleta":" ventas sin folio de boleta"):st.bajo?st.bajo+" productos con poco stock":"";
     if(verVentas()) return {tono:tono, titulo:prob||"Vendido hoy "+clp(tot), sub:(prob?"Vendido hoy "+clp(tot)+" · ":"")+n+(n===1?" venta":" ventas")+" · "+Math.round(tot/meta.v*100)+"% "+(meta.ref?"del objetivo":"de la meta")+" del día",
@@ -662,13 +701,15 @@ function renderPanorama(v){ var d=null;
 /* Avisos importantes con los datos reales del local, según el cargo. */
 function avisosSistema(){
   var L=[];
-  if(puedeVer("salon")||puedeVer("caja")){
+  /* Cocina y barra ven los avisos de disponibilidad de su área; el resto, de todo. */
+  var areaG=!(puedeVer("salon")||puedeVer("caja"))?E.ROLES[USER.r].area:null;
+  if(puedeVer("salon")||puedeVer("caja")||areaG==="bar"||areaG==="coc"){
     var c=leeLocal("ea_control")||{}, pos=leeLocal("ea_pos")||{}, umbral=(pos.cfg&&pos.cfg.umbral)||6, off=[], bajo=[];
-    E.catalogo(E.general()).forEach(function(p){ var u=c.uni&&typeof c.uni[p.id]==="number"?c.uni[p.id]:null, e=u!=null?(u<=0?"off":u<=umbral?"bajo":"ok"):((c.st&&c.st[p.id])||"ok");
+    E.catalogo(E.general()).filter(function(p){ return !areaG||p.g===areaG; }).forEach(function(p){ var u=c.uni&&typeof c.uni[p.id]==="number"?c.uni[p.id]:null, e=u!=null?(u<=0?"off":u<=umbral?"bajo":"ok"):((c.st&&c.st[p.id])||"ok");
       if(e==="off") off.push(p); else if(e==="bajo") bajo.push({p:p,u:u}); });
-    off.slice(0,6).forEach(function(p){ L.push({k:"off|"+p.id,tono:"crit",tit:"Se acabó: "+esc(p.n),det:"La Carta lo muestra no disponible",go:"salon"}); });
+    off.slice(0,6).forEach(function(p){ L.push({k:"off|"+p.id,tono:"crit",tit:"Se acabó: "+esc(p.n),det:"La Carta lo muestra no disponible",go:areaG?(areaG==="bar"?"barra":"cocina"):"salon"}); });
     if(off.length>6) L.push({k:"off+",tono:"crit",tit:"Y "+(off.length-6)+" productos más agotados",go:"salon"});
-    bajo.slice(0,6).forEach(function(x){ L.push({k:"bajo|"+x.p.id,tono:"warn",tit:"Queda poco: "+esc(x.p.n),det:x.u!=null?x.u+" en vitrina":"Marcado con poco stock",go:"salon"}); });
+    bajo.slice(0,6).forEach(function(x){ L.push({k:"bajo|"+x.p.id,tono:"warn",tit:"Queda poco: "+esc(x.p.n),det:x.u!=null?x.u+" en vitrina":"Marcado con poco stock",go:areaG?(areaG==="bar"?"barra":"cocina"):"salon"}); });
     if(bajo.length>6) L.push({k:"bajo+",tono:"warn",tit:"Y "+(bajo.length-6)+" productos más con poco stock",go:"salon"});
     var h=hornoReal();
     h.listas.forEach(function(x){ L.push({k:"lista|"+x.id,tono:"warn",tit:"Hornada lista: "+x.n+" "+esc(nombreEmp(x.emp)),det:"Salió hace "+minutosDesde(x.eta)+" min · pasa sola a la vitrina",go:puedeVer("horno")?"horno":"salon"}); });
@@ -771,6 +812,35 @@ function pintarVersiones(){
       (v.cambios.length?'<ul>'+v.cambios.slice(0,8).map(function(c){ return "<li>"+esc(c.texto)+"</li>"; }).join("")+(v.cambios.length>8?"<li>y "+(v.cambios.length-8)+" más</li>":"")+"</ul>":"")+"</li>";
   }).join("")||'<li class="empty-s">Sin versiones todavía.</li>';
 }
+/* ==================== SEGURIDAD ==================== */
+var BIT_FILTRO="todo", TIPO_BIT={ingreso:"Ingresó", salida:"Salió", denegado:"403 · denegado", autorizado:"Autorizó con su PIN", con_autorizacion:"Hecho con autorización",
+  pin_fallido:"PIN incorrecto", bloqueo:"Bloqueado", pin_creado:"Creó su PIN", pin_borrado:"PIN restablecido"};
+function pintarBitacora(){
+  var b=E.seguridad.bitacora(), rota=E.seguridad.revisarBitacora(), alertas={denegado:1,pin_fallido:1,bloqueo:1};
+  var l=b.slice().reverse().filter(function(x){ return BIT_FILTRO==="todo"||alertas[x.tipo]; }).slice(0,120);
+  var hoyN=b.filter(function(x){ return hoyISO(new Date(x.ts))===hoyISO()&&alertas[x.tipo]; }).length;
+  $("bitSub").innerHTML=(rota<0?'<span style="color:var(--ok)">Cadena íntegra</span>':'<span style="color:var(--crit)">Cadena alterada desde el registro '+rota+'</span>')+" · "+b.length+" registros · "+hoyN+(hoyN===1?" alerta hoy":" alertas hoy");
+  $("bitacora").innerHTML=l.map(function(x){ var al=alertas[x.tipo];
+    return '<tr><td class="num">'+esc(fecha(x.ts))+'</td><td>'+esc(x.quien)+(x.rol&&E.ROLES[x.rol]?'<div class="desc">'+esc(E.ROLES[x.rol].n)+'</div>':'')+'</td><td'+(al?' style="color:var(--crit);font-weight:700"':'')+'>'+esc(TIPO_BIT[x.tipo]||x.tipo)+'</td><td>'+esc((E.ACCIONES[x.recurso]||{}).n||x.recurso)+'</td><td class="desc">'+esc(x.detalle)+(x.lugar?' · '+esc(x.lugar):'')+'</td></tr>'; }).join("")||'<tr><td colspan="5" class="empty-s">Sin registros.</td></tr>';
+  document.querySelectorAll("#bitFiltro [data-bf]").forEach(function(x){ x.setAttribute("aria-pressed",String(x.dataset.bf===BIT_FILTRO)); });
+}
+$("bitFiltro").addEventListener("click",function(e){ var b=e.target.closest("[data-bf]"); if(!b) return; BIT_FILTRO=b.dataset.bf; pintarBitacora(); });
+function pintarPerimetro(){
+  $("perimetro").innerHTML=Object.keys(E.ROLES).map(function(k){ var r=E.ROLES[k];
+    var acc=Object.keys(E.ACCIONES).filter(function(a){ return E.ACCIONES[a].roles.indexOf(k)>=0; }).map(function(a){ return E.ACCIONES[a].n; });
+    var extra=E.EQUIPO.filter(function(p){ return p.r===k&&p.x.length; }).map(function(p){ return p.n+": "+p.x.map(function(a){ return (E.ACCIONES[a]||{n:a}).n.toLowerCase(); }).join(", "); });
+    return '<tr><td><b>'+esc(r.n)+'</b><div class="desc">'+esc(r.clave)+'</div></td><td>'+esc(r.inicio==="inicio"?"Dashboard":(E.MODULOS[r.inicio]||{n:r.inicio}).n)+'</td><td>'+esc(r.m.map(function(m){ return E.MODULOS[m].n; }).join(", "))+
+      (r.sistema?'<div class="desc">+ Verificación, Versiones y accesos</div>':'')+'</td><td class="desc">'+esc(acc.join(" · ")||"—")+(extra.length?'<br><b>Designados:</b> '+esc(extra.join(" · ")):'')+'</td></tr>'; }).join("");
+}
+/* Sin uso por 10 minutos, la sesión se cierra en los puestos con caja o
+   administración. Las pantallas de cocina, barra y panadería no se cierran. */
+var ULT=Date.now(), INACTIVO_MIN=10;
+function actividad(){ ULT=Date.now(); }
+["pointerdown","keydown","touchstart","wheel"].forEach(function(ev){ document.addEventListener(ev,actividad,{capture:true,passive:true}); });
+document.querySelectorAll(".marco iframe").forEach(function(f){ f.addEventListener("load",function(){ try{ ["pointerdown","keydown","touchstart","wheel"].forEach(function(ev){ f.contentWindow.document.addEventListener(ev,actividad,{capture:true,passive:true}); }); }catch(e){} }); });
+setInterval(function(){ if(!USER) return; var r=E.ROLES[USER.r]; if(r.area) return;
+  if(Date.now()-ULT>INACTIVO_MIN*60e3){ ULT=Date.now(); logout("Sesión cerrada por "+INACTIVO_MIN+" minutos sin uso"); } },20000);
+
 var resetArm={};
 function pintarAccesos(){
   var pins=E.pins();
@@ -780,7 +850,7 @@ function pintarAccesos(){
   }).join("");
 }
 $("acc").addEventListener("click",function(e){ var b=e.target.closest("[data-reset]"); if(!b) return; var p=E.EQUIPO[+b.dataset.reset], t=Date.now();
-  if(t-(resetArm[p.i]||0)<2500){ resetArm={}; E.borrarPin(p.n); U.aviso("PIN de "+p.n+" restablecido"); pintarAccesos(); }
+  if(t-(resetArm[p.i]||0)<2500){ resetArm={}; U.aviso(E.borrarPin(p.n)?"PIN de "+p.n+" restablecido":"403 · Tu cargo no puede restablecer PIN"); pintarAccesos(); }
   else { resetArm[p.i]=t; U.aviso("Toca otra vez para restablecer el PIN de "+p.n); } });
 
 /* ==================== VERIFICACIÓN ==================== */
@@ -894,11 +964,12 @@ var TIPOS={error:"Algo falla",mejora:"Mejora",dato:"Dato o precio",comentario:"C
 var ESTADOS={abierto:"Abierto",revision:"En revisión",resuelto:"Resuelto"};
 var reportes=leeLocal("eapos_retro")||[], filtro="activos", modo="local";
 function pintarRetro(){
-  var vis=reportes.filter(function(r){ return filtro==="todos"?true:filtro==="activos"?r.estado!=="resuelto":r.estado===filtro; });
-  $("retroCuenta").textContent=reportes.filter(function(r){ return r.estado!=="resuelto"; }).length+" activos · "+reportes.length+" en total";
+  var mios=USER&&E.ROLES[USER.r].sistema?reportes:reportes.filter(function(r){ return USER&&r.autor===USER.n; });
+  var vis=mios.filter(function(r){ return filtro==="todos"?true:filtro==="activos"?r.estado!=="resuelto":r.estado===filtro; });
+  $("retroCuenta").textContent=mios.filter(function(r){ return r.estado!=="resuelto"; }).length+" activos · "+mios.length+" en total"+(USER&&E.ROLES[USER.r].sistema?"":" (los tuyos)");
   var ul=$("retroLista"); ul.textContent="";
   if(!vis.length){ var li=document.createElement("li"); li.className="empty-s";
-    li.textContent=reportes.length?"No hay reportes con este estado.":"Todavía no hay reportes. Cuando algo falle en un módulo, o se te ocurra una mejora, escríbelo arriba: queda con fecha y estado hasta que se resuelva."; ul.appendChild(li); return; }
+    li.textContent=mios.length?"No hay reportes con este estado.":"Todavía no hay reportes. Cuando algo falle en un módulo, o se te ocurra una mejora, escríbelo arriba: queda con fecha y estado hasta que se resuelva."; ul.appendChild(li); return; }
   vis.forEach(function(r){
     var li=document.createElement("li"); li.className=r.prioridad||"media";
     var meta=document.createElement("div"); meta.className="meta";
@@ -906,7 +977,7 @@ function pintarRetro(){
     var q=document.createElement("span"); q.textContent=(r.autor?r.autor+" · ":"")+fecha(r.creado)+(r.prioridad==="alta"?" · prioridad alta":""); meta.appendChild(q);
     var p=document.createElement("p"); p.textContent=r.texto;
     var acc=document.createElement("div"); acc.className="acc";
-    Object.keys(ESTADOS).filter(function(k){ return k!==r.estado; }).forEach(function(k){ var b=document.createElement("button"); b.type="button"; b.className="btn sm";
+    if(USER&&E.ROLES[USER.r].sistema) Object.keys(ESTADOS).filter(function(k){ return k!==r.estado; }).forEach(function(k){ var b=document.createElement("button"); b.type="button"; b.className="btn sm";
       b.textContent=k==="resuelto"?"Marcar resuelto":k==="revision"?"Pasar a revisión":"Reabrir"; b.addEventListener("click",function(){ cambiarEstado(r,k,b); }); acc.appendChild(b); });
     li.appendChild(meta); li.appendChild(p); li.appendChild(acc); ul.appendChild(li);
   });
@@ -944,10 +1015,10 @@ function arrancarApp(primera){
   USER=s; $("login").hidden=true; $("app").hidden=false;
   $("meAv").textContent=ini(s.n); $("meAv").style.background=E.COLOR_ROL[s.r]; $("meName").textContent=s.n; $("meRole").textContent=s.c;
   buildNav(); buildHub(); red(); iniciarColapso();
-  var v=(primera===true&&VIEWS[H0])?H0:"inicio"; H0="";
-  hist("replaceState",{ea:"root"},location.pathname+location.search+"#inicio");
+  var c=casa(), v=(primera===true&&VIEWS[H0]&&puedeVer(H0))?H0:c; H0="";
+  hist("replaceState",{ea:"root"},location.pathname+location.search+"#"+c);
   cur="";
-  if(v!=="inicio"){ show("inicio",true); go(v); } else show("inicio",true);
+  show(c,true); if(v!==c) go(v);
 }
 U.reloj($("clock")); U.reloj($("loginClock"));
 arrancarApp(true);

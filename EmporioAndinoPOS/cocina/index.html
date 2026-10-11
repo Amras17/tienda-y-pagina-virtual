@@ -33,6 +33,11 @@ html.incrustado .modulo{padding-top:4px}
 .vacio{grid-column:1/-1}
 details summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:var(--fg-2)}
 .hlist{margin-top:10px}
+.dispg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.dispg button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;border:1.5px solid var(--stroke);background:var(--glass-2);color:var(--fg);border-radius:12px;padding:9px 11px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.dispg button span{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ok)}
+.dispg button.bajo{border-color:color-mix(in srgb,var(--warn) 55%,transparent)} .dispg button.bajo span{color:var(--warn)}
+.dispg button.off{border-color:color-mix(in srgb,var(--crit) 60%,transparent);opacity:.8} .dispg button.off span{color:var(--crit)}
 .hlist li{display:flex;justify-content:space-between;gap:10px;align-items:center;border-top:1px solid var(--stroke);padding-top:6px}
 </style>
 
@@ -47,14 +52,20 @@ details summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:va
       <div class="seg est" role="group" aria-label="Estación" id="estaciones"><span class="ind" id="estInd"></span></div></div>
   </article>
   <section class="tablero" id="tablero" aria-live="polite"></section>
+  <article class="tile glass" id="tDisp"><div class="tc"><details id="disp"><summary id="dispT">Disponibilidad</summary>
+    <p class="note" id="dispNota" style="margin:8px 0 10px"></p><div class="dispg" id="dispL"></div></details></div></article>
   <article class="tile glass"><div class="tc"><details id="hechas"><summary id="hechasT">Listas hoy</summary><ul class="log hlist" id="hlist"></ul></details></div></article>
 </div>
 
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
 <script src="../nucleo/fila.js"></script>
+<script src="../nucleo/produccion.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: Comandas de cocina o de barra, según la estación pedida y el cargo. */
+(function(){ var m=/[?&]est=(cocina|barra)/.exec(location.search), s=EAPOS.sesion();
+  EAPOS.seguridad.guardia(m?m[1]:(s&&EAPOS.puede("cocina",s)?"cocina":"barra")); })();
 /* ====================================================================
    Comandas: la pieza que faltaba entre la Caja y la cocina.
    Cada venta registrada en la Caja se reparte por estación según el grupo
@@ -78,9 +89,12 @@ function hora(ts){ return U.hhmm(new Date(ts)); }
 function leer(k,def){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):def; }catch(e){ return def; } }
 function guardar(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 
+/* Solo las estaciones del cargo (perímetro por área). */
+ESTACIONES=ESTACIONES.filter(function(e){ return EAPOS.puede(e.id); });
 var est=FIJA||(function(){ try{ return localStorage.getItem("eapos_comandas_est")||""; }catch(e){ return ""; } })();
+if(!EAPOS.puede(est)) est=ESTACIONES.length?ESTACIONES[0].id:"";
 /* La estación por defecto sale del cargo de quien está en sesión. */
-if(est!=="cocina"&&est!=="barra"){ var s0=EAPOS.sesion(); est = s0&&(s0.r==="barista"||s0.r==="barista_enc") ? "barra" : "cocina"; }
+if(ESTACIONES.length<2) document.getElementById("estaciones").hidden=true;
 if(FIJA){ var NOM={cocina:"Comandas de cocina",barra:"Comandas de barra"}[FIJA]; document.title=NOM+" · EmporioAndinoPOS";
   document.getElementById("titulo").textContent=NOM; document.getElementById("bajada").textContent=FIJA==="cocina"?"Los platos cobrados en la Caja":"Las bebidas cobradas en la Caja";
   document.getElementById("estT").textContent=FIJA==="cocina"?"Cocina":"Barra"; document.getElementById("estaciones").hidden=true; }
@@ -151,16 +165,42 @@ function campana(){
       o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+.3); }); }catch(e){}
 }
 
-$("estaciones").addEventListener("click",function(e){ var b=e.target.closest("[data-est]"); if(!b) return; est=b.dataset.est; try{ localStorage.setItem("eapos_comandas_est",est); }catch(x){} vistos=null; pintar(true); });
+$("estaciones").addEventListener("click",function(e){ var b=e.target.closest("[data-est]"); if(!b) return;
+  if(!EAPOS.puede(b.dataset.est)){ EAPOS.seguridad.registrar({tipo:"denegado",recurso:"estación "+b.dataset.est}); return; } est=b.dataset.est; try{ localStorage.setItem("eapos_comandas_est",est); }catch(x){} vistos=null; pintar(true); });
 $("tablero").addEventListener("click",function(e){ var b=e.target.closest("[data-listo]"); if(!b) return;
+  if(!EAPOS.seguridad.exigir("comanda.listo",b.dataset.listo)){ U.aviso("403 · Tu cargo no marca comandas. Quedó registrado."); return; }
   var m=marcas(); m.listo[b.dataset.listo]=new Date().toISOString(); guardar("eapos_comandas",m); U.aviso("Comanda lista"); pintar(); });
 $("hlist").addEventListener("click",function(e){ var b=e.target.closest("[data-volver]"); if(!b) return;
-  var m=marcas(); delete m.listo[b.dataset.volver]; guardar("eapos_comandas",m); pintar(); });
+  /* Reabrir una comanda cerrada lo hace (o lo autoriza) un encargado. */
+  var k=b.dataset.volver;
+  U.conPermiso("comanda.reabrir","comanda "+k.split("|")[0].slice(-5),function(){
+    if(!EAPOS.seguridad.exigir("comanda.reabrir",k)) return;
+    var m=marcas(); delete m.listo[k]; guardar("eapos_comandas",m); pintar(); }); });
+
+/* ---------- disponibilidad del área ----------
+   Barra marca sus bebidas y cocina sus platos: disponible → quedan pocas →
+   agotado. Es el mismo estado que leen la Caja y la Carta. */
+function pintarDisp(){
+  var g=est==="barra"?"bar":"coc", puede=EAPOS.permite("stock.area"), c=EAPOS.prod.control();
+  var lista=EAPOS.catalogo(EAPOS.general()).filter(function(p){ return p.g===g; });
+  $("dispT").textContent="Disponibilidad de "+(est==="barra"?"barra":"cocina")+" · "+lista.filter(function(p){ return (c.st[p.id]||"ok")!=="ok"; }).length+" marcadas";
+  $("dispNota").textContent=puede?"Toca para cambiar: disponible → quedan pocas → agotado. La Caja y la Carta lo ven al instante.":"Solo consulta: la disponibilidad la marca el área.";
+  if(!$("disp").open&&$("dispL").innerHTML) return;
+  $("dispL").innerHTML=lista.map(function(p){ var e=c.st[p.id]||"ok";
+    return '<button type="button" class="'+(e==="ok"?"":e)+'" data-disp="'+esc(p.id)+'"'+(puede?'':' disabled')+'>'+esc(p.n)+'<span>'+(e==="off"?"Agotado":e==="bajo"?"Quedan pocas":"Hay")+'</span></button>'; }).join("");
+}
+$("dispL").addEventListener("click",function(e){ var b=e.target.closest("[data-disp]"); if(!b) return;
+  var p=EAPOS.producto(b.dataset.disp), g=est==="barra"?"bar":"coc";
+  /* Solo productos de su propia área. */
+  if(!p||p.g!==g||!EAPOS.seguridad.exigir("stock.area",b.dataset.disp)){ U.aviso("403 · Fuera de tu área. Quedó registrado."); return; }
+  var c=EAPOS.prod.control(), a=c.st[p.id]||"ok", n=a==="ok"?"bajo":a==="bajo"?"off":"ok";
+  if(n==="ok") delete c.st[p.id]; else c.st[p.id]=n; EAPOS.prod.guardarControl(c); U.aviso(p.n+": "+(n==="off"?"agotado":n==="bajo"?"quedan pocas":"disponible")); pintarDisp(); });
+$("disp").addEventListener("toggle",pintarDisp);
 $("sonido").addEventListener("click",function(){ sonido=!sonido; this.setAttribute("aria-pressed",String(sonido)); this.textContent=sonido?"Campana encendida":"Campana apagada"; this.classList.toggle("pri",sonido); if(sonido) campana(); });
-addEventListener("storage",function(ev){ if(ev.key==="ea_pos"||ev.key==="eapos_comandas") pintar(); });
+addEventListener("storage",function(ev){ if(ev.key==="ea_pos"||ev.key==="eapos_comandas"||ev.key==="eapos_fila") pintar(); if(ev.key==="ea_control") pintarDisp(); });
 if(EAPOS.canal) EAPOS.canal.onmessage=function(){ pintar(); };
 new ResizeObserver(function(){ if(deslizador) deslizador.to($("estaciones").querySelector('[aria-pressed="true"]'),true); }).observe(document.body);
-U.reloj($("reloj")); pintar(true);
+U.reloj($("reloj")); pintar(true); pintarDisp();
 setInterval(pintar,15000);
 </script>
 </body></html>

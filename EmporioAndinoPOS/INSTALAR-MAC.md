@@ -64,11 +64,14 @@ puedes tener la Caja en una ventana, el Horno en otra y la Panadería en una ter
 La **pantalla de llamado** de la fila (Fila y mesas → *Pantalla de llamado*) se abre en otra ventana del
 mismo Mac: llévala a una tele o un segundo monitor conectado al Mac.
 
+Todas esas ventanas comparten también **la sesión**: quien ingresa último queda en sesión en todas. Cada
+módulo revisa el cargo de esa persona al abrirse (fuera de su área responde 403) y al guardar.
+
 Un segundo equipo (una tablet en el horno, otro computador en la panadería) guarda **sus propios datos**:
 no ve las ventas ni los pedidos del Mac. Para la Prueba nº1, usa un solo Mac con una ventana por puesto.
 Compartir entre equipos necesita un servidor y queda para una versión siguiente.
 
 ## 6. Comprobar que quedó bien
 
-Ingresa con un usuario de dirección y abre **Verificación → Verificar**: revisa que cada módulo abra en
+Ingresa con dirección o jefatura y abre **Verificación → Verificar**: revisa que cada módulo abra en
 ese Mac (Caja, Fila y mesas, Salón, Comandas de cocina y de barra, Horno, Panadería, Carta y Prueba).

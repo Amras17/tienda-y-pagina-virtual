@@ -145,6 +145,8 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
 <script src="../nucleo/fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("horno");
 /* ====================================================================
    Horno: recibe el pedido de la Panadería (latas de 15), carga las tandas
    (20 minutos la cocción), las saca a la vitrina, avisa a quien espera y
@@ -161,6 +163,9 @@ function restaMs(eta){ return new Date(eta).getTime()-Date.now(); }
 function latas(n){ if(!n) return "0"; var l=n/LATA; return l===Math.floor(l)? l+(l===1?" lata":" latas") : n+" u."; }
 function lista(items){ return Object.keys(items).map(function(k){ return items[k]+" "+esc(P.nombre(k)); }).join(" · "); }
 
+/* Quién hace cada cosa en el canal con la panadería (nucleo.js). */
+function quienes(accion){ return EAPOS.EQUIPO.filter(function(p){ return (p.x||[]).indexOf(accion)>=0; }).map(function(p){ return p.n; }).join(", "); }
+var PUEDE={recibir:EAPOS.permite("horno.recibir"), solicitar:EAPOS.permite("horno.solicitar"), precocido:EAPOS.permite("horno.precocido"), ajustes:EAPOS.permite("horno.ajustes"), operar:EAPOS.permite("horno.operar")};
 var SEL={}, MIN=null, REC={}, SOL=null, PREC=null, PREC_TOCADO=false, ESP=null;
 
 /* ---------- reloj grande ---------- */
@@ -227,7 +232,7 @@ function pintarPedido(){
       return '<li><div class="h"><b>'+(x.tipo==="solicitud"?"Solicitud":"Pedido")+' '+x.n+' · '+latas(sumaLatas(x.items)*LATA)+'</b><span>Enviado '+hora(x.conf?x.conf.ts:x.ts)+' por '+esc((x.conf&&x.conf.por)||x.por)+'</span></div>'+
         '<div class="recgrid">'+Object.keys(x.items).map(function(k){ var n=ed[k]||0, esp=x.items[k]*LATA;
           return '<div class="vcard on"><span class="vn">'+esc(P.nombre(k))+'<small>'+x.items[k]+(x.items[k]===1?" lata":" latas")+'</small></span><div class="paso"><button type="button" data-rec="'+x.id+'|'+k+'" data-d="-1" aria-label="Una menos">−</button><b class="num">'+n+'<small>'+(n===esp?"llegaron":(n<esp?"faltan "+(esp-n):"sobran "+(n-esp)))+'</small></b><button type="button" data-rec="'+x.id+'|'+k+'" data-d="1" aria-label="Una más">+</button></div></div>'; }).join("")+'</div>'+
-        '<div class="acc"><button class="btn pri" type="button" data-recibir="'+x.id+'">Confirmar recepción</button></div></li>'; }).join("")+'</ul>';
+        '<div class="acc">'+(PUEDE.recibir?'<button class="btn pri" type="button" data-recibir="'+x.id+'">Confirmar recepción</button>':'<span class="estd warn">Recibe: '+esc(quienes("horno.recibir"))+' o un encargado de turno</span>')+'</div></li>'; }).join("")+'</ul>';
   var resto=ped.filter(function(x){ return x.estado!=="enviado"; }).reverse();
   if(resto.length) h+='<ul class="lst listo" style="margin-top:10px">'+resto.map(function(x){ var e=ESTADO[x.estado]||[x.estado,""], u=x.rec?x.rec.u:null;
       return '<li><div class="h"><b>'+(x.tipo==="solicitud"?"Solicitud":"Pedido")+' '+x.n+'</b><span class="estd '+e[1]+'">'+e[0]+'</span></div>'+
@@ -288,7 +293,7 @@ function pintarCierre(){
   h+='<div class="recgrid">'+P.EMP.map(function(e){ var n=PREC[e.id]||0;
     return '<div class="vcard'+(n?" on":"")+'"><span class="vn">'+esc(e.n)+'<small>'+Math.max(0,crudo[e.id])+' sin hornear</small></span><div class="paso"><button type="button" data-prec="'+e.id+'" data-d="-1"'+(n?'':' disabled')+' aria-label="Menos '+esc(e.n)+'">−</button><b class="num">'+n+'<small>'+(n?latas(n):"—")+'</small></b><button type="button" data-prec="'+e.id+'" data-d="1" aria-label="Más '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>';
   h+='<p class="info">Parte con lo que el sistema calcula sin hornear (lo precocido de ayer + lo recibido hoy − lo que entró al horno). Corrígelo con lo que cuentes.</p>';
-  h+='<div class="ctl-row"><button class="btn pri" type="button" id="reportar">'+(pr?"Corregir el reporte":"Reportar precocido para mañana")+' · '+sumaLatas(PREC)+' u.</button></div>';
+  h+='<div class="ctl-row">'+(PUEDE.precocido?'<button class="btn pri" type="button" id="reportar">'+(pr?"Corregir el reporte":"Reportar precocido para mañana")+' · '+sumaLatas(PREC)+' u.</button>':'<span class="estd warn">Reporta: '+esc(quienes("horno.precocido"))+' o un encargado de turno</span>')+'</div>';
   $("cierre").innerHTML=h;
 }
 
@@ -394,6 +399,9 @@ function alHorno(){
 addEventListener("storage",function(ev){ if(["ea_control","eapos_panaderia","eapos_horno","ea_pos","eapos_comandas"].indexOf(ev.key)>=0){ pintar(); } });
 if(E.canal) E.canal.addEventListener("message",function(){ pintar(); });
 document.addEventListener("input",function(ev){ if(ev.target.id==="solNota") guardarNotaSol(); if(ev.target.id==="espNombre"||ev.target.id==="espPagado") guardarEsp(); });
+/* Lo que el cargo no hace, no aparece. */
+if(!PUEDE.solicitar) $("btnSolicitar").hidden=true;
+if(!PUEDE.ajustes) $("ajustes").hidden=true;
 U.reloj($("reloj"));
 P.revisar(); vigilarSalidas(); pintar(true); U.revelar(document);
 setInterval(function(){ pintar(); },15000);

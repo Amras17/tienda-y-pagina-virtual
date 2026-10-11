@@ -98,6 +98,8 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
 <script src="../prueba/estandar.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
+/* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
+EAPOS.seguridad.guardia("panaderia");
 /* ====================================================================
    Panadería: prepara por latas (6 de pino y 2 de cada otra variedad cada
    día, salvo que se cambie el plan), cada lata trae 15. Manda el pedido al
@@ -106,7 +108,9 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
    se queda corto, pide más con una solicitud que aquí se confirma.
    ==================================================================== */
 var U=EA_UI, E=EAPOS, P=E.prod, LATA=P.LATA, ST=window.EA_ESTANDAR||{INS:{},FICHAS:{}};
-var VER_COSTOS=E.verNumeros(), EDITA=(function(){ var s=E.sesion(); return !s||!!(E.ROLES[s.r]&&E.ROLES[s.r].sistema); })();
+var VER_COSTOS=E.verNumeros(), EDITA=E.permite("pan.escandallo"), PEDIDOS=E.permite("pan.pedidos");
+/* Los pedidos al horno los envían las encargadas designadas (nucleo.js). */
+var DESIGNADAS=E.EQUIPO.filter(function(p){ return (p.x||[]).indexOf("pan.pedidos")>=0; }).map(function(p){ return p.n; }).join(" y ");
 document.documentElement.classList.toggle("sin-costos",!VER_COSTOS);
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
@@ -136,7 +140,7 @@ function pintarPlan(){
         '<div class="paso"><button type="button" data-env="'+e.id+'" data-d="-1" aria-label="Una lata menos de '+esc(e.n)+'"'+(n?'':' disabled')+'>−</button><b class="num">'+n+'<small>'+(n*LATA)+' u.</small></b><button type="button" data-env="'+e.id+'" data-d="1" aria-label="Una lata más de '+esc(e.n)+'">+</button></div></div>'; }).join("")+'</div>'+
     '<p class="info">'+(tot?'Se envían <b>'+latasTxt(tot)+'</b> = <b>'+tot*LATA+'</b> empanadas. El Horno las cuenta al recibirlas y confirma.':(suma(env)?'El plan de hoy ya está enviado. Si hace falta más, súmalo aquí y envíalo.':'Nada por enviar.'))+'</p>'+
     '<div class="ctl-row"><button class="btn sm" type="button" id="volverSug">Volver al sugerido</button></div>'+
-    '<button class="btn pri grande" type="button" id="enviar"'+(tot?'':' disabled')+'>'+(tot?'Enviar al horno · '+latasTxt(tot):'Nada por enviar')+'</button>';
+    (PEDIDOS?'<button class="btn pri grande" type="button" id="enviar"'+(tot?'':' disabled')+'>'+(tot?'Enviar al horno · '+latasTxt(tot):'Nada por enviar')+'</button>':'<p class="info"><b>Envían al horno:</b> '+esc(DESIGNADAS)+'.</p>');
   if(!$("diario").open||!$("defecto").innerHTML) $("defecto").innerHTML='<div class="vgrid">'+P.EMP.map(function(e){
       return '<div class="vcard"><span class="vn">'+esc(e.n)+'</span><div class="paso"><button type="button" data-def="'+e.id+'" data-d="-1" aria-label="Menos">−</button><b class="num">'+d[e.id]+'<small>latas</small></b><button type="button" data-def="'+e.id+'" data-d="1" aria-label="Más">+</button></div></div>'; }).join("")+'</div>'+
       '<p class="info">Lo que se prepara cada día por defecto: 6 latas de pino y 2 de cada otra variedad. Se guarda en este equipo.</p>';
@@ -156,8 +160,8 @@ function pintarSol(){
   $("sol").innerHTML=l.length? '<ul class="lst urg">'+l.map(function(x){ var ed=SOLED[x.id]||(SOLED[x.id]=Object.assign({},x.items));
       return '<li><div class="h"><b>Solicitud '+x.n+' · '+latasTxt(suma(ed))+'</b><span>'+hora(x.ts)+' · '+esc(x.por)+'</span></div>'+(x.nota?'<div style="font-size:13px"><i>'+esc(x.nota)+'</i></div>':'')+
         '<div class="vgrid">'+Object.keys(x.items).map(function(k){ var n=ed[k]||0; return '<div class="vcard on"><span class="vn">'+esc(P.nombre(k))+'<small>pidió '+latasTxt(x.items[k])+'</small></span><div class="paso"><button type="button" data-sol="'+x.id+'|'+k+'" data-d="-1"'+(n?'':' disabled')+' aria-label="Menos">−</button><b class="num">'+n+'<small>latas</small></b><button type="button" data-sol="'+x.id+'|'+k+'" data-d="1" aria-label="Más">+</button></div></div>'; }).join("")+'</div>'+
-        '<input class="search" type="text" id="mot-'+x.id+'" maxlength="140" placeholder="Si no se puede, por qué (opcional)">'+
-        '<div class="acc"><button class="btn pri" type="button" data-conf="'+x.id+'"'+(suma(ed)?'':' disabled')+'>Confirmar y enviar</button><button class="btn" type="button" data-rech="'+x.id+'">No se puede</button></div></li>'; }).join("")+'</ul>'
+        (PEDIDOS?'<input class="search" type="text" id="mot-'+x.id+'" maxlength="140" placeholder="Si no se puede, por qué (opcional)">'+
+        '<div class="acc"><button class="btn pri" type="button" data-conf="'+x.id+'"'+(suma(ed)?'':' disabled')+'>Confirmar y enviar</button><button class="btn" type="button" data-rech="'+x.id+'">No se puede</button></div>':'<p class="info">Responden: '+esc(DESIGNADAS)+'.</p>')+'</li>'; }).join("")+'</ul>'
     : '<p class="empty-s">Sin solicitudes por confirmar.</p>';
 }
 var EST={por_confirmar:["Por confirmar","warn"], enviado:["En camino al horno","warn"], recibido:["Recibido","ok"], rechazado:["No se pudo","crit"], anulado:["Anulado",""]};
@@ -169,7 +173,7 @@ function pintarPed(){
       if(x.rec){ var d=[]; for(var k in x.items){ var esp=x.items[k]*LATA, u=x.rec.u[k]||0; if(u!==esp) d.push(P.nombre(k)+" "+(u<esp?"−":"+")+Math.abs(u-esp)); } dif=d.length?'<br><span style="color:var(--warn)">Diferencias: '+esc(d.join(", "))+'</span>':'<br><span style="color:var(--ok)">Llegó completo</span>'; }
       return '<li><div class="h"><b>'+(x.tipo==="solicitud"?"Solicitud ":"Pedido ")+x.n+' · '+latasTxt(suma(x.items))+'</b><span class="estd '+e[1]+'">'+e[0]+'</span></div>'+
         '<div style="font-size:13px;color:var(--fg-2)">'+lista(x.items,true)+' · '+hora(x.ts)+(x.rec?' · recibido '+hora(x.rec.ts)+' por '+esc(x.rec.por):'')+dif+(x.estado==="rechazado"&&x.conf&&x.conf.motivo?'<br>'+esc(x.conf.motivo):'')+'</div>'+
-        (x.estado==="enviado"&&x.tipo==="plan"?'<div class="acc"><button class="btn sm" type="button" data-anular="'+x.id+'">Anular envío</button></div>':'')+'</li>'; }).join("")+'</ul>'
+        (x.estado==="enviado"&&x.tipo==="plan"&&PEDIDOS?'<div class="acc"><button class="btn sm" type="button" data-anular="'+x.id+'">Anular envío</button></div>':'')+'</li>'; }).join("")+'</ul>'
     : '<p class="empty-s">Todavía no se envía nada hoy.</p>';
 }
 
@@ -230,6 +234,7 @@ document.addEventListener("click",function(ev){
 document.addEventListener("input",function(ev){ var i=ev.target.getAttribute&&ev.target.getAttribute("data-ing"); if(i!=null&&ESCED){ ESCED.ing[+i][1]=Math.max(0,+ev.target.value||0); } });
 addEventListener("storage",function(ev){ if(["eapos_panaderia","eapos_horno"].indexOf(ev.key)>=0) pintar(); });
 if(E.canal) E.canal.addEventListener("message",function(){ pintar(); });
+if(!PEDIDOS) $("diario").hidden=true;
 U.reloj($("reloj")); pintar(); U.revelar(document);
 setInterval(pintar,20000);
 </script>

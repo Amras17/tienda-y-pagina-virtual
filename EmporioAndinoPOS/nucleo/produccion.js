@@ -32,6 +32,9 @@
   function hoy(){ return E.hoyLocal(); }
   function diaAntes(f){ var d=new Date(f+"T12:00:00"); d.setDate(d.getDate()-1); return E.hoyLocal(d); }
   function suma(o){ var n=0; for(var k in o) n+=(+o[k]||0); return n; }
+  /* Cada operación que cambia datos exige su acción (nucleo.js): sin ella, 403
+     y queda en la bitácora. */
+  function ok(accion, recurso){ return !E.seguridad || E.seguridad.exigir(accion, recurso); }
   function nid(p){ return p+Date.now().toString(36)+Math.floor(Math.random()*1296).toString(36); }
 
   /* ---------- vitrina y horno (ea_control) ---------- */
@@ -47,7 +50,7 @@
   function vitrina(c){ c=c||control(); var o={}; EMP.forEach(function(e){ var u=c.uni[e.k]; o[e.id]=typeof u==="number"?Math.max(0,u):null; }); return o; }
   function totalVitrina(c){ var v=vitrina(c), n=0; for(var k in v) n+=v[k]||0; return n; }
   /* Corrige a mano lo que hay en la vitrina (contar y anotar). */
-  function fijarVitrina(id, n){ var c=control(), e=POR_ID[id]; if(!e) return;
+  function fijarVitrina(id, n){ if(!ok("horno.operar","vitrina")) return {error:"403"}; var c=control(), e=POR_ID[id]; if(!e) return;
     c.uni[e.k]=Math.max(0, n|0); if(c.uni[e.k]>0) delete c.st[e.k]; else c.st[e.k]="off"; guardarControl(c); }
 
   /* ---------- registro del horno (eapos_horno) ---------- */
@@ -65,12 +68,13 @@
   function podar(o, n){ var ks=Object.keys(o).sort(); while(ks.length>n){ delete o[ks.shift()]; } }
   function guardarHorno(h){ podar(h.dias,21); guardar(K.horno,h); }
   function ajustesHorno(){ return hornoLog().cfg; }
-  function fijarAjustesHorno(cfg){ var h=hornoLog(); for(var k in cfg) if(+cfg[k]>=0) h.cfg[k]=+cfg[k]; guardarHorno(h); }
+  function fijarAjustesHorno(cfg){ if(!ok("horno.ajustes")) return {error:"403"}; var h=hornoLog(); for(var k in cfg) if(+cfg[k]>=0) h.cfg[k]=+cfg[k]; guardarHorno(h); }
   function tandas(f){ return diaHorno(hornoLog(),f).tandas; }
   function enHorno(c){ c=c||control(); var ahora=Date.now(), n=0; c.horno.forEach(function(x){ if(new Date(x.eta).getTime()>ahora) n+=x.n; }); return n; }
 
   /* Mete una tanda: varias variedades con el mismo reloj. items = {id: unidades}. */
   function hornear(items, min, por){
+    if(!ok("horno.operar","tanda")) return {error:"403"};
     var c=control(), h=hornoLog(), d=diaHorno(h), total=0, it={};
     for(var id in items){ var n=Math.max(0,Math.round(+items[id]||0)); if(n&&POR_ID[id]){ it[id]=n; total+=n; } }
     if(!total) return {error:"vacia"};
@@ -99,14 +103,15 @@
   }
   /* Saca ya una tanda (salió antes del reloj). */
   function sacarYa(tandaId){
+    if(!ok("horno.operar","sacar tanda")) return [];
     var c=control(), cambio=false; c.horno.forEach(function(x){ if(x.tanda===tandaId||x.id===tandaId){ x.eta=new Date(Date.now()-1000).toISOString(); cambio=true; } });
     if(cambio){ guardarControl(c); return revisar(); } return [];
   }
   /* Quién espera la próxima tanda: {id, ts, nombre, items:{id:n}|null, n, pagado, entregado}. */
-  function esperar(nombreCli, items, n, pagado){ var h=hornoLog(), d=diaHorno(h);
+  function esperar(nombreCli, items, n, pagado){ if(!ok("horno.operar","espera de tanda")) return null; var h=hornoLog(), d=diaHorno(h);
     var e={id:nid("w"), ts:new Date().toISOString(), nombre:String(nombreCli||"").slice(0,40), items:items||null, n:n||suma(items||{}), pagado:!!pagado, entregado:null};
     d.espera.push(e); guardarHorno(h); return e; }
-  function entregar(id){ var h=hornoLog(), d=diaHorno(h); d.espera.forEach(function(e){ if(e.id===id) e.entregado=new Date().toISOString(); }); guardarHorno(h); }
+  function entregar(id){ if(!ok("horno.operar","entregar")) return; var h=hornoLog(), d=diaHorno(h); d.espera.forEach(function(e){ if(e.id===id) e.entregado=new Date().toISOString(); }); guardarHorno(h); }
   function espera(){ return diaHorno(hornoLog()).espera.filter(function(e){ return !e.entregado; }); }
 
   /* ---------- panadería (eapos_panaderia) ---------- */
@@ -123,12 +128,13 @@
   /* Plan de cada día: 6 latas de pino y 2 de cada otra variedad, salvo que
      la Panadería lo cambie. */
   function planDefecto(){ var p=pan(), o={}; EMP.forEach(function(e){ var v=p.defecto[e.id]; o[e.id]=typeof v==="number"?v:(e.id==="e-pino"?6:2); }); return o; }
-  function fijarPlanDefecto(o){ var p=pan(); EMP.forEach(function(e){ if(typeof o[e.id]==="number") p.defecto[e.id]=Math.max(0,Math.min(40,Math.round(o[e.id]))); }); guardarPan(p); }
+  function fijarPlanDefecto(o){ if(!ok("pan.pedidos","plan de cada día")) return {error:"403"}; var p=pan(); EMP.forEach(function(e){ if(typeof o[e.id]==="number") p.defecto[e.id]=Math.max(0,Math.min(40,Math.round(o[e.id]))); }); guardarPan(p); }
   function pedidos(f){ return diaPan(pan(),f).pedidos.slice(); }
   /* tipo: "plan" (lo manda la Panadería) o "solicitud" (la pide el Horno por
      sobredemanda; queda "por_confirmar" hasta que la Panadería responde).
      items: {id: latas}. */
   function nuevoPedido(tipo, items, por, nota){
+    if(!ok(tipo==="solicitud"?"horno.solicitar":"pan.pedidos", tipo==="solicitud"?"solicitud a la panadería":"pedido al horno")) return null;
     var p=pan(), d=diaPan(p), it={}; for(var id in items){ var n=Math.max(0,Math.round(+items[id]||0)); if(n&&POR_ID[id]) it[id]=n; }
     if(!suma(it)) return null;
     var x={id:nid("p"), n:d.pedidos.length+1, tipo:tipo==="solicitud"?"solicitud":"plan", items:it, ts:new Date().toISOString(), por:por||"", nota:String(nota||"").slice(0,140),
@@ -137,20 +143,21 @@
   }
   function buscar(d,id){ return d.pedidos.filter(function(x){ return x.id===id; })[0]||null; }
   /* La Panadería confirma una solicitud (puede cambiar las latas) y la manda. */
-  function confirmar(id, items, por){ var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||x.estado!=="por_confirmar") return null;
+  function confirmar(id, items, por){ if(!ok("pan.pedidos","confirmar solicitud")) return null; var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||x.estado!=="por_confirmar") return null;
     if(items){ var it={}; for(var k in items){ var n=Math.max(0,Math.round(+items[k]||0)); if(n&&POR_ID[k]) it[k]=n; } if(suma(it)) x.items=it; }
     x.estado="enviado"; x.conf={ts:new Date().toISOString(), por:por||""}; guardarPan(p); return x; }
-  function rechazar(id, motivo, por){ var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||x.estado!=="por_confirmar") return null;
+  function rechazar(id, motivo, por){ if(!ok("pan.pedidos","rechazar solicitud")) return null; var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||x.estado!=="por_confirmar") return null;
     x.estado="rechazado"; x.conf={ts:new Date().toISOString(), por:por||"", motivo:String(motivo||"").slice(0,140)}; guardarPan(p); return x; }
   function anular(id, por){ var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||(x.estado!=="enviado"&&x.estado!=="por_confirmar")) return null;
+    if(!ok(x.tipo==="solicitud"?"horno.solicitar":"pan.pedidos","anular "+x.tipo)) return null;
     x.estado="anulado"; x.conf={ts:new Date().toISOString(), por:por||""}; guardarPan(p); return x; }
   /* El Horno (cocina) registra lo que llegó, en unidades, y confirma. */
-  function recibir(id, unidades, por){ var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||x.estado!=="enviado") return null;
+  function recibir(id, unidades, por){ if(!ok("horno.recibir","recepción del pedido")) return null; var p=pan(), d=diaPan(p), x=buscar(d,id); if(!x||x.estado!=="enviado") return null;
     var u={}; for(var k in x.items) u[k]=x.items[k]*LATA; if(unidades) for(var j in unidades){ if(POR_ID[j]) u[j]=Math.max(0,Math.round(+unidades[j]||0)); }
     x.estado="recibido"; x.rec={ts:new Date().toISOString(), por:por||"", u:u}; guardarPan(p); return x; }
   /* Precocido: lo que queda armado y sin hornear al cierre; parte del día siguiente. */
   function precocido(f){ return diaPan(pan(),f).precocido; }
-  function reportarPrecocido(items, por){ var p=pan(), d=diaPan(p), it={};
+  function reportarPrecocido(items, por){ if(!ok("horno.precocido")) return null; var p=pan(), d=diaPan(p), it={};
     EMP.forEach(function(e){ var n=Math.max(0,Math.round(+(items||{})[e.id]||0)); if(n) it[e.id]=n; });
     d.precocido={ts:new Date().toISOString(), por:por||"", items:it}; guardarPan(p); return d.precocido; }
   function precocidoAyer(){ return precocido(diaAntes(hoy())); }
@@ -202,6 +209,6 @@
     precocido:precocido, reportarPrecocido:reportarPrecocido, precocidoAyer:precocidoAyer, porHornear:porHornear, totalPorHornear:totalPorHornear,
     porRecibir:porRecibir, porConfirmar:porConfirmar, vendidasHoy:vendidasHoy, sugerencia:sugerencia,
     escandalloPropio:function(){ return pan().esc; },
-    fijarEscandallo:function(id, ing){ var p=pan(); if(ing) p.esc[id]=ing; else delete p.esc[id]; guardarPan(p); }
+    fijarEscandallo:function(id, ing){ if(!ok("pan.escandallo",id)) return {error:"403"}; var p=pan(); if(ing) p.esc[id]=ing; else delete p.esc[id]; guardarPan(p); }
   };
 })();
