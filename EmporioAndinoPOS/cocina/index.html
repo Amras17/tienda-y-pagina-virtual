@@ -52,6 +52,7 @@ details summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:va
 
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
 /* ====================================================================
@@ -89,9 +90,9 @@ function marcas(){ var m=leer("eapos_comandas",null); if(!m||m.fecha!==hoyISO())
 function estacionDe(id){ var p=EAPOS.producto(id), g=p?p.g:""; return g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; }
 /* Todas las comandas del día: una por venta y estación con algo que preparar. */
 function comandas(){
-  var pos=leer("ea_pos",{}), vs=(pos&&Array.isArray(pos.ventas))?pos.ventas:[], hoy=hoyISO(), out=[];
+  /* Ventas de hoy en la Caja y pedidos de la fila ya comandados (nucleo/fila.js). */
+  var vs=EAPOS.fila.comandables(), out=[];
   vs.forEach(function(v){
-    if(v.anulada || hoyISO(new Date(v.ts))!==hoy) return;
     var por={};
     (v.lineas||[]).forEach(function(l){ var e=estacionDe(l.id); (por[e]=por[e]||[]).push(l); });
     Object.keys(por).forEach(function(e){ if(e!=="cocina"&&e!=="barra") return; out.push({clave:v.id+"|"+e, venta:v, est:e, lineas:por[e]}); });

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Sandwich de la casa">
+  <defs>
+    <linearGradient id="f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9D5AE"/><stop offset="1" stop-color="#C9A36F"/></linearGradient>
+    <linearGradient id="pa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7A95F"/><stop offset="1" stop-color="#B9733A"/></linearGradient>
+    <linearGradient id="pb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D99650"/><stop offset="1" stop-color="#A9652F"/></linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#f)"/>
+  <path d="M0 236 Q200 214 400 236 V300 H0Z" fill="#8C5A33" opacity=".35"/>
+  <ellipse cx="200" cy="238" rx="150" ry="22" fill="#5A3519" opacity=".28"/>
+  <!-- pan de abajo -->
+  <path d="M62 196 Q200 222 338 196 L332 222 Q200 246 68 222Z" fill="url(#pb)"/>
+  <!-- hojas verdes -->
+  <path d="M58 188 q14 -16 30 -2 q12 -16 28 -2 q14 -16 30 -2 q14 -16 30 -2 q14 -16 30 -2 q14 -16 30 -2 q14 -16 30 -2 q14 -16 30 -2 q14 -16 30 0 l-4 14 Q200 214 64 202Z" fill="#6E9E3C"/>
+  <!-- tomate -->
+  <path d="M84 182 h70 q-6 14 -35 14 q-29 0 -35 -14Z M168 180 h72 q-6 15 -36 15 q-30 0 -36 -15Z M252 182 h66 q-6 14 -33 14 q-27 0 -33 -14Z" fill="#D9473A"/>
+  <!-- palta -->
+  <path d="M96 172 q40 -14 80 0 q-40 10 -80 0Z M214 170 q42 -14 84 0 q-42 10 -84 0Z" fill="#A9C25A"/>
+  <!-- carne / relleno -->
+  <path d="M70 166 Q200 140 330 166 Q326 180 200 184 Q74 180 70 166Z" fill="#8A4B2B"/>
+  <!-- queso fundido -->
+  <path d="M74 158 Q200 136 326 158 l-6 10 q-10 12 -14 0 q-8 16 -18 2 q-10 14 -18 0 q-12 18 -20 2 q-10 12 -18 0 q-12 16 -20 0 q-10 14 -18 0 q-12 16 -20 0 q-10 12 -18 0 q-12 16 -20 0 q-10 14 -18 0 q-12 14 -20 0 q-8 12 -16 0Z" fill="#F4C64E"/>
+  <!-- pan de arriba -->
+  <path d="M56 152 Q60 84 200 76 Q340 84 344 152 Q200 172 56 152Z" fill="url(#pa)"/>
+  <path d="M96 116 q8 -6 16 0 M146 98 q8 -6 16 0 M200 92 q8 -6 16 0 M250 100 q8 -6 16 0 M290 118 q8 -6 16 0 M170 124 q8 -6 16 0 M228 126 q8 -6 16 0" stroke="#F6D7A6" stroke-width="4" stroke-linecap="round" fill="none" opacity=".75"/>
+  <path d="M74 136 Q200 152 326 136" stroke="#9C5A28" stroke-width="3" fill="none" opacity=".35"/>
+</svg>

@@ -1,4 +1,4 @@
-# Prueba nº 1 del sistema · EmporioAndinoPOS 2.7
+# Prueba nº 1 del sistema · EmporioAndinoPOS 2.8
 
 Un turno real, en un solo Mac (ver `INSTALAR-MAC.md`), con una ventana por puesto. Lo que falle o
 se pueda mejorar se anota en **Retroalimentación** apenas pase, con el módulo y la prioridad.
@@ -8,8 +8,10 @@ se pueda mejorar se anota en **Retroalimentación** apenas pase, con el módulo 
 1. Abrir el sistema con `Iniciar EmporioAndinoPOS.command`.
 2. Dirección entra y corre **Verificación → Verificar**: todo en verde.
 3. Cada persona crea su PIN la primera vez (incluido el usuario **Panadería**).
-4. Abrir una ventana por puesto: **Caja**, **Horno**, **Panadería**, **Comandas de cocina**,
-   **Comandas de barra** (cada uno con la sesión de quien lo usa, o dirección para todos).
+4. Abrir una ventana por puesto: **Caja**, **Fila y mesas**, **Horno**, **Panadería**, **Comandas de
+   cocina**, **Comandas de barra** (cada uno con la sesión de quien lo usa, o dirección para todos).
+5. En **Fila y mesas → Pantalla de llamado**, abrir la pantalla en la tele o un segundo monitor y tocarla
+   una vez para activar el sonido. Revisar en *Ajustes de la fila* la cantidad de mesas.
 
 ## Recorrido
 
@@ -28,7 +30,13 @@ se pueda mejorar se anota en **Retroalimentación** apenas pase, con el módulo 
 | 11 | Panadería | Revisar **Escandallos** e **Insumos del plan de hoy** | Cantidades por unidad y por lata; costos solo para dueños |
 | 12 | Todos | 11:45 y 11:55; 21:15 y 21:25; 21:55 | Avisos de fin de desayuno, cierre de mesas y cocina, y cierre del local |
 | 13 | Horno | Al cierre: **Precocido para mañana → Reportar** | La Panadería lo ve mañana como punto de partida |
-| 14 | Caja | Cierre de turno y exportar el día | Respaldo del día descargado |
+| 14 | Fila | Anotar a un grupo que espera mesa con el **código** que le dio la Carta en su teléfono | Queda anotado con sus personas y su pedido |
+| 15 | Fila | Anotar a alguien para llevar y **Comandar** a mano con *Preparar ya* | Sale a Comandas antes de que llegue al mesón |
+| 16 | Fila | Liberar una mesa (**Se levantaron**) | Propone llamar al siguiente; la pantalla de llamado lo muestra y suena |
+| 17 | Fila | **Llegó: sentar** | La mesa queda ocupada y su pedido sale a Comandas |
+| 18 | Fila | **Cobrar en Caja** | La Caja lo toma con su modo; al registrar no se vuelve a comandar |
+| 19 | Caja | Revisar precios de la carta nueva (pino $4.000, latte $4.000, Catarpe $9.500) | Iguales a la carta física |
+| 20 | Caja | Cierre de turno y exportar el día | Respaldo del día descargado |
 
 ## Qué anotar en Retroalimentación
 

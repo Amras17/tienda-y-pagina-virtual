@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v2.7
+# EmporioAndinoPOS v2.8
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -30,6 +30,60 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Fila de espera y mesas (v2.8)
+
+Área **Fila y mesas** (`fila/index.html`, datos en `nucleo/fila.js`, clave `eapos_fila`, por día):
+
+- **Anotar en la fila:** nombre, personas, *para comer aquí* (espera mesa) o *para llevar*, y teléfono
+  opcional. Cada grupo recibe su número de turno.
+- **Comandar en la fila:** el pedido se toma mientras esperan, a mano (carta por grupos y buscador, con
+  los bloqueos de horario) o con el **código de la Carta**. Se elige *preparar ya* o *al sentarse / al
+  llegar al mesón*. Lo comandado sale a Comandas de cocina y de barra y a las comandas del Horno como
+  cualquier venta (`EAPOS.fila.comandables()`).
+- **Mesas:** tablero con las mesas libres, llamadas y ocupadas (12 por defecto, se ajusta). Al liberar una
+  mesa el sistema propone **llamar al siguiente**; la mesa queda guardada para ese grupo.
+- **Llamar:** la **pantalla de llamado** (`fila/llamado.html`, para una tele o un segundo monitor) muestra
+  el turno, el nombre y la mesa, y suena. Si dejó teléfono, un botón abre WhatsApp con el aviso. Si no
+  llega en el tiempo de espera (6 min por defecto), *No llegó* le hace perder el turno y llama al
+  siguiente para esa mesa. Para llevar: *Listo: llamar* y *Entregado*.
+- **Cobrar:** *Cobrar en Caja* deja el pedido en `eapos_traspaso`; la Caja lo toma apenas su cuenta está
+  vacía, con el modo del grupo. La venta guarda `fila` y, si el pedido ya se había comandado, no se vuelve
+  a comandar.
+- **Avisos:** la campana avisa *Mesa N libre: llama a Nº …* y cuando un llamado no llega. Después de las
+  21:30 solo se anota para llevar.
+
+### Código de la Carta (`nucleo/codigo-fila.js`)
+
+Al confirmar su pedido en la Carta, el cliente ve un **código para la fila** (por ejemplo
+`M20G 10W3 1C1M 5`). Lleva el destino, las personas y cada producto con su cantidad, y dos letras de
+control. No necesita internet ni servidor. Se escribe en *Anotar en la fila* o en *Comandar*; si una
+letra está mal, o el código viene de otra versión de la carta, el sistema lo dice en vez de leerlo mal.
+Las opciones (leche, sirope) no viajan en el código: se leen en el ticket del teléfono.
+
+La **copia de la Carta digital** (artifact *Carta Interactiva (Copy)*) es la carta para los clientes en la
+fila: tiene la galería, los servicios del pueblo e Instagram, y ahora los mismos productos, precios y
+código que el sistema.
+
+## Carta de junio de 2026 (v2.8)
+
+`nucleo/datos.js` lleva los precios de la carta física (`CARTAEMPORIOANDINO_COMPLETA.pdf`): 142
+productos.
+
+- **Nuevos:** Sandwiches (Catarpe, Solor, Checar, Poconche, Quitor, Condeduque), Bowl Asaí, Espresso
+  doble, Cappuccino vainilla y caramelo, Tetera de infusiones locales y Alfajor.
+- **Renombrados:** Bowl Tropical y Bowl Detox (ahora sobre yoghurt), Espresso simple, Latte vainilla y
+  caramelo, Latte caramel y chañar fríos, Café helado.
+- **Pastelería:** el precio de su tipo (torta $5.500, cheesecake $4.800, kuchen, pie o tarta $4.500,
+  alfajor $2.500). Muffins, galletones, mil hojas, tres leches y la mini torta no están en la carta: siguen
+  con el precio que se les dé en la Prueba.
+- **Extras en la Caja:** leche vegetal $300, café descafeinado $300 y miel $600, para bebidas y
+  desayunos (el sirope sigue con el precio de Ajustes).
+- **Una vez por equipo,** el sistema general pasa a una versión nueva, *Precios de la carta física de
+  junio de 2026*: quita los precios propios que tapaban a los nuevos, saca de la carta el café con leche y
+  deja cada cambio en el historial (`EAPOS.general`, clave `eapos_carta`).
+- Fichas estándar para todo lo nuevo (pan de sandwich, asaí, mantequilla de maní, lactonesa, hierbas de
+  infusión). En la Prueba, todo insumo de la carta parte con al menos un formato de compra.
 
 ## Horno, Panadería y comandas separadas (v2.7)
 
@@ -73,8 +127,8 @@ espera y ajustes; 21 días).
 | Cargo | Áreas |
 |---|---|
 | Dirección | Todas |
-| Encargados | Caja, Salón, Comandas de cocina y de barra, Horno, Carta |
-| Garzones | Caja, Salón, Comandas de cocina y de barra, Carta |
+| Encargados | Caja, Fila y mesas, Salón, Comandas de cocina y de barra, Horno, Carta |
+| Garzones | Caja, Fila y mesas, Salón, Comandas de cocina y de barra, Carta |
 | Barra | Comandas de barra, Salón, Carta |
 | Cocina y horno | Comandas de cocina, Horno, Salón, Carta |
 | Panadería (nuevo usuario) | Panadería, Carta |
@@ -297,7 +351,8 @@ fichas estándar de todos los productos, que el stock estándar alcance un día 
 escandallo, una hornada personalizada, un ingreso de mercadería y que nada de eso toque la Caja. Desde la
 v2.6 revisa también el horario a horas fijadas (fases a los 15 y 5 minutos, chip, campana, Caja a las
 21:27 y 21:40, Carta y la Prueba a las 21:30) y que la Caja quepa bajo el encabezado sin capas encima. Desde
-la v2.7, el recorrido Panadería → Horno → Vitrina completo, las comandas separadas y el Salón sin horno.
+la v2.7, el recorrido Panadería → Horno → Vitrina completo, las comandas separadas y el Salón sin horno. Desde la
+v2.8, la fila completa (código de la Carta, llamado, sentar, comandas y cobro sin duplicar) y los precios nuevos.
 
 El sistema general incluye además una verificación que corre en el navegador de cada equipo (sección
 para dirección). Cada módulo lleva en su `<head>` una línea que avisa al sistema general cuando se abre

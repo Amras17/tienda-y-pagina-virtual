@@ -904,6 +904,7 @@ const CATS={
  brus:{n:"Bruschettas",a:"cocina",k:"food",local:1},
  tos:{n:"Tostadas masa madre",a:"cocina",k:"food",local:1},
  ens:{n:"Ensaladas",a:"cocina",k:"food"},
+ san:{n:"Sandwiches",a:"cocina",k:"food"},
  bowl:{n:"Bowls",a:"cocina",k:"food"},
  pas:{n:"Pastelería de la casa",a:"cocina",k:"food"},
  cc:{n:"Café caliente",a:"barra",k:"drink"},
@@ -949,7 +950,9 @@ const PERFIL_11=[
 const norm=x=>String(x).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
 const P11={};PERFIL_11.forEach(r=>{P11[norm(r[0])]={w:r[3],v:!!r[5]}});
 /* Nombres de la carta única que en 1.1 se llamaban distinto */
-const ALIAS={"espresso":"espresso simple","cappuccino":"capuccino","caprese":"capresse","guatin":"guatin",
+const ALIAS={"espresso":"espresso simple","bowl tropical":"tropical","bowl detox":"detox","bowl asai":"asai","latte caramelo":"latte vainilla/caramelo","latte vainilla":"latte vainilla/caramelo",
+ "cappuccino vainilla":"capuccino vainilla/caramelo","cappuccino caramelo":"capuccino vainilla/caramelo","tetera de te de hoja de sabores":"tetera te de hoja sabores",
+ "tetera de infusiones locales":"tetera infusiones locales","latte caramel frio":"latte caramel/chanar","latte chanar frio":"latte caramel/chanar","cappuccino":"capuccino","caprese":"capresse","guatin":"guatin",
  "bowl antioxidante":"antioxidante","bowl energizante":"tropical","bowl desintoxicante":"detox",
  "tostadas con palta":"tostada palta","tostadas con huevos revueltos":"tostada huevos revueltos","tostadas con hummus":"tostada hummus, betarraga y oliva",
  "tostadas con mantequilla y tapenade":"tostada mantequilla y tapenade","tostadas con queso crema y mermelada":"tostada queso crema y mermelada",
@@ -961,12 +964,12 @@ const ALIAS={"espresso":"espresso simple","cappuccino":"capuccino","caprese":"ca
  "smoothie energizante":"smoothie","smoothie desintoxicante":"smoothie","gaseosas":"gaseosa","agua con o sin gas":"agua con/sin gas",
  "caramel":"latte vainilla/caramelo","vainilla":"latte vainilla/caramelo","cafe con leche":"capuccino"};
 const ALIAS_PAST={torta:"torta",minitorta:"torta",panqueque:"torta",cheese:"cheesecake",kuchen:"kuchen, pie, tarta",tarta:"kuchen, pie, tarta",
- treslech:"kuchen, pie, tarta",milhojas:"kuchen, pie, tarta",galleton:"alfajores",galleta:"alfajores",paquete:"alfajores",muffin:"alfajores"};
-const PESO_DEF={emp:2,des:1.5,bru:1.5,brus:1,tos:1.2,ens:1,bowl:1,pas:.5,cc:2,tc:1,cf:1.5,bf:1.5};
+ treslech:"kuchen, pie, tarta",milhojas:"kuchen, pie, tarta",alfajor:"alfajores",galleton:"alfajores",galleta:"alfajores",paquete:"alfajores",muffin:"alfajores"};
+const PESO_DEF={emp:2,des:1.5,bru:1.5,brus:1,tos:1.2,ens:1,bowl:1,san:1.5,pas:.5,cc:2,tc:1,cf:1.5,bf:1.5};
 function catSim(p){
   if(p.g==="emp")return"emp";
   if(p.g==="past")return"pas";
-  if(p.g==="coc")return p.sub==="desayunos"?"des":p.sub==="brunch"?"bru":p.sub==="bruschettas"?"brus":p.sub==="tostadas"?"tos":/^bowl/i.test(p.n)?"bowl":"ens";
+  if(p.g==="coc")return p.sub==="desayunos"?"des":p.sub==="brunch"?"bru":p.sub==="bruschettas"?"brus":p.sub==="tostadas"?"tos":p.sub==="sandwiches"?"san":/^bowl/i.test(p.n)?"bowl":"ens";
   const frio=p.t==="frio";
   if(p.sub==="cafe"||p.sub==="metodo")return frio?"cf":"cc";
   if(p.sub==="te"||p.sub==="choc")return frio?"bf":"tc";
@@ -1182,7 +1185,10 @@ function stockInicial(){
   const uso={};for(const sem of [20261009,20261016,20261023]){DEMAND=SEASONS.alta*DOW_F[5];seed=sem;S=newState(inf);while(S.t<CLOSE)step();
     for(const k in S.used)uso[k]=Math.max(uso[k]||0,S.used[k])}
   DEMAND=g.DEMAND;seed=g.seed;S=g.S;NET.online=g.on;NET.queue=g.q;
-  const st={},min={};for(const k in INS){const u=Math.max(0,uso[k]||0),f=INS[k].fmt;st[k]=u>0?Math.max(f,Math.ceil(u*1.6/f)*f):0;min[k]=u*.35}
+  /* Todo insumo que usa la carta parte con al menos un formato de compra,
+     aunque en los viernes de referencia no se haya pedido lo que lo lleva. */
+  const enCarta={};MENU.forEach(it=>(it.rec||[]).forEach(([k])=>enCarta[k]=1));
+  const st={},min={};for(const k in INS){const u=Math.max(0,uso[k]||0),f=INS[k].fmt;st[k]=u>0?Math.max(f,Math.ceil(u*1.6/f)*f):enCarta[k]?f:0;min[k]=u*.35}
   STOCK0={v:menuV,s:st,min,uso};return STOCK0}
 /*ENGINE-END*/
 

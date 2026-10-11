@@ -142,6 +142,7 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
 <script src="../nucleo/produccion.js"></script>
+<script src="../nucleo/fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
 /* ====================================================================
@@ -264,8 +265,8 @@ function pintarEspera(){
 
 /* ---------- comandas de horno (lo de empanadas y pastelería) ---------- */
 function marcas(){ var m=E.leer("eapos_comandas"); if(!m||m.fecha!==E.hoyLocal()) m={fecha:E.hoyLocal(), listo:{}}; return m; }
-function comandasHorno(){ var pos=E.leer("ea_pos")||{}, vs=Array.isArray(pos.ventas)?pos.ventas:[], f=E.hoyLocal(), m=marcas(), out=[];
-  vs.forEach(function(v){ if(v.anulada||E.hoyLocal(new Date(v.ts))!==f) return;
+function comandasHorno(){ var vs=E.fila.comandables(), m=marcas(), out=[];
+  vs.forEach(function(v){
     var l=(v.lineas||[]).filter(function(x){ var p=E.producto(x.id); return p&&(p.g==="emp"||p.g==="past"); });
     if(l.length&&!m.listo[v.id+"|horno"]) out.push({clave:v.id+"|horno", venta:v, lineas:l}); });
   return out; }

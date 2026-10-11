@@ -1,0 +1,357 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>/* EmporioAndinoPOS: deja que el lanzador escuche errores desde el inicio */try{if(parent!==window&&parent.__eaGancho)parent.__eaGancho(window)}catch(e){}</script></head><body>
+<title>Fila y mesas · EmporioAndinoPOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
+<link rel="stylesheet" href="../nucleo/emporio.css">
+<style>
+/* Fila y mesas: arriba el llamado en curso y el tablero de mesas (lo que se
+   mira cada vez que alguien se levanta); después la fila, con el pedido que
+   cada grupo deja comandado mientras espera, y el formulario para anotar. */
+.modulo{position:relative;z-index:1;padding-block:16px 40px;padding-inline:16px;display:flex;flex-direction:column;gap:14px;max-width:1500px;margin:0 auto}
+html.incrustado .solo{display:none}
+html.incrustado .modulo{padding-top:4px}
+.hgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:start}
+.s7{grid-column:span 7}.s5{grid-column:span 5}.s6{grid-column:span 6}.s12{grid-column:1/-1}
+/* Quiebres fuera del rango en que cambia el ancho al plegarse la barra del sistema. */
+@media (max-width:1000px){.s7,.s5{grid-column:1/-1}}
+@media (max-width:680px){.s6{grid-column:1/-1}}
+.hd .acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+/* llamado en curso */
+.llam{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;border-color:color-mix(in srgb,var(--warn) 60%,transparent)}
+.llam .num{font-family:var(--f-num);font-weight:800;font-size:clamp(48px,8vw,84px);line-height:.9;color:var(--warn);letter-spacing:-.03em}
+.llam b.n{display:block;font-family:var(--f-num);font-size:22px}
+.llam p{margin:4px 0 0;color:var(--fg-2)}
+.llam .acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* mesas */
+.mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.mesa{display:flex;flex-direction:column;gap:4px;padding:10px 11px;border-radius:14px;border:1.5px solid var(--stroke);background:var(--glass-2);min-height:96px;text-align:left;color:var(--fg);font:inherit;cursor:pointer}
+.mesa .mn{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.mesa .mn b{font-family:var(--f-num);font-size:20px}
+.mesa .mn span{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.mesa small{color:var(--fg-2);font-size:12px;line-height:1.3}
+.mesa.libre .mn span{color:var(--ok)}
+.mesa.libre{border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+.mesa.ocupada .mn span{color:var(--muted)}
+.mesa.llamada{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,var(--glass-2))}
+.mesa.llamada .mn span{color:var(--warn)}
+.mesa[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+.accm{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+/* fila */
+.lst{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.lst>li{border:1px solid var(--stroke);border-radius:14px;padding:10px 12px;background:var(--glass-2);display:flex;flex-direction:column;gap:7px}
+.lst>li.llamado{border-color:var(--warn)}
+.lst>li.sel{border-color:var(--accent)}
+.lst .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.lst .h b{font-family:var(--f-num);font-size:15px}
+.lst .h .tn{display:inline-grid;place-items:center;min-width:32px;height:26px;border-radius:9px;background:var(--glass);border:1px solid var(--stroke-2);font-family:var(--f-num);font-weight:800;margin-right:6px;padding:0 6px}
+.lst .h span.t{font-size:12px;color:var(--muted)}
+.lst .ped{font-size:13px;color:var(--fg-2)}
+.lst .acc{display:flex;gap:6px;flex-wrap:wrap}
+.estd{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px;border:1px solid var(--stroke-2)}
+.estd.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.estd.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 55%,transparent)}
+.estd.info{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+/* formulario */
+.form{display:grid;gap:10px}
+.form .fila2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.txt{width:100%;box-sizing:border-box;border:1px solid var(--stroke-2);background:var(--glass-2);border-radius:12px;padding:10px 12px;font:inherit;color:var(--fg)}
+.txt:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(64,224,208,.14)}
+.txt.codigo{font-family:var(--f-num);font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.paso{display:grid;grid-template-columns:34px 52px 34px;align-items:center;gap:4px}
+.paso button{height:34px;border-radius:10px;border:1px solid var(--stroke-2);background:var(--glass);color:var(--fg);font-size:18px;font-weight:800;cursor:pointer}
+.paso button:disabled{opacity:.35}
+.paso b{text-align:center;font-family:var(--f-num);font-size:18px}
+.lbl2{font-size:12px;font-weight:700;color:var(--fg-2)}
+.info{margin:0;font-size:13px;color:var(--fg-2);line-height:1.45}
+.info .mal{color:var(--crit);font-weight:700}
+.grande{width:100%;justify-content:center;padding:12px 16px;font-size:15px}
+/* comandar */
+.prods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:420px;overflow:auto;padding:2px}
+.prod{display:flex;flex-direction:column;gap:2px;text-align:left;padding:9px 10px;border-radius:12px;border:1.5px solid var(--stroke);background:var(--glass-2);color:var(--fg);font:inherit;cursor:pointer;min-width:0}
+.prod b{font-size:13px;line-height:1.25}
+.prod span{font-family:var(--f-num);font-size:13px;color:var(--fg-2)}
+.prod small{font-size:11px;color:var(--warn);font-weight:700}
+.prod.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--glass-2))}
+.prod:disabled{opacity:.45;cursor:not-allowed}
+.lineas{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lineas li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;font-size:13.5px;font-weight:600}
+.lineas li .num{font-family:var(--f-num);color:var(--fg-2)}
+.tot{display:flex;justify-content:space-between;font-family:var(--f-num);font-weight:800;font-size:16px;border-top:1px solid var(--stroke);padding-top:8px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#06201d;border-radius:10px}
+.seg button:disabled{opacity:.4;cursor:not-allowed}
+details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:var(--fg-2)}
+.ajgrid{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;align-items:center}
+</style>
+
+<div class="modulo">
+  <header class="top glass solo">
+    <div class="ttl"><div><h1>Fila y mesas</h1><p>Quién espera, qué pidió y a quién se llama cuando se libera una mesa</p></div></div>
+    <div class="ctl"><span class="clock num" id="reloj">--:--</span></div>
+  </header>
+
+  <article class="tile glass llam" id="tLlamado" hidden><div class="tc" id="llamado" style="display:contents"></div></article>
+
+  <div class="hgrid">
+    <article class="tile glass s7" id="tMesas"><div class="tc">
+      <div class="hd"><div><h2>Mesas</h2><p id="mesasSub"></p></div>
+        <div class="acc"><button class="btn sm" type="button" id="abrirPantalla">Pantalla de llamado</button></div></div>
+      <div class="mesas" id="mesas"></div>
+      <div id="mesaAcc"></div>
+    </div></article>
+
+    <article class="tile glass s5" id="tAnotar"><div class="tc">
+      <div class="hd"><div><h2>Anotar en la fila</h2><p>Para comer aquí (espera mesa) o para llevar</p></div></div>
+      <div class="form" id="anotar"></div>
+    </div></article>
+
+    <article class="tile glass s6" id="tEspera"><div class="tc">
+      <div class="hd"><div><h2>Esperan mesa</h2><p id="esperaSub"></p></div></div>
+      <ul class="lst" id="espera"></ul>
+    </div></article>
+
+    <article class="tile glass s6" id="tLlevar"><div class="tc">
+      <div class="hd"><div><h2>Para llevar</h2><p id="llevarSub"></p></div></div>
+      <ul class="lst" id="llevar"></ul>
+    </div></article>
+
+    <article class="tile glass s12" id="tComandar" hidden><div class="tc">
+      <div class="hd"><div><h2 id="comT">Comandar</h2><p id="comSub"></p></div>
+        <div class="acc"><button class="btn sm" type="button" id="comCerrar">Cerrar</button></div></div>
+      <div id="comandar"></div>
+    </div></article>
+
+    <article class="tile glass s12" id="tHechos"><div class="tc">
+      <details class="aj" id="hechos"><summary id="hechosT">Atendidos hoy</summary><ul class="lst" id="hechosL" style="margin-top:10px"></ul></details>
+      <details class="aj" id="ajustes" style="margin-top:10px"><summary>Ajustes de la fila</summary><div class="ajgrid" id="ajgrid"></div></details>
+    </div></article>
+  </div>
+</div>
+
+<script src="../nucleo/datos.js"></script>
+<script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/fila.js"></script>
+<script src="../nucleo/codigo-fila.js"></script>
+<script src="../nucleo/emporio.js"></script>
+<script>
+/* ====================================================================
+   Fila y mesas: se anota a quien llega (para comer aquí o para llevar),
+   se le toma el pedido mientras espera (a mano o con el código que arma en
+   la Carta), y cuando una mesa se libera se llama al siguiente: aparece en
+   la pantalla de llamado, suena y, si dejó teléfono, se le avisa por
+   WhatsApp. Lo comandado sale a Comandas; se cobra en la Caja.
+   ==================================================================== */
+var U=EA_UI, E=EAPOS, F=E.fila, C=EA_CODIGO;
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function hora(ts){ return U.hhmm(new Date(ts)); }
+function min(ts){ return Math.max(0,Math.floor((Date.now()-new Date(ts).getTime())/60000)); }
+function clp(n){ return "$"+Math.round(n||0).toLocaleString("es-CL"); }
+function quien(){ var s=E.sesion(); return s?s.n:""; }
+var CAT=E.catalogo(E.general()), POR={}; CAT.forEach(function(p){ POR[p.id]=p; });
+function total(l){ return (l||[]).reduce(function(a,x){ return a+(x.p||0)*x.q; },0); }
+function resumen(l){ return (l||[]).map(function(x){ return x.q+"× "+esc(x.n); }).join(" · "); }
+
+var NUEVO={nombre:"", pax:2, destino:"mesa", tel:"", codigo:""}, MESA=null, COM=null;
+
+/* ---------- llamado en curso ---------- */
+function pintarLlamado(){
+  var l=F.llamado(), t=$("tLlamado");
+  if(!l){ t.hidden=true; return; }
+  var g=F.grupos().filter(function(x){ return x.id===l.grupo; })[0]; if(!g){ t.hidden=true; return; }
+  var m=min(l.ts), cfg=F.estado().cfg, wa=F.whatsapp(g);
+  t.hidden=false;
+  $("llamado").innerHTML='<div class="num">'+g.num+'</div><div><span class="lbl">'+(l.destino==="llevar"?"Pedido listo · llamando":"Llamando a la mesa "+(l.mesa||""))+(l.vez>1?" · "+l.vez+"ª vez":"")+'</span>'+
+    '<b class="n">'+esc(g.nombre)+' · '+g.pax+(g.pax===1?" persona":" personas")+'</b><p>Hace '+m+' min'+(m>=cfg.espera?' · <b style="color:var(--warn)">pasó el tiempo de espera ('+cfg.espera+' min)</b>':'')+'</p>'+
+    '<div class="acc">'+(l.destino==="mesa"?'<button class="btn pri" type="button" data-sentar="'+g.id+'">Llegó: sentar en mesa '+(l.mesa||"")+'</button>':'<button class="btn pri" type="button" data-entregado="'+g.id+'">Entregado</button>')+
+    '<button class="btn" type="button" data-rellamar="'+g.id+'">Volver a llamar</button>'+(wa?'<a class="btn" href="'+wa+'" target="_blank" rel="noopener">WhatsApp</a>':'')+
+    (l.destino==="mesa"?'<button class="btn" type="button" data-nollega="'+g.id+'">No llegó: llamar al siguiente</button>':'')+'</div></div>';
+}
+
+/* ---------- mesas ---------- */
+function pintarMesas(){
+  var ms=F.mesas(), gs={}; F.grupos().forEach(function(g){ gs[g.id]=g; });
+  var lib=ms.filter(function(m){ return m.estado==="libre"; }).length, sig=F.siguiente();
+  $("mesasSub").textContent=lib+(lib===1?" libre":" libres")+" de "+ms.length+(sig?" · siguiente en la fila: Nº "+sig.num+" "+sig.nombre:"");
+  var primeraLibre=(ms.filter(function(m){ return m.estado==="libre"; })[0]||{}).n;
+  $("mesas").innerHTML=ms.map(function(m){ var g=m.grupo&&gs[m.grupo];
+    var et=m.estado==="libre"?"Libre":m.estado==="llamada"?"Llamada":"Ocupada";
+    var det=m.estado==="libre"?(sig&&m.n===primeraLibre?"Llamar a Nº "+sig.num:"Lista para sentar"):g?esc(g.nombre)+" · "+g.pax+" pers.<br>"+(m.estado==="llamada"?"llamada hace ":"hace ")+min(m.desde)+" min":"";
+    return '<button class="mesa '+m.estado+'" type="button" data-mesa="'+m.n+'" aria-pressed="'+(MESA===m.n)+'"><span class="mn"><b>'+m.n+'</b><span>'+et+'</span></span><small>'+det+'</small></button>'; }).join("");
+  var h="";
+  if(MESA){ var m=ms.filter(function(x){ return x.n===MESA; })[0], g=m&&m.grupo&&gs[m.grupo];
+    if(m.estado==="libre"){ var esp=F.esperanMesa().filter(function(x){ return x.estado==="esperando"; });
+      h='<p class="info" style="margin-top:12px"><b>Mesa '+m.n+' libre.</b> '+(esp.length?'¿A quién llamamos?':'Nadie espera mesa.')+'</p><div class="accm">'+
+        (esp.length?esp.slice(0,4).map(function(x,i){ return '<button class="btn'+(i?"":" pri")+'" type="button" data-llamar="'+x.id+'" data-m="'+m.n+'">'+(i?"":"Llamar al siguiente: ")+'Nº '+x.num+' '+esc(x.nombre)+' ('+x.pax+')</button>'; }).join(""):'')+
+        '<button class="btn" type="button" data-ocupar="'+m.n+'">Sentar a alguien que llegó</button></div>'; }
+    else if(m.estado==="llamada"&&g){ h='<div class="accm"><button class="btn pri" type="button" data-sentar="'+g.id+'">Llegó Nº '+g.num+' '+esc(g.nombre)+': sentar</button><button class="btn" type="button" data-nollega="'+g.id+'">No llegó</button></div>'; }
+    else if(g){ h='<div class="accm"><button class="btn warn" type="button" data-liberar="'+m.n+'">Se levantaron: liberar la mesa '+m.n+'</button>'+
+        (g.pedido?'<button class="btn" type="button" data-caja="'+g.id+'">Cobrar en Caja</button>':'<button class="btn" type="button" data-comandar="'+g.id+'">Comandar</button>')+'</div>'; }
+  }
+  $("mesaAcc").innerHTML=h;
+}
+
+/* ---------- la fila ---------- */
+function estadoChip(g){
+  if(g.estado==="llamado") return '<span class="estd warn">Llamado'+(g.mesa?" · mesa "+g.mesa:"")+'</span>';
+  if(g.estado==="listo") return '<span class="estd ok">Listo para entregar</span>';
+  return '<span class="estd">Espera '+min(g.ts)+' min</span>';
+}
+function itemGrupo(g){
+  var p=g.pedido, wa=F.whatsapp(g), libres=F.mesasLibres();
+  var ped=p? '<div class="ped">'+resumen(p.lineas)+' · <b>'+clp(total(p.lineas))+'</b> · '+(p.enviado?'<span class="estd ok">Comandado '+hora(p.enviado)+'</span>':'<span class="estd info">'+(g.destino==="mesa"?"Sale al sentarse":"Sin comandar")+'</span>')+(g.cobrado?' <span class="estd ok">Cobrado</span>':'')+'</div>' : '<div class="ped">Sin pedido todavía</div>';
+  var acc='<button class="btn sm" type="button" data-comandar="'+g.id+'">'+(p?"Cambiar pedido":"Comandar")+'</button>';
+  if(p&&!p.enviado) acc+='<button class="btn sm" type="button" data-enviar="'+g.id+'">Comandar ya</button>';
+  if(p&&!g.cobrado) acc+='<button class="btn sm" type="button" data-caja="'+g.id+'">Cobrar en Caja</button>';
+  if(g.destino==="mesa"){
+    if(g.estado==="esperando"&&libres.length) acc+='<button class="btn sm pri" type="button" data-llamar="'+g.id+'" data-m="'+libres[0].n+'">Llamar · mesa '+libres[0].n+'</button>';
+    if(g.estado==="llamado") acc+='<button class="btn sm pri" type="button" data-sentar="'+g.id+'">Llegó: sentar</button>';
+  } else {
+    if(g.estado==="esperando") acc+='<button class="btn sm pri" type="button" data-listo="'+g.id+'">Listo: llamar</button>';
+    else acc+='<button class="btn sm pri" type="button" data-entregado="'+g.id+'">Entregado</button>';
+  }
+  if(wa) acc+='<a class="btn sm" href="'+wa+'" target="_blank" rel="noopener">WhatsApp</a>';
+  acc+='<button class="btn sm" type="button" data-sefue="'+g.id+'">Se fue</button>';
+  return '<li class="'+(g.estado==="llamado"?"llamado":"")+(COM===g.id?" sel":"")+'"><div class="h"><b><span class="tn">'+g.num+'</span>'+esc(g.nombre)+'</b><span class="t">'+g.pax+(g.pax===1?" pers.":" pers.")+' · llegó '+hora(g.ts)+(g.tel?" · "+esc(g.tel):"")+'</span></div>'+
+    '<div>'+estadoChip(g)+'</div>'+ped+'<div class="acc">'+acc+'</div></li>';
+}
+function pintarFila(){
+  var em=F.esperanMesa(), ll=F.llevar(), mesas=E.mesasAbiertas();
+  $("esperaSub").textContent=em.length? em.length+(em.length===1?" grupo":" grupos")+" · "+em.reduce(function(a,g){ return a+g.pax; },0)+" personas"+(mesas?"":" · las mesas cerraron a las 21:30") : (mesas?"Nadie espera mesa":"Las mesas cerraron a las 21:30");
+  $("espera").innerHTML=em.map(itemGrupo).join("")||'<li class="empty-s" style="border:0;background:none;padding:0">Sin grupos esperando.</li>';
+  $("llevarSub").textContent=ll.length? ll.length+(ll.length===1?" pedido":" pedidos")+" en la fila" : "Nadie espera para llevar";
+  $("llevar").innerHTML=ll.map(itemGrupo).join("")||'<li class="empty-s" style="border:0;background:none;padding:0">Sin pedidos para llevar en la fila.</li>';
+  var hechos=F.grupos().filter(function(g){ return ["sentado","termino","entregado","se_fue"].indexOf(g.estado)>=0; }).reverse();
+  $("hechosT").textContent="Atendidos hoy ("+hechos.length+")";
+  if(!$("hechos").open||!$("hechosL").innerHTML) $("hechosL").innerHTML=hechos.map(function(g){ var E2={sentado:"En la mesa "+g.mesa,termino:"Terminó",entregado:"Entregado",se_fue:"Se fue"}[g.estado];
+    return '<li><div class="h"><b><span class="tn">'+g.num+'</span>'+esc(g.nombre)+'</b><span class="t">'+E2+' · esperó '+(g.sentado||g.fin?Math.max(0,Math.round((new Date(g.sentado||g.fin)-new Date(g.ts))/60000)):0)+' min</span></div>'+(g.pedido?'<div class="ped">'+resumen(g.pedido.lineas)+'</div>':'')+'</li>'; }).join("")||'<li class="empty-s" style="border:0;background:none;padding:0">Nadie todavía.</li>';
+}
+
+/* ---------- anotar ---------- */
+function pintarAnotar(){
+  var mesas=E.mesasAbiertas(); if(!mesas) NUEVO.destino="llevar";
+  $("anotar").innerHTML='<div class="seg" role="group" aria-label="Destino"><button type="button" data-dest="mesa" aria-pressed="'+(NUEVO.destino==="mesa")+'"'+(mesas?'':' disabled')+'>Para comer aquí</button><button type="button" data-dest="llevar" aria-pressed="'+(NUEVO.destino==="llevar")+'">Para llevar</button></div>'+
+    '<input class="txt" type="text" id="nNombre" maxlength="40" placeholder="Nombre (como lo vamos a llamar)" value="'+esc(NUEVO.nombre)+'">'+
+    '<div class="fila2"><span class="lbl2">Personas</span><div class="paso"><button type="button" data-pax="-1" aria-label="Una persona menos"'+(NUEVO.pax>1?'':' disabled')+'>−</button><b class="num">'+NUEVO.pax+'</b><button type="button" data-pax="1" aria-label="Una persona más">+</button></div></div>'+
+    '<input class="txt" type="tel" id="nTel" maxlength="16" placeholder="Teléfono para avisar por WhatsApp (opcional)" value="'+esc(NUEVO.tel)+'">'+
+    '<input class="txt codigo" type="text" id="nCodigo" maxlength="40" placeholder="Código de la Carta (opcional)" value="'+esc(NUEVO.codigo)+'" autocomplete="off" spellcheck="false">'+
+    '<p class="info" id="nInfo">'+(mesas?'Si el cliente armó su pedido en la Carta, escribe el código que le aparece: el pedido queda anotado.':'Las mesas cerraron a las 21:30: solo para llevar.')+'</p>'+
+    '<button class="btn pri grande" type="button" id="nAnotar">Anotar en la fila</button>';
+}
+function leerNuevo(){ var n=$("nNombre"), t=$("nTel"), c=$("nCodigo"); if(n) NUEVO.nombre=n.value; if(t) NUEVO.tel=t.value; if(c) NUEVO.codigo=c.value; }
+function lineasDeCodigo(r){ var out=[], faltan=[];
+  r.lineas.forEach(function(x){ var p=POR[x.id]; if(!p||p.p==null){ faltan.push(x.id); return; } out.push({id:p.id, n:p.n, q:x.q, p:p.p}); });
+  return {lineas:out, faltan:faltan}; }
+function anotar(){
+  leerNuevo(); var cod=NUEVO.codigo.trim(), r=null, ls=null;
+  if(cod){ r=C.leer(window.EA_DATOS,cod); if(r.error){ $("nInfo").innerHTML='<span class="mal">'+esc(r.error)+'</span>'; return; }
+    ls=lineasDeCodigo(r); NUEVO.destino=r.destino; if(r.personas) NUEVO.pax=r.personas; }
+  if(NUEVO.destino==="mesa"&&!E.mesasAbiertas()){ U.aviso("Las mesas cerraron a las 21:30"); return; }
+  var g=F.anotar({nombre:NUEVO.nombre, pax:NUEVO.pax, destino:NUEVO.destino, tel:NUEVO.tel}, quien());
+  if(ls&&ls.lineas.length) F.pedir(g.id, ls.lineas, g.destino==="llevar"?"ahora":"despues", cod);
+  U.aviso("Anotado: Nº "+g.num+" "+g.nombre+(ls&&ls.lineas.length?" · pedido de la Carta ("+ls.lineas.length+" productos)":"")+(ls&&ls.faltan.length?" · "+ls.faltan.length+" sin precio no entraron":""),5000);
+  NUEVO={nombre:"", pax:2, destino:E.mesasAbiertas()?"mesa":"llevar", tel:"", codigo:""};
+  if(!g.pedido&&!(ls&&ls.lineas.length)) abrirComandar(g.id);
+  pintar(true);
+}
+
+/* ---------- comandar ---------- */
+var PED=null, GRUPO_C="emp", BUSCA="";
+var GRUPOS=[["emp","Empanadas"],["coc","Cocina"],["bar","Barra"],["past","Pastelería"]];
+function abrirComandar(id){
+  var g=F.grupos().filter(function(x){ return x.id===id; })[0]; if(!g) return;
+  COM=id; PED={lineas:g.pedido?g.pedido.lineas.map(function(l){ return Object.assign({},l); }):[], cuando:g.pedido?g.pedido.cuando:(g.destino==="llevar"?"ahora":"despues"), codigo:""};
+  $("tComandar").hidden=false; pintarComandar(); pintarFila();
+  setTimeout(function(){ $("tComandar").scrollIntoView({block:"start"}); },30);
+}
+function pintarComandar(){
+  if(!COM){ $("tComandar").hidden=true; return; }
+  var g=F.grupos().filter(function(x){ return x.id===COM; })[0]; if(!g){ COM=null; $("tComandar").hidden=true; return; }
+  $("comT").textContent="Comandar · Nº "+g.num+" "+g.nombre;
+  $("comSub").textContent=(g.destino==="mesa"?"Espera mesa":"Para llevar")+" · "+g.pax+(g.pax===1?" persona":" personas")+(g.pedido&&g.pedido.enviado?" · ya comandado: los cambios no vuelven a cocina":"");
+  var q=BUSCA.trim().toLowerCase();
+  var lista=CAT.filter(function(p){ return q? p.n.toLowerCase().indexOf(q)>=0 : p.g===GRUPO_C; });
+  var h='<div class="form" style="margin-bottom:12px"><div class="fila2"><input class="txt codigo" type="text" id="cCodigo" placeholder="Código de la Carta" autocomplete="off" spellcheck="false" value="'+esc(PED.codigo)+'"><button class="btn" type="button" id="cLeer">Leer código</button></div></div>';
+  h+='<div class="ctl-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><div class="fchips" role="group" aria-label="Grupo">'+GRUPOS.map(function(x){ return '<button class="fchip" type="button" data-gc="'+x[0]+'" aria-pressed="'+(!q&&GRUPO_C===x[0])+'">'+x[1]+'</button>'; }).join("")+'</div>'+
+    '<input class="txt" style="max-width:260px" type="search" id="cBusca" placeholder="Buscar en la carta" value="'+esc(BUSCA)+'"></div>';
+  h+='<div class="prods">'+lista.map(function(p){ var en=PED.lineas.filter(function(l){ return l.id===p.id; })[0], fh=E.porHorario(p), sin=p.p==null;
+    return '<button class="prod'+(en?" on":"")+'" type="button" data-add="'+p.id+'"'+(fh||sin?' disabled':'')+'><b>'+esc(p.n)+(en?' · '+en.q:'')+'</b><span>'+(sin?"Sin precio":clp(p.p))+'</span>'+(fh?'<small>'+esc(fh)+'</small>':(p.loc&&g.destino==="llevar"?'<small>Solo en el local</small>':''))+'</button>'; }).join("")+'</div>';
+  h+='<div style="margin-top:14px"><span class="lbl">Pedido</span><ul class="lineas" style="margin-top:8px">'+(PED.lineas.map(function(l,i){
+      return '<li><span>'+esc(l.n)+'</span><span class="num">'+clp(l.p*l.q)+'</span><div class="paso"><button type="button" data-lq="'+i+'" data-d="-1" aria-label="Uno menos">−</button><b class="num">'+l.q+'</b><button type="button" data-lq="'+i+'" data-d="1" aria-label="Uno más">+</button></div></li>'; }).join("")||'<li><span class="empty-s">Toca los productos para agregarlos.</span></li>')+'</ul>'+
+    (PED.lineas.length?'<div class="tot" style="margin-top:8px"><span>Total</span><span>'+clp(total(PED.lineas))+'</span></div>':'')+'</div>';
+  if(!(g.pedido&&g.pedido.enviado)) h+='<div class="seg" role="group" aria-label="Cuándo se prepara" style="margin-top:12px"><button type="button" data-cuando="ahora" aria-pressed="'+(PED.cuando==="ahora")+'">Preparar ya</button><button type="button" data-cuando="despues" aria-pressed="'+(PED.cuando==="despues")+'">'+(g.destino==="mesa"?"Al sentarse":"Al llegar al mesón")+'</button></div>';
+  h+='<p class="info" style="margin-top:10px">'+(PED.cuando==="ahora"?'Sale a Comandas de cocina, barra y horno al guardar: estará listo cuando '+(g.destino==="mesa"?"se sienten":"lleguen al mesón")+'.':'Queda anotado; sale a Comandas '+(g.destino==="mesa"?"al sentarlos en la mesa":"con «Comandar ya»")+'.')+' Se cobra en la Caja.</p>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn pri" type="button" id="cGuardar"'+(PED.lineas.length?'':' disabled')+'>Guardar pedido · '+clp(total(PED.lineas))+'</button>'+(PED.lineas.length?'<button class="btn" type="button" id="cGuardarCaja">Guardar y cobrar en Caja</button>':'')+'</div>';
+  $("comandar").innerHTML=h;
+}
+function agregar(id){ var p=POR[id]; if(!p||p.p==null) return; var l=PED.lineas.filter(function(x){ return x.id===id; })[0]; if(l) l.q++; else PED.lineas.push({id:p.id, n:p.n, q:1, p:p.p}); pintarComandar(); }
+function guardarPedido(){ if(!PED.lineas.length) return null; var g=F.pedir(COM, PED.lineas, PED.cuando, PED.codigo);
+  U.aviso("Pedido de Nº "+g.num+" "+(g.pedido.enviado?"comandado":"anotado")+" · "+clp(total(PED.lineas))); return g; }
+
+/* ---------- ajustes ---------- */
+function pintarAjustes(){ if($("ajustes").open&&$("ajgrid").innerHTML) return; var c=F.estado().cfg;
+  $("ajgrid").innerHTML='<span class="lbl2">Mesas del salón</span><div class="paso"><button type="button" data-aj="mesas" data-d="-1" aria-label="Una mesa menos">−</button><b class="num">'+c.mesas+'</b><button type="button" data-aj="mesas" data-d="1" aria-label="Una mesa más">+</button></div>'+
+    '<span class="lbl2">Minutos para llegar al llamado</span><div class="paso"><button type="button" data-aj="espera" data-d="-1" aria-label="Un minuto menos">−</button><b class="num">'+c.espera+'</b><button type="button" data-aj="espera" data-d="1" aria-label="Un minuto más">+</button></div>'; }
+
+/* ---------- todo junto ---------- */
+function pintar(forzar){
+  var f=document.activeElement, escribe=f&&f.tagName==="INPUT";
+  pintarLlamado(); pintarMesas(); pintarFila(); pintarAjustes();
+  if(forzar||!(escribe&&$("tAnotar").contains(f))) pintarAnotar();
+  if(forzar||!(escribe&&$("tComandar").contains(f))) pintarComandar();
+}
+
+/* ---------- acciones ---------- */
+document.addEventListener("click",function(ev){
+  var b=ev.target.closest("button"); if(!b) return; var d=+b.getAttribute("data-d")||0;
+  if(b.dataset.mesa){ MESA=MESA===+b.dataset.mesa?null:+b.dataset.mesa; pintarMesas(); return; }
+  if(b.dataset.llamar){ var gl=F.llamar(b.dataset.llamar, +b.dataset.m||null); MESA=null; U.aviso("Llamando a Nº "+gl.num+" "+gl.nombre+(gl.mesa?" · mesa "+gl.mesa:""),5000); campana(); pintar(); return; }
+  if(b.dataset.rellamar){ var gr=F.grupos().filter(function(x){ return x.id===b.dataset.rellamar; })[0]; F.llamar(gr.id, gr.mesa); campana(); pintar(); return; }
+  if(b.dataset.sentar){ var gs=F.sentar(b.dataset.sentar); MESA=null; if(gs) U.aviso("Nº "+gs.num+" "+gs.nombre+" en la mesa "+gs.mesa+(gs.pedido?" · su pedido salió a Comandas":""),5000); pintar(); return; }
+  if(b.dataset.nollega){ var g0=F.grupos().filter(function(x){ return x.id===b.dataset.nollega; })[0], mm=g0&&g0.mesa; if(!g0) return;
+    /* Pierde el turno: queda en la fila, después de los que esperan. */
+    F.cerrarLlamado(); if(mm) F.liberar(mm); F.cambiar(g0.id,{estado:"esperando", mesa:null, post:Date.now()});
+    var sg=F.siguiente(); if(sg&&sg.id===g0.id) sg=null; MESA=null;
+    if(sg&&mm){ F.llamar(sg.id,mm); campana(); U.aviso("Llamando al siguiente: Nº "+sg.num+" "+sg.nombre+" · mesa "+mm,5000); }
+    else U.aviso("Nº "+g0.num+" vuelve a la fila"+(mm?" · la mesa "+mm+" queda libre":"")); pintar(); return; }
+  if(b.dataset.ocupar){ F.ocupar(+b.dataset.ocupar,2); MESA=null; pintar(); return; }
+  if(b.dataset.liberar){ var n=+b.dataset.liberar, sig=F.liberar(n); MESA=null;
+    if(sig&&E.mesasAbiertas()){ MESA=n; U.aviso("Mesa "+n+" libre · siguiente: Nº "+sig.num+" "+sig.nombre,5000); } else U.aviso("Mesa "+n+" libre"); pintar(); return; }
+  if(b.dataset.listo){ var gk=F.marcarListo(b.dataset.listo); F.llamar(gk.id,null); campana(); U.aviso("Llamando a Nº "+gk.num+" "+gk.nombre+": su pedido está listo",5000); pintar(); return; }
+  if(b.dataset.entregado){ F.retirar(b.dataset.entregado,"entregado"); pintar(); return; }
+  if(b.dataset.sefue){ var gf=F.retirar(b.dataset.sefue,"se_fue"); if(COM===gf.id) COM=null; U.aviso("Nº "+gf.num+" salió de la fila"); pintar(); return; }
+  if(b.dataset.comandar){ abrirComandar(b.dataset.comandar); return; }
+  if(b.dataset.enviar){ var ge=F.comandar(b.dataset.enviar); U.aviso("Pedido de Nº "+ge.num+" comandado"); pintar(); return; }
+  if(b.dataset.caja){ var t=F.aCaja(b.dataset.caja); if(t){ U.aviso("Pedido de Nº "+t.num+" enviado a la Caja para cobrar"); E.irA("caja","../"); } return; }
+  if(b.dataset.dest){ leerNuevo(); NUEVO.destino=b.dataset.dest; pintarAnotar(); return; }
+  if(b.dataset.pax){ leerNuevo(); NUEVO.pax=Math.max(1,Math.min(30,NUEVO.pax+(+b.dataset.pax))); pintarAnotar(); return; }
+  if(b.id==="nAnotar"){ anotar(); return; }
+  if(b.id==="abrirPantalla"){ var w=window.open("llamado.html","ea-llamado"); if(!w) U.aviso("El navegador bloqueó la ventana: permite ventanas emergentes para este sitio"); return; }
+  if(b.id==="comCerrar"){ COM=null; PED=null; pintar(); return; }
+  if(b.dataset.gc){ GRUPO_C=b.dataset.gc; BUSCA=""; pintarComandar(); return; }
+  if(b.dataset.add){ agregar(b.dataset.add); return; }
+  if(b.dataset.lq){ var l=PED.lineas[+b.dataset.lq]; l.q+=d; if(l.q<=0) PED.lineas.splice(+b.dataset.lq,1); pintarComandar(); return; }
+  if(b.dataset.cuando){ PED.cuando=b.dataset.cuando; pintarComandar(); return; }
+  if(b.id==="cLeer"){ var cc=$("cCodigo").value, r=C.leer(window.EA_DATOS,cc); if(r.error){ U.aviso(r.error,5000); return; }
+    var ls=lineasDeCodigo(r); PED.codigo=cc; ls.lineas.forEach(function(x){ var l=PED.lineas.filter(function(y){ return y.id===x.id; })[0]; if(l) l.q+=x.q; else PED.lineas.push(x); });
+    U.aviso(ls.lineas.length+" productos desde la Carta"+(ls.faltan.length?" · "+ls.faltan.length+" sin precio no entraron":"")); pintarComandar(); return; }
+  if(b.id==="cGuardar"){ if(guardarPedido()){ COM=null; PED=null; } pintar(); return; }
+  if(b.id==="cGuardarCaja"){ var gg=guardarPedido(); if(gg){ var tt=F.aCaja(gg.id); COM=null; PED=null; pintar(); if(tt) E.irA("caja","../"); } return; }
+  if(b.dataset.aj){ var c=F.estado().cfg, nv={}; nv[b.dataset.aj]=c[b.dataset.aj]+d; F.ajustes(nv); $("ajgrid").innerHTML=""; pintar(); return; }
+});
+document.addEventListener("input",function(ev){ if(ev.target.id==="cBusca"){ BUSCA=ev.target.value; var pos=ev.target.selectionStart; pintarComandar(); var i=$("cBusca"); i.focus(); try{ i.setSelectionRange(pos,pos); }catch(e){} }
+  if(ev.target.id==="cCodigo"&&PED) PED.codigo=ev.target.value; });
+document.addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&ev.target.id==="nCodigo"){ anotar(); } if(ev.key==="Enter"&&ev.target.id==="cCodigo"){ $("cLeer").click(); } });
+
+var AC=null;
+function campana(){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume();
+  [[660,0],[880,.18],[1046,.36]].forEach(function(n){ var o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+n[1];
+    o.frequency.value=n[0]; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.18,t+.02); g.gain.exponentialRampToValueAtTime(.0001,t+.3);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+.35); }); }catch(e){} }
+
+addEventListener("storage",function(ev){ if(ev.key==="eapos_fila"||ev.key==="eapos_cfg"){ if(ev.key==="eapos_cfg"){ CAT=E.catalogo(E.general()); POR={}; CAT.forEach(function(p){ POR[p.id]=p; }); } pintar(); } });
+if(E.canal) E.canal.addEventListener("message",function(){ pintar(); });
+U.reloj($("reloj")); pintar(true); U.revelar(document);
+setInterval(function(){ pintar(); },20000);
+</script>
+</body></html>

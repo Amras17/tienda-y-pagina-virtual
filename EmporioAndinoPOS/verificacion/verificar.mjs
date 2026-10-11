@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 2.7.
+// Agente de verificación de EmporioAndinoPOS 2.8.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -21,7 +21,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const TIPOS = { ".html": "text/html; charset=utf-8", ".webp": "image/webp", ".js": "text/javascript", ".json": "application/json", ".css": "text/css" };
+const TIPOS = { ".html": "text/html; charset=utf-8", ".webp": "image/webp", ".js": "text/javascript", ".json": "application/json", ".css": "text/css", ".svg": "image/svg+xml" };
 const servidor = http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
   if (p.endsWith("/")) p += "index.html";
@@ -85,15 +85,15 @@ async function probarGeneral(vista) {
   await sesion(page, "Constanza Veliz");
   anota(M, "ingreso con PIN nuevo (crear y confirmar)", await page.locator("#app").isVisible());
   const nav = await page.locator("#nav a").evaluateAll(a => a.map(x => x.dataset.v));
-  anota(M, "dirección ve todas las áreas", nav.join(",") === "inicio,caja,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro", nav.join(","));
-  anota(M, "dashboard con áreas del local", await page.locator("#hub .acard").count() === 11);
+  anota(M, "dirección ve todas las áreas", nav.join(",") === "inicio,caja,fila,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro", nav.join(","));
+  anota(M, "dashboard con áreas del local", await page.locator("#hub .acard").count() === 12);
   await navA(page, "verificacion");
   await page.locator("#btnVerificar").click();
   await page.waitForSelector("#diagEstado[data-fin]", { timeout: 90000 }).catch(() => {});
   const fallas = await page.locator("#diagLista li.falla").count(), total = await page.locator("#diagLista li:not(.grupo)").count();
   const detalle = await page.locator("#diagLista li.falla, #diagLista li.aviso").evaluateAll(ls => ls.map(l => l.innerText.replace(/\s+/g, " ")).join(" | "));
   anota(M, "autodiagnóstico interno", total > 0 && fallas === 0, `${total - fallas}/${total}` + (detalle ? " · " + detalle : ""));
-  for (const m of ["caja", "salon", "cocina", "barra", "horno", "panaderia", "carta", "prueba"]) {
+  for (const m of ["caja", "fila", "salon", "cocina", "barra", "horno", "panaderia", "carta", "prueba"]) {
     await navA(page, m); await page.waitForTimeout(900);
     const ok = await page.locator(`section[data-view="${m}"]`).isVisible();
     const fr = page.frameLocator(`section[data-view="${m}"] iframe`);
@@ -109,7 +109,7 @@ async function probarGeneral(vista) {
       anota(M, "menú de la Caja visible y usable dentro del sistema", menu.ok, menu.n + " secciones");
     }
   }
-  for (const v of ["caja", "salon", "cocina", "barra", "horno", "panaderia", "carta", "prueba", "verificacion", "versiones", "retro"]) {
+  for (const v of ["caja", "fila", "salon", "cocina", "barra", "horno", "panaderia", "carta", "prueba", "verificacion", "versiones", "retro"]) {
     await navA(page, v); await page.waitForTimeout(150);
     const pn = await page.evaluate(v => { const e = document.querySelector(`[data-pn="${v}"]`); return e ? { tono: e.dataset.tono, tit: (e.querySelector(".pn-tit") || {}).textContent || "", k: e.querySelectorAll(".pn-k").length } : null; }, v);
     anota(M, `resumen arriba de ${v}`, !!pn && !!pn.tit && pn.k >= 3 && ["ok", "warn", "crit", "info"].includes(pn.tono), JSON.stringify(pn));
@@ -145,7 +145,9 @@ async function probarCajaYComandas(vista) {
   const caja = await ctx.newPage();
   await caja.goto(BASE + "caja/index.html"); await caja.waitForTimeout(600);
   anota(M, "la Caja toma al responsable de la sesión", (await caja.locator("#selResp").inputValue()) === "Andrea Rodriguez");
-  anota(M, "catálogo de la carta única", await caja.evaluate(() => CAT.length) === 130);
+  anota(M, "catálogo de la carta única", await caja.evaluate(() => CAT.length) === 141);
+  const precios = await caja.evaluate(() => ({ pino: CAT.find(p => p.id === "Ee-pino").p, latte: CAT.find(p => p.id === "latte").p, catarpe: (CAT.find(p => p.id === "catarpe") || {}).p, cheese: (CAT.find(p => p.sub === "cheese") || {}).p, ccl: !!CAT.find(p => p.id === "cafeconleche") }));
+  anota(M, "precios de la carta de junio 2026 (pino $4.000, latte $4.000, Catarpe $9.500, cheesecake $4.800)", precios.pino === 4000 && precios.latte === 4000 && precios.catarpe === 9500 && precios.cheese === 4800 && !precios.ccl, JSON.stringify(precios));
   await caja.evaluate(() => { [CAT.find(p => p.id === "Ee-pino"), CAT.find(p => p.id === "cappuccino"), CAT.find(p => p.id === "licancabur")].forEach(agregar); });
   await caja.evaluate(() => { pagoActivo = "debito"; pintarPagos(); pintarCuenta(); });
   await caja.locator("#btnRegistrar").click(); await caja.waitForTimeout(300);
@@ -347,6 +349,63 @@ async function probarCarta(vista) {
   await ctx.close();
 }
 
+// ---------- Fila de espera y mesas ----------
+async function probarFila(vista) {
+  const M = `Fila y mesas · ${vista}`;
+  const { ctx, errores, caidos } = await contexto(vista);
+  const page = await ctx.newPage();
+  await sesion(page, "Andrea Rodriguez");
+  // El cliente arma su pedido en la Carta y le aparece el código para la fila
+  const carta = await ctx.newPage(); await carta.goto(BASE + "carta/index.html"); await carta.waitForTimeout(900);
+  const cod = await carta.evaluate(() => { lang = "es"; pedido = [{ k: "emp", id: "e-pino", q: 2 }, { k: "beb", id: "latte", q: 1 }]; cfg.modo = "local"; cfg.personas = 2; cfg.hecho = 1; entrar("ticket", null, "Pedido");
+    const e = document.getElementById("codigoFila"); return e ? e.textContent : ""; });
+  anota(M, "la Carta muestra el código para la fila", /^[0-9A-Z ]{8,}$/.test(cod), cod);
+  const fila = await ctx.newPage(); await fila.goto(BASE + "fila/index.html"); await fila.waitForTimeout(700);
+  await fila.locator("#nNombre").fill("Juan"); await fila.locator("#nCodigo").fill(cod.toLowerCase());
+  await fila.locator("#nAnotar").click(); await fila.waitForTimeout(250);
+  const g1 = await fila.evaluate(() => { const g = EAPOS.fila.grupos()[0]; return { pax: g.pax, destino: g.destino, lineas: g.pedido && g.pedido.lineas.length, total: g.pedido && g.pedido.lineas.reduce((a, l) => a + l.p * l.q, 0), enviado: !!(g.pedido && g.pedido.enviado) }; });
+  anota(M, "anota con el código de la Carta: mesa, 2 personas y su pedido", g1.pax === 2 && g1.destino === "mesa" && g1.lineas === 2 && g1.total === 12000 && !g1.enviado, JSON.stringify(g1));
+  // Otro grupo para llevar, comandado a mano y preparado ya
+  await fila.locator('[data-dest="llevar"]').click(); await fila.locator("#nNombre").fill("Leo"); await fila.locator("#nAnotar").click(); await fila.waitForTimeout(250);
+  await fila.locator('[data-gc="bar"]').click(); await fila.locator('[data-add="cappuccino"]').click();
+  await fila.locator('[data-cuando="ahora"]').click(); await fila.locator("#cGuardar").click(); await fila.waitForTimeout(250);
+  const bar = await ctx.newPage(); await bar.goto(BASE + "cocina/index.html?est=barra"); await bar.waitForTimeout(600);
+  anota(M, "lo comandado en la fila llega a Comandas de barra", await bar.locator("#tablero .comanda").count() === 1 && /Fila · Nº 2 Leo/.test(await bar.locator("#tablero").innerText()));
+  // Ana espera mesa; todas las mesas ocupadas menos una
+  await fila.evaluate(() => { const F = EAPOS.fila; F.anotar({ nombre: "Ana", pax: 4, destino: "mesa" }); const n = F.estado().cfg.mesas; for (let i = 2; i <= n; i++) F.ocupar(i, 2); pintar(true); });
+  await fila.locator('#espera [data-llamar]').first().click(); await fila.waitForTimeout(250);
+  const ll = await fila.evaluate(() => EAPOS.fila.llamado());
+  anota(M, "llama al siguiente (Juan) a la mesa libre", !!ll && ll.nombre === "Juan" && ll.mesa === 1, JSON.stringify(ll));
+  const pant = await ctx.newPage(); await pant.goto(BASE + "fila/llamado.html"); await pant.waitForTimeout(500);
+  const txt = await pant.locator("#centro").innerText();
+  anota(M, "la pantalla de llamado muestra el turno y la mesa", /Juan/.test(txt) && /Mesa 1/.test(txt) && /\b1\b/.test(txt), txt.replace(/\s+/g, " "));
+  await fila.locator('#tLlamado [data-sentar]').click(); await fila.waitForTimeout(250);
+  await bar.reload(); await bar.waitForTimeout(500);
+  const coc = await ctx.newPage(); await coc.goto(BASE + "horno/index.html"); await coc.waitForTimeout(600);
+  anota(M, "al sentarse, el pedido de la fila sale a Comandas", await bar.locator("#tablero .comanda").count() === 2 && await coc.locator("#comandas .cmdt").count() === 1);
+  // Se levantan de la mesa 1: el sistema propone llamar a Ana
+  await fila.evaluate(() => { MESA = 1; pintarMesas(); }); await fila.locator('[data-liberar="1"]').click(); await fila.waitForTimeout(250);
+  const sig = await fila.evaluate(() => ({ sig: (EAPOS.fila.siguiente() || {}).nombre, boton: !!document.querySelector('#mesaAcc [data-llamar]'), libre: EAPOS.fila.mesasLibres().map(m => m.n) }));
+  anota(M, "al liberar la mesa propone llamar al siguiente", sig.sig === "Ana" && sig.boton && sig.libre.includes(1), JSON.stringify(sig));
+  await navA(page, "fila"); await page.waitForTimeout(900);
+  await page.locator("#avisosBtn").click(); await page.waitForTimeout(200);
+  const av = await page.evaluate(() => [...document.querySelectorAll(".avisos .av-item")].map(a => a.innerText.split("\n")[0]));
+  anota(M, "aviso: mesa libre, llama a Nº 3 Ana", av.some(t => /Mesa 1 libre: llama a Nº 3 Ana/.test(t)), JSON.stringify(av));
+  await page.keyboard.press("Escape");
+  // Cobrar en la Caja sin volver a comandar
+  await fila.evaluate(() => EAPOS.fila.aCaja(EAPOS.fila.grupos()[0].id));
+  const caja = await ctx.newPage(); await caja.goto(BASE + "caja/index.html"); await caja.waitForTimeout(700);
+  const cj = await caja.evaluate(() => ({ n: carro.length, total: totalCarro(), modo: modoActivo, ref: filaRef && filaRef.nombre }));
+  anota(M, "la Caja toma el pedido de la fila para cobrarlo", cj.n === 2 && cj.total === 12000 && cj.ref === "Juan", JSON.stringify(cj));
+  await caja.evaluate(() => { pagoActivo = "debito"; pintarPagos(); pintarCuenta(); }); await caja.locator("#btnRegistrar").click(); await caja.waitForTimeout(300);
+  const v = await caja.evaluate(() => { const v = POS.ventas[POS.ventas.length - 1]; return { fila: v.fila, cobrado: !!EAPOS.fila.grupos()[0].cobrado, comandas: EAPOS.fila.comandables().length }; });
+  anota(M, "venta registrada sin duplicar la comanda", !!v.fila && v.fila.comandado && v.cobrado && v.comandas === 2, JSON.stringify(v));
+  await cierre(M + " (fila)", fila, [], []);
+  await cierre(M + " (llamado)", pant, [], []);
+  await cierre(M, page, errores, caidos);
+  await ctx.close();
+}
+
 // ---------- Producción: Panadería → Horno → Vitrina ----------
 async function probarProduccion(vista) {
   const M = `Producción · ${vista}`;
@@ -500,11 +559,12 @@ for (const v of Object.keys(VISTAS)) {
   await probarSalon(v);
   await probarHorario(v);
   await probarProduccion(v);
+  await probarFila(v);
 }
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "2.7", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "2.8", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);

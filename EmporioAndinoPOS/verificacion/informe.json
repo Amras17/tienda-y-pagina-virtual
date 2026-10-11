@@ -1,7 +1,7 @@
 {
-  "version": "2.7",
-  "fecha": "2026-10-07T02:15:33.178Z",
-  "total": 286,
+  "version": "2.8",
+  "fecha": "2026-10-11T03:28:39.698Z",
+  "total": 330,
   "fallas": 0,
   "resultados": [
     {
@@ -32,7 +32,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
+      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -44,7 +44,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": "16/16 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
+      "detalle": "17/17 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -57,6 +57,12 @@
       "prueba": "menú de la Caja visible y usable dentro del sistema",
       "ok": true,
       "detalle": "6 secciones"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre fila como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -108,6 +114,12 @@
     },
     {
       "modulo": "Sistema general · escritorio",
+      "prueba": "resumen arriba de fila",
+      "ok": true,
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Sin fila\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
       "prueba": "resumen arriba de salon",
       "ok": true,
       "detalle": "{\"tono\":\"ok\",\"tit\":\"Toda la carta disponible\",\"k\":4}"
@@ -140,13 +152,13 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "resumen arriba de carta",
       "ok": true,
-      "detalle": "{\"tono\":\"ok\",\"tit\":\"Carta vigente · versión 1\",\"k\":4}"
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Carta vigente · versión 2\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · escritorio",
       "prueba": "resumen arriba de prueba",
       "ok": true,
-      "detalle": "{\"tono\":\"ok\",\"tit\":\"Igual a la versión 1\",\"k\":4}"
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Igual a la versión 2\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -158,7 +170,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "resumen arriba de versiones",
       "ok": true,
-      "detalle": "{\"tono\":\"ok\",\"tit\":\"Versión 1 vigente\",\"k\":4}"
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Versión 2 vigente\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -219,6 +231,12 @@
       "prueba": "catálogo de la carta única",
       "ok": true,
       "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · escritorio",
+      "prueba": "precios de la carta de junio 2026 (pino $4.000, latte $4.000, Catarpe $9.500, cheesecake $4.800)",
+      "ok": true,
+      "detalle": "{\"pino\":4000,\"latte\":4000,\"catarpe\":9500,\"cheese\":4800,\"ccl\":false}"
     },
     {
       "modulo": "Caja y Comandas · escritorio",
@@ -296,7 +314,7 @@
       "modulo": "Caja y Comandas · escritorio",
       "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,barra,carta,retro"
+      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,retro"
     },
     {
       "modulo": "Caja y Comandas · escritorio",
@@ -362,7 +380,7 @@
       "modulo": "Prueba y aplicación · escritorio",
       "prueba": "aplicar crea una versión nueva",
       "ok": true,
-      "detalle": "{\"v\":2,\"pino\":3700,\"fuera\":[\"Ee-napolitana\"],\"borrador\":false}"
+      "detalle": "{\"v\":3,\"pino\":3700,\"fuera\":[\"cafeconleche\",\"Ee-napolitana\"],\"borrador\":false}"
     },
     {
       "modulo": "Prueba y aplicación · escritorio",
@@ -416,7 +434,7 @@
       "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "un evento en un día sube su demanda",
       "ok": true,
-      "detalle": "{\"antes\":1338400,\"ev\":\"evento\",\"rev\":1819100}"
+      "detalle": "{\"antes\":1367700,\"ev\":\"evento\",\"rev\":2308800}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
@@ -434,7 +452,7 @@
       "modulo": "Prueba · contexto y pedidos · escritorio",
       "prueba": "para llevar sin vitrina: cobra y espera la tanda",
       "ok": true,
-      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":17}"
+      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":15}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · escritorio",
@@ -470,13 +488,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "todos los productos con ficha y escandallo estándar",
       "ok": true,
-      "detalle": "{\"fichas\":130,\"total\":130,\"pino\":690,\"insumos\":105,\"filas\":130}"
+      "detalle": "{\"fichas\":142,\"total\":142,\"pino\":690,\"insumos\":109,\"filas\":142}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "el stock estándar alcanza un día de temporada alta",
       "ok": true,
-      "detalle": "{\"sin\":0,\"fc\":0.2442517835136405}"
+      "detalle": "{\"sin\":0,\"fc\":0.2425281568166377}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -488,13 +506,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":3562.25,\"vit\":5},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2867}}"
+      "detalle": "{\"h0\":{\"pollo\":3000,\"vit\":0},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2304.75}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "al salir del horno las unidades pasan a la vitrina",
       "ok": true,
-      "detalle": "{\"vit\":19,\"horno\":0}"
+      "detalle": "{\"vit\":15,\"horno\":0}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -524,7 +542,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina"
+      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 6 espera la cuenta hace 6 min"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -710,7 +728,7 @@
       "modulo": "Horario · escritorio",
       "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
       "ok": true,
-      "detalle": "{\"sub\":\"Miércoles, 7 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
+      "detalle": "{\"sub\":\"Domingo, 11 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     },
     {
       "modulo": "Producción · escritorio",
@@ -722,7 +740,7 @@
       "modulo": "Producción · escritorio",
       "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
       "ok": true,
-      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 02:12 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 03:25 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
     },
     {
       "modulo": "Producción · escritorio",
@@ -764,7 +782,7 @@
       "modulo": "Producción · escritorio",
       "prueba": "resumen del Horno: el temporizador en grande y Revisar vitrina",
       "ok": true,
-      "detalle": "{\"reloj\":\"19:58\",\"grande\":92,\"revisar\":true}"
+      "detalle": "{\"reloj\":\"19:57\",\"grande\":92,\"revisar\":true}"
     },
     {
       "modulo": "Producción · escritorio",
@@ -863,6 +881,120 @@
       "detalle": ""
     },
     {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "la Carta muestra el código para la fila",
+      "ok": true,
+      "detalle": "M20W 21C1 EZ"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "anota con el código de la Carta: mesa, 2 personas y su pedido",
+      "ok": true,
+      "detalle": "{\"pax\":2,\"destino\":\"mesa\",\"lineas\":2,\"total\":12000,\"enviado\":false}"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "lo comandado en la fila llega a Comandas de barra",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "llama al siguiente (Juan) a la mesa libre",
+      "ok": true,
+      "detalle": "{\"grupo\":\"gmv39g4hr7i\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T03:25:34.669Z\",\"vez\":1}"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "la pantalla de llamado muestra el turno y la mesa",
+      "ok": true,
+      "detalle": "TU MESA ESTÁ LISTA 1 Juan Mesa 1"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "al sentarse, el pedido de la fila sale a Comandas",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "al liberar la mesa propone llamar al siguiente",
+      "ok": true,
+      "detalle": "{\"sig\":\"Ana\",\"boton\":true,\"libre\":[1]}"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "aviso: mesa libre, llama a Nº 3 Ana",
+      "ok": true,
+      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\"]"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "la Caja toma el pedido de la fila para cobrarlo",
+      "ok": true,
+      "detalle": "{\"n\":2,\"total\":12000,\"modo\":\"local\",\"ref\":\"Juan\"}"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "venta registrada sin duplicar la comanda",
+      "ok": true,
+      "detalle": "{\"fila\":{\"grupo\":\"gmv39g4hr7i\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
+    },
+    {
+      "modulo": "Fila y mesas · escritorio (fila)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio (fila)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio (fila)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio (llamado)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio (llamado)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio (llamado)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
       "modulo": "Sistema general · telefono",
       "prueba": "pide ingreso antes de mostrar módulos",
       "ok": true,
@@ -890,7 +1022,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
+      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -902,7 +1034,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "autodiagnóstico interno",
       "ok": true,
-      "detalle": "16/16 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
+      "detalle": "17/17 · Libro de retroalimentación Sin conexión compartida: los reportes quedan solo en este equipo 0 ms"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -915,6 +1047,12 @@
       "prueba": "menú de la Caja visible y usable dentro del sistema",
       "ok": true,
       "detalle": "5 secciones"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre fila como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
@@ -966,6 +1104,12 @@
     },
     {
       "modulo": "Sistema general · telefono",
+      "prueba": "resumen arriba de fila",
+      "ok": true,
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Sin fila\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
       "prueba": "resumen arriba de salon",
       "ok": true,
       "detalle": "{\"tono\":\"ok\",\"tit\":\"Toda la carta disponible\",\"k\":4}"
@@ -998,13 +1142,13 @@
       "modulo": "Sistema general · telefono",
       "prueba": "resumen arriba de carta",
       "ok": true,
-      "detalle": "{\"tono\":\"ok\",\"tit\":\"Carta vigente · versión 1\",\"k\":4}"
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Carta vigente · versión 2\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · telefono",
       "prueba": "resumen arriba de prueba",
       "ok": true,
-      "detalle": "{\"tono\":\"ok\",\"tit\":\"Igual a la versión 1\",\"k\":4}"
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Igual a la versión 2\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -1016,7 +1160,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "resumen arriba de versiones",
       "ok": true,
-      "detalle": "{\"tono\":\"ok\",\"tit\":\"Versión 1 vigente\",\"k\":4}"
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Versión 2 vigente\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -1077,6 +1221,12 @@
       "prueba": "catálogo de la carta única",
       "ok": true,
       "detalle": ""
+    },
+    {
+      "modulo": "Caja y Comandas · telefono",
+      "prueba": "precios de la carta de junio 2026 (pino $4.000, latte $4.000, Catarpe $9.500, cheesecake $4.800)",
+      "ok": true,
+      "detalle": "{\"pino\":4000,\"latte\":4000,\"catarpe\":9500,\"cheese\":4800,\"ccl\":false}"
     },
     {
       "modulo": "Caja y Comandas · telefono",
@@ -1154,7 +1304,7 @@
       "modulo": "Caja y Comandas · telefono",
       "prueba": "garzón no ve la Prueba ni el sistema",
       "ok": true,
-      "detalle": "inicio,caja,salon,cocina,barra,carta,retro"
+      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,retro"
     },
     {
       "modulo": "Caja y Comandas · telefono",
@@ -1220,7 +1370,7 @@
       "modulo": "Prueba y aplicación · telefono",
       "prueba": "aplicar crea una versión nueva",
       "ok": true,
-      "detalle": "{\"v\":2,\"pino\":3700,\"fuera\":[\"Ee-napolitana\"],\"borrador\":false}"
+      "detalle": "{\"v\":3,\"pino\":3700,\"fuera\":[\"cafeconleche\",\"Ee-napolitana\"],\"borrador\":false}"
     },
     {
       "modulo": "Prueba y aplicación · telefono",
@@ -1274,7 +1424,7 @@
       "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "un evento en un día sube su demanda",
       "ok": true,
-      "detalle": "{\"antes\":1338400,\"ev\":\"evento\",\"rev\":1819100}"
+      "detalle": "{\"antes\":1367700,\"ev\":\"evento\",\"rev\":2308800}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
@@ -1292,7 +1442,7 @@
       "modulo": "Prueba · contexto y pedidos · telefono",
       "prueba": "para llevar sin vitrina: cobra y espera la tanda",
       "ok": true,
-      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":17}"
+      "detalle": "{\"esp\":[2],\"horno\":true,\"n\":15}"
     },
     {
       "modulo": "Prueba · contexto y pedidos · telefono",
@@ -1328,13 +1478,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "todos los productos con ficha y escandallo estándar",
       "ok": true,
-      "detalle": "{\"fichas\":130,\"total\":130,\"pino\":690,\"insumos\":105,\"filas\":130}"
+      "detalle": "{\"fichas\":142,\"total\":142,\"pino\":690,\"insumos\":109,\"filas\":142}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "el stock estándar alcanza un día de temporada alta",
       "ok": true,
-      "detalle": "{\"sin\":0,\"fc\":0.2442517835136405}"
+      "detalle": "{\"sin\":0,\"fc\":0.2425281568166377}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1346,13 +1496,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":3562.25,\"vit\":5},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2867}}"
+      "detalle": "{\"h0\":{\"pollo\":3000,\"vit\":0},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2304.75}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "al salir del horno las unidades pasan a la vitrina",
       "ok": true,
-      "detalle": "{\"vit\":19,\"horno\":0}"
+      "detalle": "{\"vit\":15,\"horno\":0}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1382,7 +1532,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina"
+      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 6 espera la cuenta hace 6 min"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1568,7 +1718,7 @@
       "modulo": "Horario · telefono",
       "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
       "ok": true,
-      "detalle": "{\"sub\":\"Miércoles, 7 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
+      "detalle": "{\"sub\":\"Domingo, 11 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     },
     {
       "modulo": "Producción · telefono",
@@ -1580,7 +1730,7 @@
       "modulo": "Producción · telefono",
       "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
       "ok": true,
-      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 02:15 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 03:28 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
     },
     {
       "modulo": "Producción · telefono",
@@ -1716,6 +1866,120 @@
     },
     {
       "modulo": "Producción · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "la Carta muestra el código para la fila",
+      "ok": true,
+      "detalle": "M20W 21C1 EZ"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "anota con el código de la Carta: mesa, 2 personas y su pedido",
+      "ok": true,
+      "detalle": "{\"pax\":2,\"destino\":\"mesa\",\"lineas\":2,\"total\":12000,\"enviado\":false}"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "lo comandado en la fila llega a Comandas de barra",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "llama al siguiente (Juan) a la mesa libre",
+      "ok": true,
+      "detalle": "{\"grupo\":\"gmv39jz8k34\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T03:28:33.487Z\",\"vez\":1}"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "la pantalla de llamado muestra el turno y la mesa",
+      "ok": true,
+      "detalle": "TU MESA ESTÁ LISTA 1 Juan Mesa 1"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "al sentarse, el pedido de la fila sale a Comandas",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "al liberar la mesa propone llamar al siguiente",
+      "ok": true,
+      "detalle": "{\"sig\":\"Ana\",\"boton\":true,\"libre\":[1]}"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "aviso: mesa libre, llama a Nº 3 Ana",
+      "ok": true,
+      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\"]"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "la Caja toma el pedido de la fila para cobrarlo",
+      "ok": true,
+      "detalle": "{\"n\":2,\"total\":12000,\"modo\":\"local\",\"ref\":\"Juan\"}"
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "venta registrada sin duplicar la comanda",
+      "ok": true,
+      "detalle": "{\"fila\":{\"grupo\":\"gmv39jz8k34\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
+    },
+    {
+      "modulo": "Fila y mesas · telefono (fila)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono (fila)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono (fila)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono (llamado)",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono (llamado)",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono (llamado)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Fila y mesas · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""

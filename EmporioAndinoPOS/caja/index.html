@@ -675,6 +675,7 @@ thead th,.tbl th{background:rgba(14,22,25,.95)}
 
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
+<script src="../nucleo/fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
 /* ====================================================================
@@ -701,7 +702,7 @@ var GRUPOS=[
   {id:"past",n:"Pastelería",ico:"i-ticket"}
 ];
 var SUBN={Empanadas:"Empanadas", desayunos:"Desayunos", brunch:"Brunch", bruschettas:"Bruschettas",
-  tostadas:"Tostadas", ensaladas:"Ensaladas", cafe:"Café de máquina", metodo:"Filtrados y tónicas",
+  tostadas:"Tostadas", sandwiches:"Sandwiches", ensaladas:"Ensaladas y bowls", alfajor:"Alfajores", cafe:"Café de máquina", metodo:"Filtrados y tónicas",
   te:"Tés e infusiones", choc:"Chocolates", jugo:"Jugos y refrescos", tarta:"Tartas",
   treslech:"Tres leches", galleton:"Galletones", paquete:"Paquetes", galleta:"Galletas",
   kuchen:"Kuchen", cheese:"Cheesecakes", muffin:"Muffins", milhojas:"Milhojas", torta:"Tortas",
@@ -714,7 +715,10 @@ var PAGOS=[
   {id:"desertgo",   n:"DesertGo",     ico:"i-moto"}
 ];
 var MODOS={local:"Para el local", llevar:"Para llevar", delivery:"DesertGo"};
-var EXTRAS=[{id:"sirope", n:"Sirope"},{id:"vegetal", n:"Leche vegetal"}];
+/* Extras de la carta (leche vegetal, descafeinado, miel) más el sirope; el
+   precio viene de la carta y se puede ajustar en Ajustes. */
+var EXTRAS=(window.EA_DATOS.EXTRAS||[{id:"sirope", n:"Sirope", p:null},{id:"vegetal", n:"Leche vegetal", p:null}]);
+function precioExtra(id){ var a=POS.cfg.extras&&POS.cfg.extras[id]; if(a!=null) return a; var x=EXTRAS.filter(function(e){ return e.id===id; })[0]; return x&&x.p!=null?x.p:null; }
 var LATA=15;          /* cada lata de empanadas trae 15 unidades */
 var IVA_TASA=0.19;    /* DL 825, art. 14 */
 var PROPINA_MIN=10;   /* Art. 64 Código del Trabajo (Ley 20.729) */
@@ -918,7 +922,7 @@ function agregar(p){
   if(p.loc && modoActivo!=="local"){ avisar("«"+p.n+"» se sirve solo para comer en el local.","mal"); return; }
   var ex=null;
   for(var i=0;i<carro.length;i++) if(carro[i].id===p.id && !carro[i].mod.length) ex=carro[i];
-  if(ex) ex.q++; else carro.push({id:p.id, n:p.n, p:pr, q:1, mod:[], leche:!!p.leche});
+  if(ex) ex.q++; else carro.push({id:p.id, n:p.n, p:pr, q:1, mod:[], leche:!!p.leche||p.g==="bar"||p.sub==="desayunos"||p.sub==="brunch"});
   pintarCuenta(); pintarRejilla();
 }
 function pintarCuenta(){
@@ -981,10 +985,10 @@ function pintarPagos(){
 function hojaExtras(i){
   var l=carro[i];
   abrirHoja("Extras de "+l.n, function(b){
-    var p=el("p","vs","En desayunos y brunch el café va incluido, pero el sirope y la leche vegetal se cobran aparte. Si el precio del extra no está definido, se define en Ajustes.");
+    var p=el("p","vs","Extras de la carta: leche vegetal, café descafeinado y miel. En desayunos y brunch el café va incluido, pero los extras se cobran aparte. Si un precio no está definido, se define en Ajustes.");
     b.appendChild(p);
     EXTRAS.forEach(function(x){
-      var pr=POS.cfg.extras[x.id];
+      var pr=precioExtra(x.id);
       var puesto=l.mod.some(function(m){ return m.id===x.id; });
       var btn=el("button","btn suave lleno"); btn.type="button";
       btn.textContent=(puesto?"Quitar ":"Agregar ")+x.n+(pr!=null?" ("+plata(pr)+")":" (sin precio definido)");
@@ -1012,10 +1016,14 @@ function registrar(){
     efectivo: pagoActivo==="efectivo" ? {rec:rec, vuelto:Math.max(0,rec-(t+pr))} : null,
     doc:null, anulada:null
   };
+  /* Pedido que vino de la fila: si ya salió a Comandas, la venta no lo vuelve a comandar. */
+  if(filaRef) v.fila={grupo:filaRef.grupo, num:filaRef.num, nombre:filaRef.nombre, comandado:!!filaRef.comandado};
   POS.ventas.push(v);
   v.lineas.forEach(function(l){ descontar(l.id, l.q); });
   guardarPOS(); guardarCtrl();
+  if(filaRef){ try{ EAPOS.fila.marcarCobrado(filaRef.grupo, v.id); }catch(e){} filaRef=null; }
   carro=[]; pagoActivo=""; $("#inEfectivo").value="";
+  setTimeout(tomarTraspaso, 1600);
   pintarPagos(); pintarCuenta(); pintarRejilla(); pintarPanel(); pintarStock();
   var cr=criticos().filter(function(c){ return c.e==="off"; });
   avisar("Venta "+v.id+" registrada por "+plata(v.total+v.propina)+".","bien");
@@ -2688,7 +2696,7 @@ function pintarAjustes(){
     '<span class="campo"><label for="inProp">Propina sugerida (%)</label><input id="inProp" type="number" min="0" max="20" step="1" value="'+cf.propina+'"></span>'+
     '<span class="campo"><label for="inUmb">Avisar bajo (unidades)</label><input id="inUmb" type="number" min="1" step="1" value="'+cf.umbral+'"></span>'+
     '<span class="campo"><label for="inSirope">Extra sirope ($)</label><input id="inSirope" type="number" min="0" step="100" value="'+(cf.extras.sirope==null?"":cf.extras.sirope)+'" placeholder="por definir"></span>'+
-    '<span class="campo"><label for="inVeg">Extra leche vegetal ($)</label><input id="inVeg" type="number" min="0" step="100" value="'+(cf.extras.vegetal==null?"":cf.extras.vegetal)+'" placeholder="por definir"></span>'+
+    '<span class="campo"><label for="inVeg">Extra leche vegetal ($)</label><input id="inVeg" type="number" min="0" step="100" value="'+(cf.extras.vegetal==null?"":cf.extras.vegetal)+'" placeholder="'+(precioExtra("vegetal")!=null?precioExtra("vegetal")+' (carta)':'por definir')+'"></span>'+
     '</div><p class="mini" style="margin-top:8px">La ley obliga a sugerir al menos un 10%; bajarlo de ahí deja la cuenta fuera de norma. Por eso el mínimo que acepta este campo es 10.</p></div>';
 
   h+='<div class="seccion"><div class="rotulo"><b>Datos que van en el vale</b></div><div class="filtros">'+
@@ -2882,7 +2890,7 @@ $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(b){
 $("#swPropina").onclick=function(){ conPropina=!conPropina; pintarCuenta(); };
 $("#inEfectivo").oninput=calcVuelto;
 $("#btnRegistrar").onclick=registrar;
-$("#btnVaciar").onclick=function(){ carro=[]; pintarCuenta(); pintarRejilla(); };
+$("#btnVaciar").onclick=function(){ carro=[]; filaRef=null; pintarCuenta(); pintarRejilla(); tomarTraspaso(); };
 $("#btnCuentaMesa").onclick=cuentaPrevia;
 $("#hojaX").onclick=cerrarHoja;
 $("#hojaVelo").onclick=cerrarHoja;
@@ -2919,9 +2927,31 @@ function pintarHorario(){
 }
 setInterval(pintarHorario,15000);
 
+/* ---------- pedidos que llegan de la Fila ----------
+   «Cobrar en Caja» en Fila y mesas deja el pedido en eapos_traspaso; la Caja
+   lo toma apenas su cuenta está vacía, con el modo (local o llevar) del grupo. */
+var filaRef=null;
+function leerTraspaso(){ try{ return JSON.parse(localStorage.getItem("eapos_traspaso")||"null"); }catch(e){ return null; } }
+function tomarTraspaso(){
+  var t=leerTraspaso(); if(!t||!Array.isArray(t.lineas)) return;
+  if(carro.length){ avisar("Hay un pedido de la fila esperando (Nº "+t.num+" "+t.nombre+"): termina o vacía esta cuenta y aparece solo.","alerta"); return; }
+  try{ localStorage.removeItem("eapos_traspaso"); }catch(e){}
+  var faltan=0;
+  t.lineas.forEach(function(x){ var p=itemCat(x.id), pr=p?precioDe(p):null; if(!p||pr==null){ faltan++; return; }
+    carro.push({id:p.id, n:p.n, p:pr, q:x.q, mod:[], leche:!!p.leche||p.g==="bar"||p.sub==="desayunos"||p.sub==="brunch"}); });
+  var m=t.modo==="llevar"||!EAPOS.mesasAbiertas()?"llevar":"local";
+  modoActivo=m; conPropina=(m==="local");
+  $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(x){ x.setAttribute("aria-pressed", x.dataset.modo===m?"true":"false"); });
+  filaRef={grupo:t.grupo, num:t.num, nombre:t.nombre, comandado:!!t.comandado};
+  if(seccActiva!=="caja") irA("caja");
+  pintarCuenta(); pintarRejilla();
+  avisar("Pedido de la fila: Nº "+t.num+" "+t.nombre+(t.mesa?" · mesa "+t.mesa:"")+". Elige el medio de pago y registra."+(faltan?" "+faltan+" productos sin precio no entraron.":""),"bien");
+}
+window.addEventListener("storage",function(ev){ if(ev.key==="eapos_traspaso"&&ev.newValue) tomarTraspaso(); });
+
 function arrancar(estado){
   if(estado && estado.carro){ carro=estado.carro; modoActivo=estado.modo||"local"; grupoActivo=estado.grupo||"emp"; }
-  pintarTodo();
+  pintarTodo(); tomarTraspaso();
   if(pendientesFolio().length) setTimeout(function(){ avisar(pendientesFolio().length+" ventas quedaron sin folio de boleta.","alerta"); }, 900);
 }
 try{

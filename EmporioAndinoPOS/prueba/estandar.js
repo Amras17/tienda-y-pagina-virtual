@@ -58,6 +58,10 @@ window.EA_ESTANDAR = (function(){
   ins("salsasoya","Salsa de soya","ml",1000,"botella 1 L",2900,"cocina");
   ins("pan","Pan de masa madre (rebanada)","u",30,"2 hogazas · 30 rebanadas",5400,"cocina","Panadería artesanal");
   ins("bagel","Bagel","u",6,"bolsa 6 u",4200,"cocina");
+  ins("pansand","Pan de sandwich (ciabatta)","u",10,"bolsa 10 u",6500,"cocina","Panadería artesanal");
+  ins("lactonesa","Lactonesa de la casa","g",1000,"kg",4200,"cocina","Leche, aceite, limón y ajo");
+  ins("asai","Pulpa de asaí congelada","g",1000,"kg",9800,"cocina");
+  ins("mani","Mantequilla de maní","g",1000,"frasco 1 kg",6900,"cocina");
   ins("palta","Palta Hass","g",1000,"kg",4500,"cocina","ODEPA: $3.000–4.000/kg mayorista + flete");
   ins("mantequilla","Mantequilla","g",1000,"kg",9500,"cocina");
   ins("membrillo","Dulce de membrillo","g",1000,"kg",4200,"cocina");
@@ -108,6 +112,7 @@ window.EA_ESTANDAR = (function(){
   ins("tesabores","Té de sabores e infusiones","g",1000,"kg",30000,"barra");
   ins("marshmallow","Marshmallow","g",1000,"kg",7000,"barra");
   ins("helado","Helado de vainilla","g",5000,"balde 5 L",21000,"barra");
+  ins("infusion","Hierbas para infusión local","g",1000,"kg",30000,"barra","Hierbas de la zona, según disponibilidad");
   ins("crema","Crema de leche","ml",1000,"L",4200,"pasteleria");
   ins("tonica","Agua tónica (lata)","u",24,"pack 24",14400,"barra");
   ins("ginger","Ginger ale (lata)","u",24,"pack 24",15600,"barra");
@@ -241,14 +246,25 @@ window.EA_ESTANDAR = (function(){
   ficha("licancabur","ens",[["mozzarella",70],["cherry",100],["albahaca",8],["oliva",15],["aceituna",25],["nueces",15],["hojas",40]],5);
   ficha("quimal","ens",[["quinoa",60],["cherry",80],["pepino",60],["palta",80],["almendras",15],["serrano",40],["hojas",30],["oliva",10]],5);
   ficha("bowl-antioxidante","bowl",[["yoghurt",200],["frutilla",40],["berries",60],["uva",30],["granola",40],["frutossecos",15],["miel",10]],6);
-  ficha("bowl-energizante","bowl",[["mango",70],["durazno",60],["maracuya",30],["pina",70],["granola",40],["frutossecos",15]],6);
-  ficha("bowl-desintoxicante","bowl",[["manzana",60],["melon",60],["espinaca",20],["pina",60],["kiwi",50],["granola",40],["frutossecos",15]],6);
+  ficha("bowl-energizante","bowl",[["yoghurt",180],["mango",70],["durazno",60],["maracuya",30],["pina",70],["granola",40],["frutossecos",15]],6);
+  ficha("bowl-asai","bowl",[["asai",200],["granola",40],["mani",20],["frutossecos",15],["platano",50]],6);
+  /* ---------- sandwiches ---------- */
+  ficha("catarpe","brus",[["pansand",1],["carne",110],["mantecoso",50],["cebolla",60],["aceite",8]],5);
+  ficha("solor","brus",[["pansand",1],["jamon",70],["mantecoso",50],["azucar",5]],5);
+  ficha("checar","brus",[["pansand",1],["serrano",50],["qcrema",40],["hojas",20]],5);
+  ficha("poconche","brus",[["pansand",1],["champinon",90],["ajo",3],["qvegano",45],["hojas",20],["oliva",8]],5);
+  ficha("quitor","brus",[["pansand",1],["qcabra",50],["cherry",60],["aceituna",20],["alinos",1],["oliva",8]],5);
+  ficha("condeduque","brus",[["pansand",1],["carne",110],["tomate",50],["palta",60],["lactonesa",25],["aceite",8]],5);
+  ficha("bowl-desintoxicante","bowl",[["yoghurt",180],["manzana",60],["melon",60],["espinaca",20],["pina",60],["kiwi",50],["granola",40],["frutossecos",15]],6);
 
   /* ---------- café caliente ---------- */
   ficha("espresso","cafe",[["cafe",12]],2);
+  ficha("espresso-doble","cafe",[["cafe",19]],2);
   ficha("americano","cafe",[["cafe",18]],2);
   ficha("flatwhite","cafe",[["cafe",18],["leche",150]],3);
   ficha("cappuccino","cafe",[["cafe",12],["leche",150]],3);
+  ficha("cappuccino-vainilla","cafe",[["cafe",12],["leche",150],["sirope",15]],3);
+  ficha("cappuccino-caramelo","cafe",[["cafe",12],["leche",150],["sirope",15]],3);
   ficha("latte","cafe",[["cafe",18],["leche",220]],3);
   ficha("cafeconleche","cafe",[["cafe",12],["leche",200]],3);
   ficha("caramel","cafe",[["cafe",18],["leche",220],["sirope",20]],3);
@@ -263,6 +279,7 @@ window.EA_ESTANDAR = (function(){
   ficha("golden","te",[["golden",10],["leche",220]],3);
   ficha("tenegro","te",[["tenegro",8]],2);
   ficha("tesabores","te",[["tesabores",8]],2);
+  ficha("teinfusiones","te",[["infusion",8]],2);
   ficha("chococaliente","te",[["choco",40],["leche",220]],3,{crit:"2 scoops de chocolate por taza\nLeche bajo 70 °C"});
   ficha("chocomarsh","te",[["choco",40],["leche",220],["marshmallow",15]],3);
 
@@ -315,6 +332,7 @@ window.EA_ESTANDAR = (function(){
     muffin:[["harina",45],["azucar",25],["aceite",15],["huevo",0.5],["leche",25]],
     milhojas:[["hojaldre",60],["manjar",50],["azucar",5]],
     torta:[["harina",35],["azucar",35],["huevo",1],["mantequilla",15],["crema",60],["manjar",40]],
+    alfajor:[["harina",25],["manteca",10],["azucar",8],["manjar",25],["chocolatecob",12]],
     tortav:[["harina",35],["azucar",32],["aceite",20],["lveg",50],["chocolatecob",30],["castana",20]],
     panqueque:[["harina",30],["huevo",0.8],["leche",70],["crema",60],["azucar",25],["manjar",25]]
   };
@@ -347,7 +365,7 @@ window.EA_ESTANDAR = (function(){
     ["Pm-chocolate","Muffin de chocolate","muffin"],["Pmilhojas","Mil hojas","milhojas"],["Pto-chocolate","Torta de chocolate Emporio","torta"],["Pto-pakari","Torta Pakari","torta"],
     ["Pto-inti","Torta Inti","torta"],["Pto-nusta","Torta Ñusta","torta"],["Pto-killa","Torta Killa","torta"],["Pto-amor-mini","Mini torta Amor","minitorta"],
     ["Pto-choco-maracuya","Torta vegana de chocolate y maracuyá","torta"],["Pto-choco-naranja","Torta vegana de chocolate y naranja","torta"],
-    ["Pto-panqueque-berries","Torta panqueque de berries","panqueque"],["Pto-amor","Torta Amor","torta"],["Pto-panqueque-naranja","Torta panqueque de naranja Emporio","panqueque"]];
+    ["Pto-panqueque-berries","Torta panqueque de berries","panqueque"],["Pto-amor","Torta Amor","torta"],["Pto-panqueque-naranja","Torta panqueque de naranja Emporio","panqueque"],["Palfajor","Alfajor","alfajor"]];
   PAST.forEach(function(p){ pastel(p[0],p[1],p[2]); });
 
   /* Tortas de la casa: capas que indicó la dirección (por porción, 12 por torta). */

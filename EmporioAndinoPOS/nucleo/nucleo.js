@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "2.7";
+  var VERSION = "2.8";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -61,7 +61,31 @@
     var h=leer(K.versiones)||[]; if(!h.length){ h.push({v:1, ts:c.ts, por:c.por, nota:c.nota, cambios:[]}); guardar(K.versiones,h); }
     return c;
   }
-  function general(){ var c=leer(K.cfg); return normal(c||migrar()); }
+  function general(){ var c=leer(K.cfg); return cartaNueva(normal(c||migrar())); }
+  /* Carta física nueva (junio de 2026): una sola vez por equipo, se crea una
+     versión del sistema general que deja regir los precios de la carta (se
+     quitan los precios propios que tapaban a los nuevos) y saca de la carta
+     lo que ya no está en ella. Queda en el historial con cada cambio. */
+  var SALEN_2026_06=["cafeconleche"];
+  function cartaNueva(c){
+    var CT=D.CARTA; if(!CT||leer("eapos_carta")===CT.v) return c;
+    var antes=CT.antes||{}, n=normal(JSON.parse(JSON.stringify(c))), ch=[];
+    BASE.forEach(function(p){
+      var viejo=c.precios[p.id]!=null?c.precios[p.id]:(p.id in antes?antes[p.id]:p.p);
+      if(p.p!=null) delete n.precios[p.id];
+      var nuevo=precioEn(n,p.id);
+      if(viejo!==nuevo) ch.push({tipo:"precio", id:p.id, nombre:p.n, antes:viejo, despues:nuevo,
+        texto:p.n+": "+(viejo==null?(p.id in antes?"sin precio":"nuevo en la carta"):plata(viejo))+" → "+(nuevo==null?"sin precio":plata(nuevo))});
+    });
+    SALEN_2026_06.forEach(function(id){ if(POR_ID[id]&&n.fuera.indexOf(id)<0){ n.fuera.push(id); ch.push({tipo:"carta", id:id, nombre:POR_ID[id].n, antes:false, despues:true, texto:POR_ID[id].n+": sale de la carta"}); } });
+    if(ch.length){
+      n.v=c.v+1; n.ts=new Date().toISOString(); n.por="Sistema"; n.nota="Precios de la carta física de junio de 2026";
+      if(!guardar(K.cfg,n)) return c;
+      var h=leer(K.versiones)||[]; h.push({v:n.v, ts:n.ts, por:n.por, nota:n.nota, cambios:ch}); if(h.length>80) h=h.slice(-80); guardar(K.versiones,h);
+    }
+    guardar("eapos_carta",CT.v);
+    return ch.length?n:c;
+  }
   function hayBorrador(){ return !!leer(K.prueba); }
   function prueba(){ var c=leer(K.prueba); return c ? normal(c) : general(); }
   function guardarPrueba(c){ c=normal(c); c.v=general().v; guardar(K.prueba,c); avisarCambio("prueba"); return c; }
@@ -167,6 +191,7 @@
     caja:   {n:"Caja", d:"Cobro, boleta, stock, costos, compras, mermas e informes", ruta:"caja/index.html"},
     salon:  {n:"Control de Salón", d:"Disponibilidad de la carta y estudio de la carta", ruta:"carta/salon.html"},
     cocina: {n:"Comandas de cocina", d:"Los platos cobrados en la Caja, para cocina", ruta:"cocina/index.html?est=cocina"},
+    fila:   {n:"Fila y mesas", d:"Quién espera, su pedido en la fila y a quién llamar cuando se libera una mesa", ruta:"fila/index.html"},
     barra:  {n:"Comandas de barra", d:"Las bebidas cobradas en la Caja, para barra", ruta:"cocina/index.html?est=barra"},
     horno:  {n:"Horno", d:"Temporizador de las tandas, pedido de la panadería, vitrina y precocido", ruta:"horno/index.html"},
     panaderia:{n:"Panadería", d:"Plan por latas, pedidos al horno, solicitudes y escandallos", ruta:"panaderia/index.html"},
@@ -177,10 +202,10 @@
      historial) o "cobro" (cobro y stock). numeros: ventas en pesos, costos,
      metas, estadísticas y fichas; solo los dueños. */
   var ROLES = {
-    dueno:      {n:"Dirección",      m:["caja","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"todo", sistema:1, numeros:1},
-    jefe:       {n:"Dirección",      m:["caja","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"turno", sistema:1},
-    encargado:  {n:"Caja y salón",   m:["caja","salon","cocina","barra","horno","carta"], caja:"turno"},
-    garzon:     {n:"Garzones",       m:["caja","salon","cocina","barra","carta"], caja:"cobro"},
+    dueno:      {n:"Dirección",      m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"todo", sistema:1, numeros:1},
+    jefe:       {n:"Dirección",      m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], caja:"turno", sistema:1},
+    encargado:  {n:"Caja y salón",   m:["caja","fila","salon","cocina","barra","horno","carta"], caja:"turno"},
+    garzon:     {n:"Garzones",       m:["caja","fila","salon","cocina","barra","carta"], caja:"cobro"},
     barista_enc:{n:"Barra",          m:["barra","salon","carta"]},
     barista:    {n:"Barra",          m:["barra","salon","carta"]},
     cocina:     {n:"Cocina y horno", m:["cocina","horno","salon","carta"]},
