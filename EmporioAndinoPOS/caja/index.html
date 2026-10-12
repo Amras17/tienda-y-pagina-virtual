@@ -938,7 +938,8 @@ function pintarCuenta(){
     var izq=el("div");
     izq.innerHTML='<div class="ln">'+esc(l.n)+"</div>"+
       (l.mod.length?'<div class="lo">'+l.mod.map(function(m){ return esc(m.n)+(m.p?" +"+plata(m.p):""); }).join(" · ")+"</div>":"")+
-      (l.leche?'<div class="lo"><button class="pila" type="button" data-ex="'+idx+'" style="padding:3px 9px;font-size:11px">Extras</button></div>':"");
+      ((l.leche||conBebidaInc(l.id))?'<div class="lo">'+(conBebidaInc(l.id)?'<button class="pila" type="button" data-beb="'+idx+'" aria-pressed="'+(!!bebidaDe(l))+'" style="padding:3px 9px;font-size:11px;margin-right:6px">'+(bebidaDe(l)?"Cambiar bebida":"Bebida incluida")+'</button>':'')+
+        (l.leche?'<button class="pila" type="button" data-ex="'+idx+'" style="padding:3px 9px;font-size:11px">Extras</button>':'')+'</div>':"");
     var der=el("div","lt", plata(l.p*l.q + sumaBy(l.mod,function(m){return m.p||0;})*l.q));
     var paso=el("div","paso");
     paso.innerHTML='<button type="button" data-m="'+idx+'" aria-label="Quitar uno">−</button><span class="q">'+l.q+
@@ -949,6 +950,7 @@ function pintarCuenta(){
   L.querySelectorAll("[data-m]").forEach(function(b){ b.onclick=function(){ var i=+b.dataset.m; carro[i].q--; if(carro[i].q<=0) carro.splice(i,1); pintarCuenta(); }; });
   L.querySelectorAll("[data-p]").forEach(function(b){ b.onclick=function(){ carro[+b.dataset.p].q++; pintarCuenta(); }; });
   L.querySelectorAll("[data-ex]").forEach(function(b){ b.onclick=function(){ hojaExtras(+b.dataset.ex); }; });
+  L.querySelectorAll("[data-beb]").forEach(function(b){ b.onclick=function(){ hojaBebida(+b.dataset.beb); }; });
 
   var t=totalCarro(), pr=propinaSug();
   var S=$("#sumas"); S.innerHTML="";
@@ -984,10 +986,42 @@ function pintarPagos(){
     c.appendChild(b);
   });
 }
+/* ---------- bebida incluida en desayunos y brunch ----------
+   Cualquier café de la barra, salvo filtrados y bebidas de postre (frappés,
+   café con helado, affogato, espresso tonic y espresso ginger: no salen con el
+   desayuno ni pagando la diferencia). En desayunos también té negro en taza,
+   que no es la tetera de la carta. Queda en la línea como agregado sin precio
+   ("Bebida: …") y así llega a Comandas de barra. */
+var NO_INCLUIDOS={"f-frappe":1,"f-frappe-caramel":1,"f-frappe-moca":1,"f-helado":1,"f-affogato":1,"f-tonic":1,"f-ginger":1};
+function subDe(id){ var p=EAPOS.producto(id); return p?p.sub:""; }
+function conBebidaInc(id){ var s=subDe(id); return s==="desayunos"||s==="brunch"; }
+function bebidaDe(l){ return (l.mod||[]).filter(function(m){ return m.inc||m.id==="inc"; })[0]||null; }
+function bebidasIncluibles(id){
+  var ids={}; CAT.forEach(function(p){ ids[p.id]=1; });
+  var o=(window.EA_DATOS.BEB||[]).filter(function(b){ return b.g==="cafe" && !NO_INCLUIDOS[b.id] && ids[b.id] && estadoDe(b.id)!=="off"; })
+    .map(function(b){ var p=EAPOS.producto(b.id); return {id:b.id, n:p?p.n:b.id}; });
+  if(subDe(id)==="desayunos") o.push({id:"te-taza", n:"Té negro en taza"});
+  return o;
+}
+function hojaBebida(i){
+  var l=carro[i];
+  abrirHoja("Bebida incluida · "+l.n, function(b){
+    b.appendChild(el("p","vs","Cualquier café de la barra, salvo filtrados, frappés, café con helado, affogato, espresso tonic y espresso ginger (no salen con el desayuno ni pagando la diferencia)."+(subDe(l.id)==="desayunos"?" También té negro en taza (no es la tetera).":"")+" Leche vegetal, descafeinado, miel y sirope se agregan en Extras y se cobran aparte."));
+    var actual=bebidaDe(l), g=el("div"); g.style.cssText="display:flex;flex-wrap:wrap;gap:6px";
+    bebidasIncluibles(l.id).forEach(function(x){
+      var btn=el("button","pila",x.n); btn.type="button"; btn.setAttribute("aria-pressed",String(!!actual&&actual.b===x.id));
+      btn.onclick=function(){ l.mod=l.mod.filter(function(m){ return !(m.inc||m.id==="inc"); }); l.mod.unshift({id:"inc", n:"Bebida: "+x.n, p:0, inc:1, b:x.id}); pintarCuenta(); cerrarHoja(); };
+      g.appendChild(btn);
+    });
+    b.appendChild(g);
+    if(actual){ var q=el("button","btn suave lleno","Quitar la bebida anotada"); q.type="button"; q.style.marginTop="10px";
+      q.onclick=function(){ l.mod=l.mod.filter(function(m){ return !(m.inc||m.id==="inc"); }); pintarCuenta(); cerrarHoja(); }; b.appendChild(q); }
+  });
+}
 function hojaExtras(i){
   var l=carro[i];
   abrirHoja("Extras de "+l.n, function(b){
-    var p=el("p","vs","Extras de la carta: leche vegetal, café descafeinado, miel y sirope. En desayunos y brunch el café va incluido (cualquiera de la barra, salvo filtrados, frappés, café con helado, affogato, espresso tonic ni espresso ginger); el cliente puede armarlo como quiera y los extras se cobran aparte. Si un precio no está definido, se define en Ajustes.");
+    var p=el("p","vs","Extras de la carta: leche vegetal, café descafeinado, miel y sirope. En desayunos y brunch el café va incluido (cualquiera de la barra, salvo filtrados, frappés, café con helado, affogato, espresso tonic ni espresso ginger; esas bebidas no salen con el desayuno ni pagando la diferencia). En desayunos también puede ser té negro en taza, que no es la tetera de la carta. El cliente puede armar su café como quiera y los extras se cobran aparte. Si un precio no está definido, se define en Ajustes.");
     b.appendChild(p);
     EXTRAS.forEach(function(x){
       var pr=precioExtra(x.id);

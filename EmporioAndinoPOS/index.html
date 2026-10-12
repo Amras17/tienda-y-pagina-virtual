@@ -501,7 +501,7 @@ function comandasPend(){
   var m=leeLocal("eapos_comandas"); if(!m||m.fecha!==hoyISO()) m={listo:{}};
   var por={cocina:0,barra:0,horno:0};
   E.fila.comandables().forEach(function(v){ var est={};
-    (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; });
+    (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; if(p&&(p.sub==="desayunos"||p.sub==="brunch")) est.barra=1; });
     Object.keys(est).forEach(function(e){ if(!m.listo[v.id+"|"+e]) por[e]++; }); });
   return por;
 }
@@ -612,7 +612,7 @@ function comandasDetalle(){
   var m=leeLocal("eapos_comandas"); if(!m||m.fecha!==hoyISO()) m={listo:{}};
   var por={cocina:0,barra:0,horno:0}, viejas=[];
   E.fila.comandables().forEach(function(v){ var est={};
-    (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; });
+    (v.lineas||[]).forEach(function(l){ var p=E.producto(l.id), g=p?p.g:"", e=g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; if(e) est[e]=1; if(p&&(p.sub==="desayunos"||p.sub==="brunch")) est.barra=1; });
     Object.keys(est).forEach(function(e){ if(!m.listo[v.id+"|"+e]){ por[e]++; viejas.push({e:e, min:minutosDesde(v.ts)}); } }); });
   viejas.sort(function(a,b){ return b.min-a.min; });
   return {por:por, total:por.cocina+por.barra+por.horno, max:viejas.length?viejas[0].min:0, viejas:viejas, atrasadas:viejas.filter(function(x){ return x.min>=15; })};

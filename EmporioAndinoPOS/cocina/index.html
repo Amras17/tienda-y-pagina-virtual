@@ -30,6 +30,8 @@ html.incrustado .modulo{padding-top:4px}
 .cmdt li .q{font-family:var(--f-num);font-weight:800;background:var(--glass-2);border:1px solid var(--stroke);border-radius:9px;text-align:center}
 .cmdt li small{display:block;color:var(--warn);font-size:12px;font-weight:700}
 .cmdt .btn{justify-content:center}
+/* Barra: la bebida incluida en desayunos y brunch, con el plato al que acompaña. */
+.cmdt li .inc{display:block;color:var(--muted);font-size:12px;font-weight:500;margin-top:1px}
 .vacio{grid-column:1/-1}
 details summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color:var(--fg-2)}
 .hlist{margin-top:10px}
@@ -102,13 +104,27 @@ var sonido=false, vistos=null, deslizador=null;
 
 function marcas(){ var m=leer("eapos_comandas",null); if(!m||m.fecha!==hoyISO()) m={fecha:hoyISO(), listo:{}}; return m; }
 function estacionDe(id){ var p=EAPOS.producto(id), g=p?p.g:""; return g==="coc"?"cocina":g==="bar"?"barra":(g==="emp"||g==="past")?"horno":""; }
+/* Desayunos y brunch traen su bebida incluida (café de la barra o, en desayunos,
+   té negro en taza). La Caja la anota como un agregado "Bebida: …"; si no se
+   anotó, barra la ve "a elección" para preguntarla al garzón. */
+function conBebida(id){ var p=EAPOS.producto(id); return !!p && (p.sub==="desayunos"||p.sub==="brunch"); }
+function esBebidaInc(m){ return !!m && (m.inc||m.id==="inc"); }
+function lineaBebida(l){
+  var b=(l.mod||[]).filter(esBebidaInc)[0], extras=(l.mod||[]).filter(function(m){ return !esBebidaInc(m); });
+  return {q:l.q, n:b?String(b.n).replace(/^Bebida:\s*/,""):"Bebida incluida · a elección", mod:extras, inc:"Incluida en "+l.n};
+}
 /* Todas las comandas del día: una por venta y estación con algo que preparar. */
 function comandas(){
   /* Ventas de hoy en la Caja y pedidos de la fila ya comandados (nucleo/fila.js). */
   var vs=EAPOS.fila.comandables(), out=[];
   vs.forEach(function(v){
     var por={};
-    (v.lineas||[]).forEach(function(l){ var e=estacionDe(l.id); (por[e]=por[e]||[]).push(l); });
+    (v.lineas||[]).forEach(function(l){ var e=estacionDe(l.id);
+      if(e==="cocina"&&conBebida(l.id)){
+        /* El plato va a cocina sin la bebida; la bebida va a barra. */
+        (por.cocina=por.cocina||[]).push(Object.assign({},l,{mod:(l.mod||[]).filter(function(m){ return !esBebidaInc(m); })}));
+        (por.barra=por.barra||[]).push(lineaBebida(l)); return; }
+      (por[e]=por[e]||[]).push(l); });
     Object.keys(por).forEach(function(e){ if(e!=="cocina"&&e!=="barra") return; out.push({clave:v.id+"|"+e, venta:v, est:e, lineas:por[e]}); });
   });
   return out;
@@ -138,7 +154,7 @@ function pintar(revelar){
       return '<article class="tile glass lift comanda cmdt'+cl+'"><div class="h"><b>'+esc(c.venta.id.slice(-5))+'</b><span class="min">'+mi+' min</span></div>'+
         '<div class="meta"><span class="etq '+c.est+'">'+esc(nombreEst(c.est))+'</span><span>'+hora(c.venta.ts)+' · '+esc(MODOS[c.venta.modo]||c.venta.modo)+' · '+esc(c.venta.resp||"")+'</span></div>'+
         '<ul>'+c.lineas.map(function(l){
-          return '<li><span class="q">'+l.q+'</span><span>'+esc(l.n)+((l.mod&&l.mod.length)?'<small>'+esc(l.mod.map(function(x){ return x.n; }).join(" · "))+'</small>':'')+'</span></li>';
+          return '<li><span class="q">'+l.q+'</span><span>'+esc(l.n)+((l.mod&&l.mod.length)?'<small>'+esc(l.mod.map(function(x){ return x.n; }).join(" · "))+'</small>':'')+(l.inc?'<span class="inc">'+esc(l.inc)+'</span>':'')+'</span></li>';
         }).join("")+'</ul>'+
         '<button class="btn pri" type="button" data-listo="'+esc(c.clave)+'">Listo</button></article>';
     }).join("");
