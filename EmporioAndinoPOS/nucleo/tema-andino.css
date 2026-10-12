@@ -1,0 +1,345 @@
+/* ====================================================================
+   Tema #2 · Carta Andina
+   --------------------------------------------------------------------
+   Alternativa al tema nativo (Emporio System 1.1) para todas las capas.
+   Solo actúa con <html data-tema="andino"> (lo pone nucleo/tema.js).
+
+   Paleta: los once colores de la foto del camino al desierto
+     azul noche #102948 · azul #204F8D · cielo #4682B9 · bruma #7DA9C5
+     arena #D3BEA0 · trigo #BC9670 · tierra tostada #90603A · ocre #C07943
+     óxido claro #A75D33 · óxido #743725 · tierra #392418
+   Diseño y letra: los de la carta impresa. Papel claro, títulos escritos a
+   mano (Chinchilla → Gochi Hand), bajadas redondeadas (Neulis Cursive →
+   Grandstander), texto espaciado (Citrine → Lexend), precios en una mancha
+   de color, puntadas junto a cada ítem, guardas andinas y montañas.
+   Si el equipo tiene instaladas las fuentes originales de la carta, se usan.
+   Donde la carta usa turquesa, aquí va el azul; donde usa naranjo, el ocre y
+   el óxido. Los estados (bien, atención, grave) siguen siendo verde, ámbar y
+   rojo, en versión tierra, para que se lean igual que en el tema nativo.
+   ==================================================================== */
+:root[data-tema=andino]{
+  color-scheme:light;
+  /* paleta */
+  --and-noche:#102948; --and-azul:#204F8D; --and-cielo:#4682B9; --and-bruma:#7DA9C5;
+  --and-arena:#D3BEA0; --and-trigo:#BC9670; --and-tostado:#90603A; --and-ocre:#C07943;
+  --and-oxido-c:#A75D33; --and-oxido:#743725; --and-tierra:#392418;
+  --and-papel:#FFFCF7; --and-fondo:#F6EEE2; --and-titulo:#9A5129;
+  /* tokens de Emporio (nucleo/emporio.css y la Prueba) */
+  --bg:#F6EEE2; --bg-2:#FBF7F0;
+  --glass:#FFFCF7; --glass-2:rgba(255,255,255,.72); --glass-hi:rgba(255,255,255,.95);
+  --stroke:rgba(16,41,72,.13); --stroke-2:rgba(16,41,72,.24);
+  --fg:#102948; --fg-2:#34465F; --muted:#6B5A48; --faint:rgba(16,41,72,.08);
+  --accent:#204F8D; --accent-ink:#FFFFFF; --coral:#C07943; --gold:#90603A;
+  --barra:#2C6AA8; --horno:#9A5129; --cocina:#743725;
+  --ok:#2E7D4F; --warn:#95560F; --crit:#B23A2B; --idle:#8C8172;
+  --f-logo:"Chinchilla","Gochi Hand","Comic Sans MS",cursive;
+  --f-sub:"Neulis Cursive","Grandstander","Lexend",ui-rounded,sans-serif;
+  --f-num:"Lexend",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --f-ui:"Citrine","Lexend",ui-sans-serif,"Segoe UI",system-ui,sans-serif;
+  --r-tile:22px; --r-in:14px;
+  --and-sombra:0 1px 0 rgba(255,255,255,.9) inset,0 12px 28px -16px rgba(57,36,24,.38),0 2px 6px -3px rgba(57,36,24,.16);
+  /* guarda andina: ola azul con puntos, triángulos de óxido y puntos ocre (la de la carta) */
+  --and-guarda:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='38'%3E%3Cpath d='M0 10 L7.5 3 L15 10 L22.5 3 L30 10 L37.5 3 L45 10 L52.5 3 L60 10' fill='none' stroke='%23204F8D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cg fill='%237DA9C5'%3E%3Ccircle cx='7.5' cy='16' r='1.7'/%3E%3Ccircle cx='22.5' cy='16' r='1.7'/%3E%3Ccircle cx='37.5' cy='16' r='1.7'/%3E%3Ccircle cx='52.5' cy='16' r='1.7'/%3E%3C/g%3E%3Cpath d='M1 21 H14 L7.5 29Z M16 21 H29 L22.5 29Z M31 21 H44 L37.5 29Z M46 21 H59 L52.5 29Z' fill='%23A75D33'/%3E%3Cg fill='%23C07943'%3E%3Crect x='2' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='9.5' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='17' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='24.5' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='32' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='39.5' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='47' y='33' width='4' height='3' rx='1.5'/%3E%3Crect x='54.5' y='33' width='4' height='3' rx='1.5'/%3E%3C/g%3E%3C/svg%3E");
+  /* puntadas de la carta (para usar como máscara) */
+  --and-puntadas:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Crect x='1' y='4' width='10' height='4.4' rx='2.2' transform='rotate(-7 6 6)'/%3E%3C/svg%3E");
+  /* montañas del pie (como las de la carta: azul delante, óxido y ocre detrás) */
+  --and-montes:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 240' preserveAspectRatio='none'%3E%3Cpath d='M560 240 L760 70 L830 120 L905 40 L1080 160 L1200 120 L1200 240Z' fill='%23C07943' opacity='.55'/%3E%3Cpath d='M380 240 L600 96 L690 150 L760 110 L960 240Z' fill='%23A75D33' opacity='.75'/%3E%3Cpath d='M0 240 L0 170 L170 80 L260 140 L330 104 L520 240Z' fill='%23204F8D' opacity='.85'/%3E%3Cpath d='M820 240 L1010 150 L1200 230 L1200 240Z' fill='%23102948' opacity='.7'/%3E%3C/svg%3E");
+}
+:root[data-tema=andino] body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);letter-spacing:.012em}
+
+/* ---------- fondo: papel, una trama andina muy suave y montañas al pie ---------- */
+:root[data-tema=andino] .atmo{background:radial-gradient(120% 70% at 50% 0%,#FFFDF9,var(--bg) 70%)}
+:root[data-tema=andino] .atmo .blob{display:none}
+:root[data-tema=andino] .atmo .pattern{opacity:.045;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='48'%3E%3Cpath d='M0 12 L7.5 5 L15 12 L22.5 5 L30 12 L37.5 5 L45 12 L52.5 5 L60 12' fill='none' stroke='%23102948' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M23 30 H37 L30 38Z' fill='%23743725'/%3E%3C/svg%3E")}
+:root[data-tema=andino] .atmo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:min(26vh,230px);background:var(--and-montes) bottom/100% 100% no-repeat;opacity:.13}
+
+/* ---------- tarjetas de papel ---------- */
+:root[data-tema=andino] .glass{background:var(--and-papel);border:1px solid var(--stroke);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--and-sombra)}
+:root[data-tema=andino] .tile::before{background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(211,190,160,.28),transparent 60%)}
+:root[data-tema=andino] .tile:hover{border-color:rgba(32,79,141,.32)}
+
+/* ---------- letra de la carta ---------- */
+:root[data-tema=andino] .hd h2,:root[data-tema=andino] .top h1,:root[data-tema=andino] .login h1,:root[data-tema=andino] .sec-t,
+:root[data-tema=andino] .acard h3,:root[data-tema=andino] .av-hd,:root[data-tema=andino] .ea-mt,:root[data-tema=andino] .bt-hd b{
+  font-family:var(--f-logo);font-weight:400;letter-spacing:.01em;color:var(--and-titulo)}
+:root[data-tema=andino] .hd h2{font-size:22px;line-height:1.1}
+:root[data-tema=andino] .top h1{font-size:27px;line-height:1.05}
+:root[data-tema=andino] .login h1{font-size:32px}
+:root[data-tema=andino] .sec-t{font-size:21px}
+:root[data-tema=andino] .acard h3{font-size:20px}
+:root[data-tema=andino] .bt-hd b{font-size:21px}
+:root[data-tema=andino] .av-hd{font-size:21px}
+:root[data-tema=andino] .ea-mt{font-size:23px}
+:root[data-tema=andino] .hd p,:root[data-tema=andino] .top p,:root[data-tema=andino] .login p.lead,:root[data-tema=andino] .bt-hd small{font-family:var(--f-sub);font-weight:500;color:var(--accent);letter-spacing:.005em}
+:root[data-tema=andino] .lbl,:root[data-tema=andino] th,:root[data-tema=andino] .nav .grp,:root[data-tema=andino] .room,:root[data-tema=andino] .av-grupo,:root[data-tema=andino] .pn-et{letter-spacing:.1em}
+:root[data-tema=andino] .login-hd b,:root[data-tema=andino] .brand b{font-family:var(--f-logo);color:var(--and-titulo)}
+
+/* ---------- ingreso ---------- */
+:root[data-tema=andino] .login-card{position:relative;padding-top:46px}
+:root[data-tema=andino] .login-card::before{content:"";position:absolute;left:0;right:0;top:0;height:38px;background:var(--and-guarda) repeat-x 0 6px/60px 38px;border-radius:28px 28px 0 0;opacity:.95}
+:root[data-tema=andino] .bt{background:linear-gradient(160deg,color-mix(in srgb,var(--c) 9%,transparent),transparent 55%),#FFFDF9}
+:root[data-tema=andino] .bt::before{width:12px;left:6px;background:var(--c);box-shadow:none;-webkit-mask:var(--and-puntadas) repeat-y 0 8px/12px 12px;mask:var(--and-puntadas) repeat-y 0 8px/12px 12px;opacity:.85}
+:root[data-tema=andino] .bt{padding-left:24px}
+:root[data-tema=andino] .bt-n{color:var(--fg)}
+:root[data-tema=andino] .person:hover{border-color:rgba(32,79,141,.45);box-shadow:0 10px 24px -12px rgba(57,36,24,.4)}
+:root[data-tema=andino] .av,:root[data-tema=andino] .me span.av{color:#FFFFFF}
+:root[data-tema=andino] .pad button:hover{background:rgba(32,79,141,.08)}
+
+/* Colores de cada cargo (avatares y bloques del selector), con la paleta de la foto. */
+:root[data-tema=andino] .bt-dueno{--c:#102948!important}
+:root[data-tema=andino] .bt-jefe{--c:#204F8D!important}
+:root[data-tema=andino] .bt-encargado{--c:#90603A!important}
+:root[data-tema=andino] .bt-garzon{--c:#A75D33!important}
+:root[data-tema=andino] .bt-barista{--c:#2C6AA8!important}
+:root[data-tema=andino] .bt-cocina{--c:#743725!important}
+:root[data-tema=andino] .bt-panaderia{--c:#C07943!important}
+:root[data-tema=andino] [style*="background:#40E0D0"].av{background:#102948!important}
+:root[data-tema=andino] [style*="background:#3ABCFC"].av{background:#204F8D!important}
+:root[data-tema=andino] [style*="background:#D9A93A"].av{background:#90603A!important}
+:root[data-tema=andino] [style*="background:#FF7F50"].av{background:#A75D33!important}
+:root[data-tema=andino] [style*="background:#1AA89B"].av{background:#2C6AA8!important}
+:root[data-tema=andino] [style*="background:#9A80D6"].av{background:#743725!important}
+:root[data-tema=andino] [style*="background:#E8674A"].av{background:#D3BEA0!important;color:#392418!important}
+:root[data-tema=andino] [style*="rgb(64, 224, 208)"].av{background:#102948!important}
+:root[data-tema=andino] [style*="rgb(58, 188, 252)"].av{background:#204F8D!important}
+:root[data-tema=andino] [style*="rgb(217, 169, 58)"].av{background:#90603A!important}
+:root[data-tema=andino] [style*="rgb(255, 127, 80)"].av{background:#A75D33!important}
+:root[data-tema=andino] [style*="rgb(26, 168, 155)"].av{background:#2C6AA8!important}
+:root[data-tema=andino] [style*="rgb(154, 128, 214)"].av{background:#743725!important}
+:root[data-tema=andino] [style*="rgb(232, 103, 74)"].av{background:#D3BEA0!important;color:#392418!important}
+/* Color de cada área en el panel (lo pone el sistema en --c). */
+:root[data-tema=andino] [style*="--c:#40E0D0"]{--c:#204F8D!important}
+:root[data-tema=andino] [style*="--c:#C19A6B"]{--c:#90603A!important}
+:root[data-tema=andino] [style*="--c:#FFB547"]{--c:#C07943!important}
+:root[data-tema=andino] [style*="--c:#9A80D6"]{--c:#743725!important}
+:root[data-tema=andino] [style*="--c:#FF7F50"]{--c:#A75D33!important}
+:root[data-tema=andino] [style*="--c:#1AA89B"]{--c:#2C6AA8!important}
+:root[data-tema=andino] [style*="--c:#E8674A"]{--c:#9A5129!important}
+:root[data-tema=andino] [style*="--c:#D9A93A"]{--c:#90603A!important}
+:root[data-tema=andino] [style*="--c:#3DDC84"]{--c:#2E7D4F!important}
+
+/* Colores puestos en línea por los módulos (leyendas, puntos, barras). */
+:root[data-tema=andino] [style*="background:#40E0D0"],:root[data-tema=andino] [style*="background: rgb(64, 224, 208)"]{background:var(--and-azul)!important}
+:root[data-tema=andino] [style*="background:#1AA89B"],:root[data-tema=andino] [style*="background:#2FD3C1"]{background:var(--and-cielo)!important}
+:root[data-tema=andino] [style*="background:#FF7F50"]{background:var(--and-ocre)!important}
+:root[data-tema=andino] [style*="background:#E8674A"]{background:var(--and-oxido-c)!important}
+:root[data-tema=andino] [style*="background:#9A80D6"]{background:var(--and-oxido)!important}
+:root[data-tema=andino] [style*="background:#C19A6B"],:root[data-tema=andino] [style*="background:#D9A93A"]{background:var(--and-trigo)!important}
+:root[data-tema=andino] [style*="background:#98ABA8"]{background:var(--and-arena)!important}
+:root[data-tema=andino] .side-in .brand b{font-size:25px}
+
+:root[data-tema=andino] [style*="color:#C9B8F2"]{color:var(--and-oxido)!important}
+:root[data-tema=andino] [style*="color:#3DDC84"]{color:var(--ok)!important}
+:root[data-tema=andino] [style*="--c:#9A80D6"]{--c:#743725!important}
+:root[data-tema=andino] .seg button[aria-pressed="true"]{color:var(--accent-ink)}
+
+/* ---------- columna del sistema: azul noche con la guarda arriba ---------- */
+:root[data-tema=andino] .side-in{
+  --fg:#FBF6EE; --fg-2:#E6D8C4; --muted:#D3B48E; --stroke:rgba(255,255,255,.14); --stroke-2:rgba(255,255,255,.24);
+  --glass-2:rgba(255,255,255,.07); --accent:#D3BEA0; --accent-ink:#102948;
+  background:#102948 linear-gradient(180deg,#14325A,#102948 60%,#0D2240);border-color:rgba(16,41,72,.5);color:var(--fg)}
+:root[data-tema=andino] .side-in .band{height:38px;background:#FFFCF7 var(--and-guarda) repeat-x 0 2px/60px 38px;opacity:1}
+:root[data-tema=andino] .side-in .band>*{display:none}
+:root[data-tema=andino] .side-in .brand b{color:#F2C9A0}
+:root[data-tema=andino] .side-in .ver{background:#C07943;color:#1C120A}
+:root[data-tema=andino] .nav .ind{box-shadow:0 6px 18px -6px rgba(0,0,0,.45)}
+:root[data-tema=andino] .mnt path[fill="#FF7F50"]{fill:#C07943}
+:root[data-tema=andino] .mnt path[fill="#E8674A"]{fill:#A75D33}
+:root[data-tema=andino] .mnt path[fill="#1AA89B"]{fill:#4682B9}
+:root[data-tema=andino] .mnt path[fill="#0B2E30"]{fill:#0A1C33}
+:root[data-tema=andino] .ver{background:var(--accent);color:var(--accent-ink)}
+:root[data-tema=andino] .login-hd .ver{background:#C07943;color:#1C120A}
+
+/* ---------- barra de arriba, chips y botones ---------- */
+:root[data-tema=andino] .btn.pri{border-radius:999px}
+:root[data-tema=andino] .btn:hover:not(:disabled){border-color:rgba(32,79,141,.5);box-shadow:0 8px 18px -10px rgba(32,79,141,.45)}
+:root[data-tema=andino] .btn.warn{background:color-mix(in srgb,var(--warn) 12%,#FFFDF9);border-color:color-mix(in srgb,var(--warn) 45%,transparent);color:var(--warn)}
+:root[data-tema=andino] .search:focus{box-shadow:0 0 0 4px rgba(32,79,141,.14)}
+:root[data-tema=andino] :focus-visible{outline-color:var(--and-ocre)}
+:root[data-tema=andino] .hora-chip[data-tono="crit"]{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,#FFFDF9)}
+:root[data-tema=andino] .avisos-btn .badge-n{box-shadow:0 0 0 2px var(--and-papel)}
+:root[data-tema=andino] .avisos-btn.solo-warn .badge-n{color:#FFFFFF}
+:root[data-tema=andino] .top-pn i,:root[data-tema=andino] .av-item i,:root[data-tema=andino] .link i,:root[data-tema=andino] .hora-chip[data-tono] i{box-shadow:none}
+
+/* ---------- precios en mancha, como en la carta ---------- */
+:root[data-tema=andino] .price{background:var(--accent);color:#FFFFFF;border:0;border-radius:58% 42% 55% 45% / 62% 48% 52% 38%;padding:3px 12px 4px;font-weight:700;letter-spacing:.01em}
+
+/* ---------- puntadas: el borde de color de resúmenes, comandas y stock ---------- */
+:root[data-tema=andino] .panorama{padding-left:30px}
+:root[data-tema=andino] .panorama::before{width:12px;left:9px;background:var(--pt);box-shadow:none;-webkit-mask:var(--and-puntadas) repeat-y 0 6px/12px 12px;mask:var(--and-puntadas) repeat-y 0 6px/12px 12px}
+:root[data-tema=andino] .panorama::after{background:radial-gradient(60% 120% at 0% 0%,color-mix(in srgb,var(--pt) 7%,transparent),transparent 70%)}
+:root[data-tema=andino] .pn-ic{box-shadow:none}
+:root[data-tema=andino] .pn-tit{font-weight:600}
+:root[data-tema=andino] .inv li{border-left:1px solid var(--stroke);position:relative;padding-left:26px}
+:root[data-tema=andino] .inv li::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:11px;background:var(--sev);-webkit-mask:var(--and-puntadas) repeat-y 0 0/11px 11px;mask:var(--and-puntadas) repeat-y 0 0/11px 11px}
+
+/* ---------- piezas sueltas de Emporio con colores fijos ---------- */
+:root[data-tema=andino] .person:hover,:root[data-tema=andino] .mesa[aria-pressed="true"]{box-shadow:0 0 0 2px rgba(16,41,72,.18)}
+:root[data-tema=andino] .mesa{background:color-mix(in srgb,var(--c) 10%,#FFFDF9)}
+:root[data-tema=andino] .sk i{background:linear-gradient(90deg,rgba(16,41,72,.05) 0%,rgba(16,41,72,.11) 40%,rgba(16,41,72,.05) 80%);background-size:300% 100%}
+:root[data-tema=andino] .pill.up,:root[data-tema=andino] .badge.ok,:root[data-tema=andino] .fcp.ok{background:color-mix(in srgb,var(--ok) 12%,transparent)}
+:root[data-tema=andino] .pill.dn,:root[data-tema=andino] .badge.crit,:root[data-tema=andino] .fcp.crit{background:color-mix(in srgb,var(--crit) 11%,transparent)}
+:root[data-tema=andino] .badge.warn,:root[data-tema=andino] .fcp.warn{background:color-mix(in srgb,var(--warn) 12%,transparent)}
+:root[data-tema=andino] .flag.out{border-color:color-mix(in srgb,var(--crit) 40%,transparent)}
+:root[data-tema=andino] .mth.q{border-color:color-mix(in srgb,var(--warn) 45%,transparent);color:var(--warn)}
+:root[data-tema=andino] .tag.ok,:root[data-tema=andino] .tag.st-resuelto{border-color:color-mix(in srgb,var(--ok) 45%,transparent)}
+:root[data-tema=andino] .tag.st-abierto{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+:root[data-tema=andino] .tag.st-revision{border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+:root[data-tema=andino] .tip{background:#FFFCF7;color:var(--fg);box-shadow:0 10px 26px -10px rgba(57,36,24,.45)}
+:root[data-tema=andino] .scroll thead th,:root[data-tema=andino] thead th{background:#F8F1E6}
+@keyframes andRowin{0%{background:rgba(32,79,141,.14)}100%{background:transparent}}
+:root[data-tema=andino] tr.new td{animation-name:andRowin}
+:root[data-tema=andino] .node.on .ic{border-color:rgba(32,79,141,.55);box-shadow:0 0 0 4px rgba(32,79,141,.08)}
+:root[data-tema=andino] .node.bad .ic{border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+:root[data-tema=andino] .empty .ic{background:rgba(32,79,141,.08);border-color:rgba(32,79,141,.3)}
+:root[data-tema=andino] .toast{background:var(--and-noche);color:#FBF6EE;border:0;box-shadow:0 14px 34px -12px rgba(16,41,72,.6)}
+:root[data-tema=andino] .avisos{background:#FFFCF7;border-color:var(--stroke-2);box-shadow:0 24px 60px -20px rgba(57,36,24,.5)}
+:root[data-tema=andino] .ea-modal{background:rgba(16,41,72,.42)}
+:root[data-tema=andino] .ea-mc{background:#FFFCF7;box-shadow:0 30px 80px -24px rgba(16,41,72,.55)}
+:root[data-tema=andino] .ea-acc .ea-si{color:#FFFFFF}
+:root[data-tema=andino] .ea-acc .ea-si{background:var(--accent)}
+
+/* Barra plegada al bajar: papel y azul noche, sin el vidrio oscuro. */
+:root[data-tema=andino].colapsado .top{background:rgba(255,252,247,.96);box-shadow:0 10px 26px -14px rgba(57,36,24,.45)}
+@media (min-width:901px){
+  :root[data-tema=andino].colapsado .side:hover .side-in,:root[data-tema=andino].colapsado .side:has(:focus-visible) .side-in{background:#102948;box-shadow:0 24px 60px rgba(16,41,72,.45)}
+  :root[data-tema=andino].colapsado .side-in .band{height:22px;background-size:40px 25px}
+}
+@media (max-width:900px){
+  :root[data-tema=andino].colapsado .side-in{background:#102948}
+  :root[data-tema=andino] .side-in .band{display:none}
+}
+
+/* ---------- gráficos dibujados con los colores nativos ---------- */
+:root[data-tema=andino] [fill="#98ABA8"]{fill:var(--muted)}
+:root[data-tema=andino] [stroke="#98ABA8"]{stroke:var(--and-trigo)}
+:root[data-tema=andino] [fill="#F2F7F6"]{fill:var(--fg)}
+:root[data-tema=andino] [fill="#40E0D0"]{fill:var(--and-azul)}
+:root[data-tema=andino] [stroke="#40E0D0"]{stroke:var(--and-azul)}
+:root[data-tema=andino] [stop-color="#40E0D0"]{stop-color:var(--and-azul)}
+:root[data-tema=andino] [stop-color="#2FD3C1"]{stop-color:var(--and-cielo)}
+:root[data-tema=andino] [stop-color="#1AA89B"]{stop-color:var(--and-azul)}
+:root[data-tema=andino] [fill="#1AA89B"]{fill:var(--and-cielo)}
+:root[data-tema=andino] [fill="#FF7F50"]{fill:var(--and-ocre)}
+:root[data-tema=andino] [stroke="#FF7F50"]{stroke:var(--and-ocre)}
+:root[data-tema=andino] [fill="#E8674A"]{fill:var(--and-oxido-c)}
+:root[data-tema=andino] [fill="#D9A93A"],:root[data-tema=andino] [fill="#FFB547"]{fill:var(--and-trigo)}
+:root[data-tema=andino] [fill="#3DDC84"]{fill:var(--ok)}
+:root[data-tema=andino] [stroke="#3DDC84"]{stroke:var(--ok)}
+:root[data-tema=andino] [fill="#FF6161"]{fill:var(--crit)}
+:root[data-tema=andino] [stroke="#0A1012"]{stroke:var(--and-papel)}
+:root[data-tema=andino] [stroke^="rgba(255,255,255"]{stroke:rgba(16,41,72,.14)}
+:root[data-tema=andino] [fill^="rgba(255,255,255"]{fill:rgba(16,41,72,.08)}
+:root[data-tema=andino] [stroke="rgba(152,171,168,.55)"]{stroke:rgba(107,90,72,.5)}
+
+@media (prefers-reduced-motion:reduce){:root[data-tema=andino] .atmo::after{transition:none}}
+
+/* ====================================================================
+   Caja (caja/index.html): sus tokens propios y su piel de vidrio
+   ==================================================================== */
+:root[data-tema=andino]{
+  --crema:#F6EEE2; --papel:#FFFCF7; --papel2:rgba(16,41,72,.045); --papel3:rgba(16,41,72,.08);
+  --linea:rgba(16,41,72,.13); --linea-f:rgba(16,41,72,.24);
+  --tinta:#102948; --tinta2:#34465F; --tinta3:#6B5A48;
+  --marron:#204F8D; --marron2:#204F8D; --madera:rgba(32,79,141,.5); --arena:#90603A;
+  --bien:#2E7D4F; --bien-f:rgba(46,125,79,.12);
+  --avisa:#95560F; --avisa-f:rgba(149,86,15,.12);
+  --grave:#B23A2B; --grave-f:rgba(178,58,43,.11);
+  --dato:#2C6AA8; --dato-f:rgba(32,79,141,.09); --oro:#90603A;
+  --sobre-accion:#FFFFFF;
+  --sombra:var(--and-sombra);
+  --sombra-alta:0 1px 0 rgba(255,255,255,.9) inset,0 18px 36px -16px rgba(57,36,24,.45);
+  --sans:var(--f-ui); --mono:var(--f-num);
+}
+:root[data-tema=andino] .barra{background:rgba(255,252,247,.94);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid var(--linea);position:relative}
+:root[data-tema=andino] .barra::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:6px;background:var(--and-guarda) repeat-x 0 -26px/40px 25px;opacity:.85;pointer-events:none}
+:root[data-tema=andino] .barra .sig{box-shadow:none}
+:root[data-tema=andino] .barra .tit b,:root[data-tema=andino] h2.vt,:root[data-tema=andino] .hoja .ph b,:root[data-tema=andino] .graf .gt b,:root[data-tema=andino] .clase .ct b,:root[data-tema=andino] .metabar .mt b{
+  font-family:var(--f-logo);font-weight:400;color:var(--and-titulo);letter-spacing:.01em}
+:root[data-tema=andino] .barra .tit b{font-size:21px}
+:root[data-tema=andino] h2.vt{font-size:26px}
+:root[data-tema=andino] .hoja .ph b,:root[data-tema=andino] .graf .gt b,:root[data-tema=andino] .clase .ct b,:root[data-tema=andino] .metabar .mt b{font-size:19px}
+:root[data-tema=andino] :is(.tarjeta,.kpi,.graf,.tabox,.cuenta,.prod,.filtros,.venta,.aviso,.metabar,.normativa,.vacio){
+  background:var(--papel);backdrop-filter:none;-webkit-backdrop-filter:none}
+:root[data-tema=andino] .kpi.principal{background:var(--and-noche);color:#FBF6EE;box-shadow:0 14px 30px -14px rgba(16,41,72,.6)}
+:root[data-tema=andino] .kpi.principal .k,:root[data-tema=andino] .kpi.principal .p{color:rgba(251,246,238,.78)}
+:root[data-tema=andino] :is(.kpi.principal .dlt.sube,.kpi.principal .dlt.baja,.kpi.principal .dlt.neutro){color:#FBF6EE}
+:root[data-tema=andino] .prod:hover{border-color:rgba(32,79,141,.45)}
+:root[data-tema=andino] .btn:hover:not(:disabled){box-shadow:0 8px 18px -10px rgba(32,79,141,.45)}
+:root[data-tema=andino] .riel{background:var(--and-noche);backdrop-filter:none;-webkit-backdrop-filter:none}
+:root[data-tema=andino] .riel button{color:#E6D8C4}
+:root[data-tema=andino] .riel button[aria-current="true"]{background:#D3BEA0;color:#102948;box-shadow:none}
+:root[data-tema=andino] .pestanas{background:var(--and-noche)}
+:root[data-tema=andino] .pestanas button{color:#E6D8C4}
+:root[data-tema=andino] .pestanas button[aria-current="true"]{background:#D3BEA0;color:#102948;box-shadow:none}
+:root[data-tema=andino] .icobtn[aria-pressed="true"]{background:rgba(32,79,141,.1)}
+:root[data-tema=andino] :is(.turno select option,.campo select option){background:#FFFCF7;color:var(--tinta)}
+:root[data-tema=andino] :is(thead th,.tbl th){background:#F8F1E6}
+:root[data-tema=andino] .tbl tbody tr:hover{background:rgba(32,79,141,.05)}
+:root[data-tema=andino] :is(.campo input,.campo select,.campo textarea,.buscador input,.ingfila input,.ingfila select,input.mininum){background:#FFFDF9;border-color:var(--linea-f);color:var(--tinta)}
+:root[data-tema=andino] :is(.campo input,.campo select,.campo textarea,.buscador input,.ingfila input,input.mininum):focus{box-shadow:0 0 0 4px rgba(32,79,141,.14)}
+:root[data-tema=andino] .hoja .velo{background:rgba(16,41,72,.42)}
+:root[data-tema=andino] .hoja .panel{background:#FFFCF7;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 24px 60px -18px rgba(16,41,72,.55)}
+:root[data-tema=andino] .toast.bien{background:var(--bien);color:#FFFFFF}
+:root[data-tema=andino] .toast.mal{background:var(--grave);color:#FFFFFF}
+:root[data-tema=andino] .sumas{background:rgba(211,190,160,.16)}
+:root[data-tema=andino] .vale{box-shadow:0 12px 30px -14px rgba(57,36,24,.45)}
+/* Precios de los productos de la Caja: la mancha de la carta. */
+:root[data-tema=andino] .prod:not(.sinprecio) .pp{justify-self:start;background:var(--and-azul);color:#FFFFFF;border-radius:58% 42% 55% 45% / 62% 48% 52% 38%;padding:2px 11px 3px;font-weight:700}
+
+/* ====================================================================
+   Carta Interactiva y Control de Salón (carta/index.html, carta/salon.html)
+   ==================================================================== */
+:root[data-tema=andino]{
+  --cielo-alto:#FBF7F0; --cielo-bajo:#F6EEE2; --luz:rgba(211,190,160,.25); --suelo:transparent;
+  --surface:#FFFCF7; --surface-2:rgba(16,41,72,.05); --surface-3:rgba(16,41,72,.035);
+  --ink:#102948; --ink-soft:#34465F; --line:rgba(16,41,72,.14);
+  --on-accent:#FFFFFF; --avisa:#95560F; --falta:#B23A2B;
+  --ok-soft:rgba(46,125,79,.12); --avisa-soft:rgba(149,86,15,.12); --falta-soft:rgba(178,58,43,.11);
+  --turquesa:#204F8D; --turquesa-ink:#204F8D; --turquesa-soft:rgba(32,79,141,.12);
+  --terracota:#A75D33; --terracota-ink:#743725; --terracota-soft:rgba(167,93,51,.14);
+  --madera:#90603A; --madera-ink:#90603A; --volcan:#392418;
+  --coral-ink:#9A5129; --coral-soft:rgba(192,121,67,.16);
+  --dorado:#BC9670; --dorado-soft:rgba(188,150,112,.2); --arena-soft:rgba(211,190,160,.25);
+  --shadow:var(--and-sombra);
+}
+:root[data-tema=andino] body{text-shadow:none}
+:root[data-tema=andino] :is(h1,h2,h3,.gate h2,.familia,.bft){text-shadow:none}
+:root[data-tema=andino] .top:not(.glass){background:rgba(255,252,247,.94);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom-color:var(--line)}
+:root[data-tema=andino] :is(.opt,.card,.mcard,.ecard,.block,.nota,.guia,.optbox,.langgrid button,.hjl,.ticket,.espera,.aviso-legal){
+  background:var(--surface);border-color:var(--line);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--and-sombra)}
+:root[data-tema=andino] :is(.opt,.card,.mcard,.ecard,.langgrid button):hover{border-color:rgba(32,79,141,.45);box-shadow:0 14px 28px -14px rgba(57,36,24,.45)}
+:root[data-tema=andino] .bigbtn{box-shadow:0 10px 22px -10px rgba(32,79,141,.55)}
+:root[data-tema=andino] .hjpanel{background:#FFFCF7;backdrop-filter:none;-webkit-backdrop-filter:none}
+:root[data-tema=andino] .toast.campana{background:var(--accent);color:#FFFFFF}
+:root[data-tema=andino] .pasos .pb i{background:rgba(16,41,72,.18)}
+:root[data-tema=andino] .pasos .pb i.on{background:var(--accent)}
+:root[data-tema=andino] .plabel::after{background:rgba(16,41,72,.18)}
+:root[data-tema=andino] footer{border-top-color:rgba(16,41,72,.16)}
+:root[data-tema=andino] .insta{background:linear-gradient(118deg,#743725 0%,#A75D33 42%,#C07943 70%,#90603A 100%);background-size:220% 220%}
+/* Títulos de la carta escritos a mano, en óxido; bajadas en azul redondeado. */
+:root[data-tema=andino] :is(.gate h2,.familia,.bft,.dhead h2,.dhead h1){font-family:var(--f-logo);font-weight:400;color:var(--and-titulo);letter-spacing:.01em}
+:root[data-tema=andino] :is(.plabel,.ruta span.on,.gate .kicker,.dhead .sec){color:var(--and-azul);font-family:var(--f-sub)}
+
+/* ====================================================================
+   Prueba (prueba/index.html): piezas propias con colores de la noche
+   ==================================================================== */
+:root[data-tema=andino] :is(.miss,.ph,.pend){color:var(--warn)}
+:root[data-tema=andino] .sw2[aria-pressed="true"]{border-color:color-mix(in srgb,var(--crit) 55%,transparent);color:var(--crit);background:color-mix(in srgb,var(--crit) 10%,transparent)}
+:root[data-tema=andino] [style*="background:#3DDC84"]{background:var(--ok)!important}
+:root[data-tema=andino] [style*="background:#FF6161"]{background:var(--crit)!important}
+:root[data-tema=andino] [style*="background:#FFB547"]{background:var(--and-ocre)!important}
+:root[data-tema=andino] [style*="background:#9AAAA7"],:root[data-tema=andino] [style*="background:#5C6F6C"]{background:var(--and-arena)!important}
+:root[data-tema=andino] [fill="#5C6F6C"]{fill:var(--and-arena)}
+:root[data-tema=andino] [fill="#9AAAA7"]{fill:var(--and-arena)}
+:root[data-tema=andino] [fill="#FFB547"]{fill:var(--and-ocre)}
+:root[data-tema=andino] [fill="#FFD2C0"],:root[data-tema=andino] [fill="#FFB499"]{fill:var(--and-oxido-c)}
+:root[data-tema=andino] [color="#40E0D0"]{color:var(--and-azul)}
+:root[data-tema=andino] [color="#2FD3C1"],:root[data-tema=andino] [color="#1AA89B"]{color:var(--and-cielo)}
+
+/* Teléfono: el nombre escrito a mano es más ancho que el de Caveat. */
+@media (max-width:640px){
+  :root[data-tema=andino] .login-hd b{font-size:31px}
+  :root[data-tema=andino] .login h1{font-size:27px}
+  :root[data-tema=andino] .top h1{font-size:24px}
+}

@@ -541,3 +541,18 @@ html:not(.incrustado){scroll-padding-top:96px;scroll-padding-bottom:24px}
 .ea-acc button{border-radius:12px;padding:10px 16px;font:inherit;font-weight:800;cursor:pointer;border:1px solid var(--stroke-2);background:var(--glass-2);color:var(--fg)}
 .ea-acc .ea-si{background:var(--accent);color:#06201d;border-color:var(--accent)}
 .ea-acc .ea-si:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- selector de tema (nucleo/tema.js) ---------- */
+.login-ctl{display:inline-flex;align-items:center;gap:8px}
+.tema-btn svg{width:16px;height:16px}
+.chip.tema-btn{cursor:pointer;font-family:inherit}
+.temas{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.tema-op{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px;border-radius:18px;border:1.5px solid var(--stroke);background:var(--glass-2);color:var(--fg);font:inherit;cursor:pointer;transition:transform var(--spring-dur) var(--spring),border-color .2s}
+.tema-op:hover{transform:translateY(-2px)}
+.tema-op[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.tema-op b{font-family:var(--f-num);font-size:15px}
+.tema-op b small{font-weight:600;color:var(--muted);font-size:11.5px}
+.tema-op>span:last-child{font-size:12.5px;color:var(--fg-2)}
+.tema-sw{display:flex;height:22px;border-radius:8px;overflow:hidden;border:1px solid var(--stroke)}
+.tema-sw i{flex:1;background:var(--sw)}
+.brand .row .tema-btn{margin-left:auto;flex:none}

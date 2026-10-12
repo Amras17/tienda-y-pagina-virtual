@@ -1,7 +1,7 @@
 {
-  "version": "3.0",
-  "fecha": "2026-10-11T18:21:15.783Z",
-  "total": 366,
+  "version": "3.1",
+  "fecha": "2026-10-12T16:35:36.313Z",
+  "total": 408,
   "fallas": 0,
   "resultados": [
     {
@@ -506,13 +506,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":2768.25,\"vit\":0},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2073}}"
+      "detalle": "{\"h0\":{\"pollo\":2768.25,\"vit\":5},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2073}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "al salir del horno las unidades pasan a la vitrina",
       "ok": true,
-      "detalle": "{\"vit\":15,\"horno\":0}"
+      "detalle": "{\"vit\":18,\"horno\":0}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -542,7 +542,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 6 espera la cuenta hace 7 min"
+      "detalle": "crit:Se acabó: palta hass | warn:2 variedades de empanada agotadas | info:Salió una hornada a la vitrina"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · escritorio",
@@ -728,7 +728,7 @@
       "modulo": "Horario · escritorio",
       "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
       "ok": true,
-      "detalle": "{\"sub\":\"Domingo, 11 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
+      "detalle": "{\"sub\":\"Lunes, 12 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     },
     {
       "modulo": "Producción · escritorio",
@@ -740,7 +740,7 @@
       "modulo": "Producción · escritorio",
       "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
       "ok": true,
-      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 18:15 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 16:30 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
     },
     {
       "modulo": "Producción · escritorio",
@@ -902,7 +902,7 @@
       "modulo": "Fila y mesas · escritorio",
       "prueba": "llama al siguiente (Juan) a la mesa libre",
       "ok": true,
-      "detalle": "{\"grupo\":\"gmv459t4ouz\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T18:16:30.000Z\",\"vez\":1}"
+      "detalle": "{\"grupo\":\"gmv5gxwelzc\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-12T16:30:53.117Z\",\"vez\":1}"
     },
     {
       "modulo": "Fila y mesas · escritorio",
@@ -938,7 +938,7 @@
       "modulo": "Fila y mesas · escritorio",
       "prueba": "venta registrada sin duplicar la comanda",
       "ok": true,
-      "detalle": "{\"fila\":{\"grupo\":\"gmv459t4ouz\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
+      "detalle": "{\"fila\":{\"grupo\":\"gmv5gxwelzc\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
     },
     {
       "modulo": "Fila y mesas · escritorio (fila)",
@@ -1010,7 +1010,7 @@
       "modulo": "Seguridad · escritorio",
       "prueba": "403 al pedir la Caja desde el sistema, y queda en la bitácora",
       "ok": true,
-      "detalle": "{\"ts\":\"2026-10-11T18:16:45.995Z\",\"tipo\":\"denegado\",\"quien\":\"Joanne Daline Rodas\",\"rol\":\"barista\",\"recurso\":\"vista caja\",\"detalle\":\"fuera del área de Barra y café\",\"lugar\":\"/index.html\",\"h\":\"2bced4ee\"}"
+      "detalle": "{\"ts\":\"2026-10-12T16:31:04.486Z\",\"tipo\":\"denegado\",\"quien\":\"Joanne Daline Rodas\",\"rol\":\"barista\",\"recurso\":\"vista caja\",\"detalle\":\"fuera del área de Barra y café\",\"lugar\":\"/index.html\",\"h\":\"d7804d10\"}"
     },
     {
       "modulo": "Seguridad · escritorio",
@@ -1034,7 +1034,7 @@
       "modulo": "Seguridad · escritorio",
       "prueba": "garzón: la venta queda a su nombre y ve sus propinas",
       "ok": true,
-      "detalle": "{\"resp\":\"Wilbert Escalona\",\"fijo\":true,\"secc\":\"caja\",\"propinas\":\"11 de octubre de 2026 · tus propinas de hoy: $400 en 1 venta\"}"
+      "detalle": "{\"resp\":\"Wilbert Escalona\",\"fijo\":true,\"secc\":\"caja\",\"propinas\":\"12 de octubre de 2026 · tus propinas de hoy: $400 en 1 venta\"}"
     },
     {
       "modulo": "Seguridad · escritorio",
@@ -1098,6 +1098,132 @@
     },
     {
       "modulo": "Seguridad · escritorio",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "el tema nativo es el de siempre y no carga las fuentes de la carta",
+      "ok": true,
+      "detalle": "{\"tema\":\"nativo\",\"attr\":null,\"fuentes\":false,\"css\":true}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "el botón cambia a Carta Andina el sistema y el módulo abierto, al instante",
+      "ok": true,
+      "detalle": "{\"tema\":\"andino\",\"guardado\":\"andino\",\"modulo\":\"andino\",\"fuentes\":true,\"bg\":\"rgb(246, 238, 226)\",\"glass\":\"rgb(255, 252, 247)\",\"titulo\":\"Chinchilla, \\\"Gochi Hand\\\", \\\"Comic Sans MS\\\", cursive\",\"aviso\":\"Tema: Carta Andina\"}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "papel claro, tarjetas de papel y títulos con la letra de la carta",
+      "ok": true,
+      "detalle": "rgb(246, 238, 226) · rgb(255, 252, 247) · Chinchilla, \"Gochi Hand\", \"Comic Sans MS\", cursive"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "inicio con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"—\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "caja con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "fila con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "salon con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "cocina con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "barra con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "horno con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "panaderia con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "carta con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "prueba con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "versiones con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"—\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "Versiones muestra los dos temas y marca el elegido",
+      "ok": true,
+      "detalle": "{\"n\":2,\"on\":\"andino\"}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "la Carta abierta aparte también sigue el tema del equipo",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "volver al nativo desde Versiones también cambia las otras ventanas",
+      "ok": true,
+      "detalle": "null"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "?tema=andino en la dirección deja el tema fijo en el equipo",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -1604,13 +1730,13 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "hornada personalizada gasta los insumos de las fichas",
       "ok": true,
-      "detalle": "{\"h0\":{\"pollo\":3000,\"vit\":0},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2304.75}}"
+      "detalle": "{\"h0\":{\"pollo\":2768.25,\"vit\":5},\"h1\":{\"total\":30,\"fin\":10,\"pollo\":2073}}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "al salir del horno las unidades pasan a la vitrina",
       "ok": true,
-      "detalle": "{\"vit\":15,\"horno\":0}"
+      "detalle": "{\"vit\":18,\"horno\":0}"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1640,7 +1766,7 @@
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
       "prueba": "avisos de la Prueba: se acabó la palta",
       "ok": true,
-      "detalle": "crit:Se acabó: palta hass | crit:3 variedades de empanada agotadas | info:Salió una hornada a la vitrina | warn:Mesa 6 espera la cuenta hace 6 min"
+      "detalle": "crit:Se acabó: palta hass | warn:2 variedades de empanada agotadas | info:Salió una hornada a la vitrina"
     },
     {
       "modulo": "Prueba · fichas, horno e ingresos · telefono",
@@ -1826,7 +1952,7 @@
       "modulo": "Horario · telefono",
       "prueba": "Prueba: aviso a los 12 min y a las 21:30 cierra mesas y cocina",
       "ok": true,
-      "detalle": "{\"sub\":\"Domingo, 11 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
+      "detalle": "{\"sub\":\"Lunes, 12 de octubre de 2026 · Cierran las mesas y la cocina en 12 min · temporada baja\",\"av\":true,\"ocupadas\":0,\"cocinaDespues\":0,\"fila\":0}"
     },
     {
       "modulo": "Producción · telefono",
@@ -1838,7 +1964,7 @@
       "modulo": "Producción · telefono",
       "prueba": "plan de 6 latas de pino y 2 de cada otra, menos el precocido de ayer",
       "ok": true,
-      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 18:20 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
+      "detalle": "{\"cards\":9,\"total\":20,\"pino\":4,\"prec\":\"El Horno reportó ayer a las 16:34 (Magda) 32 empanadas armadas sin hornear. Se hornean primero; el sugerido de hoy descuenta las latas completas.\\n\\n32Pino\"}"
     },
     {
       "modulo": "Producción · telefono",
@@ -1880,7 +2006,7 @@
       "modulo": "Producción · telefono",
       "prueba": "resumen del Horno: el temporizador en grande y Revisar vitrina",
       "ok": true,
-      "detalle": "{\"reloj\":\"19:57\",\"grande\":52,\"revisar\":true}"
+      "detalle": "{\"reloj\":\"19:58\",\"grande\":52,\"revisar\":true}"
     },
     {
       "modulo": "Producción · telefono",
@@ -2000,7 +2126,7 @@
       "modulo": "Fila y mesas · telefono",
       "prueba": "llama al siguiente (Juan) a la mesa libre",
       "ok": true,
-      "detalle": "{\"grupo\":\"gmv45fbs6ro\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-11T18:20:44.190Z\",\"vez\":1}"
+      "detalle": "{\"grupo\":\"gmv5h30utjk\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-12T16:34:51.930Z\",\"vez\":1}"
     },
     {
       "modulo": "Fila y mesas · telefono",
@@ -2036,7 +2162,7 @@
       "modulo": "Fila y mesas · telefono",
       "prueba": "venta registrada sin duplicar la comanda",
       "ok": true,
-      "detalle": "{\"fila\":{\"grupo\":\"gmv45fbs6ro\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
+      "detalle": "{\"fila\":{\"grupo\":\"gmv5h30utjk\",\"num\":1,\"nombre\":\"Juan\",\"comandado\":true},\"cobrado\":true,\"comandas\":2}"
     },
     {
       "modulo": "Fila y mesas · telefono (fila)",
@@ -2108,7 +2234,7 @@
       "modulo": "Seguridad · telefono",
       "prueba": "403 al pedir la Caja desde el sistema, y queda en la bitácora",
       "ok": true,
-      "detalle": "{\"ts\":\"2026-10-11T18:20:55.540Z\",\"tipo\":\"denegado\",\"quien\":\"Joanne Daline Rodas\",\"rol\":\"barista\",\"recurso\":\"vista caja\",\"detalle\":\"fuera del área de Barra y café\",\"lugar\":\"/index.html\",\"h\":\"e59845e8\"}"
+      "detalle": "{\"ts\":\"2026-10-12T16:35:01.372Z\",\"tipo\":\"denegado\",\"quien\":\"Joanne Daline Rodas\",\"rol\":\"barista\",\"recurso\":\"vista caja\",\"detalle\":\"fuera del área de Barra y café\",\"lugar\":\"/index.html\",\"h\":\"0e5c1819\"}"
     },
     {
       "modulo": "Seguridad · telefono",
@@ -2132,7 +2258,7 @@
       "modulo": "Seguridad · telefono",
       "prueba": "garzón: la venta queda a su nombre y ve sus propinas",
       "ok": true,
-      "detalle": "{\"resp\":\"Wilbert Escalona\",\"fijo\":true,\"secc\":\"caja\",\"propinas\":\"11 de octubre de 2026 · tus propinas de hoy: $400 en 1 venta\"}"
+      "detalle": "{\"resp\":\"Wilbert Escalona\",\"fijo\":true,\"secc\":\"caja\",\"propinas\":\"12 de octubre de 2026 · tus propinas de hoy: $400 en 1 venta\"}"
     },
     {
       "modulo": "Seguridad · telefono",
@@ -2196,6 +2322,132 @@
     },
     {
       "modulo": "Seguridad · telefono",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "el tema nativo es el de siempre y no carga las fuentes de la carta",
+      "ok": true,
+      "detalle": "{\"tema\":\"nativo\",\"attr\":null,\"fuentes\":false,\"css\":true}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "el botón cambia a Carta Andina el sistema y el módulo abierto, al instante",
+      "ok": true,
+      "detalle": "{\"tema\":\"andino\",\"guardado\":\"andino\",\"modulo\":\"andino\",\"fuentes\":true,\"bg\":\"rgb(246, 238, 226)\",\"glass\":\"rgb(255, 252, 247)\",\"titulo\":\"Chinchilla, \\\"Gochi Hand\\\", \\\"Comic Sans MS\\\", cursive\",\"aviso\":\"Tema: Carta Andina\"}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "papel claro, tarjetas de papel y títulos con la letra de la carta",
+      "ok": true,
+      "detalle": "rgb(246, 238, 226) · rgb(255, 252, 247) · Chinchilla, \"Gochi Hand\", \"Comic Sans MS\", cursive"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "inicio con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"—\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "caja con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "fila con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "salon con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "cocina con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "barra con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "horno con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "panaderia con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "carta con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "prueba con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "versiones con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"—\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "Versiones muestra los dos temas y marca el elegido",
+      "ok": true,
+      "detalle": "{\"n\":2,\"on\":\"andino\"}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "la Carta abierta aparte también sigue el tema del equipo",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "volver al nativo desde Versiones también cambia las otras ventanas",
+      "ok": true,
+      "detalle": "null"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "?tema=andino en la dirección deja el tema fijo en el equipo",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""

@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="nucleo/tema.js"></script></head><body>
 <title>EmporioAndinoPOS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.0</span></div><span class="chip num" id="loginClock">--:--</span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.1</span></div><span class="login-ctl"><button class="chip tema-btn" type="button" id="temaLogin" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>Tema</span></button><span class="chip num" id="loginClock">--:--</span></span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Toca tu nombre y escribe tu PIN: entras directo a tu área. Cada cargo ve solo lo que le corresponde.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.0</span><small>Emporio Andino · San Pedro</small></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.1</span><small>Emporio Andino · San Pedro</small><button class="btn sm icon tema-btn" type="button" id="temaBtn" aria-label="Cambiar tema" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></button></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -197,6 +197,9 @@
           <div class="hd"><div><h2>Accesos del equipo</h2><p>Restablecer un PIN obliga a esa persona a crear uno nuevo al entrar</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>PIN</th><th class="r">Acción</th></tr></thead><tbody id="acc"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
+          <div class="hd"><div><h2>Tema del sistema</h2><p>Se elige en cada equipo y cambia al instante en todas sus ventanas, módulos y en la Carta</p></div></div>
+          <div class="temas" id="temas" role="group" aria-label="Tema del sistema"></div></div></article>
+        <article class="tile glass s12"><div class="tc">
           <div class="hd"><div><h2>Perímetro de cada cargo</h2><p>Qué áreas abre cada cargo; fuera de ellas no hay ruta (403) y el intento queda en la bitácora</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Cargo</th><th>Entra a</th><th>Áreas</th><th>Acciones sensibles</th></tr></thead><tbody id="perimetro"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
@@ -204,8 +207,12 @@
             <div class="seg" role="group" aria-label="Filtro" id="bitFiltro"><button type="button" data-bf="todo" aria-pressed="true">Todo</button><button type="button" data-bf="alerta" aria-pressed="false">Solo alertas</button></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Hora</th><th>Quién</th><th>Qué</th><th>Recurso</th><th>Detalle</th></tr></thead><tbody id="bitacora"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 3.0</h2><p>Equipo real, pantalla de inicio por áreas y seguridad por cargo y área</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 3.1</h2><p>Tema #2 Carta Andina, y antes el equipo real con seguridad por cargo y área</p></div></div>
           <div class="notas">
+            <div><h3>Tema Carta Andina (3.1)</h3><ul>
+              <li>Segundo tema para todo el sistema, alternativo al nativo: los colores de la foto del camino al desierto (azul noche, cielo, arena, ocre, óxido y tierra) con el diseño de la carta impresa.</li>
+              <li>Papel claro, títulos escritos a mano, bajadas redondeadas, precios en mancha de color, puntadas, guardas andinas y montañas. Se cambia con el botón de paleta junto a la versión, en el ingreso o en Versiones; vale para cada equipo y todas sus ventanas.</li>
+            </ul></div>
             <div><h3>Pantalla de inicio (3.0)</h3><ul>
               <li>Mosaico por áreas con las 28 personas del equipo. Al elegir a alguien y dar su PIN entra directo a su área: barra a Comandas de barra, cocina a Comandas de cocina, panadería a Panadería, garzones a Fila y mesas.</li>
               <li>PIN de 4 dígitos que cada persona crea la primera vez; 5 intentos fallidos bloquean un minuto. La sesión de Caja, Fila y gestión se cierra tras 10 minutos sin uso; las pantallas de cocina, barra y panadería quedan abiertas.</li>
@@ -1020,6 +1027,23 @@ function arrancarApp(primera){
   cur="";
   show(c,true); if(v!==c) go(v);
 }
+/* ==================== TEMA ==================== */
+/* Nativo o Carta Andina (nucleo/tema.js): por equipo, para todas las capas. */
+var TEMA=window.EA_TEMA||{actual:function(){ return "nativo"; },poner:function(){},lista:[]};
+function nombreTema(t){ return ((TEMA.lista.filter(function(x){ return x.id===t; })[0])||{n:t}).n; }
+function pintarTemas(){
+  var t=TEMA.actual();
+  $("temas").innerHTML=TEMA.lista.map(function(x){
+    return '<button type="button" class="tema-op" data-tema-op="'+x.id+'" aria-pressed="'+(x.id===t)+'"><span class="tema-sw">'+x.muestra.map(function(c){ return '<i style="--sw:'+c+'"></i>'; }).join("")+'</span>'+
+      '<b>'+esc(x.n)+(x.id==="nativo"?' <small>(tema #1)</small>':' <small>(tema #2)</small>')+'</b><span>'+esc(x.d)+'</span></button>'; }).join("");
+  ["temaBtn","temaLogin"].forEach(function(id){ var b=$(id); if(b) b.title="Tema: "+nombreTema(t)+" · tocar para cambiar"; });
+}
+function cambiarTema(t){ t=TEMA.poner(t||(TEMA.actual()==="andino"?"nativo":"andino")); pintarTemas(); U.aviso("Tema: "+nombreTema(t)); }
+$("temaBtn").addEventListener("click",function(){ cambiarTema(); });
+$("temaLogin").addEventListener("click",function(){ cambiarTema(); });
+$("temas").addEventListener("click",function(e){ var b=e.target.closest("[data-tema-op]"); if(b) cambiarTema(b.dataset.temaOp); });
+addEventListener("ea-tema",pintarTemas);
+pintarTemas();
 U.reloj($("clock")); U.reloj($("loginClock"));
 arrancarApp(true);
 })();

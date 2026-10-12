@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v3.0
+# EmporioAndinoPOS v3.1
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -20,6 +20,8 @@ nucleo/datos.js   la carta única (130 productos, 10 idiomas)
 nucleo/nucleo.js  catálogo, configuración general y de prueba, versiones, equipo, cargos, PIN y sesión
 nucleo/emporio.css  sistema de diseño de Emporio System 1.1, común a todas las capas
 nucleo/emporio.js   comportamientos de Emporio System 1.1 (resortes, indicador, mosaicos, atmósfera, avisos)
+nucleo/tema.js      elige el tema (nativo o Carta Andina) en cada página
+nucleo/tema-andino.css  tema #2 Carta Andina para todas las capas
 ```
 
 Cómo fluye el dato:
@@ -30,6 +32,30 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Tema #2: Carta Andina (v3.1)
+
+Alternativa al tema nativo (Emporio System 1.1, noche volcánica con vidrio y turquesa) para **todas las
+capas**: sistema general, Caja, Fila y pantalla de llamado, Salón, Comandas, Horno, Panadería, Carta y
+Prueba.
+
+- **Paleta:** los once colores de la foto del camino al desierto: azul noche `#102948`, azul `#204F8D`,
+  cielo `#4682B9`, bruma `#7DA9C5`, arena `#D3BEA0`, trigo `#BC9670`, tierra tostada `#90603A`, ocre
+  `#C07943`, óxido claro `#A75D33`, óxido `#743725` y tierra `#392418`. Donde la carta usa turquesa va el
+  azul; donde usa naranjo, el ocre y el óxido. Los estados siguen siendo verde, ámbar y rojo, en tonos
+  tierra, para que se lean igual que en el nativo.
+- **Diseño y letra de la carta impresa:** papel claro, títulos escritos a mano, bajadas redondeadas, texto
+  espaciado, precios en una mancha de color, puntadas junto a cada ítem, la guarda andina (ola, triángulos
+  y puntos) y montañas al pie. La carta usa Chinchilla, Neulis Cursive y Citrine, que no se pueden
+  publicar en la web; el tema usa sus equivalentes libres de Google Fonts (Gochi Hand, Grandstander y
+  Lexend). Si un equipo tiene instaladas las originales, se usan esas.
+- **Cómo se elige:** botón de paleta junto a la versión (columna del sistema), en la pantalla de ingreso, o *Versiones →
+  Tema del sistema*. Se guarda por equipo (`eapos_tema`) y cambia al instante en todas sus ventanas y
+  módulos abiertos. `?tema=andino` en la dirección (por ejemplo, el enlace de la Carta) lo deja fijo en ese
+  equipo; `?tema=nativo` vuelve al de siempre.
+- **Archivos:** `nucleo/tema.js` (en el `<head>` de cada página: aplica el tema antes de pintar y carga las
+  fuentes solo si hace falta) y `nucleo/tema-andino.css` (todo el tema, activo solo con
+  `<html data-tema="andino">`). El tema nativo no cambió.
 
 ## Equipo, pantalla de inicio y seguridad (v3.0)
 
@@ -386,6 +412,8 @@ larga ahora se desplaza dentro de la pantalla.
 ```bash
 cd EmporioAndinoPOS
 NODE_PATH=$(npm root -g) node verificacion/verificar.mjs
+# solo algunas pruebas, por ejemplo el tema:
+SOLO=probarTema NODE_PATH=$(npm root -g) node verificacion/verificar.mjs
 ```
 
 Prueba cada módulo a 1366 px y a 390 px, y los flujos que cruzan módulos: ingreso con PIN → venta en la

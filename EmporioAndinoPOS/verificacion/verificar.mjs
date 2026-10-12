@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 3.0.
+// Agente de verificación de EmporioAndinoPOS 3.1.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -625,23 +625,53 @@ async function probarSalon(vista) {
   await ctx.close();
 }
 
+async function probarTema(vista) {
+  const M = `Tema Carta Andina · ${vista}`;
+  const { ctx, errores, caidos } = await contexto(vista);
+  const page = await ctx.newPage();
+  await page.goto(BASE + "index.html"); await page.waitForTimeout(400);
+  const ini = await page.evaluate(() => ({ tema: EA_TEMA.actual(), attr: document.documentElement.getAttribute("data-tema"), fuentes: !!document.getElementById("ea-tema-fuentes"), css: !!document.getElementById("ea-tema-css") }));
+  anota(M, "el tema nativo es el de siempre y no carga las fuentes de la carta", ini.tema === "nativo" && ini.attr === null && !ini.fuentes && ini.css, JSON.stringify(ini));
+  await sesion(page, "Constanza Veliz");
+  await page.locator('#nav a[data-v="caja"]').click(); await page.waitForTimeout(1500);
+  await page.locator("#temaBtn").click(); await page.waitForTimeout(700);
+  const cambio = await page.evaluate(() => { const f = document.querySelector('.view[data-view="caja"] iframe'), d = f && f.contentDocument;
+    const bg = getComputedStyle(document.body).backgroundColor, glass = getComputedStyle(document.querySelector(".top.glass")).backgroundColor;
+    return { tema: document.documentElement.dataset.tema, guardado: localStorage.getItem("eapos_tema"), modulo: d && d.documentElement.dataset.tema, fuentes: !!document.getElementById("ea-tema-fuentes"),
+      bg, glass, titulo: getComputedStyle(document.getElementById("vTitle")).fontFamily, aviso: ([...document.querySelectorAll(".toast")].pop() || {}).textContent || "" }; });
+  anota(M, "el botón cambia a Carta Andina el sistema y el módulo abierto, al instante", cambio.tema === "andino" && cambio.guardado === "andino" && cambio.modulo === "andino" && /Carta Andina/.test(cambio.aviso), JSON.stringify(cambio));
+  anota(M, "papel claro, tarjetas de papel y títulos con la letra de la carta", cambio.bg === "rgb(246, 238, 226)" && cambio.glass === "rgb(255, 252, 247)" && /Gochi Hand/.test(cambio.titulo) && cambio.fuentes, cambio.bg + " · " + cambio.glass + " · " + cambio.titulo);
+  for (const v of ["inicio", "caja", "fila", "salon", "cocina", "barra", "horno", "panaderia", "carta", "prueba", "versiones"]) {
+    await navA(page, v); await page.waitForTimeout(v === "prueba" || v === "carta" ? 1200 : 500);
+    const r = await page.evaluate(v => { const f = document.querySelector(`.view[data-view="${v}"] iframe`); let mod = "—", desb = false;
+      if (f && f.contentDocument) { mod = f.contentDocument.documentElement.dataset.tema || "nativo"; desb = f.contentDocument.documentElement.scrollWidth > f.clientWidth + 1; }
+      return { mod, desb, pagina: document.documentElement.scrollWidth > innerWidth + 1 }; }, v);
+    anota(M, `${v} con el tema y sin desborde`, (r.mod === "andino" || r.mod === "—") && !r.desb && !r.pagina, JSON.stringify(r));
+  }
+  const temas = await page.evaluate(() => ({ n: document.querySelectorAll("#temas [data-tema-op]").length, on: (document.querySelector('#temas [aria-pressed="true"]') || {}).dataset?.temaOp }));
+  anota(M, "Versiones muestra los dos temas y marca el elegido", temas.n === 2 && temas.on === "andino", JSON.stringify(temas));
+  const otra = await ctx.newPage(); await otra.goto(BASE + "carta/index.html"); await otra.waitForTimeout(800);
+  anota(M, "la Carta abierta aparte también sigue el tema del equipo", (await otra.evaluate(() => document.documentElement.dataset.tema)) === "andino");
+  await page.locator('#temas [data-tema-op="nativo"]').click(); await page.waitForTimeout(600);
+  const vuelta = await otra.evaluate(() => document.documentElement.getAttribute("data-tema"));
+  anota(M, "volver al nativo desde Versiones también cambia las otras ventanas", (await page.evaluate(() => EA_TEMA.actual())) === "nativo" && vuelta === null, String(vuelta));
+  await otra.goto(BASE + "carta/index.html?tema=andino"); await otra.waitForTimeout(600);
+  anota(M, "?tema=andino en la dirección deja el tema fijo en el equipo", (await otra.evaluate(() => localStorage.getItem("eapos_tema"))) === "andino");
+  await otra.evaluate(() => EA_TEMA.poner("nativo")); await otra.close();
+  await cierre(M, page, errores, caidos);
+  await ctx.close();
+}
+
+// SOLO=probarTema,probarFila node verificacion/verificar.mjs corre solo esas pruebas.
+const SOLO = (process.env.SOLO || "").split(",").filter(Boolean);
+const PRUEBAS = { probarGeneral, probarCajaYComandas, probarPruebaAplicar, probarPruebaContexto, probarPruebaFichas, probarCarta, probarSalon, probarHorario, probarProduccion, probarFila, probarSeguridad, probarTema };
 for (const v of Object.keys(VISTAS)) {
-  await probarGeneral(v);
-  await probarCajaYComandas(v);
-  await probarPruebaAplicar(v);
-  await probarPruebaContexto(v);
-  await probarPruebaFichas(v);
-  await probarCarta(v);
-  await probarSalon(v);
-  await probarHorario(v);
-  await probarProduccion(v);
-  await probarFila(v);
-  await probarSeguridad(v);
+  for (const [nombre, prueba] of Object.entries(PRUEBAS)) if (!SOLO.length || SOLO.includes(nombre)) await prueba(v);
 }
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "3.0", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "3.1", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);
