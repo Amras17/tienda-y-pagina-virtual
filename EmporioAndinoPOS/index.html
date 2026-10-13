@@ -57,7 +57,7 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.1</span></div><span class="login-ctl"><button class="chip tema-btn" type="button" id="temaLogin" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>Tema</span></button><span class="chip num" id="loginClock">--:--</span></span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.2</span></div><span class="login-ctl"><button class="chip tema-btn" type="button" id="temaLogin" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>Tema</span></button><span class="chip num" id="loginClock">--:--</span></span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Toca tu nombre y escribe tu PIN: entras directo a tu área. Cada cargo ve solo lo que le corresponde.</p>
@@ -91,7 +91,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.1</span><small>Emporio Andino · San Pedro</small><button class="btn sm icon tema-btn" type="button" id="temaBtn" aria-label="Cambiar tema" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></button></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.2</span><small>Emporio Andino · San Pedro</small><button class="btn sm icon tema-btn" type="button" id="temaBtn" aria-label="Cambiar tema" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></button></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -159,6 +159,8 @@
     </section>
 
     <!-- ===== MÓDULOS: cada uno es una subcapa dentro de la app ===== -->
+    <section class="view" data-view="pedidos" hidden><div class="panorama tile glass pn-modulo" data-pn="pedidos"></div><article class="tile glass marco"><iframe title="Pedidos" data-src="pedidos/index.html"></iframe></article></section>
+    <section class="view" data-view="reportes" hidden><div class="panorama tile glass pn-modulo" data-pn="reportes"></div><article class="tile glass marco"><iframe title="Reportes" data-src="reportes/index.html"></iframe></article></section>
     <section class="view" data-view="caja" hidden><div class="panorama tile glass pn-modulo" data-pn="caja"></div><article class="tile glass marco"><iframe title="Caja" data-src="caja/index.html"></iframe></article></section>
     <section class="view" data-view="fila" hidden><div class="panorama tile glass pn-modulo" data-pn="fila"></div><article class="tile glass marco"><iframe title="Fila y mesas" data-src="fila/index.html"></iframe></article></section>
     <section class="view" data-view="salon" hidden><div class="panorama tile glass pn-modulo" data-pn="salon"></div><article class="tile glass marco"><iframe title="Control de Salón" data-src="carta/salon.html"></iframe></article></section>
@@ -207,8 +209,16 @@
             <div class="seg" role="group" aria-label="Filtro" id="bitFiltro"><button type="button" data-bf="todo" aria-pressed="true">Todo</button><button type="button" data-bf="alerta" aria-pressed="false">Solo alertas</button></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Hora</th><th>Quién</th><th>Qué</th><th>Recurso</th><th>Detalle</th></tr></thead><tbody id="bitacora"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 3.1</h2><p>Tema #2 Carta Andina, y antes el equipo real con seguridad por cargo y área</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 3.2</h2><p>Pedidos, Caja y Reportes por separado; números completos y avisos que llevan a la acción</p></div></div>
           <div class="notas">
+            <div><h3>Pedidos, Caja y Reportes (3.2)</h3><ul>
+              <li>Pedidos: para quién (mesa, para llevar o fila), la carta y la cuenta en rondas que salen a Comandas, con agregados, bebida incluida y notas. La Caja muestra "Por cobrar" y carga la cuenta con un toque.</li>
+              <li>Reportes aparte: por hora o día, área, más vendidos, pagos, canal y garzón, con CSV. Salieron la pantalla de llamado y el código de la Carta.</li>
+            </ul></div>
+            <div><h3>Números y avisos (3.2)</h3><ul>
+              <li>Las cifras grandes ya no se cortan con "…": la letra se achica lo justo.</li>
+              <li>Cada aviso se toca para ir a donde ocurrió la acción, y queda en la campana, en Recientes.</li>
+            </ul></div>
             <div><h3>Tema Carta Andina (3.1)</h3><ul>
               <li>Segundo tema para todo el sistema, alternativo al nativo: los colores de la foto del camino al desierto (azul noche, cielo, arena, ocre, óxido y tierra) con el diseño de la carta impresa.</li>
               <li>Papel claro, títulos escritos a mano, bajadas redondeadas, precios en mancha de color, puntadas, guardas andinas y montañas. Se cambia con el botón de paleta junto a la versión, en el ingreso o en Versiones; vale para cada equipo y todas sus ventanas.</li>
@@ -336,14 +346,16 @@ function hoyISO(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMont
 /* ==================== ÁREAS ==================== */
 var VIEWS={
   inicio:{t:"Dashboard",g:"Inicio",c:"#40E0D0"},
-  caja:{t:"Caja",g:"Operación",c:"#C19A6B",d:"Cobro, boleta, stock, costos, compras, mermas e informes"},
-  fila:{t:"Fila y mesas",g:"Operación",c:"#FFB547",d:"Quién espera, su pedido en la fila y a quién llamar cuando se libera una mesa"},
+  pedidos:{t:"Pedidos",g:"Operación",c:"#40E0D0",d:"Tomar pedido por mesa, para llevar o de la fila, en rondas que salen a comandas"},
+  caja:{t:"Caja",g:"Operación",c:"#C19A6B",d:"Cobro, boleta, stock, compras, mermas y cierre"},
+  fila:{t:"Fila y mesas",g:"Operación",c:"#FFB547",d:"Quién espera mesa o su pedido para llevar, y a quién llamar cuando se libera una mesa"},
   salon:{t:"Control de Salón",g:"Operación",c:"#9A80D6",d:"Disponibilidad de la carta y estudio de la carta"},
   cocina:{t:"Comandas de cocina",g:"Operación",c:"#FF7F50",d:"Los platos cobrados en la Caja, para cocina"},
   barra:{t:"Comandas de barra",g:"Operación",c:"#1AA89B",d:"Las bebidas cobradas en la Caja, para barra"},
   horno:{t:"Horno",g:"Producción",c:"#E8674A",d:"Temporizador de las tandas, pedido de la panadería, vitrina y precocido"},
   panaderia:{t:"Panadería",g:"Producción",c:"#D9A93A",d:"Plan por latas, pedidos al horno, solicitudes y escandallos"},
   carta:{t:"Carta Interactiva",g:"Operación",c:"#1AA89B",d:"La carta que usa el cliente en la mesa"},
+  reportes:{t:"Reportes",g:"Gestión",c:"#D9A93A",d:"Ventas por hora, área, producto, medio de pago, canal y garzón"},
   prueba:{t:"Prueba y simulación",g:"Gestión",c:"#FFB547",d:"Simulación por día, semana o mes, pedidos a mano y cambios antes de aplicarlos"},
   verificacion:{t:"Verificación",g:"Sistema",c:"#3DDC84",d:"Que cada módulo abra y funcione en este equipo"},
   versiones:{t:"Versiones y accesos",g:"Sistema",c:"#40E0D0",d:"Historial de configuración y PIN del equipo"},
@@ -410,7 +422,7 @@ function pinKey(k){ if(!pinTarget) return;
   if(k==="del") pinBuf=pinBuf.slice(0,-1); else if(k==="clr") pinBuf=""; else if(/^\d$/.test(k)&&pinBuf.length<4) pinBuf+=k;
   drawDots(); if(pinBuf.length===4){ var c=pinBuf; pinBuf=""; setTimeout(function(){ pinComplete(c); },120); } }
 function login(p){ E.abrirSesion(p); pinTarget=null; arrancarApp(true); var n=ALLV.filter(puedeVer).filter(function(v){ return v!=="inicio"&&v!=="retro"; }).length;
-  U.aviso("Hola, "+p.n.split(" ")[0]+". Entras a "+(VIEWS[casa()]||{t:""}).t+" · "+n+(n===1?" área":" áreas")+" de tu cargo"); }
+  U.aviso("Hola, "+p.n.split(" ")[0]+". Entras a "+(VIEWS[casa()]||{t:""}).t+" · "+n+(n===1?" área":" áreas")+" de tu cargo",{historial:false}); }
 function logout(msg){ if(AV) AV.cerrar(); E.cerrarSesion(msg||""); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
 $("peopleList").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) openPin(E.EQUIPO[+b.dataset.p]); });
 $("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) pinKey(b.dataset.k); });
@@ -441,7 +453,7 @@ function buildHub(){
 }
 function vaciarMarcos(){ document.querySelectorAll(".marco iframe").forEach(function(f){ f.removeAttribute("src"); f._cargado=false; }); }
 function show(v,silent){
-  if(!puedeVer(v)){ if(v&&VIEWS[v]) E.seguridad.registrar({tipo:"denegado", recurso:"vista "+v, detalle:"fuera del área de "+E.ROLES[USER.r].n}); v=casa(); } cur=v; U.desplazo("modulo",0);
+  if(!puedeVer(v)){ if(v&&VIEWS[v]) E.seguridad.registrar({tipo:"denegado", recurso:"vista "+v, detalle:"fuera del área de "+E.ROLES[USER.r].n}); v=casa(); } cur=v; window.EA_VISTA=v; U.desplazo("modulo",0);
   document.querySelectorAll(".view").forEach(function(el){ el.hidden=el.dataset.view!==v; });
   var fr=document.querySelector('.view[data-view="'+v+'"] .marco iframe');
   if(fr&&!fr._cargado){ fr.src=fr.dataset.src; fr._cargado=true; }
@@ -471,7 +483,11 @@ function irDentro(v,destino){ var fr=document.querySelector('.view[data-view="'+
     if(++n<25) setTimeout(intento,200); })(); }
 $("backBtn").addEventListener("click",function(){ var c=casa(); hist("replaceState",{ea:"view",v:c},"#"+c); show(c); });
 /* Los módulos piden abrir otro módulo por aquí: así se respeta el cargo. */
-window.EAPOS_SISTEMA={abrir:function(id){ go(id); }, desplazo:function(y){ U.desplazo("modulo",y); }};
+/* ir("area") o ir("area:parte"): lo usan los avisos tocados y los Recientes de la campana. */
+function irDestino(ir){ var p=String(ir||"").split(":"), v=p[0]; if(!VIEWS[v]) return;
+  if(!puedeVer(v)){ U.aviso("403 · Tu cargo no tiene acceso a "+VIEWS[v].t,{historial:false}); return; }
+  if(v!==cur) go(v); if(p[1]) irDentro(v,p[1]); }
+window.EAPOS_SISTEMA={abrir:function(id){ go(id); }, ir:irDestino, desplazo:function(y){ U.desplazo("modulo",y); }};
 /* Barra colapsable: al bajar (en la página o dentro de un módulo) la columna
    queda en íconos y el encabezado muestra el resumen de la pestaña. */
 var colapsoListo=false;
@@ -565,6 +581,8 @@ function renderChart(vs,meta){
 function renderHub(vs,total,cp,st){
   var set=function(v,a,b,badge){ var el=$("ac-"+v); if(!el) return; el.querySelector("[data-st]").innerHTML=a; if(b!=null) el.querySelector("[data-ss]").innerHTML=b+(badge||""); };
   var sf=sinFolio();
+  var ca=cuentasAbiertas(); set("pedidos", ca.n+(ca.n===1?" cuenta abierta":" cuentas abiertas"), E.fila.mesas().filter(function(m){ return m.estado==="ocupada"; }).length+" mesas ocupadas ", ca.n?'<span class="badge warn">Por cobrar</span>':'');
+  set("reportes", vs.length+(vs.length===1?" ticket":" tickets"), "Ventas de hoy por hora, área y producto");
   set("caja", verVentas()?clp(total):vs.length+" ventas", vs.length+(vs.length===1?" venta hoy":" ventas hoy")+(verVentas()&&sf?" · "+sf+" sin folio ":" "), sf&&verVentas()?'<span class="badge warn">Folio</span>':"");
   set("salon", st.off+" agotados", st.bajo+" quedan pocos ", st.off?'<span class="badge crit">Revisar</span>':'<span class="badge ok">OK</span>');
   var FI=E.fila, fe=FI.esperanMesa().filter(function(g){ return g.estado==="esperando"; }).length, fl=FI.mesasLibres().length;
@@ -632,7 +650,20 @@ function panoComandas(e){ var c=comandasDetalle(), n=c.por[e], viejas=c.viejas.f
   return {tono:tarde?"warn":n?"info":"ok", titulo:n?n+(n===1?" comanda por preparar":" comandas por preparar"):"Sin comandas pendientes",
     sub:n?"La más antigua espera hace "+max+" min"+(tarde?" · "+tarde+" pasan de 15 min":""):"Todo lo cobrado ya salió",
     kpis:[{v:n,l:e==="cocina"?"En cocina":"En barra"},{v:max+" min",l:"La más antigua",tono:max>=15?"warn":""},{v:tarde,l:"Pasan de 15 min",tono:tarde?"warn":"ok"},{v:c.por[e==="cocina"?"barra":"cocina"],l:e==="cocina"?"En barra":"En cocina",go:e==="cocina"?"barra":"cocina"}]}; }
+/* Cuentas abiertas de Pedidos (mesas, para llevar y fila) y lo que suman. */
+function cuentasAbiertas(){ var cs=E.fila.cuentas(); return {n:cs.length, total:cs.reduce(function(a,x){ return a+x.total; },0),
+  mesas:cs.filter(function(x){ return x.grupo.destino==="mesa"&&x.grupo.estado==="sentado"; }).length,
+  vieja:cs.length?Math.max.apply(null,cs.map(function(x){ return minutosDesde(x.grupo.sentado||x.grupo.ts); })):0}; }
 var PANO={
+  pedidos:function(){ var F=E.fila, ms=F.mesas(), oc=ms.filter(function(m){ return m.estado==="ocupada"; }).length, ca=cuentasAbiertas(), es=F.esperanMesa().length;
+    var pend=0; F.grupos().forEach(function(g){ if(g.pedido&&g.pedido.rondas) g.pedido.rondas.forEach(function(r){ if(!r.enviado) pend++; }); });
+    return {tono:ca.vieja>=90?"warn":ca.n?"info":"ok", titulo:ca.n?ca.n+(ca.n===1?" cuenta abierta":" cuentas abiertas")+(verVentas()?" · "+clp(ca.total):""):"Sin cuentas abiertas",
+      sub:oc+" de "+ms.length+" mesas ocupadas"+(es?" · "+es+" esperan mesa":"")+(pend?" · "+pend+(pend===1?" ronda espera":" rondas esperan")+" que se sienten":""),
+      kpis:[{v:oc,l:"Mesas ocupadas",s:"de "+ms.length},{v:ca.n,l:"Cuentas por cobrar",tono:ca.n?"warn":"ok",go:"caja"},{v:F.llevar().length,l:"Para llevar en curso"},{v:ca.vieja+" min",l:"Cuenta más antigua",tono:ca.vieja>=90?"warn":""}]}; },
+  reportes:function(){ var vs=ventasHoy(), tot=vs.reduce(function(a,v){ return a+v.total; },0), pes=E.permite("reportes.pesos"), uni=vs.reduce(function(a,v){ return a+(v.lineas||[]).reduce(function(b,l){ return b+l.q; },0); },0);
+    var tp={}; vs.forEach(function(v){ (v.lineas||[]).forEach(function(l){ tp[l.n]=(tp[l.n]||0)+l.q; }); }); var top=Object.keys(tp).sort(function(a,b){ return tp[b]-tp[a]; })[0];
+    return {tono:"info", titulo:pes?"Hoy "+clp(tot)+" en "+vs.length+(vs.length===1?" ticket":" tickets"):vs.length+(vs.length===1?" ticket hoy":" tickets hoy"), sub:top?"Lo más vendido: "+esc(top)+" ("+tp[top]+")":"Sin ventas todavía hoy",
+      kpis:[{v:vs.length,l:"Tickets hoy"},{v:uni,l:"Unidades"}].concat(pes?[{v:clp(vs.length?tot/vs.length:0),l:"Ticket promedio"}]:[]).concat([{v:cuentasAbiertas().n,l:"Cuentas abiertas",go:"pedidos"}])}; },
   caja:function(){ var vs=ventasHoy(), n=vs.length, tot=vs.reduce(function(a,v){ return a+v.total; },0), sf=sinFolio(), st=stockEstado(), meta=metaDia();
     var tono=st.off?"crit":(sf||st.bajo)?"warn":"ok";
     /* Garzones: solo lo suyo, con sus propinas del día. */
@@ -765,7 +796,7 @@ var SALIDAS=null;
 function vigilarHorno(){ if(!USER) return; var P=E.prod; P.revisar();
   var tt=P.tandas(), ids=tt.filter(function(t){ return t.salio; }).map(function(t){ return t.id; });
   if(SALIDAS&&(puedeVer("horno")||puedeVer("salon"))){ var n=tt.filter(function(t){ return t.salio&&SALIDAS.indexOf(t.id)<0; }).pop();
-    if(n&&cur!=="horno") U.aviso("Salió la tanda "+n.n+": "+Object.keys(n.items).map(function(k){ return n.items[k]+" "+P.nombre(k); }).join(" · "),6000); }
+    if(n&&cur!=="horno") U.aviso("Salió la tanda "+n.n+": "+Object.keys(n.items).map(function(k){ return n.items[k]+" "+P.nombre(k); }).join(" · "),{ms:6000, ir:"horno"}); }
   SALIDAS=ids; }
 setInterval(vigilarHorno,3000);
 
@@ -809,7 +840,7 @@ $("horaChip").addEventListener("click",function(){ var hs=E.horario();
 
 var AV=null;
 function refrescarAvisos(){ if(!USER) return; if(!AV){ $("avisosBtn").innerHTML=U.CAMPANA;
-    AV=U.avisos($("avisosBtn"),{ir:function(v){ go(v); }, alNuevo:function(a){ if(String(a.k).indexOf("hora|")===0) return; U.aviso(a.tit.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&")); }}); }
+    AV=U.avisos($("avisosBtn"),{ir:function(v){ irDestino(v); }, alNuevo:function(a){ if(String(a.k).indexOf("hora|")===0) return; U.aviso(a.tit.replace(/<[^>]+>/g,"").replace(/&amp;/g,"&"),{ir:a.go||"inicio"}); }}); }
   AV.render(avisosSistema()); pintarHorario(); }
 
 /* ==================== VERSIONES Y ACCESOS ==================== */
@@ -868,6 +899,8 @@ var PRUEBAS_MOD={
   barra:function(d){ return !!d.getElementById("tablero") && d.getElementById("titulo").textContent==="Comandas de barra"; },
   horno:function(d){ return d.querySelectorAll("#carga .vcard").length===9 && !!d.getElementById("vitrina"); },
   fila:function(d){ return d.querySelectorAll("#mesas .mesa").length>0 && !!d.getElementById("nAnotar"); },
+  pedidos:function(d){ return d.querySelectorAll("#destinos .dest").length>0 && d.querySelectorAll("#prods .prod").length>0; },
+  reportes:function(d){ return d.querySelectorAll("#kpis .kp").length>=3 && !!d.querySelector("#chart svg"); },
   panaderia:function(d){ return d.querySelectorAll("#plan .vcard").length===9 && !!d.querySelector("#esc table"); },
   carta:function(d){ return d.querySelectorAll(".langgrid button").length>0||!!d.getElementById("splash"); },
   prueba:function(d){ return d.querySelectorAll("#nav a").length>0; }

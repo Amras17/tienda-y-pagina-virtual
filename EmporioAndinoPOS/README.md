@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v3.1
+# EmporioAndinoPOS v3.2
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -7,10 +7,14 @@ Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama),
 ```
 Sistema general (index.html) ── capa superior: ingreso con PIN, cargos, versión vigente,
 │                                verificación, versiones aplicadas, accesos y retroalimentación
-├── Caja            caja/index.html      punto de venta: cobro, boleta, stock, costos y fichas técnicas,
-│                                         compras, mermas, metas (lectura) e informes
-├── Control de Salón carta/salon.html    disponibilidad de la carta, horno y estudio de la carta
-├── Comandas        cocina/index.html    ventas de la Caja repartidas por estación (cocina, barra, horno)
+├── Pedidos         pedidos/index.html   tomar pedido por mesa, para llevar o de la fila, en rondas
+├── Caja            caja/index.html      cobro de cuentas y ventas, boleta, stock, costos y fichas,
+│                                         compras, mermas y cierre
+├── Reportes        reportes/index.html  ventas por hora, área, producto, pago, canal y garzón
+├── Fila y mesas    fila/index.html      quién espera mesa o su pedido, y a quién llamar
+├── Control de Salón carta/salon.html    disponibilidad de la carta y estudio de la carta
+├── Comandas        cocina/index.html    cocina y barra, cada una en su pantalla (las empanadas, en Horno)
+├── Horno · Panadería horno/ y panaderia/  tandas, vitrina, plan por latas y escandallos
 ├── Carta Interactiva carta/index.html   la carta que usa el cliente en la mesa
 └── Prueba          prueba/index.html    simulación por día, semana o mes, pedidos a mano, horno en vivo,
                                           fichas y escandallos estándar y borrador de cambios; "Aplicar al
@@ -32,6 +36,49 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Pedidos, Caja y Reportes por separado (v3.2)
+
+Como en la Prueba, la toma de pedido, el cobro y los reportes son tres áreas distintas:
+
+- **Pedidos** (`pedidos/index.html`): arriba, *para quién*: **Mesas** (toca una libre, eliges personas y
+  se abre), **Para llevar** (un nombre y listo) o **Fila** (quien espera mesa). Al centro, la carta con
+  buscador y categorías (desayunos, brunch, cocina, café, otras bebidas, empanadas, pastelería), con los
+  bloqueos de horario, lo agotado y lo *solo en el local*. Al lado, la **cuenta en rondas**: la ronda nueva
+  se arma con cantidades, agregados con precio (leche vegetal, descafeinado, miel), la **bebida incluida**
+  de desayunos y brunch y una **nota** para cocina o barra. *Enviar ronda* la manda a Comandas (cada ronda
+  es una comanda propia); a quien espera mesa se le guarda y sale al sentarse, o con *Preparar ya*. Quitar
+  algo de una ronda ya enviada lo hace o lo autoriza un encargado. *Cobrar en Caja* manda la cuenta
+  completa; cobrada la mesa, *Se levantaron* la libera y propone al siguiente de la fila.
+- **Caja**: arriba de la carta, **Por cobrar** lista las cuentas abiertas (mesas, para llevar y fila) con
+  su total; un toque la carga entera con sus agregados y notas, y al registrar queda cobrada sin volver a
+  comandar. La venta guarda la mesa. La sección *Informes* pasa a llamarse **Cierre** (cierre, historial
+  y entrega al contador): las estadísticas se fueron a Reportes.
+- **Reportes** (`reportes/index.html`): hoy, ayer, 7 días, 30 días o el mes; tickets, ticket promedio,
+  unidades, propinas y anuladas; ventas por hora (o por día), por área, los más vendidos, medios de pago,
+  canal (mesa desde Pedidos, local, llevar, DesertGo), por garzón (ventas, propinas y mesas) y día por
+  día; exporta CSV. Las cifras en pesos las ven dirección y jefatura (`reportes.pesos`); encargados ven
+  tickets y unidades.
+- **Datos** (`nucleo/fila.js`): el pedido de cada grupo guarda sus `rondas` (`{n, lineas, ts, enviado,
+  cobrado, por}`); `pedido.lineas` es la suma. `F.ronda()`, `F.quitar()`, `F.porCobrar()`, `F.cuentas()` y
+  `F.aCaja()` (que manda a cocina lo que esperaba antes de cobrar).
+- **Cargos**: Pedidos para dirección, jefatura, encargados y garzones (el garzón entra directo a Pedidos);
+  Reportes para dirección, jefatura y encargados.
+
+### Salieron
+
+- **Pantalla de llamado** (`fila/llamado.html`): llamar sigue en Fila y mesas, con campana, aviso en el
+  sistema y WhatsApp si dejó teléfono.
+- **Código de la Carta** (`nucleo/codigo-fila.js`): la Carta ya no muestra código y la Fila no lo pide; el
+  pedido se toma en Pedidos.
+
+### Números completos y avisos que llevan a la acción
+
+- Las cifras grandes (resúmenes, indicadores, totales, tarjetas del panel) ya no se cortan con "…": si no
+  caben, la letra se achica lo justo (`EA_UI.encajar`, automático en todas las capas).
+- Cada aviso de una acción (*Ronda 2 en comandas*, *Mesa 3 abierta*, *Cuenta enviada a la Caja*, una
+  venta registrada…) se puede **tocar para ir a donde ocurrió**. Aunque ya se haya ido, queda en la
+  campana, en **Recientes** (`eapos_recientes`, las del día), con la hora y quién; tocarlo lleva a esa área.
 
 ## Tema #2: Carta Andina (v3.1)
 
@@ -117,14 +164,12 @@ con base de datos; es el paso siguiente y también resuelve compartir datos entr
 
 - **Anotar en la fila:** nombre, personas, *para comer aquí* (espera mesa) o *para llevar*, y teléfono
   opcional. Cada grupo recibe su número de turno.
-- **Comandar en la fila:** el pedido se toma mientras esperan, a mano (carta por grupos y buscador, con
-  los bloqueos de horario) o con el **código de la Carta**. Se elige *preparar ya* o *al sentarse / al
+- **Comandar en la fila:** desde la v3.2 el pedido se toma en **Pedidos** (pestaña *Fila*). Se elige *preparar ya* o *al sentarse / al
   llegar al mesón*. Lo comandado sale a Comandas de cocina y de barra y a las comandas del Horno como
   cualquier venta (`EAPOS.fila.comandables()`).
 - **Mesas:** tablero con las mesas libres, llamadas y ocupadas (12 por defecto, se ajusta). Al liberar una
   mesa el sistema propone **llamar al siguiente**; la mesa queda guardada para ese grupo.
-- **Llamar:** la **pantalla de llamado** (`fila/llamado.html`, para una tele o un segundo monitor) muestra
-  el turno, el nombre y la mesa, y suena. Si dejó teléfono, un botón abre WhatsApp con el aviso. Si no
+- **Llamar:** (la pantalla de llamado salió en la v3.2) suena, queda en la campana y, si dejó teléfono, un botón abre WhatsApp con el aviso. Si no
   llega en el tiempo de espera (6 min por defecto), *No llegó* le hace perder el turno y llama al
   siguiente para esa mesa. Para llevar: *Listo: llamar* y *Entregado*.
 - **Cobrar:** *Cobrar en Caja* deja el pedido en `eapos_traspaso`; la Caja lo toma apenas su cuenta está
@@ -133,17 +178,9 @@ con base de datos; es el paso siguiente y también resuelve compartir datos entr
 - **Avisos:** la campana avisa *Mesa N libre: llama a Nº …* y cuando un llamado no llega. Después de las
   21:30 solo se anota para llevar.
 
-### Código de la Carta (`nucleo/codigo-fila.js`)
+### Código de la Carta (salió en la v3.2)
 
-Al confirmar su pedido en la Carta, el cliente ve un **código para la fila** (por ejemplo
-`M20G 10W3 1C1M 5`). Lleva el destino, las personas y cada producto con su cantidad, y dos letras de
-control. No necesita internet ni servidor. Se escribe en *Anotar en la fila* o en *Comandar*; si una
-letra está mal, o el código viene de otra versión de la carta, el sistema lo dice en vez de leerlo mal.
-Las opciones (leche, sirope) no viajan en el código: se leen en el ticket del teléfono.
-
-La **copia de la Carta digital** (artifact *Carta Interactiva (Copy)*) es la carta para los clientes en la
-fila: tiene la galería, los servicios del pueblo e Instagram, y ahora los mismos productos, precios y
-código que el sistema.
+La Carta ya no genera código para la fila: el pedido se toma en **Pedidos**.
 
 ## Carta de junio de 2026 (v2.8)
 

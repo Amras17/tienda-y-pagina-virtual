@@ -61,9 +61,6 @@ mismo navegador** y **esa misma dirección**, todo sigue ahí. Ojo:
 Todas las ventanas y pestañas **del mismo Mac y el mismo navegador** comparten los datos al instante:
 puedes tener la Caja en una ventana, el Horno en otra y la Panadería en una tercera.
 
-La **pantalla de llamado** de la fila (Fila y mesas → *Pantalla de llamado*) se abre en otra ventana del
-mismo Mac: llévala a una tele o un segundo monitor conectado al Mac.
-
 Todas esas ventanas comparten también **la sesión**: quien ingresa último queda en sesión en todas. Cada
 módulo revisa el cargo de esa persona al abrirse (fuera de su área responde 403) y al guardar.
 
@@ -74,4 +71,4 @@ Compartir entre equipos necesita un servidor y queda para una versión siguiente
 ## 6. Comprobar que quedó bien
 
 Ingresa con dirección o jefatura y abre **Verificación → Verificar**: revisa que cada módulo abra en
-ese Mac (Caja, Fila y mesas, Salón, Comandas de cocina y de barra, Horno, Panadería, Carta y Prueba).
+ese Mac (Pedidos, Caja, Reportes, Fila y mesas, Salón, Comandas de cocina y de barra, Horno, Panadería, Carta y Prueba).

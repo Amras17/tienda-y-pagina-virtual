@@ -14,7 +14,7 @@
    ==================================================================== */
 (function(){
   "use strict";
-  var VERSION = "3.1";
+  var VERSION = "3.2";
   var K = {cfg:"eapos_cfg", prueba:"eapos_prueba_cfg", versiones:"eapos_versiones", sesion:"eapos_sesion", pins:"es_pins"};
 
   function leer(k){ try{ var r=localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
@@ -204,8 +204,10 @@
      para el servidor que la haga cumplir de verdad (ver README).
      ==================================================================== */
   var MODULOS = {
-    caja:   {n:"Caja", d:"Cobro, boleta, stock, costos, compras, mermas e informes", ruta:"caja/index.html"},
-    fila:   {n:"Fila y mesas", d:"Quién espera, su pedido en la fila y a quién llamar cuando se libera una mesa", ruta:"fila/index.html"},
+    pedidos:{n:"Pedidos", d:"Tomar pedido por mesa, para llevar o de la fila, en rondas que salen a comandas", ruta:"pedidos/index.html"},
+    caja:   {n:"Caja", d:"Cobro de cuentas y ventas, boleta, stock, compras, mermas y cierre", ruta:"caja/index.html"},
+    reportes:{n:"Reportes", d:"Ventas por hora, área, producto, medio de pago, canal y garzón", ruta:"reportes/index.html"},
+    fila:   {n:"Fila y mesas", d:"Quién espera mesa o su pedido para llevar, y a quién llamar cuando se libera una mesa", ruta:"fila/index.html"},
     salon:  {n:"Control de Salón", d:"Disponibilidad de la carta y estudio de la carta", ruta:"carta/salon.html"},
     cocina: {n:"Comandas de cocina", d:"Los platos cobrados en la Caja, para cocina", ruta:"cocina/index.html?est=cocina"},
     barra:  {n:"Comandas de barra", d:"Las bebidas cobradas en la Caja, para barra", ruta:"cocina/index.html?est=barra"},
@@ -218,13 +220,13 @@
      e historial), "encargado" (cobro, ventas, cierre e historial) o "cobro"
      (solo cobrar y sus propinas). inicio: "inicio" es el Dashboard. */
   var ROLES = {
-    dueno:     {n:"Dirección", clave:"DUENO", m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], inicio:"inicio", caja:"todo", sistema:1, numeros:1, dash:1,
+    dueno:     {n:"Dirección", clave:"DUENO", m:["pedidos","caja","reportes","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], inicio:"inicio", caja:"todo", sistema:1, numeros:1, dash:1,
                 d:"Acceso total y transversal"},
-    jefe:      {n:"Jefatura de operaciones", clave:"JEFE_AREA", m:["caja","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], inicio:"inicio", caja:"jefe", sistema:1, dash:1,
+    jefe:      {n:"Jefatura de operaciones", clave:"JEFE_AREA", m:["pedidos","caja","reportes","fila","salon","cocina","barra","horno","panaderia","carta","prueba"], inicio:"inicio", caja:"jefe", sistema:1, dash:1,
                 d:"Control total de la operación: modificación, stock e informes"},
-    encargado: {n:"Encargados de turno", clave:"ENCARGADO_TURNO", m:["caja","fila","salon","cocina","barra","horno","panaderia","carta"], inicio:"inicio", caja:"encargado", dash:1,
+    encargado: {n:"Encargados de turno", clave:"ENCARGADO_TURNO", m:["pedidos","caja","reportes","fila","salon","cocina","barra","horno","panaderia","carta"], inicio:"inicio", caja:"encargado", dash:1,
                 d:"Visión operativa de todas las áreas; modifica mesas, mostrador y ventas"},
-    garzon:    {n:"Salón y atención", clave:"GARZON", m:["fila","caja","salon","carta"], inicio:"fila", caja:"cobro",
+    garzon:    {n:"Salón y atención", clave:"GARZON", m:["pedidos","fila","caja","salon","carta"], inicio:"pedidos", caja:"cobro",
                 d:"Fila, pedidos, carta, cobro y sus propinas"},
     barista:   {n:"Barra y café", clave:"BARISTA", m:["barra"], inicio:"barra", area:"bar",
                 d:"Comandas de barra y disponibilidad de la barra"},
@@ -266,8 +268,9 @@
     "venta.responsable":   {n:"Registrar una venta a nombre de otra persona", roles:["dueno","jefe","encargado"]},
     "comanda.listo":       {n:"Marcar una comanda lista", roles:["dueno","jefe","encargado","barista","cocina"]},
     "comanda.reabrir":     {n:"Reabrir una comanda cerrada", roles:["dueno","jefe","encargado"], autoriza:true},
+    "pedido.tomar":        {n:"Tomar pedidos y enviar rondas a comandas", roles:["dueno","jefe","encargado","garzon"]},
     "fila.operar":         {n:"Anotar, llamar y sentar en la fila", roles:["dueno","jefe","encargado","garzon"]},
-    "fila.cambiarComandado":{n:"Cambiar un pedido ya enviado a cocina", roles:["dueno","jefe","encargado"], autoriza:true},
+    "fila.cambiarComandado":{n:"Quitar o cambiar lo ya enviado a cocina", roles:["dueno","jefe","encargado"], autoriza:true},
     "fila.ajustes":        {n:"Ajustes de la fila (mesas y espera)", roles:["dueno","jefe","encargado"]},
     "stock.disponibilidad":{n:"Marcar disponibilidad de la carta", roles:["dueno","jefe","encargado"]},
     "stock.area":          {n:"Marcar disponibilidad de su área", roles:["dueno","jefe","encargado","barista","cocina"]},
@@ -280,6 +283,7 @@
     "pan.pedidos":         {n:"Enviar al horno y responder solicitudes", roles:["dueno","jefe"]},
     "pan.escandallo":      {n:"Ajustar escandallos", roles:["dueno","jefe"]},
     "sistema":             {n:"Administración del sistema", roles:["dueno","jefe"]},
+    "reportes.pesos":      {n:"Reportes en pesos", roles:["dueno","jefe"]},
     "numeros":             {n:"Cifras del negocio y costos", roles:["dueno"]}
   };
 

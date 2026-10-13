@@ -1,7 +1,7 @@
 {
   "version": "3.1",
-  "fecha": "2026-10-12T16:44:44.853Z",
-  "total": 156,
+  "fecha": "2026-10-13T04:37:23.970Z",
+  "total": 186,
   "fallas": 0,
   "resultados": [
     {
@@ -32,7 +32,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
+      "detalle": "inicio,pedidos,caja,fila,salon,cocina,barra,carta,horno,panaderia,reportes,prueba,verificacion,versiones,retro"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -48,6 +48,12 @@
     },
     {
       "modulo": "Sistema general · escritorio",
+      "prueba": "abre pedidos como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · escritorio",
       "prueba": "abre caja como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
@@ -57,6 +63,12 @@
       "prueba": "menú de la Caja visible y usable dentro del sistema",
       "ok": true,
       "detalle": "6 secciones"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "abre reportes como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -108,9 +120,21 @@
     },
     {
       "modulo": "Sistema general · escritorio",
+      "prueba": "resumen arriba de pedidos",
+      "ok": true,
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Sin cuentas abiertas\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
       "prueba": "resumen arriba de caja",
       "ok": true,
       "detalle": "{\"tono\":\"ok\",\"tit\":\"Vendido hoy $0\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · escritorio",
+      "prueba": "resumen arriba de reportes",
+      "ok": true,
+      "detalle": "{\"tono\":\"info\",\"tit\":\"Hoy $0 en 0 tickets\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -182,7 +206,7 @@
       "modulo": "Sistema general · escritorio",
       "prueba": "avisos importantes: se acabó",
       "ok": true,
-      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\",\"Plan de hoy por enviar al horno\"]}"
+      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\",\"Plan de hoy por enviar al horno\",\"Se acabó: Latte\"]}"
     },
     {
       "modulo": "Sistema general · escritorio",
@@ -221,127 +245,181 @@
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "la Caja toma al responsable de la sesión",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "la Carta ya no genera código para la fila",
+      "ok": true,
+      "detalle": "{\"cod\":false,\"lib\":\"undefined\"}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "Fila sin código ni pantalla de llamado",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "catálogo de la carta única",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "la pantalla de llamado ya no existe",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "precios de la carta de junio 2026 (pino $4.000, latte $4.000, Catarpe $9.500, cheesecake $4.800)",
-      "ok": true,
-      "detalle": "{\"pino\":4000,\"latte\":4000,\"catarpe\":9500,\"cheese\":4800,\"ccl\":false}"
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "registra la venta",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "la ronda para llevar llega a Comandas de barra",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "Comandas de barra: solo la bebida",
-      "ok": true,
-      "detalle": "{\"n\":1,\"t\":\"Comandas de barra\",\"sel\":true}"
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "la empanada llega a las comandas del Horno",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "a quien espera mesa, la ronda sale al sentarse",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "Comandas de cocina: solo el plato",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "ronda 1 de Juan guardada sin comandar: 2 pino y un latte",
+      "ok": true,
+      "detalle": "{\"n\":\"Juan\",\"rondas\":1,\"enviado\":false,\"total\":12000}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "llama al siguiente (Juan) a la mesa libre",
+      "ok": true,
+      "detalle": "{\"grupo\":\"gmv66t1acyk\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-13T04:35:01.818Z\",\"vez\":1}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "al sentarse, su ronda sale a Comandas (barra y horno)",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "marcar lista la comanda",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "la mesa sigue pidiendo: ronda 2 sale como otra comanda",
+      "ok": true,
+      "detalle": "{\"rondas\":2,\"enviadas\":2,\"coms\":2}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "la ronda 2 llega a cocina con la nota",
+      "ok": true,
+      "detalle": "cyk-2 0 min COCINA 04:35 · Local · Fila · Nº 1 Juan · mesa 1 · ronda 2 1 Chileno Nota: sin mantequilla Listo"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "quitar 1 pino ya enviado (encargada) baja la cuenta",
+      "ok": true,
+      "detalle": "{\"ok\":true,\"antes\":19500,\"despues\":15500}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "la Caja lista las cuentas por cobrar (mesa 1 y Leo)",
+      "ok": true,
+      "detalle": "POR COBRAR Mesa 1 $15.500 Llevar Nº 2 $3.700"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "toca la cuenta de la mesa y la Caja la carga entera",
+      "ok": true,
+      "detalle": "{\"n\":3,\"total\":15500,\"ref\":\"Juan\",\"mesa\":1}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "venta registrada a la mesa 1, cuenta cerrada y sin duplicar comandas",
+      "ok": true,
+      "detalle": "{\"fila\":{\"grupo\":\"gmv66t1acyk\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"comandado\":true},\"cobrado\":true,\"porCobrar\":0,\"comandas\":3}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "Reportes: 1 ticket, latte entre los más vendidos y la mesa como canal; sin pesos para encargados",
+      "ok": true,
+      "detalle": "{\"kpis\":[\"TICKETS 1\",\"UNIDADES 3 productos vendidos\",\"ANULADAS 0 ninguna\"],\"top\":\"Pino\\n1 u.\\nLatte\\n1 u.\\nChileno\\n1 u.\",\"canal\":\"Mesa (desde Pedidos)\\n1 tickets\",\"pesos\":false}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "al liberar la mesa propone llamar al siguiente",
+      "ok": true,
+      "detalle": "{\"sig\":\"Ana\",\"boton\":true,\"libre\":[1]}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "aviso: mesa libre, llama a Nº 3 Ana",
+      "ok": true,
+      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\",\"1 venta sin folio de boleta\",\"Plan de hoy por enviar al horno\"]"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "Recientes: las acciones quedan en la campana con su destino",
+      "ok": true,
+      "detalle": "[\"fila|Mesa 1 libre · siguiente: Nº 3 Ana\",\"caja|Venta VMV66TGPC registrada por $17.050.\",\"caja|Cuenta de la mesa 1. Elige el medio de pago y registra.\",\"pedidos|Ronda 2 en comandas · Mesa 1 · Juan\"]"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "tocar un reciente lleva a esa área",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio (comandas)",
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "tocar el aviso flotante lleva a su destino",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "una cifra larga se ve completa (se achica, sin «…»)",
+      "ok": true,
+      "detalle": "{\"ok\":true,\"fs\":\"21.5px\",\"elipsis\":\"clip\"}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio (fila)",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio (comandas)",
+      "modulo": "Pedidos, fila y cuentas · escritorio (fila)",
       "prueba": "sin errores de JavaScript",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio (comandas)",
+      "modulo": "Pedidos, fila y cuentas · escritorio (fila)",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "encargado: cobro, cierre e historial; sin panel, stock, compras, costos ni metas",
-      "ok": true,
-      "detalle": "{\"secc\":\"caja,inf\",\"gest\":\"costos,compras,mermas,metas\",\"inf\":\"rep,hist\"}"
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "encargado: el dashboard no muestra ventas en pesos",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "dueña: la Caja completa",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "garzón ve solo el cobro",
-      "ok": true,
-      "detalle": "caja"
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "garzón no ve la Prueba ni el sistema",
-      "ok": true,
-      "detalle": "caja,fila,salon,carta,retro"
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "la Caja tiene el diseño Emporio",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
-      "prueba": "Comandas tiene el diseño Emporio",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · escritorio",
+      "modulo": "Pedidos, fila y cuentas · escritorio (pedidos)",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
+      "modulo": "Pedidos, fila y cuentas · escritorio (pedidos)",
       "prueba": "sin errores de JavaScript",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · escritorio",
+      "modulo": "Pedidos, fila y cuentas · escritorio (pedidos)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · escritorio",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -356,7 +434,7 @@
       "modulo": "Tema Carta Andina · escritorio",
       "prueba": "el botón cambia a Carta Andina el sistema y el módulo abierto, al instante",
       "ok": true,
-      "detalle": "{\"tema\":\"andino\",\"guardado\":\"andino\",\"modulo\":\"andino\",\"fuentes\":true,\"bg\":\"rgb(246, 238, 226)\",\"glass\":\"rgb(255, 252, 247)\",\"titulo\":\"Chinchilla, \\\"Gochi Hand\\\", \\\"Comic Sans MS\\\", cursive\",\"aviso\":\"Tema: Carta Andina\"}"
+      "detalle": "{\"tema\":\"andino\",\"guardado\":\"andino\",\"modulo\":\"andino\",\"fuentes\":true,\"bg\":\"rgb(246, 238, 226)\",\"glass\":\"rgb(255, 252, 247)\",\"titulo\":\"Chinchilla, \\\"Gochi Hand\\\", \\\"Comic Sans MS\\\", cursive\",\"aviso\":\"Tema: Carta AndinaVer →\"}"
     },
     {
       "modulo": "Tema Carta Andina · escritorio",
@@ -372,7 +450,19 @@
     },
     {
       "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "pedidos con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
       "prueba": "caja con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · escritorio",
+      "prueba": "reportes con el tema y sin desborde",
       "ok": true,
       "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
     },
@@ -500,7 +590,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "dirección ve todas las áreas",
       "ok": true,
-      "detalle": "inicio,caja,fila,salon,cocina,barra,carta,horno,panaderia,prueba,verificacion,versiones,retro"
+      "detalle": "inicio,pedidos,caja,fila,salon,cocina,barra,carta,horno,panaderia,reportes,prueba,verificacion,versiones,retro"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -516,6 +606,12 @@
     },
     {
       "modulo": "Sistema general · telefono",
+      "prueba": "abre pedidos como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Sistema general · telefono",
       "prueba": "abre caja como subcapa con el diseño Emporio",
       "ok": true,
       "detalle": ""
@@ -525,6 +621,12 @@
       "prueba": "menú de la Caja visible y usable dentro del sistema",
       "ok": true,
       "detalle": "5 secciones"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "abre reportes como subcapa con el diseño Emporio",
+      "ok": true,
+      "detalle": ""
     },
     {
       "modulo": "Sistema general · telefono",
@@ -576,9 +678,21 @@
     },
     {
       "modulo": "Sistema general · telefono",
+      "prueba": "resumen arriba de pedidos",
+      "ok": true,
+      "detalle": "{\"tono\":\"ok\",\"tit\":\"Sin cuentas abiertas\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
       "prueba": "resumen arriba de caja",
       "ok": true,
       "detalle": "{\"tono\":\"ok\",\"tit\":\"Vendido hoy $0\",\"k\":4}"
+    },
+    {
+      "modulo": "Sistema general · telefono",
+      "prueba": "resumen arriba de reportes",
+      "ok": true,
+      "detalle": "{\"tono\":\"info\",\"tit\":\"Hoy $0 en 0 tickets\",\"k\":4}"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -650,7 +764,7 @@
       "modulo": "Sistema general · telefono",
       "prueba": "avisos importantes: se acabó",
       "ok": true,
-      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\",\"Plan de hoy por enviar al horno\"]}"
+      "detalle": "{\"badge\":\"1\",\"items\":[\"Se acabó: Latte\",\"Plan de hoy por enviar al horno\",\"Se acabó: Latte\"]}"
     },
     {
       "modulo": "Sistema general · telefono",
@@ -689,127 +803,181 @@
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "la Caja toma al responsable de la sesión",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "la Carta ya no genera código para la fila",
+      "ok": true,
+      "detalle": "{\"cod\":false,\"lib\":\"undefined\"}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "Fila sin código ni pantalla de llamado",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "catálogo de la carta única",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "la pantalla de llamado ya no existe",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "precios de la carta de junio 2026 (pino $4.000, latte $4.000, Catarpe $9.500, cheesecake $4.800)",
-      "ok": true,
-      "detalle": "{\"pino\":4000,\"latte\":4000,\"catarpe\":9500,\"cheese\":4800,\"ccl\":false}"
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "registra la venta",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "la ronda para llevar llega a Comandas de barra",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "Comandas de barra: solo la bebida",
-      "ok": true,
-      "detalle": "{\"n\":1,\"t\":\"Comandas de barra\",\"sel\":true}"
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "la empanada llega a las comandas del Horno",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "a quien espera mesa, la ronda sale al sentarse",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "Comandas de cocina: solo el plato",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "ronda 1 de Juan guardada sin comandar: 2 pino y un latte",
+      "ok": true,
+      "detalle": "{\"n\":\"Juan\",\"rondas\":1,\"enviado\":false,\"total\":12000}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "llama al siguiente (Juan) a la mesa libre",
+      "ok": true,
+      "detalle": "{\"grupo\":\"gmv66vevmoz\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"destino\":\"mesa\",\"ts\":\"2026-10-13T04:36:48.013Z\",\"vez\":1}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "al sentarse, su ronda sale a Comandas (barra y horno)",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "marcar lista la comanda",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "la mesa sigue pidiendo: ronda 2 sale como otra comanda",
+      "ok": true,
+      "detalle": "{\"rondas\":2,\"enviadas\":2,\"coms\":2}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "la ronda 2 llega a cocina con la nota",
+      "ok": true,
+      "detalle": "moz-2 0 min COCINA 04:36 · Local · Fila · Nº 1 Juan · mesa 1 · ronda 2 1 Chileno Nota: sin mantequilla Listo"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "quitar 1 pino ya enviado (encargada) baja la cuenta",
+      "ok": true,
+      "detalle": "{\"ok\":true,\"antes\":19500,\"despues\":15500}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "la Caja lista las cuentas por cobrar (mesa 1 y Leo)",
+      "ok": true,
+      "detalle": "POR COBRAR Mesa 1 $15.500 Llevar Nº 2 $3.700"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "toca la cuenta de la mesa y la Caja la carga entera",
+      "ok": true,
+      "detalle": "{\"n\":3,\"total\":15500,\"ref\":\"Juan\",\"mesa\":1}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "venta registrada a la mesa 1, cuenta cerrada y sin duplicar comandas",
+      "ok": true,
+      "detalle": "{\"fila\":{\"grupo\":\"gmv66vevmoz\",\"num\":1,\"nombre\":\"Juan\",\"mesa\":1,\"comandado\":true},\"cobrado\":true,\"porCobrar\":0,\"comandas\":3}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "Reportes: 1 ticket, latte entre los más vendidos y la mesa como canal; sin pesos para encargados",
+      "ok": true,
+      "detalle": "{\"kpis\":[\"TICKETS 1\",\"UNIDADES 3 productos vendidos\",\"ANULADAS 0 ninguna\"],\"top\":\"Pino\\n1 u.\\nLatte\\n1 u.\\nChileno\\n1 u.\",\"canal\":\"Mesa (desde Pedidos)\\n1 tickets\",\"pesos\":false}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "al liberar la mesa propone llamar al siguiente",
+      "ok": true,
+      "detalle": "{\"sig\":\"Ana\",\"boton\":true,\"libre\":[1]}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "aviso: mesa libre, llama a Nº 3 Ana",
+      "ok": true,
+      "detalle": "[\"Mesa 1 libre: llama a Nº 3 Ana\",\"1 venta sin folio de boleta\",\"Plan de hoy por enviar al horno\"]"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "Recientes: las acciones quedan en la campana con su destino",
+      "ok": true,
+      "detalle": "[\"fila|Mesa 1 libre · siguiente: Nº 3 Ana\",\"caja|Venta VMV66VOHV registrada por $17.050.\",\"caja|Cuenta de la mesa 1. Elige el medio de pago y registra.\",\"pedidos|Ronda 2 en comandas · Mesa 1 · Juan\"]"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "tocar un reciente lleva a esa área",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono (comandas)",
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "tocar el aviso flotante lleva a su destino",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "una cifra larga se ve completa (se achica, sin «…»)",
+      "ok": true,
+      "detalle": "{\"ok\":true,\"fs\":\"13.3px\",\"elipsis\":\"clip\"}"
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono (fila)",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono (comandas)",
+      "modulo": "Pedidos, fila y cuentas · telefono (fila)",
       "prueba": "sin errores de JavaScript",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono (comandas)",
+      "modulo": "Pedidos, fila y cuentas · telefono (fila)",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "encargado: cobro, cierre e historial; sin panel, stock, compras, costos ni metas",
-      "ok": true,
-      "detalle": "{\"secc\":\"caja,inf\",\"gest\":\"costos,compras,mermas,metas\",\"inf\":\"rep,hist\"}"
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "encargado: el dashboard no muestra ventas en pesos",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "dueña: la Caja completa",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "garzón ve solo el cobro",
-      "ok": true,
-      "detalle": "caja"
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "garzón no ve la Prueba ni el sistema",
-      "ok": true,
-      "detalle": "caja,fila,salon,carta,retro"
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "la Caja tiene el diseño Emporio",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
-      "prueba": "Comandas tiene el diseño Emporio",
-      "ok": true,
-      "detalle": ""
-    },
-    {
-      "modulo": "Caja y Comandas · telefono",
+      "modulo": "Pedidos, fila y cuentas · telefono (pedidos)",
       "prueba": "sin desborde horizontal",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
+      "modulo": "Pedidos, fila y cuentas · telefono (pedidos)",
       "prueba": "sin errores de JavaScript",
       "ok": true,
       "detalle": ""
     },
     {
-      "modulo": "Caja y Comandas · telefono",
+      "modulo": "Pedidos, fila y cuentas · telefono (pedidos)",
+      "prueba": "recursos propios cargan",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "sin desborde horizontal",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
+      "prueba": "sin errores de JavaScript",
+      "ok": true,
+      "detalle": ""
+    },
+    {
+      "modulo": "Pedidos, fila y cuentas · telefono",
       "prueba": "recursos propios cargan",
       "ok": true,
       "detalle": ""
@@ -824,7 +992,7 @@
       "modulo": "Tema Carta Andina · telefono",
       "prueba": "el botón cambia a Carta Andina el sistema y el módulo abierto, al instante",
       "ok": true,
-      "detalle": "{\"tema\":\"andino\",\"guardado\":\"andino\",\"modulo\":\"andino\",\"fuentes\":true,\"bg\":\"rgb(246, 238, 226)\",\"glass\":\"rgb(255, 252, 247)\",\"titulo\":\"Chinchilla, \\\"Gochi Hand\\\", \\\"Comic Sans MS\\\", cursive\",\"aviso\":\"Tema: Carta Andina\"}"
+      "detalle": "{\"tema\":\"andino\",\"guardado\":\"andino\",\"modulo\":\"andino\",\"fuentes\":true,\"bg\":\"rgb(246, 238, 226)\",\"glass\":\"rgb(255, 252, 247)\",\"titulo\":\"Chinchilla, \\\"Gochi Hand\\\", \\\"Comic Sans MS\\\", cursive\",\"aviso\":\"Tema: Carta AndinaVer →\"}"
     },
     {
       "modulo": "Tema Carta Andina · telefono",
@@ -840,7 +1008,19 @@
     },
     {
       "modulo": "Tema Carta Andina · telefono",
+      "prueba": "pedidos con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
       "prueba": "caja con el tema y sin desborde",
+      "ok": true,
+      "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
+    },
+    {
+      "modulo": "Tema Carta Andina · telefono",
+      "prueba": "reportes con el tema y sin desborde",
       "ok": true,
       "detalle": "{\"mod\":\"andino\",\"desb\":false,\"pagina\":false}"
     },

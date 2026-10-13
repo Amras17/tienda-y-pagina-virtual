@@ -100,16 +100,76 @@
   function hhmm(d){ d=d||new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
   function reloj(el){ if(!el) return; var f=function(){ el.textContent=hhmm(); }; f(); setInterval(f,5000); }
   var tAviso=null;
-  function aviso(msg, ms){
+  /* ---------- avisos de una acción ----------
+     aviso(texto, ms) o aviso(texto, {ms, ir}). Cada aviso se puede tocar para
+     ir a donde ocurrió la acción ("caja", "pedidos", "horno:vitrina"…; si no se
+     indica, el área donde se generó), y queda en Recientes (eapos_recientes):
+     la campana del sistema general lo muestra aunque el aviso ya se haya ido. */
+  var KREC="eapos_recientes";
+  function areaActual(){
+    if(window.EA_VISTA) return window.EA_VISTA;
+    var p=location.pathname, q=location.search;
+    if(/\/cocina\//.test(p)) return /est=barra/.test(q)?"barra":"cocina";
+    if(/carta\/salon/.test(p)) return "salon";
+    var m=/\/(pedidos|caja|reportes|fila|horno|panaderia|carta|prueba)\//.exec(p); return m?m[1]:"inicio";
+  }
+  function escA(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function recientes(){ try{ var r=JSON.parse(localStorage.getItem(KREC)||"[]"); return Array.isArray(r)?r:[]; }catch(e){ return []; } }
+  function guardarReciente(msg, ir){
+    try{ var r=recientes(), ahora=Date.now(), u=r[r.length-1];
+      if(u&&u.msg===msg&&ahora-u.t<1500) return;
+      var s=window.EAPOS&&EAPOS.sesion&&EAPOS.sesion();
+      r.push({t:ahora, msg:String(msg).slice(0,160), ir:ir, quien:s?s.n:""}); if(r.length>40) r=r.slice(-40);
+      localStorage.setItem(KREC,JSON.stringify(r)); }catch(e){}
+  }
+  /* Ir a un destino "area" o "area:parte": dentro del sistema general lo abre el
+     sistema; suelto, abre el módulo o baja a la parte en esta misma página. */
+  function irA(ir){
+    if(!ir) return; var p=String(ir).split(":"), area=p[0], parte=p[1]||"";
+    try{ if(window.parent!==window&&window.parent.EAPOS_SISTEMA&&window.parent.EAPOS_SISTEMA.ir){ window.parent.EAPOS_SISTEMA.ir(ir); return; } }catch(e){}
+    if(window.EAPOS_SISTEMA&&window.EAPOS_SISTEMA.ir){ window.EAPOS_SISTEMA.ir(ir); return; }
+    if(area===areaActual()){ if(parte){ if(window.EA_IR) window.EA_IR(parte); else { var el=document.getElementById(parte); if(el) el.scrollIntoView({block:"start"}); } } return; }
+    if(window.EAPOS&&EAPOS.irA) EAPOS.irA(area,"../");
+  }
+  function aviso(msg, opt){
+    var o=typeof opt==="number"?{ms:opt}:(opt||{}), ir=o.ir||areaActual();
     var el=document.getElementById("ea-toast");
-    if(!el){ el=document.createElement("div"); el.id="ea-toast"; el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el); }
-    el.hidden=true; void el.offsetWidth; el.textContent=msg; el.hidden=false;
-    clearTimeout(tAviso); tAviso=setTimeout(function(){ el.hidden=true; },ms||2800);
+    if(!el){ el=document.createElement("button"); el.type="button"; el.id="ea-toast"; el.className="toast"; el.setAttribute("aria-live","polite");
+      el.addEventListener("click",function(){ el.hidden=true; irA(el.dataset.ir); }); document.body.appendChild(el); }
+    el.hidden=true; void el.offsetWidth; el.dataset.ir=ir;
+    el.innerHTML=escA(msg)+'<span class="toast-ir" aria-hidden="true">Ver →</span>'; el.title="Toca para ir · queda en Recientes (campana)"; el.hidden=false;
+    if(o.historial!==false) guardarReciente(msg, ir);
+    clearTimeout(tAviso); tAviso=setTimeout(function(){ el.hidden=true; },o.ms||3200);
+  }
+
+  /* ---------- números completos ----------
+     Las cifras grandes (resúmenes, indicadores, totales) nunca se cortan con
+     "…": si no caben, la letra se achica justo lo necesario (hasta la mitad). */
+  var ENCAJAR=".pn-k b,.big,.kpi .v,.acard .st,.stat b,.q b,.oven .v,.kpis .v,.kpi b.v,.pn-reloj,.cnum,[data-encajar]";
+  function encajar(el){
+    if(!el||!el.isConnected) return; el.style.fontSize="";
+    var cs=getComputedStyle(el), base=parseFloat(cs.fontSize)||16, inline=cs.display.indexOf("inline")===0;
+    var cont=inline?el.parentElement:el; if(!cont) return;
+    var ccs=getComputedStyle(cont), disp=cont.clientWidth-(parseFloat(ccs.paddingLeft)||0)-(parseFloat(ccs.paddingRight)||0);
+    var usa=inline?el.getBoundingClientRect().width:el.scrollWidth;
+    if(disp>0&&usa>disp+1){ var f=Math.max(.5, disp/usa*.97); el.style.fontSize=(base*f).toFixed(1)+"px"; }
+  }
+  var tEnc=0;
+  function encajarTodo(root){ (root||document).querySelectorAll(ENCAJAR).forEach(encajar); }
+  function programarEncaje(){ if(tEnc) return; tEnc=requestAnimationFrame(function(){ tEnc=0; encajarTodo(); }); }
+  if(typeof MutationObserver!=="undefined"){
+    var obsEnc=new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var t=ms[i].target; if(t&&t.id==="ea-toast") continue; programarEncaje(); return; } });
+    var arrancarEncaje=function(){ obsEnc.observe(document.body,{childList:true,subtree:true,characterData:true}); programarEncaje(); };
+    if(document.body) arrancarEncaje(); else document.addEventListener("DOMContentLoaded",arrancarEncaje);
+    addEventListener("resize",programarEncaje);
+    if(document.fonts&&document.fonts.ready) document.fonts.ready.then(programarEncaje);
   }
   /* Íconos de las áreas, los mismos trazos de Emporio System 1.1. */
   var ICONOS={
     inicio:'<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>',
     caja:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
+    pedidos:'<path d="M8 3h8l1 2h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2z"/><path d="M8 3v3h8V3M8 11h8M8 15h5"/>',
+    reportes:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     salon:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
     cocina:'<path d="M6 13.9A4 4 0 0 1 7 6a5 5 0 0 1 10 0 4 4 0 0 1 1 7.9V20H6z"/><path d="M6 17h12"/>',
     fila:'<circle cx="7" cy="7" r="2.6"/><circle cx="17" cy="7" r="2.6"/><path d="M2.5 20v-2.5a4.5 4.5 0 0 1 9 0V20M12.5 20v-2.5a4.5 4.5 0 0 1 9 0V20"/>',
@@ -172,6 +232,12 @@
         }).join("");
       });
       if(!lista.length) h+='<div class="av-vacio">Sin avisos: todo en orden.</div>';
+      /* Recientes: lo que avisaron las acciones de este equipo hoy, para volver a
+         donde ocurrió aunque el aviso ya se haya ido. */
+      var hoyR=new Date(); hoyR.setHours(0,0,0,0);
+      var rec=recientes().filter(function(r){ return r.t>=hoyR.getTime(); }).reverse().slice(0,12);
+      if(rec.length) h+='<div class="av-grupo">Recientes · toca para ir</div>'+rec.map(function(r){
+        return '<button type="button" class="av-item av-rec" data-av-go="'+escA(r.ir||"")+'"><i aria-hidden="true"></i><span class="av-tx"><b>'+escA(r.msg)+'</b><span>'+hhmm(new Date(r.t))+(r.quien?' · '+escA(r.quien):'')+'</span></span><em>Ir →</em></button>'; }).join("");
       if(h!==html){ html=h; panel.innerHTML=h; }
     }
     function render(l){
@@ -194,6 +260,7 @@
     btn.addEventListener("click",function(e){ e.stopPropagation(); if(panel.hidden) abrir(); else cerrar(); });
     panel.addEventListener("click",function(e){ e.stopPropagation(); var x=e.target.closest("[data-av-go]"); if(x){ cerrar(); if(cfg.ir) cfg.ir(x.getAttribute("data-av-go")); } });
     document.addEventListener("click",function(){ if(!panel.hidden) cerrar(); });
+    addEventListener("storage",function(e){ if(e.key===KREC&&!panel.hidden) pintar(); });
     document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!panel.hidden){ cerrar(); btn.focus(); } });
     return {render:render, abrir:abrir, cerrar:cerrar, panel:panel};
   }
@@ -294,5 +361,6 @@
 
   window.EA_UI={REDUCE:REDUCE, Spring:Spring, tween:tween, numero:numero, deslizador:deslizador, mosaicos:mosaicos, revelar:revelar,
     atmosfera:atmosfera, reloj:reloj, hhmm:hhmm, aviso:aviso, icono:icono, ICONOS:ICONOS, incrustado:incrustado, conPermiso:conPermiso, autorizar:autorizar,
-    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA, colapsable:colapsable, desplazo:desplazo, filasX:filasX, centrarActivo:centrarActivo};
+    panorama:panorama, avisos:avisos, CAMPANA:CAMPANA, colapsable:colapsable, desplazo:desplazo, filasX:filasX, centrarActivo:centrarActivo,
+    recientes:recientes, reciente:guardarReciente, irA:irA, encajar:encajar, encajarTodo:encajarTodo, areaActual:areaActual};
 })();

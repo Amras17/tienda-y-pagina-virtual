@@ -57,7 +57,6 @@ html.incrustado .modulo{padding-top:4px}
 .form .fila2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
 .txt{width:100%;box-sizing:border-box;border:1px solid var(--stroke-2);background:var(--glass-2);border-radius:12px;padding:10px 12px;font:inherit;color:var(--fg)}
 .txt:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(64,224,208,.14)}
-.txt.codigo{font-family:var(--f-num);font-weight:800;letter-spacing:.12em;text-transform:uppercase}
 .paso{display:grid;grid-template-columns:34px 52px 34px;align-items:center;gap:4px}
 .paso button{height:34px;border-radius:10px;border:1px solid var(--stroke-2);background:var(--glass);color:var(--fg);font-size:18px;font-weight:800;cursor:pointer}
 .paso button:disabled{opacity:.35}
@@ -95,7 +94,7 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
   <div class="hgrid">
     <article class="tile glass s7" id="tMesas"><div class="tc">
       <div class="hd"><div><h2>Mesas</h2><p id="mesasSub"></p></div>
-        <div class="acc"><button class="btn sm" type="button" id="abrirPantalla">Pantalla de llamado</button></div></div>
+        <div class="acc"><button class="btn sm" type="button" data-irpedidos="">Tomar pedido</button></div></div>
       <div class="mesas" id="mesas"></div>
       <div id="mesaAcc"></div>
     </div></article>
@@ -115,12 +114,6 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
       <ul class="lst" id="llevar"></ul>
     </div></article>
 
-    <article class="tile glass s12" id="tComandar" hidden><div class="tc">
-      <div class="hd"><div><h2 id="comT">Comandar</h2><p id="comSub"></p></div>
-        <div class="acc"><button class="btn sm" type="button" id="comCerrar">Cerrar</button></div></div>
-      <div id="comandar"></div>
-    </div></article>
-
     <article class="tile glass s12" id="tHechos"><div class="tc">
       <details class="aj" id="hechos"><summary id="hechosT">Atendidos hoy</summary><ul class="lst" id="hechosL" style="margin-top:10px"></ul></details>
       <details class="aj" id="ajustes" style="margin-top:10px"><summary>Ajustes de la fila</summary><div class="ajgrid" id="ajgrid"></div></details>
@@ -131,19 +124,18 @@ details.aj summary{cursor:pointer;font-family:var(--f-num);font-weight:700;color
 <script src="../nucleo/datos.js"></script>
 <script src="../nucleo/nucleo.js"></script>
 <script src="../nucleo/fila.js"></script>
-<script src="../nucleo/codigo-fila.js"></script>
 <script src="../nucleo/emporio.js"></script>
 <script>
 /* Seguridad: sin sesión o fuera del área del cargo, 403 (nucleo/nucleo.js). */
 EAPOS.seguridad.guardia("fila");
 /* ====================================================================
-   Fila y mesas: se anota a quien llega (para comer aquí o para llevar),
-   se le toma el pedido mientras espera (a mano o con el código que arma en
-   la Carta), y cuando una mesa se libera se llama al siguiente: aparece en
-   la pantalla de llamado, suena y, si dejó teléfono, se le avisa por
-   WhatsApp. Lo comandado sale a Comandas; se cobra en la Caja.
+   Fila y mesas: se anota a quien llega (para comer aquí o para llevar) y,
+   cuando una mesa se libera, se llama al siguiente: suena, queda en la
+   campana del sistema y, si dejó teléfono, se le avisa por WhatsApp.
+   El pedido se toma en Pedidos (en rondas que salen a Comandas) y se cobra
+   en la Caja.
    ==================================================================== */
-var U=EA_UI, E=EAPOS, F=E.fila, C=EA_CODIGO;
+var U=EA_UI, E=EAPOS, F=E.fila;
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
 function hora(ts){ return U.hhmm(new Date(ts)); }
@@ -155,6 +147,8 @@ function total(l){ return (l||[]).reduce(function(a,x){ return a+(x.p||0)*x.q; }
 function resumen(l){ return (l||[]).map(function(x){ return x.q+"× "+esc(x.n); }).join(" · "); }
 
 var NUEVO={nombre:"", pax:2, destino:"mesa", tel:"", codigo:""}, MESA=null, COM=null;
+/* El pedido se toma en Pedidos: se abre con el grupo ya elegido. */
+function irPedidos(id){ try{ localStorage.setItem("eapos_pedido_sel",JSON.stringify({grupo:id||"", ts:Date.now()})); }catch(e){} E.irA("pedidos","../"); }
 
 /* ---------- llamado en curso ---------- */
 function pintarLlamado(){
@@ -188,7 +182,7 @@ function pintarMesas(){
         '<button class="btn" type="button" data-ocupar="'+m.n+'">Sentar a alguien que llegó</button></div>'; }
     else if(m.estado==="llamada"&&g){ h='<div class="accm"><button class="btn pri" type="button" data-sentar="'+g.id+'">Llegó Nº '+g.num+' '+esc(g.nombre)+': sentar</button><button class="btn" type="button" data-nollega="'+g.id+'">No llegó</button></div>'; }
     else if(g){ h='<div class="accm"><button class="btn warn" type="button" data-liberar="'+m.n+'">Se levantaron: liberar la mesa '+m.n+'</button>'+
-        (g.pedido?'<button class="btn" type="button" data-caja="'+g.id+'">Cobrar en Caja</button>':'<button class="btn" type="button" data-comandar="'+g.id+'">Comandar</button>')+'</div>'; }
+        '<button class="btn" type="button" data-comandar="'+g.id+'">'+(g.pedido?"Ver o agregar al pedido":"Tomar pedido")+'</button>'+(F.porCobrar(g).length?'<button class="btn" type="button" data-caja="'+g.id+'">Cobrar en Caja</button>':'')+'</div>'; }
   }
   $("mesaAcc").innerHTML=h;
 }
@@ -201,10 +195,10 @@ function estadoChip(g){
 }
 function itemGrupo(g){
   var p=g.pedido, wa=F.whatsapp(g), libres=F.mesasLibres();
-  var ped=p? '<div class="ped">'+resumen(p.lineas)+' · <b>'+clp(total(p.lineas))+'</b> · '+(p.enviado?'<span class="estd ok">Comandado '+hora(p.enviado)+'</span>':'<span class="estd info">'+(g.destino==="mesa"?"Sale al sentarse":"Sin comandar")+'</span>')+(g.cobrado?' <span class="estd ok">Cobrado</span>':'')+'</div>' : '<div class="ped">Sin pedido todavía</div>';
-  var acc='<button class="btn sm" type="button" data-comandar="'+g.id+'">'+(p?"Cambiar pedido":"Comandar")+'</button>';
-  if(p&&!p.enviado) acc+='<button class="btn sm" type="button" data-enviar="'+g.id+'">Comandar ya</button>';
-  if(p&&!g.cobrado) acc+='<button class="btn sm" type="button" data-caja="'+g.id+'">Cobrar en Caja</button>';
+  var ped=p? '<div class="ped">'+resumen(p.lineas)+' · <b>'+clp(F.total(p.lineas))+'</b> · '+(p.enviado?'<span class="estd ok">Comandado '+hora(p.enviado)+'</span>':'<span class="estd info">'+(g.destino==="mesa"?"Sale al sentarse":"Sin comandar")+'</span>')+(g.cobrado&&!F.porCobrar(g).length?' <span class="estd ok">Cobrado</span>':'')+'</div>' : '<div class="ped">Sin pedido todavía</div>';
+  var acc='<button class="btn sm" type="button" data-comandar="'+g.id+'">'+(p?"Ver o agregar al pedido":"Tomar pedido")+'</button>';
+  if(p&&p.rondas&&p.rondas.some(function(r){ return !r.enviado; })) acc+='<button class="btn sm" type="button" data-enviar="'+g.id+'">Comandar ya</button>';
+  if(F.porCobrar(g).length) acc+='<button class="btn sm" type="button" data-caja="'+g.id+'">Cobrar en Caja</button>';
   if(g.destino==="mesa"){
     if(g.estado==="esperando"&&libres.length) acc+='<button class="btn sm pri" type="button" data-llamar="'+g.id+'" data-m="'+libres[0].n+'">Llamar · mesa '+libres[0].n+'</button>';
     if(g.estado==="llamado") acc+='<button class="btn sm pri" type="button" data-sentar="'+g.id+'">Llegó: sentar</button>';
@@ -236,59 +230,19 @@ function pintarAnotar(){
     '<input class="txt" type="text" id="nNombre" maxlength="40" placeholder="Nombre (como lo vamos a llamar)" value="'+esc(NUEVO.nombre)+'">'+
     '<div class="fila2"><span class="lbl2">Personas</span><div class="paso"><button type="button" data-pax="-1" aria-label="Una persona menos"'+(NUEVO.pax>1?'':' disabled')+'>−</button><b class="num">'+NUEVO.pax+'</b><button type="button" data-pax="1" aria-label="Una persona más">+</button></div></div>'+
     '<input class="txt" type="tel" id="nTel" maxlength="16" placeholder="Teléfono para avisar por WhatsApp (opcional)" value="'+esc(NUEVO.tel)+'">'+
-    '<input class="txt codigo" type="text" id="nCodigo" maxlength="40" placeholder="Código de la Carta (opcional)" value="'+esc(NUEVO.codigo)+'" autocomplete="off" spellcheck="false">'+
-    '<p class="info" id="nInfo">'+(mesas?'Si el cliente armó su pedido en la Carta, escribe el código que le aparece: el pedido queda anotado.':'Las mesas cerraron a las 21:30: solo para llevar.')+'</p>'+
+    '<p class="info" id="nInfo">'+(mesas?'Al anotar se abre Pedidos para tomarle el pedido mientras espera.':'Las mesas cerraron a las 21:30: solo para llevar.')+'</p>'+
     '<button class="btn pri grande" type="button" id="nAnotar">Anotar en la fila</button>';
 }
-function leerNuevo(){ var n=$("nNombre"), t=$("nTel"), c=$("nCodigo"); if(n) NUEVO.nombre=n.value; if(t) NUEVO.tel=t.value; if(c) NUEVO.codigo=c.value; }
-function lineasDeCodigo(r){ var out=[], faltan=[];
-  r.lineas.forEach(function(x){ var p=POR[x.id]; if(!p||p.p==null){ faltan.push(x.id); return; } out.push({id:p.id, n:p.n, q:x.q, p:p.p}); });
-  return {lineas:out, faltan:faltan}; }
+function leerNuevo(){ var n=$("nNombre"), t=$("nTel"); if(n) NUEVO.nombre=n.value; if(t) NUEVO.tel=t.value; }
 function anotar(){
-  leerNuevo(); var cod=NUEVO.codigo.trim(), r=null, ls=null;
-  if(cod){ r=C.leer(window.EA_DATOS,cod); if(r.error){ $("nInfo").innerHTML='<span class="mal">'+esc(r.error)+'</span>'; return; }
-    ls=lineasDeCodigo(r); NUEVO.destino=r.destino; if(r.personas) NUEVO.pax=r.personas; }
+  leerNuevo();
   if(NUEVO.destino==="mesa"&&!E.mesasAbiertas()){ U.aviso("Las mesas cerraron a las 21:30"); return; }
   var g=F.anotar({nombre:NUEVO.nombre, pax:NUEVO.pax, destino:NUEVO.destino, tel:NUEVO.tel}, quien());
-  if(ls&&ls.lineas.length) F.pedir(g.id, ls.lineas, g.destino==="llevar"?"ahora":"despues", cod);
-  U.aviso("Anotado: Nº "+g.num+" "+g.nombre+(ls&&ls.lineas.length?" · pedido de la Carta ("+ls.lineas.length+" productos)":"")+(ls&&ls.faltan.length?" · "+ls.faltan.length+" sin precio no entraron":""),5000);
+  if(!g){ U.aviso("403 · Tu cargo no anota en la fila. Quedó registrado."); return; }
+  U.aviso("Anotado: Nº "+g.num+" "+g.nombre+" · toca para tomarle el pedido",{ir:"pedidos"});
   NUEVO={nombre:"", pax:2, destino:E.mesasAbiertas()?"mesa":"llevar", tel:"", codigo:""};
-  if(!g.pedido&&!(ls&&ls.lineas.length)) abrirComandar(g.id);
   pintar(true);
 }
-
-/* ---------- comandar ---------- */
-var PED=null, GRUPO_C="emp", BUSCA="";
-var GRUPOS=[["emp","Empanadas"],["coc","Cocina"],["bar","Barra"],["past","Pastelería"]];
-function abrirComandar(id){
-  var g=F.grupos().filter(function(x){ return x.id===id; })[0]; if(!g) return;
-  COM=id; PED={lineas:g.pedido?g.pedido.lineas.map(function(l){ return Object.assign({},l); }):[], cuando:g.pedido?g.pedido.cuando:(g.destino==="llevar"?"ahora":"despues"), codigo:""};
-  $("tComandar").hidden=false; pintarComandar(); pintarFila();
-  setTimeout(function(){ $("tComandar").scrollIntoView({block:"start"}); },30);
-}
-function pintarComandar(){
-  if(!COM){ $("tComandar").hidden=true; return; }
-  var g=F.grupos().filter(function(x){ return x.id===COM; })[0]; if(!g){ COM=null; $("tComandar").hidden=true; return; }
-  $("comT").textContent="Comandar · Nº "+g.num+" "+g.nombre;
-  $("comSub").textContent=(g.destino==="mesa"?"Espera mesa":"Para llevar")+" · "+g.pax+(g.pax===1?" persona":" personas")+(g.pedido&&g.pedido.enviado?" · ya comandado: los cambios no vuelven a cocina":"");
-  var q=BUSCA.trim().toLowerCase();
-  var lista=CAT.filter(function(p){ return q? p.n.toLowerCase().indexOf(q)>=0 : p.g===GRUPO_C; });
-  var h='<div class="form" style="margin-bottom:12px"><div class="fila2"><input class="txt codigo" type="text" id="cCodigo" placeholder="Código de la Carta" autocomplete="off" spellcheck="false" value="'+esc(PED.codigo)+'"><button class="btn" type="button" id="cLeer">Leer código</button></div></div>';
-  h+='<div class="ctl-row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><div class="fchips" role="group" aria-label="Grupo">'+GRUPOS.map(function(x){ return '<button class="fchip" type="button" data-gc="'+x[0]+'" aria-pressed="'+(!q&&GRUPO_C===x[0])+'">'+x[1]+'</button>'; }).join("")+'</div>'+
-    '<input class="txt" style="max-width:260px" type="search" id="cBusca" placeholder="Buscar en la carta" value="'+esc(BUSCA)+'"></div>';
-  h+='<div class="prods">'+lista.map(function(p){ var en=PED.lineas.filter(function(l){ return l.id===p.id; })[0], fh=E.porHorario(p), sin=p.p==null;
-    return '<button class="prod'+(en?" on":"")+'" type="button" data-add="'+p.id+'"'+(fh||sin?' disabled':'')+'><b>'+esc(p.n)+(en?' · '+en.q:'')+'</b><span>'+(sin?"Sin precio":clp(p.p))+'</span>'+(fh?'<small>'+esc(fh)+'</small>':(p.loc&&g.destino==="llevar"?'<small>Solo en el local</small>':''))+'</button>'; }).join("")+'</div>';
-  h+='<div style="margin-top:14px"><span class="lbl">Pedido</span><ul class="lineas" style="margin-top:8px">'+(PED.lineas.map(function(l,i){
-      return '<li><span>'+esc(l.n)+'</span><span class="num">'+clp(l.p*l.q)+'</span><div class="paso"><button type="button" data-lq="'+i+'" data-d="-1" aria-label="Uno menos">−</button><b class="num">'+l.q+'</b><button type="button" data-lq="'+i+'" data-d="1" aria-label="Uno más">+</button></div></li>'; }).join("")||'<li><span class="empty-s">Toca los productos para agregarlos.</span></li>')+'</ul>'+
-    (PED.lineas.length?'<div class="tot" style="margin-top:8px"><span>Total</span><span>'+clp(total(PED.lineas))+'</span></div>':'')+'</div>';
-  if(!(g.pedido&&g.pedido.enviado)) h+='<div class="seg" role="group" aria-label="Cuándo se prepara" style="margin-top:12px"><button type="button" data-cuando="ahora" aria-pressed="'+(PED.cuando==="ahora")+'">Preparar ya</button><button type="button" data-cuando="despues" aria-pressed="'+(PED.cuando==="despues")+'">'+(g.destino==="mesa"?"Al sentarse":"Al llegar al mesón")+'</button></div>';
-  h+='<p class="info" style="margin-top:10px">'+(PED.cuando==="ahora"?'Sale a Comandas de cocina, barra y horno al guardar: estará listo cuando '+(g.destino==="mesa"?"se sienten":"lleguen al mesón")+'.':'Queda anotado; sale a Comandas '+(g.destino==="mesa"?"al sentarlos en la mesa":"con «Comandar ya»")+'.')+' Se cobra en la Caja.</p>';
-  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn pri" type="button" id="cGuardar"'+(PED.lineas.length?'':' disabled')+'>Guardar pedido · '+clp(total(PED.lineas))+'</button>'+(PED.lineas.length?'<button class="btn" type="button" id="cGuardarCaja">Guardar y cobrar en Caja</button>':'')+'</div>';
-  $("comandar").innerHTML=h;
-}
-function agregar(id){ var p=POR[id]; if(!p||p.p==null) return; var l=PED.lineas.filter(function(x){ return x.id===id; })[0]; if(l) l.q++; else PED.lineas.push({id:p.id, n:p.n, q:1, p:p.p}); pintarComandar(); }
-function guardarPedido(){ if(!PED.lineas.length) return null; var g=F.pedir(COM, PED.lineas, PED.cuando, PED.codigo); if(!g) return null;
-  U.aviso("Pedido de Nº "+g.num+" "+(g.pedido.enviado?"comandado":"anotado")+" · "+clp(total(PED.lineas))); return g; }
 
 /* ---------- ajustes ---------- */
 function pintarAjustes(){ if($("ajustes").open&&$("ajgrid").innerHTML) return; var c=F.estado().cfg;
@@ -300,7 +254,6 @@ function pintar(forzar){
   var f=document.activeElement, escribe=f&&f.tagName==="INPUT";
   pintarLlamado(); pintarMesas(); pintarFila(); pintarAjustes();
   if(forzar||!(escribe&&$("tAnotar").contains(f))) pintarAnotar();
-  if(forzar||!(escribe&&$("tComandar").contains(f))) pintarComandar();
 }
 
 /* ---------- acciones ---------- */
@@ -322,33 +275,16 @@ document.addEventListener("click",function(ev){
   if(b.dataset.listo){ var gk=F.marcarListo(b.dataset.listo); F.llamar(gk.id,null); campana(); U.aviso("Llamando a Nº "+gk.num+" "+gk.nombre+": su pedido está listo",5000); pintar(); return; }
   if(b.dataset.entregado){ F.retirar(b.dataset.entregado,"entregado"); pintar(); return; }
   if(b.dataset.sefue){ var gf=F.retirar(b.dataset.sefue,"se_fue"); if(COM===gf.id) COM=null; U.aviso("Nº "+gf.num+" salió de la fila"); pintar(); return; }
-  if(b.dataset.comandar){ abrirComandar(b.dataset.comandar); return; }
+  if(b.dataset.comandar!=null){ irPedidos(b.dataset.comandar); return; }
+  if(b.dataset.irpedidos!=null){ irPedidos(""); return; }
   if(b.dataset.enviar){ var ge=F.comandar(b.dataset.enviar); U.aviso("Pedido de Nº "+ge.num+" comandado"); pintar(); return; }
   if(b.dataset.caja){ var t=F.aCaja(b.dataset.caja); if(t){ U.aviso("Pedido de Nº "+t.num+" enviado a la Caja para cobrar"); E.irA("caja","../"); } return; }
   if(b.dataset.dest){ leerNuevo(); NUEVO.destino=b.dataset.dest; pintarAnotar(); return; }
   if(b.dataset.pax){ leerNuevo(); NUEVO.pax=Math.max(1,Math.min(30,NUEVO.pax+(+b.dataset.pax))); pintarAnotar(); return; }
   if(b.id==="nAnotar"){ anotar(); return; }
-  if(b.id==="abrirPantalla"){ var w=window.open("llamado.html","ea-llamado"); if(!w) U.aviso("El navegador bloqueó la ventana: permite ventanas emergentes para este sitio"); return; }
-  if(b.id==="comCerrar"){ COM=null; PED=null; pintar(); return; }
-  if(b.dataset.gc){ GRUPO_C=b.dataset.gc; BUSCA=""; pintarComandar(); return; }
-  if(b.dataset.add){ agregar(b.dataset.add); return; }
-  if(b.dataset.lq){ var l=PED.lineas[+b.dataset.lq]; l.q+=d; if(l.q<=0) PED.lineas.splice(+b.dataset.lq,1); pintarComandar(); return; }
-  if(b.dataset.cuando){ PED.cuando=b.dataset.cuando; pintarComandar(); return; }
-  if(b.id==="cLeer"){ var cc=$("cCodigo").value, r=C.leer(window.EA_DATOS,cc); if(r.error){ U.aviso(r.error,5000); return; }
-    var ls=lineasDeCodigo(r); PED.codigo=cc; ls.lineas.forEach(function(x){ var l=PED.lineas.filter(function(y){ return y.id===x.id; })[0]; if(l) l.q+=x.q; else PED.lineas.push(x); });
-    U.aviso(ls.lineas.length+" productos desde la Carta"+(ls.faltan.length?" · "+ls.faltan.length+" sin precio no entraron":"")); pintarComandar(); return; }
-  if(b.id==="cGuardar"||b.id==="cGuardarCaja"){ var aCajaTambien=b.id==="cGuardarCaja";
-    /* Cambiar un pedido que ya salió a cocina lo hace (o lo autoriza) un encargado. */
-    var g0=F.grupos().filter(function(x){ return x.id===COM; })[0], yaFue=!!(g0&&g0.pedido&&g0.pedido.enviado);
-    U.conPermiso(yaFue?"fila.cambiarComandado":"fila.operar","pedido de Nº "+(g0?g0.num:""),function(){
-      var gg=guardarPedido(); if(!gg){ U.aviso("403 · No se guardó el pedido. Quedó registrado."); return; }
-      var tt=aCajaTambien?F.aCaja(gg.id):null; COM=null; PED=null; pintar(); if(tt) E.irA("caja","../"); });
-    return; }
   if(b.dataset.aj){ var c=F.estado().cfg, nv={}; nv[b.dataset.aj]=c[b.dataset.aj]+d; F.ajustes(nv); $("ajgrid").innerHTML=""; pintar(); return; }
 });
-document.addEventListener("input",function(ev){ if(ev.target.id==="cBusca"){ BUSCA=ev.target.value; var pos=ev.target.selectionStart; pintarComandar(); var i=$("cBusca"); i.focus(); try{ i.setSelectionRange(pos,pos); }catch(e){} }
-  if(ev.target.id==="cCodigo"&&PED) PED.codigo=ev.target.value; });
-document.addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&ev.target.id==="nCodigo"){ anotar(); } if(ev.key==="Enter"&&ev.target.id==="cCodigo"){ $("cLeer").click(); } });
+document.addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&ev.target.id==="nNombre"){ anotar(); } });
 
 var AC=null;
 function campana(){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume();

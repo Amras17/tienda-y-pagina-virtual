@@ -518,6 +518,13 @@ input.mininum:focus{outline:2px solid var(--madera); outline-offset:1px}
 .clase{min-width:0}
 .tabox{max-width:100%}
 
+/* Cuentas abiertas de Pedidos (mesas, para llevar y fila): se cobran con un toque. */
+.porcobrar{display:flex;gap:8px;align-items:center;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:thin}
+.porcobrar .pct{flex:none;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta3)}
+.porcobrar button{flex:none;display:grid;gap:1px;text-align:left;border:1.5px solid var(--madera);background:var(--papel);color:var(--tinta);border-radius:12px;padding:6px 11px;font:inherit;cursor:pointer}
+.porcobrar button b{font-size:13px}
+.porcobrar button span{font-family:var(--mono);font-size:12.5px;color:var(--marron);font-weight:700}
+
 /* ===== Piel Emporio System 1.1 =====
    La Caja conserva su armado (rejilla y cuenta, riel o pestañas) y toma el
    vidrio, los resortes y los indicadores de Emporio System 1.1. */
@@ -622,6 +629,7 @@ thead th,.tbl th{background:rgba(14,22,25,.95)}
     <div class="caja">
       <div class="izq">
         <div class="hora-aviso" id="horaAviso" role="status" hidden></div>
+        <div class="porcobrar" id="porCobrar" hidden></div>
         <div class="fila">
           <span class="buscador"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-lupa"/></svg><input id="buscaProd" type="search" placeholder="Buscar producto, empanada, café…" autocomplete="off"></span>
         </div>
@@ -854,6 +862,8 @@ function pito(clase){
 var tToast=null;
 function avisar(txt,clase){
   var t=$("#toast"); t.textContent=txt;
+  /* Queda en Recientes de la campana del sistema: tocarlo vuelve a la Caja. */
+  try{ if(window.EA_UI&&EA_UI.reciente) EA_UI.reciente(txt, "caja"+(seccActiva&&seccActiva!=="caja"?":"+seccActiva:"")); }catch(e){}
   t.className="toast ver"+(clase?" "+clase:"");
   pito(clase);
   clearTimeout(tToast); tToast=setTimeout(function(){ t.className="toast"+(clase?" "+clase:""); }, 3200);
@@ -1054,11 +1064,12 @@ function registrar(){
     doc:null, anulada:null
   };
   /* Pedido que vino de la fila: si ya salió a Comandas, la venta no lo vuelve a comandar. */
-  if(filaRef) v.fila={grupo:filaRef.grupo, num:filaRef.num, nombre:filaRef.nombre, comandado:!!filaRef.comandado};
+  if(filaRef) v.fila={grupo:filaRef.grupo, num:filaRef.num, nombre:filaRef.nombre, mesa:filaRef.mesa||null, comandado:!!filaRef.comandado};
   POS.ventas.push(v);
   v.lineas.forEach(function(l){ descontar(l.id, l.q); });
   guardarPOS(); guardarCtrl(); pintarPropias();
   if(filaRef){ try{ EAPOS.fila.marcarCobrado(filaRef.grupo, v.id); }catch(e){} filaRef=null; }
+  try{ pintarPorCobrar(); }catch(e){}
   carro=[]; pagoActivo=""; $("#inEfectivo").value="";
   setTimeout(tomarTraspaso, 1600);
   pintarPagos(); pintarCuenta(); pintarRejilla(); pintarPanel(); pintarStock();
@@ -2665,9 +2676,9 @@ function hojaRestaurar(){
 }
 
 /* ==================== INFORMES: pestañas ==================== */
+/* Las estadísticas de ventas viven en el área Reportes del sistema general. */
 var SUBINF=[
   {id:"rep",   n:"Cierre"},
-  {id:"estad", n:"Estadísticas"},
   {id:"hist",  n:"Historial"},
   {id:"ent",   n:"Entregar"}
 ];
@@ -2827,7 +2838,7 @@ var SECC=[
   {id:"panel", n:"Panel",    ico:"i-panel",   v:"vPanel"},
   {id:"stock", n:"Stock",    ico:"i-stock",   v:"vStock"},
   {id:"gest",  n:"Gestión",  ico:"i-grano",   v:"vGest"},
-  {id:"inf",   n:"Informes", ico:"i-reporte", v:"vInf"},
+  {id:"inf",   n:"Cierre", ico:"i-reporte", v:"vInf"},
   {id:"ajustes",n:"Ajustes", ico:"i-ajustes", v:"vAjustes", oculta:true}
 ];
 var seccActiva="caja";
@@ -2980,9 +2991,10 @@ function pintarHorario(){
 }
 setInterval(pintarHorario,15000);
 
-/* ---------- pedidos que llegan de la Fila ----------
-   «Cobrar en Caja» en Fila y mesas deja el pedido en eapos_traspaso; la Caja
-   lo toma apenas su cuenta está vacía, con el modo (local o llevar) del grupo. */
+/* ---------- cuentas que llegan de Pedidos y de la Fila ----------
+   «Cobrar» en Pedidos o en Fila y mesas deja la cuenta en eapos_traspaso; la
+   Caja la toma apenas su cuenta está vacía, con el modo (local o llevar) del
+   grupo. Arriba de la carta, «Por cobrar» lista las cuentas abiertas. */
 var filaRef=null;
 function leerTraspaso(){ try{ return JSON.parse(localStorage.getItem("eapos_traspaso")||"null"); }catch(e){ return null; } }
 function tomarTraspaso(){
@@ -2991,20 +3003,36 @@ function tomarTraspaso(){
   try{ localStorage.removeItem("eapos_traspaso"); }catch(e){}
   var faltan=0;
   t.lineas.forEach(function(x){ var p=itemCat(x.id), pr=p?precioDe(p):null; if(!p||pr==null){ faltan++; return; }
-    carro.push({id:p.id, n:p.n, p:pr, q:x.q, mod:[], leche:!!p.leche||p.g==="bar"||p.sub==="desayunos"||p.sub==="brunch"}); });
+    var mod=(x.mod||[]).map(function(m){ return {id:m.id, n:m.n, p:m.p||0, inc:m.inc, b:m.b}; });
+    if(x.nota) mod.push({id:"nota", n:"Nota: "+x.nota, p:0});
+    carro.push({id:p.id, n:p.n, p:pr, q:x.q, mod:mod, leche:!!p.leche||p.g==="bar"||p.sub==="desayunos"||p.sub==="brunch"}); });
   var m=t.modo==="llevar"||!EAPOS.mesasAbiertas()?"llevar":"local";
   modoActivo=m; conPropina=(m==="local");
   $("#modoVenta").querySelectorAll("[data-modo]").forEach(function(x){ x.setAttribute("aria-pressed", x.dataset.modo===m?"true":"false"); });
-  filaRef={grupo:t.grupo, num:t.num, nombre:t.nombre, comandado:!!t.comandado};
+  filaRef={grupo:t.grupo, num:t.num, nombre:t.nombre, mesa:t.mesa||null, comandado:!!t.comandado};
   if(seccActiva!=="caja") irA("caja");
   pintarCuenta(); pintarRejilla();
-  avisar("Pedido de la fila: Nº "+t.num+" "+t.nombre+(t.mesa?" · mesa "+t.mesa:"")+". Elige el medio de pago y registra."+(faltan?" "+faltan+" productos sin precio no entraron.":""),"bien");
+  avisar((t.mesa?"Cuenta de la mesa "+t.mesa:t.modo==="llevar"?"Para llevar Nº "+t.num+" "+t.nombre:"Cuenta de Nº "+t.num+" "+t.nombre)+". Elige el medio de pago y registra."+(faltan?" "+faltan+" productos sin precio no entraron.":""),"bien");
 }
-window.addEventListener("storage",function(ev){ if(ev.key==="eapos_traspaso"&&ev.newValue) tomarTraspaso(); });
+window.addEventListener("storage",function(ev){ if(ev.key==="eapos_traspaso"&&ev.newValue) tomarTraspaso(); if(ev.key==="eapos_fila") pintarPorCobrar(); });
+/* Desde el sistema general (avisos y Recientes): "caja:inf" abre esa sección. */
+window.EA_IR=function(parte){ if(SECC.some(function(x){ return x.id===parte; })) irA(parte); };
+function pintarPorCobrar(){
+  var c=$("#porCobrar"); if(!c||!EAPOS.fila) return;
+  var cs=EAPOS.fila.cuentas().filter(function(x){ return !filaRef||x.grupo.id!==filaRef.grupo; });
+  c.hidden=!cs.length; if(!cs.length){ c.innerHTML=""; return; }
+  c.innerHTML='<span class="pct">Por cobrar</span>'+cs.map(function(x){ var g=x.grupo;
+    var et=g.destino==="llevar"?"Llevar Nº "+g.num:g.mesa?"Mesa "+g.mesa:"Fila Nº "+g.num;
+    return '<button type="button" data-cobrar="'+esc(g.id)+'" title="'+esc(g.nombre)+'"><b>'+esc(et)+'</b><span>'+plata(x.total)+'</span></button>'; }).join("");
+}
+document.addEventListener("click",function(ev){ var b=ev.target.closest("[data-cobrar]"); if(!b) return;
+  if(carro.length){ avisar("Termina o vacía la cuenta en curso para cobrar otra.","alerta"); return; }
+  var t=EAPOS.fila.aCaja(b.dataset.cobrar); if(t) tomarTraspaso(); pintarPorCobrar(); });
+setInterval(pintarPorCobrar,15000);
 
 function arrancar(estado){
   if(estado && estado.carro){ carro=estado.carro; modoActivo=estado.modo||"local"; grupoActivo=estado.grupo||"emp"; }
-  pintarTodo(); tomarTraspaso();
+  pintarTodo(); tomarTraspaso(); pintarPorCobrar();
   if(pendientesFolio().length) setTimeout(function(){ avisar(pendientesFolio().length+" ventas quedaron sin folio de boleta.","alerta"); }, 900);
 }
 try{

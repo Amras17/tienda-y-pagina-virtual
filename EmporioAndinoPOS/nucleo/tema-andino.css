@@ -343,3 +343,7 @@
   :root[data-tema=andino] .login h1{font-size:27px}
   :root[data-tema=andino] .top h1{font-size:24px}
 }
+
+/* Avisos que llevan a la acción (3.2): el "Ver →" en arena sobre el azul noche. */
+:root[data-tema=andino] .toast-ir{color:#D3BEA0}
+:root[data-tema=andino] button.toast:hover{box-shadow:0 0 0 2px #D3BEA0}
