@@ -4,6 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap">
 <link rel="stylesheet" href="nucleo/emporio.css">
+<style id="nubeCss">.nube-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:6px 0 10px}.nube-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;opacity:.85}.nube-form input{width:100%;box-sizing:border-box;min-width:0}.nube-acc{display:flex;flex-wrap:wrap;gap:8px}.nube-msg{margin:8px 0 0;font-size:13px;min-height:1.2em;overflow-wrap:anywhere}.nube-msg.err{color:#b3261e}.dot.warn{background:var(--warn);animation:none}.nube-login{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;margin:0 0 14px;padding:12px;border-radius:14px;border:1px dashed currentColor}.nube-login>div{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;font-size:13px}.nube-login>div span{opacity:.8}.nube-login input{min-width:0;width:100%;box-sizing:border-box}.nube-login .nube-msg{grid-column:1/-1;margin:0}.nube-login .nube-msg:empty{display:none}@media(max-width:620px){.nube-login{grid-template-columns:1fr}}</style>
 <style>
 /* Layout: el de Emporio System 1.1, ahora como capa superior de todo el sistema.
    Ingreso de personas con PIN, menú lateral por grupos, dashboard como inicio
@@ -57,10 +58,17 @@
 <!-- ================= INGRESO ================= -->
 <section class="login" id="login" aria-label="Seleccionar usuario">
   <div class="login-card glass">
-    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.2</span></div><span class="login-ctl"><button class="chip tema-btn" type="button" id="temaLogin" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>Tema</span></button><span class="chip num" id="loginClock">--:--</span></span></div>
+    <div class="login-hd"><div><b>EmporioAndinoPOS</b><span class="ver">3.3</span></div><span class="login-ctl"><button class="chip tema-btn" type="button" id="temaLogin" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>Tema</span></button><span class="chip num" id="loginClock">--:--</span></span></div>
     <div id="whoStep">
       <h1>¿Quién usa el sistema?</h1>
       <p class="lead">Toca tu nombre y escribe tu PIN: entras directo a tu área. Cada cargo ve solo lo que le corresponde.</p>
+      <form class="nube-login" id="nubeLogin" hidden autocomplete="off">
+        <div><b>Este sistema tiene nube</b><span>Para sumar este equipo, escribe una vez la clave del local: trae las ventas, los pedidos y los PIN del equipo.</span></div>
+        <input id="nubeLoginClave" type="password" placeholder="Clave del local" aria-label="Clave del local">
+        <input id="nubeLoginNombre" type="text" placeholder="Nombre de este equipo (Caja 1, Tablet…)" aria-label="Nombre de este equipo">
+        <button class="btn sm pri" type="submit">Conectar este equipo</button>
+        <p class="nube-msg" id="nubeLoginMsg" role="status" aria-live="polite"></p>
+      </form>
       <div id="peopleList"></div>
     </div>
     <div id="pinStep" hidden>
@@ -70,7 +78,7 @@
           <div class="pin-who" style="margin-top:18px"><span class="av" id="pinAv"></span><div><h1 style="margin:0" id="pinName"></h1><span style="color:var(--muted)" id="pinRole"></span></div></div>
           <div class="pin-dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
           <div class="pin-msg" id="pinMsg" role="status"></div>
-          <p class="note">El PIN se guarda cifrado solo en este equipo. Tras 5 intentos fallidos esa persona queda bloqueada un minuto y el intento queda en la bitácora de seguridad.</p>
+          <p class="note">El PIN se guarda cifrado en este equipo (y en la nube del local, si está conectada). Tras 5 intentos fallidos esa persona queda bloqueada un minuto y el intento queda en la bitácora de seguridad.</p>
         </div>
         <div class="pad" id="pad" aria-label="Teclado del PIN">
           <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
@@ -91,7 +99,7 @@
         <defs><pattern id="zz" width="24" height="22" patternUnits="userSpaceOnUse"><path d="M0 4 L6 13 L12 4 L18 13 L24 4" fill="none" stroke="#40E0D0" stroke-width="2"/><path d="M0 16 L12 16 L6 21Z M12 16 L24 16 L18 21Z" fill="#FF7F50"/></pattern></defs>
         <rect width="240" height="22" fill="url(#zz)"/>
       </svg>
-      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.2</span><small>Emporio Andino · San Pedro</small><button class="btn sm icon tema-btn" type="button" id="temaBtn" aria-label="Cambiar tema" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></button></div></div>
+      <div class="brand"><b>EmporioAndinoPOS</b><div class="row"><span class="ver">3.3</span><small>Emporio Andino · San Pedro</small><button class="btn sm icon tema-btn" type="button" id="temaBtn" aria-label="Cambiar tema" title="Cambiar el tema de este equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1-.1-2.2 1.1-2.2H17a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg></button></div></div>
       <div class="me"><span class="av" id="meAv"></span><div><b id="meName"></b><span id="meRole"></span></div>
         <button class="btn sm icon" type="button" id="logoutBtn" aria-label="Cerrar sesión" title="Cerrar sesión (toca dos veces)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
       <nav class="nav" id="nav"><span class="ind" id="navInd"></span></nav>
@@ -201,6 +209,24 @@
         <article class="tile glass s12"><div class="tc">
           <div class="hd"><div><h2>Tema del sistema</h2><p>Se elige en cada equipo y cambia al instante en todas sus ventanas, módulos y en la Carta</p></div></div>
           <div class="temas" id="temas" role="group" aria-label="Tema del sistema"></div></div></article>
+        <article class="tile glass s12" id="nubeTile"><div class="tc">
+          <div class="hd"><div><h2>Nube · Google Cloud SQL</h2><p id="nubeSub">Comparte ventas, fila, comandas, stock y configuración entre equipos. Sin nube, todo sigue en este equipo.</p></div>
+            <span class="chip" id="nubeEstado"><span class="dot" id="nubeDot"></span><span id="nubeEstTxt">Sin nube</span></span></div>
+          <div class="nube-form">
+            <label>Dirección del servidor<input id="nubeUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://emporio-xxxx.southamerica-west1.run.app (vacío = este mismo sitio)"></label>
+            <label>Clave del local<input id="nubeClave" type="password" autocomplete="off" placeholder="La CLAVE_LOCAL del servidor"></label>
+            <label>Nombre de este equipo<input id="nubeNombre" type="text" autocomplete="off" placeholder="Caja 1, Tablet garzón, Cocina…"></label>
+            <label id="nubePinL">Tu PIN (abre tu sesión en la nube)<input id="nubePin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="4 dígitos"></label>
+          </div>
+          <div class="nube-acc">
+            <button class="btn sm" type="button" id="nubeProbar">Probar conexión</button>
+            <button class="btn sm pri" type="button" id="nubeSubir" title="Primer equipo: sube lo de este equipo y lo junta con la nube">Conectar y subir lo de este equipo</button>
+            <button class="btn sm" type="button" id="nubeTraer" title="Equipos que se suman: parten de lo que ya hay en la nube">Conectar y traer de la nube</button>
+            <button class="btn sm pri" type="button" id="nubeIngresar" hidden>Abrir mi sesión en la nube</button>
+            <button class="btn sm" type="button" id="nubeYa" hidden>Sincronizar ahora</button>
+            <button class="btn sm warn" type="button" id="nubeOff" hidden>Desconectar este equipo</button>
+          </div>
+          <p class="nube-msg" id="nubeMsg" role="status" aria-live="polite"></p></div></article>
         <article class="tile glass s12"><div class="tc">
           <div class="hd"><div><h2>Perímetro de cada cargo</h2><p>Qué áreas abre cada cargo; fuera de ellas no hay ruta (403) y el intento queda en la bitácora</p></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Cargo</th><th>Entra a</th><th>Áreas</th><th>Acciones sensibles</th></tr></thead><tbody id="perimetro"></tbody></table></div></div></article>
@@ -209,8 +235,12 @@
             <div class="seg" role="group" aria-label="Filtro" id="bitFiltro"><button type="button" data-bf="todo" aria-pressed="true">Todo</button><button type="button" data-bf="alerta" aria-pressed="false">Solo alertas</button></div></div>
           <div class="tbl-wrap"><table><thead><tr><th>Hora</th><th>Quién</th><th>Qué</th><th>Recurso</th><th>Detalle</th></tr></thead><tbody id="bitacora"></tbody></table></div></div></article>
         <article class="tile glass s12"><div class="tc">
-          <div class="hd"><div><h2>Notas de la versión 3.2</h2><p>Pedidos, Caja y Reportes por separado; números completos y avisos que llevan a la acción</p></div></div>
+          <div class="hd"><div><h2>Notas de la versión 3.3</h2><p>Nube con Google Cloud SQL: todos los equipos comparten ventas, pedidos y stock</p></div></div>
           <div class="notas">
+            <div><h3>Nube · Google Cloud SQL (3.3)</h3><ul>
+              <li>Servidor propio (carpeta servidor) para Google Cloud Run con base PostgreSQL en Cloud SQL: guarda ventas, fila y pedidos, comandas, stock, horno, panadería, configuración y PIN, y vuelca cada venta a tablas para consultar con SQL o Looker Studio.</li>
+              <li>Cada equipo se conecta en Versiones → Nube con la clave del local. Si dos cajas venden a la vez, se juntan las dos ventas; sin internet todo sigue funcionando y se sube al volver. El servidor revisa de nuevo el cargo de quien guarda (403) y lo anota en la bitácora.</li>
+            </ul></div>
             <div><h3>Pedidos, Caja y Reportes (3.2)</h3><ul>
               <li>Pedidos: para quién (mesa, para llevar o fila), la carta y la cuenta en rondas que salen a Comandas, con agregados, bebida incluida y notas. La Caja muestra "Por cobrar" y carga la cuenta con un toque.</li>
               <li>Reportes aparte: por hora o día, área, más vendidos, pagos, canal y garzón, con CSV. Salieron la pantalla de llamado y el código de la Carta.</li>
@@ -331,6 +361,7 @@
 <script src="nucleo/produccion.js"></script>
 <script src="nucleo/fila.js"></script>
 <script src="nucleo/emporio.js"></script>
+<script src="nucleo/nube.js"></script>
 <script>
 (function(){
 var $=function(id){ return document.getElementById(id); };
@@ -408,14 +439,14 @@ function pinComplete(code){
   var p=pinTarget; if(!p) return;
   var bh=bloqueadoHasta(p.n); if(bh) return pinErr("Bloqueado por PIN incorrecto: espera "+Math.ceil((bh-Date.now())/1000)+" s");
   E.verificarPin(p.n,code).then(function(ok){
-    if(ok===true) return login(p);
+    if(ok===true){ nubeSesion(p,code); return login(p); }
     if(ok===false){ var h=fallo(p); pinFails++;
       return pinErr(h?"5 PIN incorrectos: bloqueado un minuto. Quedó registrado.":pinFails>=3?"PIN incorrecto. Si lo olvidaste, dirección puede restablecerlo en Versiones y accesos.":"PIN incorrecto, intenta de nuevo"); }
     /* Sin PIN todavía: se crea y se confirma. */
     return E.hashPin(p.n,code).then(function(h){
       if(!pinFirst){ pinFirst=h; drawDots(); $("pinMsg").className="pin-msg"; $("pinMsg").textContent="Repite el PIN para confirmarlo"; return; }
       if(pinFirst!==h){ pinFirst=null; return pinErr("Los PIN no coinciden. Créalo otra vez"); }
-      E.guardarPin(p.n,h); E.seguridad.registrar({tipo:"pin_creado", quien:p.n, rol:p.r}); login(p); });
+      E.guardarPin(p.n,h); E.seguridad.registrar({tipo:"pin_creado", quien:p.n, rol:p.r}); nubeSesion(p,code); login(p); });
   });
 }
 function pinKey(k){ if(!pinTarget) return;
@@ -423,7 +454,7 @@ function pinKey(k){ if(!pinTarget) return;
   drawDots(); if(pinBuf.length===4){ var c=pinBuf; pinBuf=""; setTimeout(function(){ pinComplete(c); },120); } }
 function login(p){ E.abrirSesion(p); pinTarget=null; arrancarApp(true); var n=ALLV.filter(puedeVer).filter(function(v){ return v!=="inicio"&&v!=="retro"; }).length;
   U.aviso("Hola, "+p.n.split(" ")[0]+". Entras a "+(VIEWS[casa()]||{t:""}).t+" · "+n+(n===1?" área":" áreas")+" de tu cargo",{historial:false}); }
-function logout(msg){ if(AV) AV.cerrar(); E.cerrarSesion(msg||""); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
+function logout(msg){ if(AV) AV.cerrar(); if(window.EA_NUBE) EA_NUBE.salir(); E.cerrarSesion(msg||""); USER=null; vaciarMarcos(); $("app").hidden=true; $("login").hidden=false; $("whoStep").hidden=false; $("pinStep").hidden=true; renderPeople(); if(msg) U.aviso(msg); }
 $("peopleList").addEventListener("click",function(e){ var b=e.target.closest("[data-p]"); if(b) openPin(E.EQUIPO[+b.dataset.p]); });
 $("pad").addEventListener("click",function(e){ var b=e.target.closest("[data-k]"); if(b) pinKey(b.dataset.k); });
 $("pinBack").addEventListener("click",function(){ pinTarget=null; $("pinStep").hidden=true; $("whoStep").hidden=false; });
@@ -608,12 +639,61 @@ function subtitulo(){
   $("cfgChip").title=g.ts?"Aplicada el "+fecha(g.ts)+(g.por?" por "+g.por:""):"";
   $("borradorBtn").hidden=!(dir&&pc&&cur!=="prueba"); $("borradorBtn").textContent=pc+(pc===1?" cambio":" cambios")+" en Prueba";
 }
-function red(){ var on=navigator.onLine!==false; $("netDot").className="dot"+(on?" live":" off"); $("netTxt").textContent=on?"En línea":"Sin internet · todo sigue en este equipo"; }
-addEventListener("online",red); addEventListener("offline",red);
+/* La sesión con PIN abre también la sesión en la nube (si este equipo está conectado). */
+function nubeSesion(p,code){ if(!window.EA_NUBE||!EA_NUBE.activa()) return; E.hashPin(p.n,code).then(function(h){ return EA_NUBE.ingresar(p.n,h); }).then(function(r){ red(); }); }
+var NUBE_TXT={"al día":"Nube al día","conectando":"Conectando con la nube…","pendiente":"Nube · subiendo cambios","sin conexión":"Sin conexión con la nube · todo sigue en este equipo","clave incorrecta":"Nube · clave del local incorrecta","falta ingresar":"Nube · ingresa con tu PIN para subir","sin permiso":"Nube · tu cargo no sube ese dato"};
+function red(){ var on=navigator.onLine!==false, n=window.EA_NUBE?EA_NUBE.estado():{activa:false}, txt, cls;
+  if(!on){ cls="off"; txt="Sin internet · todo sigue en este equipo"+(n.activa&&n.pendientes?" · "+n.pendientes+" por subir":""); }
+  else if(!n.activa){ cls="live"; txt="En línea"; }
+  else { cls=n.modo==="al día"?"live":n.modo==="conectando"||n.modo==="pendiente"?"warn":"off"; txt=(NUBE_TXT[n.modo]||"Nube")+(n.pendientes&&n.modo!=="al día"?" · "+n.pendientes+" por subir":""); }
+  $("netDot").className="dot"+(cls?" "+cls:""); $("netTxt").textContent=txt; $("netChip").title=n.activa?(n.error||"")+(n.visto?" · última sincronización "+new Date(n.visto).toLocaleTimeString("es-CL"):""):"";
+  if(cur==="versiones") pintarNube(); }
+addEventListener("online",red); addEventListener("offline",red); addEventListener("ea-nube",red);
+/* ---------- Nube (Versiones) ---------- */
+function pintarNube(){ if(!window.EA_NUBE||!$("nubeTile")) return; var n=EA_NUBE.estado(), act=n.activa, foco=document.activeElement;
+  if(foco!==$("nubeUrl")&&!$("nubeUrl").value) $("nubeUrl").value=n.url||"";
+  if(foco!==$("nubeNombre")&&!$("nubeNombre").value) $("nubeNombre").value=n.equipo||"";
+  $("nubeDot").className="dot"+(!act?"":n.modo==="al día"?" live":n.modo==="conectando"||n.modo==="pendiente"?" warn":" off");
+  $("nubeEstTxt").textContent=!act?"Sin nube":(NUBE_TXT[n.modo]||n.modo)+(n.pendientes?" · "+n.pendientes+" por subir":"");
+  var tk=null; try{ tk=JSON.parse(localStorage.getItem("eapos_nube_tk")||"null"); }catch(e){}
+  var conSesion=!!(tk&&USER&&tk.n===USER.n&&tk.exp>Date.now());
+  $("nubeSubir").hidden=act; $("nubeTraer").hidden=act; $("nubeYa").hidden=!act; $("nubeOff").hidden=!act;
+  $("nubeIngresar").hidden=!act||conSesion; $("nubePinL").hidden=act&&conSesion;
+  $("nubeSub").textContent=act?"Este equipo ("+(n.equipo||"sin nombre")+") sincroniza con "+(n.url||location.host)+(n.visto?" · última vez "+new Date(n.visto).toLocaleTimeString("es-CL"):""):"Comparte ventas, fila, comandas, stock y configuración entre equipos. Sin nube, todo sigue en este equipo."; }
+function nubeConf(){ var c=$("nubeClave").value.trim(), prev=EA_NUBE.estado(); return {url:$("nubeUrl").value.trim().replace(/\/+$/,""), clave:c||undefined, nombre:$("nubeNombre").value.trim()||prev.equipo||"Equipo"}; }
+/* Con el PIN de quien está en el sistema se abre su sesión en el servidor. */
+function nubePinOk(){ var pin=$("nubePin").value.trim(); if(!/^\d{4}$/.test(pin)) return Promise.reject(new Error("Escribe tu PIN de 4 dígitos"));
+  return E.verificarPin(USER.n,pin).then(function(ok){ if(ok!==true) throw new Error("PIN incorrecto"); return E.hashPin(USER.n,pin); }); }
+function nubeMsg(t,err){ $("nubeMsg").textContent=t; $("nubeMsg").className="nube-msg"+(err?" err":""); }
+function nubeError(e){ return e&&e.status===401?"La clave del local no coincide con la del servidor":e&&/fetch|network|load/i.test(e.message||"")?"No se pudo llegar al servidor. Revisa la dirección (y que tenga https)":(e&&e.message)||"Error"; }
+$("nubeProbar").addEventListener("click",function(){ var c=nubeConf(); if(!c.clave&&!EA_NUBE.estado().configurada) return nubeMsg("Escribe la clave del local",true); nubeMsg("Probando…");
+  EA_NUBE.probar(c).then(function(s){ nubeMsg("Conexión correcta · "+(s.base||"PostgreSQL")+" · "+(s.ventas||0)+" ventas y "+(s.claves||0)+" datos en la nube"); }).catch(function(e){ nubeMsg(nubeError(e),true); }); });
+function nubeConectar(modo){ var c=nubeConf(); if(!c.clave&&!EA_NUBE.estado().configurada) return nubeMsg("Escribe la clave del local",true);
+  nubePinOk().then(function(h){
+  var txt=modo==="traer"?"Este equipo va a reemplazar sus datos compartidos por los de la nube. ¿Seguir?":"Lo de este equipo se sube y se junta con lo que ya haya en la nube. ¿Seguir?";
+  Promise.resolve(confirm(txt)).then(function(ok){ if(!ok) return; nubeMsg("Conectando…");
+    EA_NUBE.conectar(c,modo,{nombre:USER.n, huella:h}).then(function(){ $("nubeClave").value=""; $("nubePin").value=""; nubeMsg(modo==="traer"?"Listo: este equipo trajo los datos de la nube":"Listo: subiendo lo de este equipo");
+      E.seguridad.registrar({tipo:"nube", quien:USER.n, rol:USER.r, recurso:"nube", detalle:(modo==="traer"?"conectó y trajo":"conectó y subió")+" · "+(c.url||location.host)});
+      pintarNube(); red(); }).catch(function(e){ nubeMsg(nubeError(e),true); }); }); }).catch(function(e){ nubeMsg(e.message,true); }); }
+$("nubeIngresar").addEventListener("click",function(){ nubePinOk().then(function(h){ $("nubePin").value=""; nubeMsg("Abriendo sesión…");
+  return EA_NUBE.ingresar(USER.n,h).then(function(r){ nubeMsg(r?"Sesión abierta en la nube como "+r.nombre:EA_NUBE.estado().error||"No se pudo abrir la sesión",!r); pintarNube(); red(); }); }).catch(function(e){ nubeMsg(e.message,true); }); });
+$("nubeSubir").addEventListener("click",function(){ nubeConectar("subir"); });
+$("nubeTraer").addEventListener("click",function(){ nubeConectar("traer"); });
+$("nubeYa").addEventListener("click",function(){ EA_NUBE.sincronizar(); nubeMsg("Sincronizando…"); });
+/* En la pantalla de ingreso: si el sistema viene del servidor, se ofrece unir este equipo. */
+if(window.EA_NUBE&&!EA_NUBE.estado().configurada) EA_NUBE.detectar().then(function(s){ if(s&&!EA_NUBE.activa()) $("nubeLogin").hidden=false; });
+$("nubeLogin").addEventListener("submit",function(e){ e.preventDefault(); var c=$("nubeLoginClave").value.trim(), m=$("nubeLoginMsg");
+  if(!c){ m.className="nube-msg err"; m.textContent="Escribe la clave del local"; return; }
+  m.className="nube-msg"; m.textContent="Conectando…";
+  EA_NUBE.conectar({url:"", clave:c, nombre:$("nubeLoginNombre").value.trim()||"Equipo"},"traer").then(function(){
+    $("nubeLogin").hidden=true; $("nubeLoginClave").value=""; renderPeople(); red();
+    U.aviso("Equipo conectado a la nube: ya puedes ingresar con tu PIN de siempre",{historial:false}); })
+  .catch(function(err){ m.className="nube-msg err"; m.textContent=nubeError(err); }); });
+$("nubeOff").addEventListener("click",function(){ EA_NUBE.desconectar(); nubeMsg("Este equipo dejó de sincronizar; sus datos quedan aquí."); pintarNube(); red(); });
 function renderView(){
   if(!USER) return;
   if(cur==="inicio") renderDash();
-  if(cur==="versiones"){ pintarVersiones(); pintarAccesos(); pintarPerimetro(); pintarBitacora(); }
+  if(cur==="versiones"){ pintarVersiones(); pintarAccesos(); pintarPerimetro(); pintarBitacora(); pintarNube(); }
   if(cur==="retro") pintarRetro();
   renderPanorama(cur); refrescarAvisos();
 }

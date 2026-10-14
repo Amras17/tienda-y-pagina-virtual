@@ -65,8 +65,11 @@ Todas esas ventanas comparten también **la sesión**: quien ingresa último que
 módulo revisa el cargo de esa persona al abrirse (fuera de su área responde 403) y al guardar.
 
 Un segundo equipo (una tablet en el horno, otro computador en la panadería) guarda **sus propios datos**:
-no ve las ventas ni los pedidos del Mac. Para la Prueba nº1, usa un solo Mac con una ventana por puesto.
-Compartir entre equipos necesita un servidor y queda para una versión siguiente.
+no ve las ventas ni los pedidos del Mac, salvo que el local tenga **nube** (v3.3).
+
+Con la nube en Google Cloud, todos los equipos comparten ventas, pedidos, comandas y stock. Ver
+[NUBE-GOOGLE-CLOUD.md](NUBE-GOOGLE-CLOUD.md). Este Mac sube su información la primera vez desde
+**Versiones y accesos → Nube · Google Cloud SQL → Conectar y subir lo de este equipo**.
 
 ## 6. Comprobar que quedó bien
 

@@ -1,0 +1,7 @@
+# Lo que no se sube a Google Cloud al desplegar
+.gcloudignore
+.git
+.gitignore
+**/node_modules/
+verificacion/
+*.command

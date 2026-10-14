@@ -68,7 +68,9 @@
       if(por[k]) por[k].q+=l.q; else { por[k]=Object.assign({},l,{mod:(l.mod||[]).slice()}); out.push(por[k]); } }); });
     return out; }
   function rehacer(g){ var p=g.pedido; if(!p) return;
-    if(!Array.isArray(p.rondas)) p.rondas=[{n:1, lineas:p.lineas||[], ts:p.ts, cuando:p.cuando, enviado:p.enviado||null, por:""}];
+    if(!Array.isArray(p.rondas)) p.rondas=[{id:"r1"+(p.ts||""), n:1, lineas:p.lineas||[], ts:p.ts, cuando:p.cuando, enviado:p.enviado||null, por:""}];
+    /* Cada ronda tiene id: así dos equipos que agregan rondas a la misma mesa no se pisan. */
+    p.rondas.forEach(function(r){ if(!r.id) r.id=nid("r"); });
     p.rondas=p.rondas.filter(function(r){ return r.lineas&&r.lineas.length; });
     p.rondas.forEach(function(r,i){ r.n=i+1; });
     p.lineas=sumar(p.rondas);
@@ -82,7 +84,7 @@
     return con(function(d){ var g=buscar(d,id); if(!g) return null;
     var ya=g.pedido&&g.pedido.enviado, ts=new Date().toISOString();
     g.pedido={lineas:lineas, ts:ts, cuando:cuando==="ahora"?"ahora":"despues", codigo:codigo||"", enviado:null,
-      rondas:[{n:1, lineas:lineas, ts:ts, cuando:cuando==="ahora"?"ahora":"despues", enviado:ya||(cuando==="ahora"?ts:null), por:""}]};
+      rondas:[{id:nid("r"), n:1, lineas:lineas, ts:ts, cuando:cuando==="ahora"?"ahora":"despues", enviado:ya||(cuando==="ahora"?ts:null), por:""}]};
     rehacer(g); return g; }, yaEnviado?"fila.cambiarComandado":"fila.operar", yaEnviado?"pedido ya comandado de Nº "+g0.num:"pedido"); }
   /* Agrega una ronda. Sale ya a Comandas si es "ahora" o si el grupo ya está
      sentado o es para llevar; si espera mesa, sale al sentarse. */
@@ -92,7 +94,7 @@
       var ts=new Date().toISOString(), sale=cuando==="ahora"||g.estado==="sentado"||(g.destino==="llevar"&&cuando!=="despues");
       if(!g.pedido) g.pedido={lineas:[], ts:ts, cuando:"ahora", codigo:"", enviado:null, rondas:[]};
       rehacer(g); if(!g.pedido) g.pedido={lineas:[], ts:ts, cuando:"ahora", codigo:"", enviado:null, rondas:[]};
-      g.pedido.rondas.push({n:g.pedido.rondas.length+1, lineas:lineas.map(function(l){ return {id:l.id, n:l.n, q:l.q, p:l.p, mod:(l.mod||[]).slice(), nota:l.nota||""}; }),
+      g.pedido.rondas.push({id:nid("r"), n:g.pedido.rondas.length+1, lineas:lineas.map(function(l){ return {id:l.id, n:l.n, q:l.q, p:l.p, mod:(l.mod||[]).slice(), nota:l.nota||""}; }),
         ts:ts, cuando:sale?"ahora":"despues", enviado:sale?ts:null, por:por||""});
       g.cobrado=null; rehacer(g); return g; }, "pedido.tomar", "ronda"); }
   /* Quita una línea de una ronda: si la ronda ya salió a cocina, lo hace o lo

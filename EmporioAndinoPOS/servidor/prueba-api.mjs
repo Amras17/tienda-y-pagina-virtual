@@ -1,0 +1,35 @@
+/* Prueba de la API del servidor (con una base vacía).
+   NUBE_URL=http://localhost:8901 CLAVE=local-123 node prueba-api.mjs */
+import crypto from "crypto";
+const U = (process.env.NUBE_URL || "http://localhost:8901").replace(/\/+$/, ""), H = { "Content-Type": "application/json", "X-Clave-Local": process.env.CLAVE || "local-123" };
+const huella = (n, p) => crypto.createHash("sha256").update("emporio|" + n + "|" + p).digest("hex");
+const ok = (c, m, x) => { console.log((c ? "OK   " : "MAL  ") + m + (x ? " · " + JSON.stringify(x).slice(0, 160) : "")); if (!c) process.exitCode = 1; };
+const api = async (met, ruta, cuerpo, ses, eq) => { const r = await fetch(U + ruta, { method: met, headers: { ...H, ...(ses ? { "X-Sesion": ses } : {}), "X-Equipo": eq || "pc1", "X-Equipo-Nombre": eq || "pc1" }, body: cuerpo ? JSON.stringify(cuerpo) : undefined }); return { s: r.status, j: await r.json() }; };
+let r = await api("PUT", "/api/kv/es_pins", { valor: { "Constanza Veliz": huella("Constanza Veliz", "1234"), "Wilbert Escalona": huella("Wilbert Escalona", "5555") }, base: 0 });
+ok(r.s === 200, "crear PIN nuevos sin sesión", r.j.version);
+r = await api("PUT", "/api/kv/es_pins", { valor: { "Constanza Veliz": "otra" }, base: 0 });
+ok(r.s === 403, "cambiar un PIN existente sin dirección: 403");
+r = await api("POST", "/api/sesion", { nombre: "Constanza Veliz", huella: huella("Constanza Veliz", "9999") }); ok(r.s === 403, "PIN incorrecto: 403");
+r = await api("POST", "/api/sesion", { nombre: "Constanza Veliz", huella: huella("Constanza Veliz", "1234") }); ok(r.s === 200 && r.j.sesion, "sesión de dirección", r.j.rol); const sC = r.j.sesion;
+r = await api("POST", "/api/sesion", { nombre: "Wilbert Escalona", huella: huella("Wilbert Escalona", "5555") }); const sW = r.j.sesion;
+r = await api("PUT", "/api/kv/ea_pos", { valor: { ventas: [] }, base: 0 }); ok(r.s === 401, "guardar sin sesión: 401");
+r = await api("PUT", "/api/kv/eapos_cfg", { valor: { v: 9 }, base: 0 }, sW); ok(r.s === 403, "garzón cambia la configuración: 403");
+const v1 = { id: "V1", ts: "2026-10-14T15:00:00Z", resp: "Wilbert Escalona", modo: "local", pago: "debito", total: 8000, propina: 800, lineas: [{ id: "Ee-pino", n: "Pino", q: 2, p: 4000, mod: [] }], fila: { mesa: 3, grupo: "g1" } };
+r = await api("PUT", "/api/kv/ea_pos", { valor: { cfg: { umbral: 6 }, ventas: [v1] }, base: 0 }, sW, "caja1"); ok(r.s === 200, "caja 1 guarda su venta", r.j.version); const vBase = r.j.version;
+const v2 = { id: "V2", ts: "2026-10-14T15:05:00Z", resp: "Constanza Veliz", modo: "llevar", pago: "efectivo", total: 4300, propina: 0, lineas: [{ id: "latte", n: "Latte", q: 1, p: 4000, mod: [{ id: "vegetal", n: "Leche vegetal", p: 300 }] }] };
+const v3 = { id: "V3", ts: "2026-10-14T15:06:00Z", resp: "Wilbert Escalona", modo: "local", pago: "credito", total: 7500, propina: 750, lineas: [{ id: "chileno", n: "Chileno", q: 1, p: 7500, mod: [] }] };
+r = await api("PUT", "/api/kv/ea_pos", { valor: { cfg: { umbral: 6 }, ventas: [v1, v2] }, base: vBase }, sC, "caja2"); ok(r.s === 200, "caja 2 vende sobre la misma base");
+r = await api("PUT", "/api/kv/ea_pos", { valor: { cfg: { umbral: 6 }, ventas: [v1, v3] }, base: vBase }, sW, "caja1");
+ok(r.s === 200 && r.j.valor.ventas.map(v => v.id).join() === "V1,V3,V2" && r.j.fusionado, "caja 1 guarda sin haber visto la de caja 2: se fusionan las tres", r.j.valor.ventas.map(v => v.id));
+r = await api("GET", "/api/cambios?desde=0"); ok(r.j.cambios.length === 2 && r.j.ultimo > 0, "cambios para otro equipo", r.j.cambios.map(c => c.clave));
+r = await api("GET", "/api/ventas-por-dia", null, sW); ok(r.s === 403, "garzón pide reporte en pesos: 403");
+r = await api("GET", "/api/ventas-por-dia", null, sC); ok(r.s === 200 && r.j[0] && +r.j[0].tickets === 3 && +r.j[0].ventas === 19800, "ventas por día desde SQL (3 tickets, $19.800)", r.j[0]);
+r = await api("POST", "/api/bitacora", { entradas: [{ ts: new Date().toISOString(), tipo: "ingreso", quien: "Constanza Veliz", h: "abc123" }, { ts: new Date().toISOString(), tipo: "ingreso", quien: "Constanza Veliz", h: "abc123" }] }, null, "caja1");
+ok(r.j.recibidas === 1, "bitácora sin duplicados", r.j);
+r = await api("GET", "/api/cambios?desde=0"); const vp = r.j.cambios.find(c => c.clave === "es_pins").version;
+r = await api("PUT", "/api/kv/es_pins", { valor: { "Constanza Veliz": huella("Constanza Veliz", "1234") }, base: vp });
+ok(r.s === 200 && r.j.valor["Wilbert Escalona"], "borrar un PIN sin dirección no lo borra", Object.keys(r.j.valor));
+r = await api("PUT", "/api/kv/es_pins", { valor: { "Constanza Veliz": huella("Constanza Veliz", "1234") }, base: r.j.version }, sC);
+ok(r.s === 200 && !r.j.valor["Wilbert Escalona"], "dirección restablece un PIN", Object.keys(r.j.valor));
+r = await fetch(U + "/servidor/servidor.js"); ok(r.status === 404, "el código del servidor no se publica");
+r = await fetch(U + "/index.html"); ok(r.status === 200, "el sistema se sirve en la misma dirección");

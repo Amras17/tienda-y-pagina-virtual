@@ -1,0 +1,21 @@
+{
+  "name": "emporioandinopos-servidor",
+  "version": "3.3.0",
+  "private": true,
+  "description": "Servidor de EmporioAndinoPOS: sirve el sistema y guarda los datos en Google Cloud SQL (PostgreSQL)",
+  "main": "servidor.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node servidor.js",
+    "esquema": "node -e \"require('./servidor.js').aplicarEsquema().then(()=>{console.log('Esquema listo');process.exit(0)},e=>{console.error(e.message);process.exit(1)})\"",
+    "prueba": "node prueba-api.mjs",
+    "prueba-nube": "node prueba-nube.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}

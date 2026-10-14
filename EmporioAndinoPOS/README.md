@@ -1,4 +1,4 @@
-# EmporioAndinoPOS v3.2
+# EmporioAndinoPOS v3.3
 
 Sistema gastronómico y punto de venta de Emporio Andino (San Pedro de Atacama), unificado.
 
@@ -26,6 +26,10 @@ nucleo/emporio.css  sistema de diseño de Emporio System 1.1, común a todas las
 nucleo/emporio.js   comportamientos de Emporio System 1.1 (resortes, indicador, mosaicos, atmósfera, avisos)
 nucleo/tema.js      elige el tema (nativo o Carta Andina) en cada página
 nucleo/tema-andino.css  tema #2 Carta Andina para todas las capas
+nucleo/nube.js      sincroniza con el servidor en Google Cloud (si el equipo está conectado)
+nucleo/fusion.js    fusión de tres vías (la usan el servidor y las pruebas)
+servidor/           servidor para Google Cloud Run + Cloud SQL (PostgreSQL): API, política y esquema
+Dockerfile          imagen del servidor para Cloud Run
 ```
 
 Cómo fluye el dato:
@@ -36,6 +40,39 @@ Cómo fluye el dato:
 3. La **Caja**, la **Carta**, el **Control de Salón** y las **Comandas** leen esa versión. La Caja vende,
    descuenta stock (`ea_control`, el mismo que marca el Salón y suma el horno) y cada venta aparece en
    Comandas.
+
+## Nube con Google Cloud SQL (v3.3)
+
+Compatibilidad comprobada con **PostgreSQL 16**, la misma versión mayor que ofrece Cloud SQL. Se
+probó el servidor en su contenedor (Dockerfile), conectado por el socket `/cloudsql/PROYECTO:REGION:INSTANCIA`
+igual que en Cloud Run. Guía paso a paso para contratar y cargar: **[NUBE-GOOGLE-CLOUD.md](NUBE-GOOGLE-CLOUD.md)**.
+
+- **Sin nube no cambia nada**: cada equipo guarda en su navegador como siempre.
+- **Con nube**, el servidor (`servidor/servidor.js`, Node + Express + pg) sirve el sistema y una API.
+  `nucleo/nube.js` sube cada dato compartido al cambiar. Las claves que se comparten son: ventas
+  `ea_pos`, `ea_control`, fila y pedidos, comandas, horno, panadería, configuración, versiones, Prueba,
+  carta, retroalimentación y PIN. Cada 4 s trae lo que cambiaron los demás equipos.
+- **Dos cajas a la vez**: el servidor junta los cambios contra la versión que ambas conocían
+  (fusión de tres vías, `nucleo/fusion.js`). Las listas con `id` (ventas, grupos, rondas, pedidos,
+  tandas) se juntan por id, así no se pierde ninguna venta.
+- **Sin internet**: el equipo sigue funcionando; los cambios quedan pendientes y se suben al volver.
+- **Seguridad en el servidor**: clave del local (401). Sesión firmada que se abre con el mismo PIN
+  del ingreso. Política de cargos leída de `nucleo/nucleo.js`, la misma tabla que usa el navegador
+  (403 si el cargo no guarda ese dato). Crear un PIN nuevo se permite; cambiarlo o borrarlo es solo
+  de dirección o jefatura. Todo queda en la tabla `bitacora`.
+- **Ventas en tablas**: cada venta se vuelca a `ventas` y `venta_lineas` (día en hora de Chile) y
+  queda la vista `ventas_por_dia`, para consultar con SQL, Looker Studio o una planilla.
+- **Conectar un equipo**:
+  - Abierto desde el servidor, la pantalla de ingreso ofrece "Este sistema tiene nube" y basta la
+    clave del local.
+  - Desde otra dirección (el Mac), se conecta en **Versiones → Nube · Google Cloud SQL**. Hay que
+    poner la dirección, la clave y el PIN, y elegir "Conectar y subir lo de este equipo" (la primera
+    carga) o "Conectar y traer de la nube".
+- El chip de red del encabezado muestra "Nube al día", "subiendo cambios" o "Sin conexión con la nube".
+
+Pruebas: `servidor/prueba-api.mjs` (17 de la API) y `servidor/prueba-nube.mjs` (25 con dos
+navegadores: pedido de un equipo al otro, dos ventas a la vez con un equipo sin internet, cambio
+dentro de un módulo, 403 por cargo, unirse desde la pantalla de ingreso y carga desde otra dirección).
 
 ## Pedidos, Caja y Reportes por separado (v3.2)
 

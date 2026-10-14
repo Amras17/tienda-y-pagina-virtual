@@ -1,0 +1,6 @@
+.git
+**/node_modules
+verificacion
+servidor/prueba-*.mjs
+*.command
+Dockerfile

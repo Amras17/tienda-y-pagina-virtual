@@ -1,4 +1,4 @@
-// Agente de verificación de EmporioAndinoPOS 3.2.
+// Agente de verificación de EmporioAndinoPOS 3.3.
 // Levanta un servidor estático sobre la carpeta del paquete, abre cada módulo
 // en Chromium (escritorio y teléfono), recorre sus pantallas principales y
 // prueba los flujos que cruzan módulos:
@@ -711,7 +711,7 @@ for (const v of Object.keys(VISTAS)) {
 await navegador.close();
 servidor.close();
 const fallas = resultados.filter(r => !r.ok);
-const informe = { version: "3.2", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
+const informe = { version: "3.3", fecha: new Date().toISOString(), total: resultados.length, fallas: fallas.length, resultados };
 fs.writeFileSync(path.join(RAIZ, "verificacion", "informe.json"), JSON.stringify(informe, null, 2));
 console.log(`\n${resultados.length - fallas.length}/${resultados.length} pruebas OK`);
 process.exit(fallas.length ? 1 : 0);
